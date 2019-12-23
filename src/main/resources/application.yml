@@ -1,0 +1,11 @@
+app:
+  bank:
+    secret-value: geheim
+    api-key: averylongdifficultapikey
+
+spring:
+  security:
+    user:
+      password: geheim
+      name: admin
+
