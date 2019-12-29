@@ -1,11 +1,18 @@
 app:
   bank:
     secret-value: geheim
-    api-key: averylongdifficultapikey
+    api-key: ${BUNQ_APIKEY:averylongdifficultkey}
 
 spring:
   security:
     user:
-      password: geheim
+      password: ${ADMIN_PASSWORD:geheim}
       name: admin
 
+
+server:
+  port: ${PORT:8080}
+management:
+  endpoints:
+    web:
+      base-path: /_ah

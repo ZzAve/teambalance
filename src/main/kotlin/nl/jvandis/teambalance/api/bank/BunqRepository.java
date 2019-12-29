@@ -16,6 +16,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +26,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BunqRepository {
@@ -82,14 +85,19 @@ public class BunqRepository {
 
     private ApiEnvironmentType environmentType;
 
-    private String apiKey;
+    private final String apiKey;
+    private final Boolean saveSessionToFile;
 
     private User user;
 
+    private static Logger log = LoggerFactory.getLogger(BunqRepository.class);
+
     public BunqRepository(ApiEnvironmentType environmentType,
-                          String apiKey) throws UnknownHostException {
+                          String apiKey,
+                          Boolean saveSessionToFile) throws UnknownHostException {
         this.environmentType = environmentType;
         this.apiKey = apiKey;
+        this.saveSessionToFile = saveSessionToFile;
 
         this.setupContext();
         this.setupCurrentUser();
@@ -97,12 +105,20 @@ public class BunqRepository {
     }
 
 
-    private void createApiConfig() throws UnknownHostException {
-        ApiContext.create(
-                ApiEnvironmentType.PRODUCTION,
+    private ApiContext createApiConfig() throws UnknownHostException {
+        ArrayList<String> permittedIps = new ArrayList<>();
+//        permittedIps.add(Inet4Address.getLocalHost().getHostAddress());
+        permittedIps.add("82.161.37.58");
+        permittedIps.add("*");
+        ApiContext apiContext = ApiContext.create(
+                this.environmentType,
                 apiKey,
                 InetAddress.getLocalHost().getHostName()
-        ).save("bunq-production.conf");
+//                ,
+//                permittedIps
+        );
+//        apiContext.save("bunq-production.conf");
+        return apiContext;
     }
 
     /**
@@ -116,20 +132,23 @@ public class BunqRepository {
      *
      */
     private void setupContext(boolean resetConfigIfNeeded) throws UnknownHostException {
+        ApiContext apiContext;
         if (new File(this.determineBunqConfigFileName()).exists()) {
             // Config is already present.
+            apiContext = ApiContext.restore(this.determineBunqConfigFileName());
         } else if (ApiEnvironmentType.SANDBOX.equals(this.environmentType)) {
             SandboxUser sandboxUser = generateNewSandboxUser();
-            ApiContext.create(ApiEnvironmentType.SANDBOX, sandboxUser.getApiKey(), DEVICE_SERVER_DESCRIPTION).save(this.determineBunqConfigFileName());
+            apiContext = ApiContext.create(ApiEnvironmentType.SANDBOX, sandboxUser.getApiKey(), DEVICE_SERVER_DESCRIPTION);
+
         } else {
-            createApiConfig();
+            log.info("No API config found. Creating new API config.");
+            apiContext = createApiConfig();
+            log.info("Created new API config.");
         }
 
         try {
-            ApiContext apiContext = ApiContext.restore(this.determineBunqConfigFileName());
-
             apiContext.ensureSessionActive();
-            apiContext.save(this.determineBunqConfigFileName());
+            safeSave(apiContext);
 
             BunqContext.loadApiContext(apiContext);
         } catch (ForbiddenException forbiddenException) {
@@ -141,8 +160,17 @@ public class BunqRepository {
         }
     }
 
+    private void safeSave(ApiContext apiContext) {
+        if (saveSessionToFile){
+            apiContext.save(this.determineBunqConfigFileName());
+        } else {
+            log.info("Skipping saving context to file");
+        }
+    }
+
     public void updateContext() {
-        BunqContext.getApiContext().save(this.determineBunqConfigFileName());
+        log.info("Saving context (not)");
+//        BunqContext.getApiContext().save(this.determineBunqConfigFileName());
     }
 
     /**
