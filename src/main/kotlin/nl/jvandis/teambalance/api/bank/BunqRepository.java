@@ -107,18 +107,13 @@ public class BunqRepository {
 
     private ApiContext createApiConfig() throws UnknownHostException {
         ArrayList<String> permittedIps = new ArrayList<>();
-//        permittedIps.add(Inet4Address.getLocalHost().getHostAddress());
-        permittedIps.add("82.161.37.58");
         permittedIps.add("*");
-        ApiContext apiContext = ApiContext.create(
+        return ApiContext.create(
                 this.environmentType,
                 apiKey,
-                InetAddress.getLocalHost().getHostName()
-//                ,
-//                permittedIps
+                InetAddress.getLocalHost().getHostName(),
+                permittedIps
         );
-//        apiContext.save("bunq-production.conf");
-        return apiContext;
     }
 
     /**
@@ -161,7 +156,7 @@ public class BunqRepository {
     }
 
     private void safeSave(ApiContext apiContext) {
-        if (saveSessionToFile){
+        if (saveSessionToFile) {
             apiContext.save(this.determineBunqConfigFileName());
         } else {
             log.info("Skipping saving context to file");

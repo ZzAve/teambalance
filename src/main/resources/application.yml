@@ -1,6 +1,6 @@
 app:
   bank:
-    secret-value: geheim
+    secret-value: ${API_SECRET:geheim}
     api-key: ${BUNQ_APIKEY:averylongdifficultkey}
 
 spring:

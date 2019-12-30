@@ -2,3 +2,4 @@
 *.iml
 target
 /*.conf
+src/main/resources/application-dev.yml
