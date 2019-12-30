@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import java.util.*
 import javax.validation.ConstraintViolationException
 import javax.validation.constraints.Max
@@ -69,6 +70,17 @@ class BankController(
             status = HttpStatus.BAD_REQUEST,
             reason = e.message ?: "Please verify your input arguments"
     )
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleBadInputArguments(e: MethodArgumentTypeMismatchException): Error {
+        log.info("Invalid request arguments received: ", e.message)
+        return Error(
+                status = HttpStatus.BAD_REQUEST,
+                reason = "Please verify your input arguments"
+        )
+    }
+
 
     @ExceptionHandler(Throwable::class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
