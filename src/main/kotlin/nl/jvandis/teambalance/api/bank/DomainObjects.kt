@@ -3,6 +3,11 @@ package nl.jvandis.teambalance.api.bank
 import org.springframework.http.HttpStatus
 import java.time.ZonedDateTime
 
+
+data class BalanceResponse(
+        val balance: String
+)
+
 data class Transactions(
         val transactions: List<Transaction>,
         val limit: Int
@@ -16,7 +21,14 @@ data class Transaction(
 )
 
 data class TransactionsResponse(
-        val transactions: List<Transaction>
+        val transactions: List<TransactionResponse>
+)
+
+data class TransactionResponse(
+        val id: Int,
+        val amount: String,
+        val counterParty: String,
+        val timestamp: Long
 )
 
 data class Error(

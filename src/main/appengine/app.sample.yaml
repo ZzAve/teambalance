@@ -1,0 +1,18 @@
+runtime: java11
+#env: flex
+instance_class: B2
+# Explicitly set the memory limit and maximum heap size for the Spring Boot app
+env_variables:
+  JAVA_TOOL_OPTIONS: "-XX:MaxRAM=256m -XX:ActiveProcessorCount=2 -Xmx64m"
+  BUNQ_APIKEY: <your-api-key>
+  API_SECRET: <your-secret>>
+  ADMIN_PASSWORD: <your-password>
+entrypoint: java -jar teambalance-0.0.1-SNAPSHOT.jar
+basic_scaling:
+  max_instances: 1
+  idle_timeout: 30m
+handlers:
+  - url: /.*
+    script: auto
+    secure: always
+    redirect_http_response_code: 301

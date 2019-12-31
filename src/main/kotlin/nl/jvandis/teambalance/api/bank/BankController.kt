@@ -26,10 +26,10 @@ class BankController(
     @GetMapping("/balance")
     fun getBalance(
             @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
-    ): String {
+    ): BalanceResponse {
         ensureSecret(secret)
 
-        return bankService.getBalance()
+        return bankService.getBalance().toResponse()
     }
 
     @GetMapping("/transactions")
@@ -41,21 +41,29 @@ class BankController(
 
 
         return bankService.getTransactions(limit).let {
-            TransactionsResponse(transactions = it.transactions)
+            TransactionsResponse(transactions = it.transactions.toResponse())
         }
     }
 
-    private fun ensureSecret(secret: String?): String = secret
-            ?.let {
-                val decoded = Base64.getDecoder().decode(it)
-                String(decoded, Charsets.UTF_8)
-            }
-            .let {
-                if (it != validSecretValue) {
-                    throw InvalidSecretException("There was no secret provided, or value was not valid")
-                }
-                it
-            }
+    private fun ensureSecret(secret: String?) {
+        val decodedSecret = decodeSecret(secret)
+        if (decodedSecret != validSecretValue) {
+            throw InvalidSecretException("There was no secret provided, or value was not valid")
+        }
+    }
+
+    private fun decodeSecret(secret: String?): String? = secret?.let {
+        try {
+            val decoded = Base64.getDecoder().decode(it)
+            String(decoded, Charsets.UTF_8)
+        } catch (t: Throwable) {
+            log.error("Could not parse secret because of encoding issue ($secret)", t)
+            null
+        }
+    }
+
+
+    private fun String.toResponse() = BalanceResponse(this)
 
     @ExceptionHandler(InvalidSecretException::class)
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
@@ -92,6 +100,17 @@ class BankController(
         )
     }
 }
+
+private fun  List<Transaction>.toResponse() = map{
+        TransactionResponse(
+                id = it.id,
+                amount = it.amount,
+                counterParty = it.counterParty,
+                timestamp = it.date.toEpochSecond()
+        )
+    }
+
+
 
 class InvalidSecretException(msg: String) : RuntimeException(msg)
 
