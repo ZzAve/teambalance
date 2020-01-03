@@ -13,7 +13,7 @@ module.exports = {
         path: path.resolve(__dirname, "src/main/webapp"),
     },
 
-    devtool: "eval-source-map",
+    devtool: "cheap-module-source-map",
     module: {
         rules: [
             {

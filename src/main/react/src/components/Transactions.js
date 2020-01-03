@@ -7,6 +7,9 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
 
 
 const useStyles = makeStyles({
@@ -15,14 +18,31 @@ const useStyles = makeStyles({
         overflowX: 'auto',
     },
     table: {
-        minWidth: 650,
-        maxWidth: 1024
+        // minWidth: 650,
+        // maxWidth: 1024
     },
+    alignCenter: {
+        // flexDirection:"column",
+        alignItems:"center",
+        justifyContent:"center",
+        display:"flex",
+        minHeight: 150
+    }
+
 });
 
-const Transactions = ({ transactions }) => {
+const Transactions = ({transactions}) => {
     const classes = useStyles();
-
+    if (transactions.length === 0) {
+        return (
+            <div className={classes.alignCenter}>
+                {/*<Grid item xs={12} >*/}
+                    {/*<Typography variant="h6">Transactions</Typography>*/}
+                    <CircularProgress/>
+                {/*</Grid>*/}
+            </div>
+        )
+    }
     return (
 
         <TableContainer component={Paper}>
