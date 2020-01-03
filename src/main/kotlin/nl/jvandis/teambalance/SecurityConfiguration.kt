@@ -30,6 +30,8 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .antMatchers("/**.js").permitAll()
                 .antMatchers("/**.css").permitAll()
                 .antMatchers("/**.ico").permitAll()
+                .antMatchers("/**.png").permitAll()
+                .antMatchers("/**.jpg").permitAll()
                 .antMatchers("/manifest.json").permitAll()
                 .antMatchers("/").permitAll()
                 .anyRequest().authenticated()

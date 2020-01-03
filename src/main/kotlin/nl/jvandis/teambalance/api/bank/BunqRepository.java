@@ -18,6 +18,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.io.File;
 import java.io.IOException;
@@ -164,8 +165,7 @@ public class BunqRepository {
     }
 
     public void updateContext() {
-        log.info("Saving context (not)");
-//        BunqContext.getApiContext().save(this.determineBunqConfigFileName());
+        safeSave(BunqContext.getApiContext());
     }
 
     /**

@@ -40,7 +40,7 @@ class BankController(
         ensureSecret(secret)
 
 
-        return bankService.getTransactions(limit).let {
+        return bankService.getTransactions(limit,0).let {
             TransactionsResponse(transactions = it.transactions.toResponse())
         }
     }
