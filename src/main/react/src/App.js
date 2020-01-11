@@ -92,6 +92,9 @@ const OverviewGrid = ({ state, loadingState }) => {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Card>
+              <CardHeader title="Transacties"/>
+            </Card>
+            <Card>
               <Transactions transactions={state.transactions} isLoading={loadingState.loadingTransactions} />
             </Card>
           </Grid>
@@ -184,7 +187,7 @@ const App = () => {
           "X-Secret": btoa(secret)
         }
       },
-      2000
+      5000
     ).then(res => {
       if (!res.ok) {
         if (res.status === 403) {

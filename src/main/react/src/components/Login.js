@@ -39,7 +39,7 @@ const Login = ({ loading, setSecret }) => {
 
   useEffect(
     _ => {
-      console.log("Loading state changed to ", loading);
+      // console.log("Loading state changed to ", loading);
       setUpdate(state => ({ ...state, shouldUpdate: loading }));
     },
     [loading]
