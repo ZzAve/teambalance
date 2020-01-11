@@ -1,8 +1,6 @@
 package nl.jvandis.teambalance.api.bank
 
-import org.springframework.http.HttpStatus
 import java.time.ZonedDateTime
-
 
 data class BalanceResponse(
         val balance: String
@@ -31,7 +29,3 @@ data class TransactionResponse(
         val timestamp: Long
 )
 
-data class Error(
-        val status: HttpStatus,
-        val reason: String
-)
