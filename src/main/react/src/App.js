@@ -27,7 +27,7 @@ const TopBar = ({ authenticated, handleRefresh, setSecret }) => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} alignItems="center">
           <Grid item xs>
             <Typography variant="h6">Tovo Heren 5 Teampot</Typography>
           </Grid>
