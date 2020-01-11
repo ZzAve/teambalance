@@ -25,6 +25,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .authorizeRequests()
                 .antMatchers("/api/bank/**").permitAll()
                 .antMatchers("/api/authentication/**").permitAll()
+                .antMatchers("/images/**").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/_ah/**").permitAll()
                 .antMatchers("/**.html").permitAll()
