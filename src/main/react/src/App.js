@@ -104,6 +104,8 @@ const OverviewGrid = ({ state, loadingState }) => {
   );
 };
 
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
 const PageItem = ({ title, children }) => {
   return (
     <Grid item xs={12}>
@@ -176,18 +178,18 @@ const App = () => {
     callBankAPI();
   }, [authenticated]);
 
-  const apiCall = (path, method = "GET") => {
+  const apiCall = (path, method = "GET", timeout= 5000, minDelay = 750) => {
     // console.log(`Calling  ${method} ${path}`);
-    return fetchWithTimeout(
-      `/api/${path}`,
-      {
-        method: method,
-        headers: {
-          Accept: "application/json",
-          "X-Secret": btoa(secret)
-        }
-      },
-      5000
+    const apiResult = fetchWithTimeout(
+        `/api/${path}`,
+        {
+          method: method,
+          headers: {
+            Accept: "application/json",
+            "X-Secret": btoa(secret)
+          }
+        },
+        timeout
     ).then(res => {
       if (!res.ok) {
         if (res.status === 403) {
@@ -202,6 +204,10 @@ const App = () => {
 
       return res.json();
     });
+
+    return Promise.all([apiResult,delay(minDelay)])
+        .then(([result,_]) => result
+        );
   };
 
   const authenticate = _ => {
