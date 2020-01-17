@@ -1,9 +1,6 @@
 package nl.jvandis.teambalance.api.training
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import javax.persistence.*
 
 
 data class Users(
@@ -15,7 +12,7 @@ data class User(
         @GeneratedValue
         @Id val id: Long,
         @Column(nullable = false) val name: String,
-        @Column(nullable = false) val role: Role
+        @Enumerated(EnumType.STRING) @Column(nullable = false) val role: Role
 ) {
 
     constructor(name: String, role: Role) : this(0, name, role)
