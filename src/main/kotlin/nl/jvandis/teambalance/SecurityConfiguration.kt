@@ -22,9 +22,11 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/bank/**").permitAll()
                 .antMatchers("/api/authentication/**").permitAll()
+                .antMatchers("/api/users/**").permitAll() //TODO: do not commit me
                 .antMatchers("/images/**").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/_ah/**").permitAll()
