@@ -1,4 +1,4 @@
-package nl.jvandis.teambalance.api.training
+package nl.jvandis.teambalance.api.users
 
 import javax.persistence.*
 

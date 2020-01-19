@@ -27,8 +27,9 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .authorizeRequests()
                 .antMatchers("/api/bank/**").permitAll()
                 .antMatchers("/api/authentication/**").permitAll()
-                .antMatchers("/api/users/**").permitAll()
-                .antMatchers("/images/**").permitAll()
+                .antMatchers("/api/users/**").permitAll() // TO BE NOT AVAILABLE FOR EVERYBODY
+                .antMatchers("/api/trainings/**").permitAll() // TO BE NOT AVAILABLEF FOR EVERYBODY
+                .antMatchers("/api/attendees/**").permitAll() // TO BE NOT AVAILABLEF FOR EVERYBODY
                 .antMatchers("/login").permitAll()
                 .antMatchers("/_ah/**").permitAll()
                 .antMatchers("/**.html").permitAll()
