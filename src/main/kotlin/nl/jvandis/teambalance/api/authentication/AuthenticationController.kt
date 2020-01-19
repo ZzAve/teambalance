@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@Api(tags=["authentication", "bank"], position = Int.MIN_VALUE)
+@Api(tags=["authentication"], position = Int.MIN_VALUE)
 @RequestMapping(path = ["api/authentication"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class AuthenticationController(
         private val secretService: SecretService
