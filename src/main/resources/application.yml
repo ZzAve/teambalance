@@ -26,3 +26,9 @@ management:
   endpoints:
     web:
       base-path: /_ah
+
+springfox:
+  documentation:
+    swagger:
+      v2:
+        path: /internal/api-docs

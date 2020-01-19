@@ -1,8 +1,10 @@
 package nl.jvandis.teambalance.api.bank
 
+import io.swagger.annotations.Api
 import nl.jvandis.teambalance.api.SECRET_HEADER
 import nl.jvandis.teambalance.api.SecretService
 import org.slf4j.LoggerFactory
+import org.springframework.http.MediaType
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import javax.validation.constraints.Max
@@ -10,7 +12,8 @@ import javax.validation.constraints.Min
 
 @RestController
 @Validated
-@RequestMapping(path = ["/api/bank"])
+@Api(value = "Bank", tags = ["bank"])
+@RequestMapping(path = ["/api/bank"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class BankController(
         private val bankService: BankService,
         private val secretService: SecretService

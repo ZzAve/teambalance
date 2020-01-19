@@ -1,15 +1,18 @@
 package nl.jvandis.teambalance.api.authentication
 
+import io.swagger.annotations.Api
 import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.InvalidSecretException
 import nl.jvandis.teambalance.api.SECRET_HEADER
 import nl.jvandis.teambalance.api.SecretService
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping(path = ["api/authentication"])
+@Api(tags=["authentication", "bank"], position = Int.MIN_VALUE)
+@RequestMapping(path = ["api/authentication"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class AuthenticationController(
         private val secretService: SecretService
 ) {

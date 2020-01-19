@@ -32,6 +32,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .antMatchers("/api/attendees/**").permitAll() // TO BE NOT AVAILABLEF FOR EVERYBODY
                 .antMatchers("/login").permitAll()
                 .antMatchers("/_ah/**").permitAll()
+                .antMatchers("/swagger-ui.html").fullyAuthenticated()
                 .antMatchers("/**.html").permitAll()
                 .antMatchers("/**.js").permitAll()
                 .antMatchers("/**.css").permitAll()
