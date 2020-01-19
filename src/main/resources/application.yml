@@ -16,9 +16,10 @@ spring:
 
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
-  h2:
-    console:
-      enabled: true
+    open-in-view: false
+  jackson.serialization:
+    WRITE_DATES_AS_TIMESTAMPS: true
+    WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS: false
 
 server:
   port: ${PORT:8080}
