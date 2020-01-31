@@ -43,7 +43,7 @@ fun List<Attendee>.toTrainingResponse(trainingId: Long) = map {
     AttendeeResponse(
             id = it.id,
             trainingId = trainingId,
-            state = it.state,
+            state = it.availability,
             user = it.user
     )
 }

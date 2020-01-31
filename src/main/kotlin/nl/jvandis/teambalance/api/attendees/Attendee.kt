@@ -8,11 +8,12 @@ import java.time.Instant
 import javax.persistence.*
 
 @Entity
+@Table(uniqueConstraints=arrayOf(UniqueConstraint(columnNames=arrayOf("USER_ID", "TRAINING_ID"))))
 data class Attendee(
         @Id @GeneratedValue val id: Long = -1,
-        @ManyToOne val user: User,
-        @Enumerated(EnumType.STRING) @Column(nullable = false) val state: Availability,
-        @ManyToOne val training: Training
+        @ManyToOne @JoinColumn(name = "USER_ID") val user: User,
+        @Enumerated(EnumType.STRING) @Column(nullable = false) val availability: Availability,
+        @ManyToOne @JoinColumn(name="TRAINING_ID") val training: Training
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(javaClass)
@@ -30,7 +31,7 @@ data class Attendee(
 
     constructor(user: User, training: Training) : this(
             user = user,
-            state = Availability.NOT_RESPONDED,
+            availability = Availability.NOT_RESPONDED,
             training = training)
 }
 

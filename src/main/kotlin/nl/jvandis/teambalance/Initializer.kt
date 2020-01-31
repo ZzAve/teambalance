@@ -26,10 +26,12 @@ class Initializer(
     @Bean
     fun sendDatabase(): InitializingBean? {
         return InitializingBean {
-            userRepository.save(User("Julius", Role.DIAGONAL))
-            userRepository.save(User("Maurice", Role.COACH))
-            userRepository.save(User("Bocaj", Role.MID))
-            userRepository.save(User("Joep", Role.PASSER))
+            userRepository.saveAll(listOf(
+                    User("Julius", Role.DIAGONAL),
+                    User("Maurice", Role.COACH),
+                    User("Bocaj", Role.MID),
+                    User("Joep", Role.PASSER))
+            )
 
             log.info("After user injection")
             val users = userRepository.findAll()

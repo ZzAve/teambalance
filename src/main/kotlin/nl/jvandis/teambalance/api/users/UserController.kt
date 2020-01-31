@@ -1,9 +1,13 @@
 package nl.jvandis.teambalance.api.users
 
 import io.swagger.annotations.Api
+import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidUserException
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
@@ -21,6 +25,13 @@ class UserController(
         return Users(users = userRepository.findAll().filterNotNull())
     }
 
+    @GetMapping("/{id}")
+    fun getUser(@PathVariable(value="id") userId: Long): User{
+        log.info("getUser $userId")
+        return userRepository.findByIdOrNull(userId) ?: throw InvalidUserException(userId)
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun postUser(@RequestBody potentialUser: PotentialUser) {
         log.info("postUser $potentialUser")
@@ -42,18 +53,25 @@ class UserController(
                             role = potentialUserUpdate.role ?: it.role
                     )
 
-                    userRepository.save(x)
-
+                    try {
+                        userRepository.save(x)
+                    } catch (e: DataIntegrityViolationException){
+                        throw DataConstraintViolationException("Could not update user $userId to $potentialUserUpdate, name already in use")
+                    }
                 } ?: throw InvalidUserException(userId)
     }
 
-
+    @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun updateUser(
             @PathVariable(value = "id") userId: Long
     ) {
         log.info("deletingUser: $userId")
-        userRepository.deleteById(userId);
+        try {
+            userRepository.deleteById(userId)
+        } catch (e: DataIntegrityViolationException){
+            throw DataConstraintViolationException("User $userId could not be deleted. User is still bound to trainings")
+        }
     }
 
 

@@ -54,6 +54,18 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
     }
 
+    @ExceptionHandler(DataConstraintViolationException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleDataConstraintValidationExceptions(e: DataConstraintViolationException) : ResponseEntity<Error>{
+        return ResponseEntity
+                .badRequest()
+                .body(Error(
+                        status = HttpStatus.BAD_REQUEST,
+                        reason = e.message
+                ))
+
+    }
+
     @ExceptionHandler(Throwable::class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     fun handleUnhandledExceptions(t: Throwable): ResponseEntity<Error> {
@@ -65,4 +77,5 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
                         reason = "Something went wrong. Please try again later"
                 ))
     }
+
 }

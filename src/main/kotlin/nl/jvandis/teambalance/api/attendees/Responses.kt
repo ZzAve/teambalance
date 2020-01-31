@@ -14,7 +14,7 @@ fun List<Attendee>.toResponse() = map {
     AttendeeResponse(
             id = it.id,
             trainingId = it.training.id,
-            state = it.state,
+            state = it.availability,
             user = it.user
     )
 }

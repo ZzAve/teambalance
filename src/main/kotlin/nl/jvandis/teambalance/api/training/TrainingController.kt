@@ -1,11 +1,13 @@
 package nl.jvandis.teambalance.api.training
 
 import io.swagger.annotations.Api
+import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.attendees.*
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -64,7 +66,6 @@ class TrainingController(
     }
 
 
-
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun postUser(@RequestBody potentialTraining: PotentialTraining): Training {
@@ -81,24 +82,21 @@ class TrainingController(
             @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,
             @RequestBody user: UserAddRequest
     ): List<Attendee> {
-        log.info("Adding: $user to training $trainingId")
+        log.info("Adding: $user (or all: $addAll) to training $trainingId")
 
-        return trainingRepository.findById(trainingId).map { training ->
-            val users = if (addAll) {
-                userRepository.findAll()
-            } else {
-                userRepository
-                        .findById(user.userId)
-                        .map(::listOf)
-                        .orElseThrow {
-                            InvalidUserException(user.userId)
-                        }
-            }
+        val training = trainingRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
+        val users = if (addAll) {
+            userRepository.findAll()
+        } else {
+            userRepository
+                    .findByIdOrNull(user.userId)
+                    ?.let(::listOf)
+                    ?: throw InvalidUserException(user.userId)
+        }
 
-            users.map { u ->
-                attendeeRepository.save(u.toAttendee(training))
-            }
-        }.orElseThrow { InvalidTrainingException(trainingId) }
+        return users.map { u ->
+            attendeeRepository.save(u.toAttendee(training))
+        }
     }
 
     @PutMapping("/{training-id}")
@@ -117,11 +115,21 @@ class TrainingController(
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{training-id}")
-    fun updateUser(
-            @PathVariable(value = "training-id") trainingId: Long
+    fun deleteTraining(
+            @PathVariable(value = "training-id") trainingId: Long,
+            @RequestParam(value="deleteAttendees", defaultValue = "false") deleteAttendees : Boolean
     ) {
         log.info("Deleting training: $trainingId")
-        trainingRepository.deleteById(trainingId)
+
+        if (deleteAttendees){
+            attendeeRepository.findAllByTrainingIdIn(listOf(trainingId))
+                    .let { attendeeRepository.deleteAll(it) }
+        }
+        try {
+            trainingRepository.deleteById(trainingId)
+        } catch (e: DataIntegrityViolationException) {
+            throw DataConstraintViolationException("Training $trainingId could not be deleted. There are still attendees bound to this training")
+        }
     }
 
     private fun Training.createUpdatedTraining(updateTrainingRequestBody: UpdateTrainingRequest) = copy(

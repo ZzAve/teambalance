@@ -11,7 +11,7 @@ data class Users(
 data class User(
         @GeneratedValue
         @Id val id: Long,
-        @Column(nullable = false) val name: String,
+        @Column(nullable = false, unique = true) val name: String,
         @Enumerated(EnumType.STRING) @Column(nullable = false) val role: Role
 ) {
 
