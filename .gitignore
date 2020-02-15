@@ -2,8 +2,8 @@
 *.iml
 target
 /*.conf
-src/main/resources/application-dev.yml
 src/main/appengine/app.yaml
 node
 node_modules
 src/main/webapp
+.env
