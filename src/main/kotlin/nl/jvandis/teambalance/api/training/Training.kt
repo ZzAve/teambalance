@@ -8,7 +8,7 @@ import javax.persistence.*
 @Inheritance(
         strategy = InheritanceType.JOINED
 )
-open class Event (
+abstract class Event (
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         open val id: Long,
 
@@ -20,7 +20,7 @@ open class Event (
 
         @Column(nullable = true)
         open val comment: String?
-) {
+){
     constructor() : this(-1, Instant.MIN,"",null)
 }
 
