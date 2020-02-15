@@ -18,7 +18,7 @@ import java.time.Instant
 @Api(tags = ["trainings"])
 @RequestMapping(path = ["/api/trainings"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class TrainingController(
-        private val trainingRepository: TrainingRepository,
+        private val eventRepository: EventRepository,
         private val userRepository: UserRepository,
         private val attendeeRepository: AttendeeRepository
 ) {
@@ -29,10 +29,10 @@ class TrainingController(
             @RequestParam(value = "includeAttendees", defaultValue = "false") includeAttendees: Boolean
     ): TrainingsResponse {
         log.info("GetAllTrainings")
-        return trainingRepository.findAll()
+        return eventRepository.findAll()
                 .filterNotNull()
                 .map {
-                    val attendees = if (includeAttendees) attendeeRepository.findAllByTrainingIdIn(listOf(it.id)).toTrainingResponse(it.id) else null
+                    val attendees = if (includeAttendees) attendeeRepository.findAllByEventIdIn(listOf(it.id)).toTrainingResponse(it.id) else null
                     TrainingResponse(
                             id = it.id,
                             comment = it.comment,
@@ -51,8 +51,8 @@ class TrainingController(
                     @RequestParam(value = "includeAttendees", defaultValue = "false") includeAttendees: Boolean
     ): TrainingResponse {
         log.info("Get training $trainingId")
-        val training = trainingRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
-        val attendees = if (!includeAttendees) null else attendeeRepository.findAllByTrainingIdIn(listOf(trainingId)).toResponse()
+        val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
+        val attendees = if (!includeAttendees) null else attendeeRepository.findAllByEventIdIn(listOf(trainingId)).toResponse()
 
         return training.let {
             TrainingResponse(
@@ -72,7 +72,7 @@ class TrainingController(
         log.info("postTraining $potentialTraining")
         val users = userRepository.findAll()
         val training = potentialTraining.internalize(users)
-        return trainingRepository.save(training)
+        return eventRepository.save(training)
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -84,7 +84,7 @@ class TrainingController(
     ): List<Attendee> {
         log.info("Adding: $user (or all: $addAll) to training $trainingId")
 
-        val training = trainingRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
+        val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
         val users = if (addAll) {
             userRepository.findAll()
         } else {
@@ -105,11 +105,12 @@ class TrainingController(
             @RequestBody updateTrainingRequest: UpdateTrainingRequest
 
     ): Training {
-        return trainingRepository
+        return eventRepository
                 .findByIdOrNull(trainingId)
+                ?.let { if (it is Training) it else null }
                 ?.let {
                     val updatedTraining = it.createUpdatedTraining(updateTrainingRequest)
-                    trainingRepository.save(updatedTraining)
+                    eventRepository.save(updatedTraining)
                 } ?: throw InvalidTrainingException(trainingId)
     }
 
@@ -122,11 +123,11 @@ class TrainingController(
         log.info("Deleting training: $trainingId")
 
         if (deleteAttendees){
-            attendeeRepository.findAllByTrainingIdIn(listOf(trainingId))
+            attendeeRepository.findAllByEventIdIn(listOf(trainingId))
                     .let { attendeeRepository.deleteAll(it) }
         }
         try {
-            trainingRepository.deleteById(trainingId)
+            eventRepository.deleteById(trainingId)
         } catch (e: DataIntegrityViolationException) {
             throw DataConstraintViolationException("Training $trainingId could not be deleted. There are still attendees bound to this training")
         }

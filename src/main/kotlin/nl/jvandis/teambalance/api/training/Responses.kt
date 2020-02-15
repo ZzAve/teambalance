@@ -33,16 +33,16 @@ data class PotentialTraining(
     }
 }
 
-fun User.toAttendee(training: Training) = Attendee(
+fun User.toAttendee(event: Event) = Attendee(
         user = this,
-        training = training
+        event = event
 )
 
 
 fun List<Attendee>.toTrainingResponse(trainingId: Long) = map {
     AttendeeResponse(
             id = it.id,
-            trainingId = trainingId,
+            eventId = trainingId,
             state = it.availability,
             user = it.user
     )
@@ -54,6 +54,6 @@ data class TrainingResponse(
         val id: Long,
         val startTime: Instant,
         val location: String,
-        val comment: String,
+        val comment: String?,
         val attendees: List<AttendeeResponse>?
 )

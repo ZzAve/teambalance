@@ -1,11 +1,13 @@
 package nl.jvandis.teambalance.api.attendees
 
 import io.swagger.annotations.Api
+import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
-import nl.jvandis.teambalance.api.training.TrainingRepository
+import nl.jvandis.teambalance.api.training.EventRepository
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NO_CONTENT
@@ -17,22 +19,22 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping(path = ["/api/attendees"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class AttendeeController(
         private val attendeeRepository: AttendeeRepository,
-        private val trainingRepository: TrainingRepository,
+        private val eventRepository: EventRepository,
         private val userRepository: UserRepository
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
     fun getAttendees(
-            @RequestParam(value = "trainingIds", defaultValue = "") trainingIds: List<Long>,
+            @RequestParam(value = "eventIds", defaultValue = "") eventIds: List<Long>,
             @RequestParam(value = "userIds", defaultValue = "") userIds: List<Long>
     ): AttendeesResponse {
-        log.info("Get attendees (filter trainingIds: $trainingIds,userIds: $userIds")
+        log.info("Get attendees (filter eventIds: $eventIds,userIds: $userIds")
 
         val attendees = when {
-            trainingIds.isEmpty() && userIds.isEmpty() -> attendeeRepository.findAll()
-            trainingIds.isNotEmpty() && userIds.isNotEmpty() -> attendeeRepository.findALlByTrainingIdInAndUserIdIn(trainingIds,userIds)
-            trainingIds.isNotEmpty() -> attendeeRepository.findAllByTrainingIdIn(trainingIds)
+            eventIds.isEmpty() && userIds.isEmpty() -> attendeeRepository.findAll()
+            eventIds.isNotEmpty() && userIds.isNotEmpty() -> attendeeRepository.findALlByEventIdInAndUserIdIn(eventIds,userIds)
+            eventIds.isNotEmpty() -> attendeeRepository.findAllByEventIdIn(eventIds)
             else -> attendeeRepository.findAllByUserIdIn(userIds)
         }
 
@@ -41,7 +43,7 @@ class AttendeeController(
                 .map {
                     AttendeeResponse(
                             id = it.id,
-                            trainingId = it.training.id,
+                            eventId = it.event.id,
                             user = it.user,
                             state = it.availability
                     )
@@ -56,16 +58,18 @@ class AttendeeController(
         val user = userRepository.findByIdOrNull(potentialAttendee.userId) ?:
                 throw InvalidUserException(potentialAttendee.userId)
 
-        val training = trainingRepository.findByIdOrNull(potentialAttendee.trainingId)
-                ?: throw InvalidTrainingException(potentialAttendee.trainingId)
+        val event = eventRepository.findByIdOrNull(potentialAttendee.eventId)
+                ?: throw InvalidTrainingException(potentialAttendee.eventId)
 
-        return attendeeRepository.save(Attendee(
-                user = user,
-                training = training,
-                availability = potentialAttendee.state
-        ))
-
-
+        return try {
+            attendeeRepository.save(Attendee(
+                    user = user,
+                    event = event,
+                    availability = potentialAttendee.state
+            ))
+        } catch (e : DataIntegrityViolationException){
+            throw DataConstraintViolationException("Could not add user ${potentialAttendee.userId} to training ${potentialAttendee.eventId}. User already added")
+        }
     }
 
     @PutMapping("{id}")
@@ -90,7 +94,7 @@ class AttendeeController(
 }
 
 data class PotentialAttendee (
-        val trainingId : Long,
+        val eventId : Long,
         val userId: Long,
         val state: Availability
 )

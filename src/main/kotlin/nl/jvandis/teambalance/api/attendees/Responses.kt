@@ -5,7 +5,7 @@ import nl.jvandis.teambalance.api.users.User
 data class AttendeesResponse(val attendees: List<AttendeeResponse>)
 data class AttendeeResponse(
         val id: Long,
-        val trainingId: Long,
+        val eventId: Long,
         val state: Availability,
         val user: User
 )
@@ -13,7 +13,7 @@ data class AttendeeResponse(
 fun List<Attendee>.toResponse() = map {
     AttendeeResponse(
             id = it.id,
-            trainingId = it.training.id,
+            eventId = it.event.id,
             state = it.availability,
             user = it.user
     )
