@@ -18,7 +18,7 @@ import java.time.Instant
 @Api(tags = ["trainings"])
 @RequestMapping(path = ["/api/trainings"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class TrainingController(
-        private val eventRepository: EventRepository,
+        private val eventRepository: TrainingRepository,
         private val userRepository: UserRepository,
         private val attendeeRepository: AttendeeRepository
 ) {
@@ -26,11 +26,16 @@ class TrainingController(
 
     @GetMapping
     fun getTrainings(
-            @RequestParam(value = "includeAttendees", defaultValue = "false") includeAttendees: Boolean
+            @RequestParam(value = "includeAttendees", defaultValue = "false") includeAttendees: Boolean,
+            @RequestParam(value = "since", required=false) since: Instant?,
+            @RequestParam(value = "limit", defaultValue = "50") limit: Int
+
     ): TrainingsResponse {
         log.info("GetAllTrainings")
         return eventRepository.findAll()
                 .filterNotNull()
+                .filter{ since == null || since < it.startTime }
+                .take(limit)
                 .map {
                     val attendees = if (includeAttendees) attendeeRepository.findAllByEventIdIn(listOf(it.id)).toTrainingResponse(it.id) else null
                     TrainingResponse(

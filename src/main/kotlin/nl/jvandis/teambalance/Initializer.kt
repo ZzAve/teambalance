@@ -39,9 +39,9 @@ class Initializer(
                 val users = userRepository.findAll()
                 log.info("ALl users: ", users)
                 eventRepository.save(Training(startTime = LocalDateTime.now().minusDays(3).toInstant(ZoneOffset.UTC), location = "Training plaza", comment = ""))
-                eventRepository.save(Training(startTime = LocalDateTime.now().minusDays(10).toInstant(ZoneOffset.UTC), location = "adsfadf,asdf", comment = ""))
+                eventRepository.save(Training(startTime = LocalDateTime.now().plusDays(10).toInstant(ZoneOffset.UTC), location = "adsfadf,asdf", comment = ""))
                 eventRepository.save(Training(startTime = LocalDateTime.now().minusDays(20).toInstant(ZoneOffset.UTC), location = "Training,asdf", comment = ""))
-                eventRepository.save(Training(startTime = LocalDateTime.now().minusDays(22).toInstant(ZoneOffset.UTC), location = "Train,asdf", comment = ""))
+                eventRepository.save(Training(startTime = LocalDateTime.now().plusDays(22).toInstant(ZoneOffset.UTC), location = "Train,asdf", comment = ""))
 
                 log.info("After training injection")
                 val trainings = eventRepository.findAll()

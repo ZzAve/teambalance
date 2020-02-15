@@ -10,7 +10,7 @@ import javax.persistence.*
 )
 abstract class Event (
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-        open val id: Long,
+        open val id: Long = 0,
 
         @Column(nullable = false)
         open val startTime: Instant,
@@ -21,7 +21,7 @@ abstract class Event (
         @Column(nullable = true)
         open val comment: String?
 ){
-    constructor() : this(-1, Instant.MIN,"",null)
+    constructor() : this(startTime = Instant.MIN, location = "", comment = null)
 }
 
 @Entity
@@ -32,7 +32,7 @@ data class Training(
         override val comment: String? = null
 ) : Event(id, startTime, location, comment) {
     constructor(startTime: Instant, location: String, comment: String) :
-            this(0, startTime, location, comment)
+            this(id = 0, startTime = startTime, location = location, comment = comment)
 }
 
 

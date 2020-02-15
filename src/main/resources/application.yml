@@ -12,7 +12,7 @@ spring:
     properties.hibernate.jdbc.lob.non_contextual_creation: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
-    hibernate.ddl-auto: create-drop
+    hibernate.ddl-auto: create-drop # TODO set to validate
     generate-ddl: true
   datasource:
     username: ${POSTGRES_USERNAME}
@@ -22,7 +22,6 @@ spring:
     database-name: ${DATABASE_NAME}
 
   jackson.serialization:
-    WRITE_DATES_AS_TIMESTAMPS: true
     WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS: false
 
 springfox:

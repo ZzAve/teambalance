@@ -25,9 +25,7 @@ data class Attendee(
     /**
      * no-args constructor
      */
-    protected constructor() : this(dummyUser, dummyEvent) {
-        log.warn("I got called. unfortunately :${toString()}")
-    }
+    protected constructor() : this(dummyUser, dummyEvent)
 
     constructor(user: User, event: Event) : this(
             user = user,
