@@ -24,6 +24,7 @@ const Balance = ({ balance, isLoading }) => {
         <Grid item >
             <Typography variant="h6">( ~ {calculateBeers(balance)}🍺)</Typography>
         </Grid>
+
     </Grid>
   );
 };

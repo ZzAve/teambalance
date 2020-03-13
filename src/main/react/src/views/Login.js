@@ -3,7 +3,8 @@ import { Button, TextField } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
-import { SpinnerWithText } from "./SpinnerWithText";
+import { SpinnerWithText } from "../components/SpinnerWithText";
+import PageItem from "../components/PageItem";
 
 const Texts = [
   "Netten aan het opspannen",
@@ -58,13 +59,13 @@ const Login = ({ loading, setSecret }) => {
 
   const updateText = () =>
     setTimeout(() => {
-      if (Math.random() < 0.5) {
+      if (Math.random() < 0.4) {
         let index = Math.floor(Math.random() * Texts.length);
         setText(`${Texts[index]} ...`);
       }
 
       setUpdate(state => ({ ...state, isUpdating: false }));
-    }, 500);
+    }, 750);
 
   const handleLogin = e => {
     e.preventDefault();
@@ -83,30 +84,34 @@ const Login = ({ loading, setSecret }) => {
   }
 
   return (
-    <>
-      <form onSubmit={handleLogin}>
+      <Grid item xs={12}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Typography>omdat we niet graag onze namen delen</Typography>
-          </Grid>
-          <Grid item>
-            <TextField
-              id="secret"
-              type="password"
-              value={input}
-              onChange={handleInput}
-              placeholder="******"
-              autoFocus
-            />
-          </Grid>
-          <Grid item>
-            <Button variant="contained" color="primary" type="submit">
-              <LockOpenIcon /> Login
-            </Button>
-          </Grid>
+          <PageItem title={loading ? "" : "Login"}>
+            <form onSubmit={handleLogin}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Typography>omdat we niet graag onze namen delen</Typography>
+                </Grid>
+                <Grid item>
+                  <TextField
+                      id="secret"
+                      type="password"
+                      value={input}
+                      onChange={handleInput}
+                      placeholder="******"
+                      autoFocus
+                  />
+                </Grid>
+                <Grid item>
+                  <Button variant="contained" color="primary" type="submit">
+                    <LockOpenIcon/> Login
+                  </Button>
+                </Grid>
+              </Grid>
+            </form>
+          </PageItem>
         </Grid>
-      </form>
-    </>
+      </Grid>
   );
 };
 

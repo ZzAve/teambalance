@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import {Transactions} from "./components/Transactions";
 import Topup from "./components/Topup";
-import Login from "./components/Login";
+import Login from "./views/Login";
 import Balance from "./components/Balance";
 import "./App.css";
 import {
@@ -22,6 +22,8 @@ import { useSecretStore } from "./hooks/secretHook";
 import { fetchWithTimeout } from "./utils/fetchWithTimeout";
 import { Logout } from "./components/Logout";
 import { Refresh } from "./components/Refresh";
+import Overview from "./views/Overview";
+import PageItem from "./components/PageItem";
 
 const TopBar = ({ authenticated, handleRefresh, setSecret }) => {
   return (
@@ -65,57 +67,12 @@ const Wrapper = ({ authenticated, setSecret, handleRefresh, children }) => {
 
 const LoginGrid = ({ isLoading, setSecret }) => {
   return (
-    <Grid item xs={12}>
-      <Grid container spacing={2}>
-        <PageItem title={isLoading ? "" : "Login"}>
-          <Login loading={isLoading} setSecret={setSecret} />
-        </PageItem>
-      </Grid>
-    </Grid>
-  );
-};
-
-const OverviewGrid = ({ state, loadingState }) => {
-  return (
-    <>
-      <Grid item xs={12} md={6}>
-        <Grid container spacing={2}>
-          <PageItem title="Huidig saldo">
-            <Balance balance={state.balance} isLoading={loadingState.loadingBalance} />
-          </PageItem>
-          <PageItem title="Bijpotten">
-            <Topup baseURL={state.bunqMeUrl} />
-          </PageItem>
-        </Grid>
-      </Grid>
-      <Grid item xs={12} md={6}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Card>
-              <CardHeader title="Transacties"/>
-            </Card>
-            <Card>
-              <Transactions transactions={state.transactions} isLoading={loadingState.loadingTransactions} />
-            </Card>
-          </Grid>
-        </Grid>
-      </Grid>
-    </>
-  );
+      <Login loading={isLoading} setSecret={setSecret} />
+      );
 };
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
-const PageItem = ({ title, children }) => {
-  return (
-    <Grid item xs={12}>
-      <Card>
-        <CardHeader title={title} />
-        <CardContent>{children}</CardContent>
-      </Card>
-    </Grid>
-  );
-};
 
 const useStyles = makeStyles({
   alignCenter: {
@@ -130,12 +87,14 @@ const useStyles = makeStyles({
 const initialState = {
   balance: "€ XX,XX",
   transactions: [],
-  bunqMeUrl: "https://bunq.me/tovoheren5"
+  bunqMeUrl: "https://bunq.me/tovoheren5",
+  trainings: []
 };
 const initialApiState = {
   loadingAuthentication: false,
   loadingTransactions: false,
-  loadingBalance: false
+  loadingBalance: false,
+  loadingTrainings: false
 };
 
 const App = () => {
@@ -175,7 +134,8 @@ const App = () => {
       setAuthenticated(false);
     }
 
-    callBankAPI();
+    // callBankAPI();
+    callTrainingApi()
   }, [authenticated]);
 
   const apiCall = (path, method = "GET", timeout= 5000, minDelay = 750) => {
@@ -233,6 +193,32 @@ const App = () => {
           }));
         }
       });
+  };
+
+  const callTrainingApi = _ => {
+      setLoadingState(state => ({
+          ...state,
+          loadingTrainings: true
+      }));
+
+      let hours = new Date();
+
+      apiCall(`trainings?since=${hours.toJSON()}&includeAttendees=true`)
+          .then(data => {
+              setState(state => ({
+                  ...state,
+                  trainings: data.trainings
+              }))
+          })
+          .catch(e => {
+              console.error(e)
+          })
+          .finally(_ => {
+              setLoadingState(state => ({
+                  ...state,
+                  loadingTrainings: false
+              }))
+          });
   };
 
   const callBankAPI = _ => {
@@ -301,12 +287,9 @@ const App = () => {
 
         <Grid container spacing={2} alignItems="flex-start">
           {authenticated ? (
-            <OverviewGrid state={state} loadingState={loadingState} />
+            <Overview state={state} loadingState={loadingState} />
           ) : (
-            <LoginGrid
-              isLoading={loadingState.loadingAuthentication}
-              setSecret={setSecret}
-            />
+            <Login loading={loadingState.loadingAuthentication} setSecret={setSecret} />
           )}
         </Grid>
       </Container>

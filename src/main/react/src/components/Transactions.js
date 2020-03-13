@@ -38,3 +38,5 @@ export const Transactions = ({ transactions, isLoading = false }) => {
     </TableContainer>
   );
 };
+
+export default Transactions
