@@ -1,29 +1,19 @@
 // src/App.js
 
-import React, { useEffect, useState } from "react";
-import {Transactions} from "./components/Transactions";
-import Topup from "./components/Topup";
+import React, {useEffect, useState} from "react";
 import Login from "./views/Login";
-import Balance from "./components/Balance";
 import "./App.css";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  Container,
-  CssBaseline,
-  makeStyles
-} from "@material-ui/core";
+import {Container, CssBaseline, makeStyles} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import { useSecretStore } from "./hooks/secretHook";
-import { fetchWithTimeout } from "./utils/fetchWithTimeout";
-import { Logout } from "./components/Logout";
-import { Refresh } from "./components/Refresh";
+import {useSecretStore} from "./hooks/secretHook";
+import {fetchWithTimeout} from "./utils/fetchWithTimeout";
+import {Logout} from "./components/Logout";
+import {Refresh} from "./components/Refresh";
 import Overview from "./views/Overview";
-import PageItem from "./components/PageItem";
+import {delay} from "./utils/util";
 
 const TopBar = ({ authenticated, handleRefresh, setSecret }) => {
   return (
@@ -71,7 +61,6 @@ const LoginGrid = ({ isLoading, setSecret }) => {
       );
 };
 
-const delay = ms => new Promise(res => setTimeout(res, ms));
 
 
 const useStyles = makeStyles({
@@ -100,7 +89,7 @@ const initialApiState = {
 const App = () => {
   const [state, setState] = useState(initialState);
   const [loadingState, setLoadingState] = useState(initialApiState);
-  const [secret, setSecret] = useSecretStore();
+  const [secret, setSecret] = useSecretStore("app");
   const [authenticated, setAuthenticated] = useState(false);
 
   const classes = useStyles();

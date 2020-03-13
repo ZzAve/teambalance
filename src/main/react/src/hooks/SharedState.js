@@ -2,8 +2,6 @@ import React, {useEffect, useState} from 'react'
 
 const keys = {};
 export const useSharedState = (key, initialValue) => {
-
-
     const [state, setState] = useState(undefined);
     useEffect(() => {
         if (!keys[key]) {

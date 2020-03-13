@@ -2,6 +2,7 @@ package nl.jvandis.teambalance.api.attendees
 
 import io.swagger.annotations.Api
 import nl.jvandis.teambalance.api.DataConstraintViolationException
+import nl.jvandis.teambalance.api.InvalidAttendeeException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.training.EventRepository
@@ -40,19 +41,24 @@ class AttendeeController(
 
         return attendees
                 .filterNotNull()
-                .map {
-                    AttendeeResponse(
-                            id = it.id,
-                            eventId = it.event.id,
-                            user = it.user,
-                            state = it.availability
-                    )
-                }.let(::AttendeesResponse)
+                .map { it.toResponse() }
+                .let(::AttendeesResponse)
+    }
+
+    @GetMapping("/{id}")
+    fun getAttendee(
+            @PathVariable(value = "id") attendeeId: Long
+    ): AttendeeResponse {
+        log.info("Get attendees $attendeeId")
+
+        val attendee = attendeeRepository.findByIdOrNull(attendeeId) ?: throw InvalidAttendeeException(attendeeId)
+
+        return attendee.toResponse()
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    fun addAttendee(@RequestBody potentialAttendee: PotentialAttendee ): Attendee {
+    fun addAttendee(@RequestBody potentialAttendee: PotentialAttendee ): AttendeeResponse {
         log.info("Adding attendee: $potentialAttendee")
 
         val user = userRepository.findByIdOrNull(potentialAttendee.userId) ?:
@@ -66,7 +72,7 @@ class AttendeeController(
                     user = user,
                     event = event,
                     availability = potentialAttendee.state
-            ))
+            )).toResponse()
         } catch (e : DataIntegrityViolationException){
             throw DataConstraintViolationException("Could not add user ${potentialAttendee.userId} to training ${potentialAttendee.eventId}. User already added")
         }
@@ -74,12 +80,17 @@ class AttendeeController(
 
     @PutMapping("{id}")
     fun updateAttendee(
-            @PathVariable("id") id: Long,
+            @PathVariable("id") attendeeId: Long,
             @RequestBody attendeeStateUpdate: AttendeeStateUpdate
-    ) {
-        attendeeRepository.findById(id).map {
+    ): AttendeeResponse {
+        val attendee = attendeeRepository.findByIdOrNull(attendeeId)
+                ?: throw InvalidAttendeeException(attendeeId)
+
+        val updatedAttendee = attendee.let {
             attendeeRepository.save(it.copy(availability = attendeeStateUpdate.availability))
         }
+
+        return updatedAttendee.toResponse()
     }
 
     @ResponseStatus(NO_CONTENT)
@@ -90,7 +101,13 @@ class AttendeeController(
         attendeeRepository.deleteById(id)
     }
 
-
+    private fun Attendee.toResponse() =
+        AttendeeResponse(
+                id = id,
+                eventId = event.id,
+                user = user,
+                state = availability
+        )
 }
 
 data class PotentialAttendee (
