@@ -11,7 +11,7 @@ import javax.persistence.*
 @Entity
 @Table(uniqueConstraints=arrayOf(UniqueConstraint(columnNames=arrayOf("USER_ID", "EVENT_ID"))))
 data class Attendee(
-        @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = -1,
+        @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
         @ManyToOne @JoinColumn(name = "USER_ID") val user: User,
         @Enumerated(EnumType.STRING) @Column(nullable = false) val availability: Availability,
         @ManyToOne @JoinColumn(name="EVENT_ID") val event: Event
@@ -29,7 +29,13 @@ data class Attendee(
 
     constructor(user: User, event: Event) : this(
             user = user,
-            availability = Availability.NOT_RESPONDED,
+            event = event,
+            availability = Availability.NOT_RESPONDED
+    )
+    constructor(user: User, event: Event, availability: Availability) : this(
+            id = 0,
+            user = user,
+            availability = availability,
             event = event
     )
 }

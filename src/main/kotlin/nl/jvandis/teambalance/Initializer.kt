@@ -2,8 +2,9 @@ package nl.jvandis.teambalance
 
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
-import nl.jvandis.teambalance.api.training.Training
+import nl.jvandis.teambalance.api.attendees.Availability
 import nl.jvandis.teambalance.api.training.EventRepository
+import nl.jvandis.teambalance.api.training.Training
 import nl.jvandis.teambalance.api.users.Role
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.api.users.UserRepository
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import kotlin.random.Random
 
 @Configuration
 class Initializer(
@@ -38,7 +40,7 @@ class Initializer(
                 log.info("After user injection")
                 val users = userRepository.findAll()
                 log.info("ALl users: ", users)
-                eventRepository.save(Training(startTime = LocalDateTime.now().minusDays(3).toInstant(ZoneOffset.UTC), location = "Training plaza", comment = ""))
+                eventRepository.save(Training(startTime = LocalDateTime.now().minusDays(3).toInstant(ZoneOffset.UTC), location = "Training plaza", comment = "No, this is patrick"))
                 eventRepository.save(Training(startTime = LocalDateTime.now().plusDays(10).toInstant(ZoneOffset.UTC), location = "adsfadf,asdf", comment = ""))
                 eventRepository.save(Training(startTime = LocalDateTime.now().minusDays(20).toInstant(ZoneOffset.UTC), location = "Training,asdf", comment = ""))
                 eventRepository.save(Training(startTime = LocalDateTime.now().plusDays(22).toInstant(ZoneOffset.UTC), location = "Train,asdf", comment = ""))
@@ -50,7 +52,7 @@ class Initializer(
 
                 trainings.forEach { t ->
                     attendeeRepository.saveAll(users.map { user ->
-                        Attendee(user, t)
+                        Attendee(user, t, availability =  Availability.values()[Random.nextInt(Availability.values().size)])
                     })
                 }
 

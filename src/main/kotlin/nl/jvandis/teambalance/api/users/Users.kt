@@ -9,8 +9,7 @@ data class Users(
 
 @Entity(name="Uzer")
 data class User(
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Id val id: Long,
+        @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
         @Column(nullable = false, unique = true) val name: String,
         @Enumerated(EnumType.STRING) @Column(nullable = false) val role: Role
 ) {
