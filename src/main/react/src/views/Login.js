@@ -1,92 +1,70 @@
-import React, { useEffect, useState } from "react";
-import { Button, TextField } from "@material-ui/core";
+import React, {useEffect, useState} from "react";
+import {Button, TextField} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
-import { SpinnerWithText } from "../components/SpinnerWithText";
 import PageItem from "../components/PageItem";
+import {withLoading} from "../utils/util";
+import Loading from "./Loading";
+import {Redirect} from "react-router-dom";
+import {authenticationManager} from "../utils/AuthenticationManager";
 
-const Texts = [
-  "Netten aan het opspannen",
-  "Muntjes poetsen",
-  "🏐 TOVO TOVO 🏐 🥇",
-  "De fluim van de maand verzinnen",
-  "De eentjes van de nulletjes scheiden",
-  "Wachtwoord controleren",
-  "💵 💲 💰" // emojis
-];
-const initialState = {
-  isUpdating: false,
-  shouldUpdate: false
-};
 
-const Login = ({ loading, setSecret }) => {
-  const [update, setUpdate] = useState(initialState);
+const Login = ({location, handleRefresh}) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(undefined);
   const [input, setInput] = useState("");
-  const [text, setText] = useState("Inloggen ...");
-  const [lastDelayedExecution, setLastDelayedExecution] = useState(-1);
-
-  // Unmount cancellation effect
-  useEffect(() => {
-    // console.log("Registering setTimeout handle:", lastDelayedExecution);
-    return () => {
-      // console.log(
-      //   `Cancelling previous delayed execution I guess? handle`,
-      //   lastDelayedExecution
-      // );
-      clearTimeout(lastDelayedExecution);
-    };
-  }, [lastDelayedExecution]);
-
-  useEffect(
-    _ => {
-      // console.log("Loading state changed to ", loading);
-      setUpdate(state => ({ ...state, shouldUpdate: loading }));
-    },
-    [loading]
-  );
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (update.shouldUpdate && !update.isUpdating) {
-      const handle = updateText();
-      setLastDelayedExecution(handle);
-      setUpdate(state => ({
-        ...state,
-        isUpdating: true
-      }));
-    }
-  }, [update]);
+      //On startup , try with current value in authenticationManager
+      setTimeout(() => {
+          authenticationManager.checkAuthentication()
+              .then(isAuth => {
+                  console.debug(`Checked authentiation: user is ${isAuth ? "" : "NOT"} authenticated (${isAuth})`);
+                  setIsLoading(false);
+                  setIsAuthenticated(isAuth);
+              });
+      })
+  }, []);
 
-  const updateText = () =>
-    setTimeout(() => {
-      if (Math.random() < 0.4) {
-        let index = Math.floor(Math.random() * Texts.length);
-        setText(`${Texts[index]} ...`);
-      }
+    useEffect(() => {
+        console.debug(`Current state:
+            authenticated: ${isAuthenticated}
+            input: ${randomChars(Math.max(input.length, 0))}
+            isLoading: ${isLoading}
+      `);
+    }, [input]);
 
-      setUpdate(state => ({ ...state, isUpdating: false }));
-    }, 750);
+  const authenticate = (passphrase) =>
+      withLoading(setIsLoading, () => authenticationManager.authenticate(passphrase))
+          .catch((e) => {
+              console.error("Login did not work",e);
+          })
+          .then(_ => {
+              setIsAuthenticated(true);
+          });
 
-  const handleLogin = e => {
-    e.preventDefault();
-    setSecret(null);
-    setTimeout(_ => {
-      setSecret(input);
-    });
+  const handleLogin = async e => {
+      e.preventDefault();
+      await authenticate(input);
   };
 
-  const handleInput = e => {
-    return setInput(e.target.value);
-  };
+  const handleInput = e => setInput(e.target.value);
 
-  if (loading) {
-    return <SpinnerWithText text={text} />;
+  if (isAuthenticated){
+      const { from } = location.state || { from: { pathname: '/' } };
+      handleRefresh();
+      return (<Redirect to={from} />)
+  }
+
+  if( isLoading){
+    return (<Loading/>)
   }
 
   return (
       <Grid item xs={12}>
         <Grid container spacing={2}>
-          <PageItem title={loading ? "" : "Login"}>
+          <PageItem title= "Login">
             <form onSubmit={handleLogin}>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
@@ -96,6 +74,7 @@ const Login = ({ loading, setSecret }) => {
                   <TextField
                       id="secret"
                       type="password"
+                      autoComplete="password"
                       value={input}
                       onChange={handleInput}
                       placeholder="******"
@@ -114,5 +93,20 @@ const Login = ({ loading, setSecret }) => {
       </Grid>
   );
 };
+
+/**
+ * Some fun and giggles
+ * @param number
+ * @returns {string}
+ */
+const randomChars = (number) =>{
+    let char = () => Math.floor(Math.random()*36).toString(36);
+    let outStr = "";
+    while (outStr.length < number){
+        outStr += char();
+    }
+    return `=== ${number} = ${outStr} ===`
+};
+
 
 export default Login;

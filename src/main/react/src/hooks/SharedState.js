@@ -28,6 +28,6 @@ export const useSharedState = (key, initialValue) => {
         keys[key].setStates.forEach(setState => setState(newValue));
     };
 
-    console.log(keys);
+    // console.log(keys);
     return [state, handleStateChange]
 };

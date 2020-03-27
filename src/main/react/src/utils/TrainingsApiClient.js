@@ -1,31 +1,19 @@
 import {ApiClient} from "./apiClient";
 
-const trainingsClient = ApiClient();
+const trainingsClient = ApiClient("trainings");
 
-const getTrainings = () => {
-    return trainingsClient.call(`trainings?trainings?since=${(new Date()).toJSON()}&includeAttendees=true`)
+const getTrainings = (since, includeAttendees = true) => {
+    return trainingsClient.call(`trainings?since=${since}&includeAttendees=${includeAttendees}`)
 };
 
 const updateAttendee = (attendeeId, availability ) => {
-    return trainingsClient.callWithBody(`attendees/${attendeeId}`, {availability: availability},"PUT")
+    return trainingsClient.callWithBody(`attendees/${attendeeId}`, {availability: availability},{method:"PUT"})
         .then(data => {
-            return data.balance
+            return data
         })
-        // .then(data => {
-        //     setState(state => ({
-        //         ...state,
-        //         balance: data.balance || initialState.balance
-        //     }));
-        // })
         .catch(e => {
             console.error(e);
         })
-    // .finally(_ => {
-    //     setLoadingState(state => ({
-    //         ...state,
-    //         loadingBalance: false
-    //     }));
-    // });
 };
 
 export const trainingsApiClient = {

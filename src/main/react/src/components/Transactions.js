@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -7,8 +7,18 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { SpinnerWithText } from "./SpinnerWithText";
+import {BankApiClient as bankApiClient} from "../utils/BankApiClient";
+import {withLoading} from "../utils/util";
 
-export const Transactions = ({ transactions, isLoading = false }) => {
+export const Transactions = ({ refresh }) => {
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(()=> {
+    withLoading(setIsLoading, () =>  bankApiClient.getTransactions().then(setTransactions)).then()
+
+  },[refresh]);
+
   if (isLoading) {
     return <SpinnerWithText text="ophalen transacties" />;
   }
