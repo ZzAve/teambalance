@@ -16,6 +16,14 @@ Technology
 - Google App Engine (appengine.yaml)
 - Postgres database in GCP
 
+## Deploying to PRO:
+
+[Find reference docs here](https://cloud.google.com/appengine/docs/standard/java/tools/uploadinganapp)
+
+
+```bash
+./mvnw clean package appengine:deploy
+```
 
 ## Connect to the database
 Teambalance makes use of a Postgres db that lives in GCP.
