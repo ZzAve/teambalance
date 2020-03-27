@@ -30,7 +30,7 @@ const Overview = ({ refresh }) => {
             </Grid>
             <Grid item xs={12} md={6}>
                 <Grid container spacing={2}>
-                    <PageItem title="Aanstaande trainingen">
+                    <PageItem title="Aanstaande trainingen (met prutsdata voor nu)">
                         <Trainings refresh={refresh}/>
                     </PageItem>
 

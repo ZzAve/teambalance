@@ -59,6 +59,7 @@ for a service account](https://cloud.google.com/sdk/gcloud/reference/auth/applic
  - Debounce was introduced to ensure every API call takes at least 500 ms (for UX purposes). This only works if a call is successful.
  - Ensure training endpoint are also protected
  - Use 'proper' authentication mechanism.
+ - Get back polling mechanism when back-end is still down.
  
  
  Nice to have:

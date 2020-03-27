@@ -24,14 +24,15 @@ const TopBar = ({ handleRefresh, refresh }) => {
                         <Typography variant="h6">Tovo Heren 5 Teampot</Typography>
                     </Grid>
 
-                    <Grid item>
-                        <Refresh handleRefresh={handleRefresh} />
-                    </Grid>
                     { isAuth ? (
+                    <>
                         <Grid item>
-                            <Logout handleRefresh={handleRefresh} />
+                            <Refresh handleRefresh={handleRefresh} />
                         </Grid>
-
+                            <Grid item>
+                                <Logout handleRefresh={handleRefresh} />
+                        </Grid>
+                    </>
                     ) : null}
                 </Grid>
             </Toolbar>
