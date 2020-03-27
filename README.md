@@ -48,6 +48,9 @@ for a service account](https://cloud.google.com/sdk/gcloud/reference/auth/applic
  Must have:
  - Training overview including player availability
  - Match overview including player availability
+ - Debounce was introduced to ensure every API call takes at least 500 ms (for UX purposes). This only works if a call is successful.
+ - Ensure training endpoint are also protected
+ - Use 'proper' authentication mechanism.
  
  
  Nice to have:
