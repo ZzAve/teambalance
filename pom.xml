@@ -191,7 +191,7 @@
                     <extraFilesDirectories>
                         <extraFilesDirectory>${project.build.directory}/dependencies</extraFilesDirectory>
                     </extraFilesDirectories>
-                    <version>2</version>
+                    <version>1</version>
                     <projectId>GCLOUD_CONFIG</projectId>
                 </configuration>
             </plugin>

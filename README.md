@@ -53,15 +53,29 @@ To be able to run this locally, one should make sure to be connected to gcloud, 
 for a service account](https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login)
 
 ## TODO:
- Must have:
- - Training overview including player availability
+### Must have:
+ - ~~Ability to contribute to team balance~~
+ - ~~View latest contribution to team balance~~
+ - ~~Training overview including player availability~~
  - Match overview including player availability
- - Debounce was introduced to ensure every API call takes at least 500 ms (for UX purposes). This only works if a call is successful.
+ - Training admin screen (add/change/remove trainings)
+ - Match admin screen (add/change/remove matches)
+ - Get back polling mechanism when back-end is still down.
  - Ensure training endpoint are also protected
  - Use 'proper' authentication mechanism.
- - Get back polling mechanism when back-end is still down.
  
+### Should have:
+ - Debounce was introduced to ensure every API call takes at least 500 ms (for UX purposes). This only works if a call is successful. Should also work for unsuccessful ones.
+ - Github actions, used to deploy to Google cloud on every merge to master 
+ - Stg env for testing purposes (use a different application version, but don't take all traffic ?)
  
- Nice to have:
- - Link to Nevobo team 'API': https://api.nevobo.nl/export/team/CKL7W0D/heren/1/programma.rss
+### Could have
+ - Availabilities and agenda for non training/match events (like team uitje)
+ - Upload receipts and tie them to payments
+ - Stats on team balanc contributors
+ - Link to Nevobo site with competition
+ - Integration with Nevobo: Link to Nevobo team 'API': https://api.nevobo.nl/export/team/CKL7W0D/heren/1/programma.rss
+ 
+### Won't have:
+ - tbd
  
