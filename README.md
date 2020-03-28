@@ -1,10 +1,38 @@
 # teambalance
 Personal project to monitor team expenses on beer and brown fruit
 
+## What it does
+Team balance started off a hobby project and technology explorer (see setup). Its goal is to allow a group of people 
+that go out together often to have a kind of shared wallet or 'pot' in Dutch. With everybody being able to chip in and 
+see what transactions went out, it allows the bills to be paid from a single bank account.
+
+As it is becoming more uncommon to use cash, and bars and clubs allow card payments more often,
+ the need for a digital money pool is becoming more and more apparent.
 
 
+### Parts
+Team balance has 2 main parts:
 
-## Setup
+- BankAPI that has a connection with bunqAPI. To gain insights in transactions on the team's money pool
+- EventsAPI to allow teammembers to register availability for upcoming trainings and matches. Admins can also create events
+
+The APIs are exposed through a reactive front-end that includes an authentication flow as well to prevent nosy neighbours
+from peeking.
+
+## Comparable solutions:
+(this list is probably never complete)
+
+1. [Paypal's money pools](https://www.paypal.com/uk/webapps/mpp/money-pools):
+    1.  More targeted towards reaching a certain goals (in terms of $), to be able to buy something.
+1. [Tikkie (url will follw)](#)
+    1. Tikkie allows you to pay people upon request. Unfortunately there's no way of seeing how much money is available.
+    1. Tikkie's concept of payment requests is used by team balance. [bunq.me](https://bunq.me) is a similar concept where
+    one can own a page a allow people to pay whatever they want, and include a message.
+
+
+## Dev
+
+### Setup
 
 Technology
 
@@ -16,7 +44,8 @@ Technology
 - Google App Engine (appengine.yaml)
 - Postgres database in GCP
 
-## Deploying to PRO:
+
+### Deploying to PRO:
 
 [Find reference docs here](https://cloud.google.com/appengine/docs/standard/java/tools/uploadinganapp)
 
@@ -25,7 +54,7 @@ Technology
 ./mvnw clean package appengine:deploy
 ```
 
-## Connect to the database
+### Connect to the database
 Teambalance makes use of a Postgres db that lives in GCP.
 
 By having added the following dependency  
@@ -75,7 +104,8 @@ for a service account](https://cloud.google.com/sdk/gcloud/reference/auth/applic
  - Stats on team balanc contributors
  - Link to Nevobo site with competition
  - Integration with Nevobo: Link to Nevobo team 'API': https://api.nevobo.nl/export/team/CKL7W0D/heren/1/programma.rss
+ - A setup that makes it reusable for different teams as well.
  
 ### Won't have:
- - tbd
+ - Integration with CMS systems for customisation purposes
  
