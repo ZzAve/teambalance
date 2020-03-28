@@ -11,7 +11,8 @@ class BunqConfiguration(
         @Value("\${app.bank.api-key}") private val apiKey: String,
         @Value("\${app.bank.saveSessionToFile:false}") private val saveSessionToFile: Boolean
 ) {
-    val log = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
+
     @Bean
     fun bunqLib(): BunqRepository {
         log.info("Using api-key '${apiKey.substring(0, 5)}******${apiKey.substring(apiKey.length - 5)}'")

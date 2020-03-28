@@ -1,67 +1,42 @@
 import React from "react";
-import { Button } from "@material-ui/core";
+import {Button} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 
-const Topup = ({ baseURL }) => {
-  const createTopUpLink = function(number) {
-    //TODO: not use window?
-    //TODO: querybuilder?
-    return () => {
-      return window.open(
-        baseURL +
-          "?amount=" +
-          number +
-          "&description=Meer%20Muntjes%20Meer%20Beter",
-        "_blank"
-      );
-    };
-  };
+const bunqMeUrl = "https://bunq.me/tovoheren5";
+
+const Topup = () => {
+  const createTopUpLink = (price) =>
+      () =>
+          window.open(
+              `${bunqMeUrl}?amount=${price}&description=Meer%20Muntjes%20Meer%20Beter`,
+              "_blank"
+          );
+
+
+    function getButton(clickPrice, content) {
+        return <Button
+            variant="contained"
+            color="primary"
+            onClick={createTopUpLink(clickPrice)}
+        >
+            {content}
+        </Button>;
+    }
 
   return (
-    <>
-      <Grid container spacing={1}>
+      <Grid container spacing={2}>
         <Grid item xs={12}>
           <Typography>Spek jij de teamkas vandaag?</Typography>
         </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={createTopUpLink(10)}
-          >
-            10 euro
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={createTopUpLink(20)}
-          >
-            20 euro
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={createTopUpLink(50)}
-          >
-            50 euro
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={createTopUpLink(0.0)}
-          >
-            Ander bedrag
-          </Button>
+        <Grid item container spacing={1}>
+          <Grid item>{getButton(10, "€ 10,-")}</Grid>
+          <Grid item>{getButton(20, "€ 20,-")}</Grid>
+          <Grid item>{getButton(50, "€ 50,-")}</Grid>
+          <Grid item>{getButton(0.0, "Anders ...")}</Grid>
+
         </Grid>
       </Grid>
-    </>
   );
 };
 

@@ -42,6 +42,30 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
                 ))
     }
 
+    @ExceptionHandler(InvalidIdException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleInvalidRequestArguments(e: InvalidIdException): ResponseEntity<Error> {
+        return ResponseEntity
+                .badRequest()
+                .body(Error(
+                        status = HttpStatus.BAD_REQUEST,
+                        reason = "Could not apply operation because Id was invalid (${e.type} id ${e.id}) "
+                ))
+
+    }
+
+    @ExceptionHandler(DataConstraintViolationException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleDataConstraintValidationExceptions(e: DataConstraintViolationException) : ResponseEntity<Error>{
+        return ResponseEntity
+                .badRequest()
+                .body(Error(
+                        status = HttpStatus.BAD_REQUEST,
+                        reason = e.message
+                ))
+
+    }
+
     @ExceptionHandler(Throwable::class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     fun handleUnhandledExceptions(t: Throwable): ResponseEntity<Error> {
@@ -53,4 +77,5 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
                         reason = "Something went wrong. Please try again later"
                 ))
     }
+
 }

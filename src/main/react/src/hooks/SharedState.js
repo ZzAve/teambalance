@@ -2,8 +2,6 @@ import React, {useEffect, useState} from 'react'
 
 const keys = {};
 export const useSharedState = (key, initialValue) => {
-
-
     const [state, setState] = useState(undefined);
     useEffect(() => {
         if (!keys[key]) {
@@ -30,6 +28,6 @@ export const useSharedState = (key, initialValue) => {
         keys[key].setStates.forEach(setState => setState(newValue));
     };
 
-    console.log(keys);
+    // console.log(keys);
     return [state, handleStateChange]
 };

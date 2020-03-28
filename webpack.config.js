@@ -8,8 +8,10 @@ const htmlPlugin = new HtmlWebPackPlugin({
 });
 
 module.exports = {
-  entry: path.join(__dirname, "src/main/react"),
-
+  entry: [
+      'babel-polyfill',
+      path.join(__dirname, "src/main/react")
+  ],
   output: {
     path: path.resolve(__dirname, "src/main/webapp")
   },
@@ -46,6 +48,7 @@ module.exports = {
   ],
 
   devServer: {
+    historyApiFallback: true,
     port: 3000,
     proxy: {
       "/api/**": "http://localhost:8080",

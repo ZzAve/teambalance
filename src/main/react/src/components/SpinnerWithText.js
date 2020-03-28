@@ -4,17 +4,24 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-const useStyles = makeStyles({
+const useStyles = (size) => makeStyles({
   alignCenter: {
     alignItems: "center",
     justifyContent: "center",
     display: "flex",
-    minHeight: 150
+    minHeight: size
   }
 });
 
-export const SpinnerWithText = ({ text }) => {
-  const classes = useStyles();
+const styles = {
+  "sm" : useStyles(50),
+  "md" : useStyles(100),
+  "lg" : useStyles(150)
+};
+
+export const SpinnerWithText = ({ text, size = "md" }) => {
+
+  const classes = (styles[size] || styles["md"])();
   return (
     <>
       <Grid container>

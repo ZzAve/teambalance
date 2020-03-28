@@ -1,9 +1,19 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import {SpinnerWithText} from "./SpinnerWithText";
+import {BankApiClient as bankApiClient} from "../utils/BankApiClient";
+import {withLoading} from "../utils/util";
 
-const Balance = ({ balance, isLoading }) => {
+const noBalance = "€ XX,XX";
+const Balance = ({ refresh }) => {
+    const [balance, setBalance] = useState(noBalance);
+    const [isLoading, setIsLoading] = useState(noBalance);
+
+    useEffect(() => {
+        withLoading(setIsLoading, () => bankApiClient.getBalance().then(setBalance)).then()
+    }, [refresh]);
+
   if (isLoading) {
     return <SpinnerWithText text="ophalen saldo" />;
   }
@@ -24,6 +34,7 @@ const Balance = ({ balance, isLoading }) => {
         <Grid item >
             <Typography variant="h6">( ~ {calculateBeers(balance)}🍺)</Typography>
         </Grid>
+
     </Grid>
   );
 };
