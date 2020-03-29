@@ -22,7 +22,6 @@ const getSecretFromLocalStorage = () =>{
 
   // Decrypt
   let cipher = item.toString();
-  // console.log(`Decrypting '${cipher}'`);
   let decrypt = Aes.decrypt(cipher, PRIVATE_ENCRYPTION_KEY);
   item = decrypt.toString(CryptoJS.enc.Utf8);
 
@@ -66,11 +65,8 @@ const authenticate = (passphrase) => {
 
     _authenticationCheck = new Promise((resolve) =>
         isAuthenticated
-            .then(() => true)
-            .catch(e => {
-                console.error("Something went wrong",e);
-                console.log(`typeOf ${typeof e}. instance of TimeoutError: ${e instanceof TimeoutError}`);
-             return false})
+            .then(_ => true)
+            .catch(_ => false)
             .then(it => {
                 _authenticated = it;
                 resolve(it)
@@ -92,15 +88,13 @@ const recursiveAuth = async (pass, number = 1) => {
     }
 
     try {
-        console.log(`trying to recursive auth ${number}`);
+        console.debug(`Trying to recursive auth ${number}`);
         await _doAuthenticate(pass)
     } catch (e) {
-        console.error("error",e);
-        // debugger;
         if (e instanceof TimeoutError) {
-            console.log("Catch ", number);
             await recursiveAuth(pass, ++number)
         } else {
+            console.debug("Unknown error occured", e);
             throw e;
         }
     }
@@ -110,7 +104,6 @@ const startupAuth = (passphrase) => {
     _authenticationCheck = new Promise((resolve) => {
         return recursiveAuth(passphrase)
             .then((result) => {
-                console.log(result);
                 _authenticated = true;
                 resolve(true)
             })

@@ -12,6 +12,7 @@ const updateAttendee = (attendeeId, availability ) => {
             return data
         })
         .catch(e => {
+            // TODO: Error handling
             console.error(e);
         })
 };
