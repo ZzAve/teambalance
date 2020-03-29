@@ -1,4 +1,4 @@
-import {ApiClient} from "./apiClient";
+import {ApiClient} from "./ApiClient";
 
 const bankClient = ApiClient("bank");
 
@@ -10,15 +10,6 @@ const getBalance = () => {
 const getTransactions = () => {
     return bankClient.call('bank/transactions')
         .then(data => internalize(data.transactions) || [])
-}
-const updateAttendee = (attendeeId, availability ) => {
-    return bankClient.callWithBody(`attendees/${attendeeId}`, {availability: availability},"PUT")
-        .then(data => {
-            return data.balance
-        })
-        .catch(e => {
-            console.error(e);
-        })
 };
 
 const internalize = transactions => {

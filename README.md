@@ -89,12 +89,12 @@ for a service account](https://cloud.google.com/sdk/gcloud/reference/auth/applic
  - Match overview including player availability
  - Training admin screen (add/change/remove trainings)
  - Match admin screen (add/change/remove matches)
- - Get back polling mechanism when back-end is still down.
+ - ~~Use polling mechanism when back-end is still down.~~
  - Ensure training endpoint are also protected
  - Use 'proper' authentication mechanism.
  
 ### Should have:
- - Debounce was introduced to ensure every API call takes at least 500 ms (for UX purposes). This only works if a call is successful. Should also work for unsuccessful ones.
+ - ~~Debounce was introduced to ensure every API call takes at least 500 ms (for UX purposes). This only works if a call is successful. Should also work for unsuccessful ones.~~
  - Github actions, used to deploy to Google cloud on every merge to master 
  - Stg env for testing purposes (use a different application version, but don't take all traffic ?)
  

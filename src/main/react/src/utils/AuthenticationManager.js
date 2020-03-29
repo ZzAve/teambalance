@@ -2,6 +2,7 @@ import React from "react";
 import Aes from "crypto-js/aes";
 import CryptoJS from "crypto-js";
 import {authenticationApiClient} from "./AuthenticationApiClient";
+import {TimeoutError} from "./Exceptions";
 
 const _key = "apiSecret";
 const PRIVATE_ENCRYPTION_KEY =
@@ -21,7 +22,6 @@ const getSecretFromLocalStorage = () =>{
 
   // Decrypt
   let cipher = item.toString();
-  // console.log(`Decrypting '${cipher}'`);
   let decrypt = Aes.decrypt(cipher, PRIVATE_ENCRYPTION_KEY);
   item = decrypt.toString(CryptoJS.enc.Utf8);
 
@@ -60,14 +60,13 @@ const _doAuthenticate = (passphrase) =>
           setSecret(passphrase);
         });
 
-
 const authenticate = (passphrase) => {
   let isAuthenticated = _doAuthenticate(passphrase);
 
     _authenticationCheck = new Promise((resolve) =>
         isAuthenticated
-            .then(() => true)
-            .catch(() => false)
+            .then(_ => true)
+            .catch(_ => false)
             .then(it => {
                 _authenticated = it;
                 resolve(it)
@@ -83,14 +82,45 @@ const logout = () => {
     _authenticationCheck = new Promise(resolve => {resolve(_authenticated)});
 
 };
+const recursiveAuth = async (pass, number = 1) => {
+    if (number >10) {
+        throw Error("Too many tries");
+    }
 
+    try {
+        console.debug(`Trying to recursive auth ${number}`);
+        await _doAuthenticate(pass)
+    } catch (e) {
+        if (e instanceof TimeoutError) {
+            await recursiveAuth(pass, ++number)
+        } else {
+            console.debug("Unknown error occured", e);
+            throw e;
+        }
+    }
+};
+
+const startupAuth = (passphrase) => {
+    _authenticationCheck = new Promise((resolve) => {
+        return recursiveAuth(passphrase)
+            .then((result) => {
+                _authenticated = true;
+                resolve(true)
+            })
+            .catch(_ => {
+                _authenticated = false;
+                resolve(false)
+            })
+    })
+
+};
 
 setTimeout(() => {
   //on start fetch from localStorage
   _secret = getSecretFromLocalStorage("apiSecret");
 
   // on start check credentials
-  authenticate(_secret);
+  startupAuth(_secret);
 });
 
 export const authenticationManager = {
