@@ -1,3 +1,4 @@
+import {TimeoutError} from "./Exceptions";
 
 export const fetchWithTimeout = (uri, options = {}, time = 5000) => {
   // Lets set up our `AbortController`, and create a request options object
@@ -14,7 +15,7 @@ export const fetchWithTimeout = (uri, options = {}, time = 5000) => {
       // When we abort our `fetch`, the controller conveniently throws a named
       // error, allowing us to handle them separately from other errors.
       if (error.name === "AbortError") {
-        throw new Error("Response timed out");
+        throw new TimeoutError("Response timed out");
       }
       throw new Error(error.message);
     });

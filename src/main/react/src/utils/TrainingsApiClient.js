@@ -1,4 +1,4 @@
-import {ApiClient} from "./apiClient";
+import {ApiClient} from "./ApiClient";
 
 const trainingsClient = ApiClient("trainings");
 
@@ -7,7 +7,7 @@ const getTrainings = (since, includeAttendees = true) => {
 };
 
 const updateAttendee = (attendeeId, availability ) => {
-    return trainingsClient.callWithBody(`attendees/${attendeeId}`, {availability: availability},{method:"PUT"})
+    return trainingsClient.callWithBody(`attendees/${attendeeId}`, {availability: availability},{method:"PUT"}, trainingsClient.defaultTimeout, 250 )
         .then(data => {
             return data
         })

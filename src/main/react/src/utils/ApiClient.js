@@ -1,10 +1,13 @@
 import {fetchWithTimeout} from "./fetchWithTimeout";
 import {delay} from "./util";
 import {authenticationManager} from "./AuthenticationManager";
+import {InvalidSecretException} from "./Exceptions";
 
 
 const DEFAULT_TIMEOUT = 5000; //ms
-const DEFAULT_MIN_DELAY = 500; //ms
+const DEFAULT_MIN_DELAY = 750; //ms
+
+
 
 const _mergeFetchOptions = (options, secret) => ({
     ...options,
@@ -22,6 +25,7 @@ const _throwIfNotOk = (path, res) => {
         if (res.status === 403) {
             console.log("Status was 403");
             // setAuthenticated(false);
+            throw new InvalidSecretException("nope")
         }
 
         throw Error(
@@ -31,10 +35,10 @@ const _throwIfNotOk = (path, res) => {
 };
 
 
-const _resultWithMinDelay = (result, minDelay) =>
-    Promise.all([result, delay(minDelay)])
-        .then(([result, _]) => result);
-
+const _resultWithMinDelay =  async(result, minDelay) =>{
+    await delay(minDelay);
+    return result;
+};
 
 export const ApiClient = () => {
 
