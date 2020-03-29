@@ -33,6 +33,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/_ah/**").permitAll()
                 .antMatchers("/swagger-ui.html").fullyAuthenticated()
+                .antMatchers("/webjars/**").fullyAuthenticated()
                 .antMatchers("/**.html").permitAll()
                 .antMatchers("/**.js").permitAll()
                 .antMatchers("/**.css").permitAll()

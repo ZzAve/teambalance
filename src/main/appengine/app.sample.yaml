@@ -24,7 +24,7 @@ handlers:
     static_files: static/\1
     upload: static/.*\.js$
     secure: always
-  - url: /(_ah|login|logout|oauth2|api).*
+  - url: /(_ah|login|logout|oauth2|api|swagger-ui.html|webjars).*
     script: auto
     secure: always
   - url: .*
