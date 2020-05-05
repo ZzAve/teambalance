@@ -10,6 +10,7 @@ import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import Loading from "./views/Loading";
 import {PrivateRoute} from "./components/PrivateRoute";
 import TopBar from "./components/TopBar";
+import Admin from "./views/Admin";
 
 
 // Determine which view to show.
@@ -43,6 +44,7 @@ const App = () => {
                     <Login handleRefresh={refreshTopBar} location={location}/>
                 )}
                 />
+                <PrivateRoute path="/admin" component={Admin} refresh={shouldRefresh} />
                 <PrivateRoute path="/loading" component={Loading} />
                 <PrivateRoute path="/" component={Overview} refresh={shouldRefresh}/>
               </Switch>

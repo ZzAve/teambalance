@@ -6,6 +6,7 @@ import {Card, CardHeader} from "@material-ui/core";
 import Transactions from "../components/Transactions";
 import React from "react";
 import Trainings from "../components/Trainings";
+import {ViewType} from "../utils/util";
 
 const Overview = ({ refresh }) => {
     return (
@@ -31,7 +32,7 @@ const Overview = ({ refresh }) => {
             <Grid item xs={12} md={6}>
                 <Grid container spacing={2}>
                     <PageItem title="Aanstaande trainingen (met prutsdata voor nu)">
-                        <Trainings refresh={refresh}/>
+                        <Trainings refresh={refresh} view={ViewType.List}/>
                     </PageItem>
 
                 </Grid>
