@@ -83,7 +83,7 @@
         <dependency>
             <groupId>com.github.bunq</groupId>
             <artifactId>sdk_java</artifactId>
-            <version>1.12.1</version>
+            <version>1.13.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
