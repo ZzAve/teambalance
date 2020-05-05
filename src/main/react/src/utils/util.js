@@ -15,3 +15,29 @@ export const withLoading= async (loadingStateSetter, func) => {
         await loadingStateSetter(false);
     }
 };
+
+
+
+const dateOptions = {
+    // year: "numeric",
+    month: "long",
+    day: "2-digit",
+    weekday: "long",
+    timeZone: "Europe/Amsterdam"
+};
+
+const timeOptions = {
+    hour12: false,
+    hour: "numeric",
+    minute:"numeric",
+    timeZone: "Europe/Amsterdam"
+};
+export const formattedDate = (dateTime) => new Intl.DateTimeFormat("nl-NL", dateOptions).format(dateTime);
+export const formattedTime = (dateTime) =>  new Intl.DateTimeFormat("nl-NL", timeOptions).format(dateTime);
+
+
+export const ViewType = {
+    List: "list",
+    Table: "table",
+};
+Object.freeze(ViewType);

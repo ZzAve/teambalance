@@ -5,6 +5,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const htmlPlugin = new HtmlWebPackPlugin({
   template: path.join(__dirname, "src/main/react/index.html"),
   filename: "./index.html"
+
 });
 
 module.exports = {
@@ -13,7 +14,10 @@ module.exports = {
       path.join(__dirname, "src/main/react")
   ],
   output: {
-    path: path.resolve(__dirname, "src/main/webapp")
+    path: path.resolve(__dirname, "src/main/webapp/"),
+    filename: "main.js",
+    publicPath: "/"
+
   },
 
   devtool: "cheap-module-source-map",
