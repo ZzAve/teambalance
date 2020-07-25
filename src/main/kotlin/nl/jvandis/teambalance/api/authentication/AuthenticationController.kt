@@ -8,13 +8,17 @@ import nl.jvandis.teambalance.api.SecretService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@Api(tags=["authentication"], position = Int.MIN_VALUE)
+@Api(tags = ["authentication"], position = Int.MIN_VALUE)
 @RequestMapping(path = ["api/authentication"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class AuthenticationController(
-        private val secretService: SecretService
+    private val secretService: SecretService
 ) {
 
     @GetMapping
@@ -24,16 +28,16 @@ class AuthenticationController(
     }
 
     data class Success(
-            val message: String = "You have managed to get access. Well done"
+        val message: String = "You have managed to get access. Well done"
     )
-
 
     @ExceptionHandler(InvalidSecretException::class)
     fun handleSecretExceptions(e: InvalidSecretException) =
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Error(
-                            status = HttpStatus.UNAUTHORIZED,
-                            reason = e.message ?: "Unauthorized")
-                    )
-
+        ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(
+                Error(
+                    status = HttpStatus.UNAUTHORIZED,
+                    reason = e.message ?: "Unauthorized"
+                )
+            )
 }

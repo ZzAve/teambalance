@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class BunqConfiguration(
-        @Value("\${app.bank.api-key}") private val apiKey: String,
-        @Value("\${app.bank.saveSessionToFile:false}") private val saveSessionToFile: Boolean
+    @Value("\${app.bank.api-key}") private val apiKey: String,
+    @Value("\${app.bank.saveSessionToFile:false}") private val saveSessionToFile: Boolean
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 

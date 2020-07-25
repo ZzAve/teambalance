@@ -9,13 +9,21 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Api(tags = ["users"])
 @RequestMapping(path = ["/api/users"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class UserController(
-        private val userRepository: UserRepository
+    private val userRepository: UserRepository
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -26,7 +34,7 @@ class UserController(
     }
 
     @GetMapping("/{id}")
-    fun getUser(@PathVariable(value="id") userId: Long): User{
+    fun getUser(@PathVariable(value = "id") userId: Long): User {
         log.info("getUser $userId")
         return userRepository.findByIdOrNull(userId) ?: throw InvalidUserException(userId)
     }
@@ -41,45 +49,43 @@ class UserController(
 
     @PutMapping("/{id}")
     fun updateUser(
-            @PathVariable(value = "id") userId: Long,
-            @RequestBody potentialUserUpdate: PotentialUserUpdate
+        @PathVariable(value = "id") userId: Long,
+        @RequestBody potentialUserUpdate: PotentialUserUpdate
     ): User {
         log.info("updatingUser: $potentialUserUpdate")
         return userRepository
-                .findByIdOrNull(userId)
-                ?.let {
-                    val x = it.copy(
-                            name = potentialUserUpdate.name ?: it.name,
-                            role = potentialUserUpdate.role ?: it.role
-                    )
+            .findByIdOrNull(userId)
+            ?.let {
+                val x = it.copy(
+                    name = potentialUserUpdate.name ?: it.name,
+                    role = potentialUserUpdate.role ?: it.role
+                )
 
-                    try {
-                        userRepository.save(x)
-                    } catch (e: DataIntegrityViolationException){
-                        throw DataConstraintViolationException("Could not update user $userId to $potentialUserUpdate, name already in use")
-                    }
-                } ?: throw InvalidUserException(userId)
+                try {
+                    userRepository.save(x)
+                } catch (e: DataIntegrityViolationException) {
+                    throw DataConstraintViolationException("Could not update user $userId to $potentialUserUpdate, name already in use")
+                }
+            } ?: throw InvalidUserException(userId)
     }
 
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun updateUser(
-            @PathVariable(value = "id") userId: Long
+        @PathVariable(value = "id") userId: Long
     ) {
         log.info("deletingUser: $userId")
         try {
             userRepository.deleteById(userId)
-        } catch (e: DataIntegrityViolationException){
+        } catch (e: DataIntegrityViolationException) {
             throw DataConstraintViolationException("User $userId could not be deleted. User is still bound to trainings")
         }
     }
-
-
 }
 
 data class PotentialUser(
-        val name: String,
-        val role: Role
+    val name: String,
+    val role: Role
 ) {
 
     fun internalize() = User(name, role)
@@ -87,10 +93,9 @@ data class PotentialUser(
     fun internalize(id: Long) = User(id = id, name = name, role = role)
 }
 
-
 data class PotentialUserUpdate(
-        val name: String?,
-        val role: Role?
+    val name: String?,
+    val role: Role?
 ) {
 
 //    fun internalize() = User(name, role)
