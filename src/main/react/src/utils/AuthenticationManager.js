@@ -1,6 +1,6 @@
 import React from "react";
 import Aes from "crypto-js/aes";
-import CryptoJS from "crypto-js";
+import Utf8 from "crypto-js/enc-utf8";
 import { authenticationApiClient } from "./AuthenticationApiClient";
 import { TimeoutError } from "./Exceptions";
 
@@ -24,7 +24,7 @@ const getSecretFromLocalStorage = () => {
   // Decrypt
   let cipher = item.toString();
   let decrypt = Aes.decrypt(cipher, PRIVATE_ENCRYPTION_KEY);
-  item = decrypt.toString(CryptoJS.enc.Utf8);
+  item = Utf8.stringify(decrypt);
 
   return item;
 };

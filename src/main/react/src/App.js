@@ -1,16 +1,19 @@
 // src/App.js
 
-import React, { useState } from "react";
-import Login from "./views/Login";
+import React, { lazy, Suspense, useState } from "react";
 import "./App.css";
-import { Container, CssBaseline } from "@material-ui/core";
-import Grid from "@material-ui/core/Grid";
-import Overview from "./views/Overview";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Switch } from "react-router-dom";
 import Loading from "./views/Loading";
 import { PrivateRoute } from "./components/PrivateRoute";
+import { PublicRoute } from "./components/PublicRoute";
 import TopBar from "./components/TopBar";
-import Admin from "./views/Admin";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
+
+const Admin = lazy(() => import("./views/Admin.js"));
+const Login = lazy(() => import("./views/Login.js"));
+const Overview = lazy(() => import("./views/Overview.js"));
 
 // Determine which view to show.
 
@@ -22,12 +25,18 @@ const App = () => {
   const [shouldRefresh, setShouldRefresh] = useState(false);
 
   const handleRefresh = _ => {
-    setShouldRefresh(!shouldRefresh);
+    setTimeout(() => {
+      setShouldRefresh(!shouldRefresh);
+    });
   };
 
   const refreshTopBar = _ => {
-    setTopBarShouldRefresh(!topBarShouldRefresh);
+    setTimeout(() => {
+      setTopBarShouldRefresh(!topBarShouldRefresh);
+    });
   };
+
+  console.debug("[App] render");
   return (
     <>
       <CssBaseline />
@@ -35,25 +44,26 @@ const App = () => {
         <TopBar handleRefresh={handleRefresh} refresh={topBarShouldRefresh} />
         <Router>
           <Grid container spacing={2} alignItems="flex-start">
-            <Switch>
-              <Route
-                path="/authenticate"
-                children={({ location }) => (
-                  <Login handleRefresh={refreshTopBar} location={location} />
-                )}
-              />
-              <PrivateRoute
-                path="/admin"
-                component={Admin}
-                refresh={shouldRefresh}
-              />
-              <PrivateRoute path="/loading" component={Loading} />
-              <PrivateRoute
-                path="/"
-                component={Overview}
-                refresh={shouldRefresh}
-              />
-            </Switch>
+            <Suspense fallback={<Loading />}>
+              <Switch>
+                <PublicRoute
+                  path="/authenticate"
+                  component={Login}
+                  handleRefresh={refreshTopBar}
+                />
+                <PrivateRoute
+                  path="/admin"
+                  component={Admin}
+                  refresh={shouldRefresh}
+                />
+                <PrivateRoute path="/loading" component={Loading} />
+                <PrivateRoute
+                  path="/"
+                  component={Overview}
+                  refresh={shouldRefresh}
+                />
+              </Switch>
+            </Suspense>
           </Grid>
         </Router>
       </Container>

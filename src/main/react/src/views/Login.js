@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Button, TextField } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
 import PageItem from "../components/PageItem";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
 import { withLoading } from "../utils/util";
 import Loading from "./Loading";
 import { Redirect } from "react-router-dom";
@@ -65,6 +66,7 @@ const Login = ({ location, handleRefresh }) => {
     return <Loading />;
   }
 
+  console.log(`[Login] ${JSON.stringify(location)} ... ${handleRefresh}`);
   return (
     <Grid item xs={12}>
       <Grid container spacing={2}>

@@ -4,7 +4,6 @@ export const withLoading = async (loadingStateSetter, func) => {
   try {
     await loadingStateSetter(true);
     const x = await func(); // fault tolerant part
-    console.debug(`Result of fun: ${x}`);
     return x;
     // }
     // catch (e) {

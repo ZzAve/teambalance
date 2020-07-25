@@ -1,7 +1,8 @@
 import React from "react";
-import { Button, Hidden } from "@material-ui/core";
 import LockIcon from "@material-ui/icons/Lock";
 import { authenticationManager } from "../utils/AuthenticationManager";
+import Button from "@material-ui/core/Button";
+import Hidden from "@material-ui/core/Hidden";
 
 export const Logout = ({ handleRefresh }) => {
   const handleLogout = () => {

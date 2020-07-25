@@ -11,15 +11,13 @@ const TopBar = ({ handleRefresh, refresh }) => {
   const [isAuth, setIsAuth] = useState(true);
 
   useEffect(() => {
-    let checkAuthentication = authenticationManager.checkAuthentication();
-    checkAuthentication.then(it => {
-      console.log(`Result: ${it}`);
-    });
-    checkAuthentication.then(it => {
+    authenticationManager.checkAuthentication().then(it => {
+      console.debug(`[Topbar] Authentication result: ${it}`);
       setIsAuth(it);
     });
   }, [refresh]);
 
+  console.debug("[Topbar] render");
   return (
     <AppBar position="static">
       <Toolbar>
