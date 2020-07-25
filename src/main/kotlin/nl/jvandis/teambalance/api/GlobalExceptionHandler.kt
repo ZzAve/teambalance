@@ -16,54 +16,62 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(InvalidSecretException::class)
     fun handleSecretExceptions(e: InvalidSecretException) =
-            ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Error(
-                            status = HttpStatus.FORBIDDEN,
-                            reason = e.message ?: "Forbidden")
-                    )
+        ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(
+                Error(
+                    status = HttpStatus.FORBIDDEN,
+                    reason = e.message ?: "Forbidden"
+                )
+            )
 
     @ExceptionHandler(ConstraintViolationException::class)
     fun handleConstraintViolationException(e: ConstraintViolationException) = ResponseEntity
-            .badRequest()
-            .body(Error(
-                    status = HttpStatus.BAD_REQUEST,
-                    reason = e.message ?: "Please verify your input arguments"
-            ))
+        .badRequest()
+        .body(
+            Error(
+                status = HttpStatus.BAD_REQUEST,
+                reason = e.message ?: "Please verify your input arguments"
+            )
+        )
 
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleBadInputArguments(e: MethodArgumentTypeMismatchException): ResponseEntity<Error> {
         log.info("Invalid request arguments received: ", e.message)
         return ResponseEntity
-                .badRequest()
-                .body(Error(
-                        status = HttpStatus.BAD_REQUEST,
-                        reason = "Please verify your input arguments"
-                ))
+            .badRequest()
+            .body(
+                Error(
+                    status = HttpStatus.BAD_REQUEST,
+                    reason = "Please verify your input arguments"
+                )
+            )
     }
 
     @ExceptionHandler(InvalidIdException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleInvalidRequestArguments(e: InvalidIdException): ResponseEntity<Error> {
         return ResponseEntity
-                .badRequest()
-                .body(Error(
-                        status = HttpStatus.BAD_REQUEST,
-                        reason = "Could not apply operation because Id was invalid (${e.type} id ${e.id}) "
-                ))
-
+            .badRequest()
+            .body(
+                Error(
+                    status = HttpStatus.BAD_REQUEST,
+                    reason = "Could not apply operation because Id was invalid (${e.type} id ${e.id}) "
+                )
+            )
     }
 
     @ExceptionHandler(DataConstraintViolationException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun handleDataConstraintValidationExceptions(e: DataConstraintViolationException) : ResponseEntity<Error>{
+    fun handleDataConstraintValidationExceptions(e: DataConstraintViolationException): ResponseEntity<Error> {
         return ResponseEntity
-                .badRequest()
-                .body(Error(
-                        status = HttpStatus.BAD_REQUEST,
-                        reason = e.message
-                ))
-
+            .badRequest()
+            .body(
+                Error(
+                    status = HttpStatus.BAD_REQUEST,
+                    reason = e.message
+                )
+            )
     }
 
     @ExceptionHandler(Throwable::class)
@@ -71,11 +79,12 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     fun handleUnhandledExceptions(t: Throwable): ResponseEntity<Error> {
         log.error("Unhandled exception occured: ${t.message}", t)
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Error(
-                        status = HttpStatus.INTERNAL_SERVER_ERROR,
-                        reason = "Something went wrong. Please try again later"
-                ))
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(
+                Error(
+                    status = HttpStatus.INTERNAL_SERVER_ERROR,
+                    reason = "Something went wrong. Please try again later"
+                )
+            )
     }
-
 }

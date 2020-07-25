@@ -18,9 +18,9 @@ import kotlin.random.Random
 
 @Configuration
 class Initializer(
-        private val userRepository: UserRepository,
-        private val eventRepository: EventRepository,
-        private val attendeeRepository: AttendeeRepository
+    private val userRepository: UserRepository,
+    private val eventRepository: EventRepository,
+    private val attendeeRepository: AttendeeRepository
 
 ) {
 
@@ -30,11 +30,13 @@ class Initializer(
 
         return InitializingBean {
             if (true) {
-                userRepository.saveAll(listOf(
+                userRepository.saveAll(
+                    listOf(
                         User("Julius", Role.DIAGONAL),
                         User("Maurice", Role.COACH),
                         User("Bocaj", Role.MID),
-                        User("Joep", Role.PASSER))
+                        User("Joep", Role.PASSER)
+                    )
                 )
 
                 log.info("After user injection")
@@ -49,18 +51,18 @@ class Initializer(
                 val trainings = eventRepository.findAll()
                 log.info("ALl trainings: ", trainings)
 
-
                 trainings.forEach { t ->
-                    attendeeRepository.saveAll(users.map { user ->
-                        Attendee(user, t, availability =  Availability.values()[Random.nextInt(Availability.values().size)])
-                    })
+                    attendeeRepository.saveAll(
+                        users.map { user ->
+                            Attendee(user, t, availability = Availability.values()[Random.nextInt(Availability.values().size)])
+                        }
+                    )
                 }
 
                 log.info("After attendee additions", attendeeRepository.findAll())
             }
         }
     }
-
 }
 //    @Bean
 //    fun initializeTraining(): InitializingBean{

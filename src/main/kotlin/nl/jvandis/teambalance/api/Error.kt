@@ -1,13 +1,11 @@
 package nl.jvandis.teambalance.api
 
 import org.springframework.http.HttpStatus
-import java.lang.RuntimeException
 
 data class Error(
-        val status: HttpStatus,
-        val reason: String
+    val status: HttpStatus,
+    val reason: String
 )
-
 
 open class InvalidIdException(val id: Long, val type: String) : RuntimeException()
 class InvalidUserException(id: Long) : InvalidIdException(id, "user")

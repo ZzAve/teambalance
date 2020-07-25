@@ -3,16 +3,10 @@ package nl.jvandis.teambalance
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import springfox.documentation.builders.PathSelectors.regex
-
 import springfox.documentation.builders.RequestHandlerSelectors
-
 import springfox.documentation.spi.DocumentationType
-
 import springfox.documentation.spring.web.plugins.Docket
-
-
 import springfox.documentation.swagger2.annotations.EnableSwagger2
-
 
 @Configuration
 @EnableSwagger2
@@ -23,16 +17,14 @@ class SpringFoxConfig {
         val path = "/api/.*"
         return Docket(DocumentationType.SWAGGER_2)
 //                .groupName("api")
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(regex(path))
-                .build()
+            .select()
+            .apis(RequestHandlerSelectors.any())
+            .paths(regex(path))
+            .build()
     }
-
-
 }
 //
-//private fun metaData(): ApiInfo {
+// private fun metaData(): ApiInfo {
 //    val apiInfo =  ApiInfo(
 //            "Team Balance REST API",
 //            "Spring Boot REST API for Tovo Heren 5",
@@ -43,4 +35,4 @@ class SpringFoxConfig {
 //    "https://www.apache.org/licenses/LICENSE-2.0",
 //            null);
 //    return apiInfo;
-//}
+// }

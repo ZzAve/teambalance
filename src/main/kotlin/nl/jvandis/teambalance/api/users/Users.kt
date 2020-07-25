@@ -1,26 +1,28 @@
 package nl.jvandis.teambalance.api.users
 
-import javax.persistence.*
-
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
 
 data class Users(
-        val users: List<User>
+    val users: List<User>
 )
 
-@Entity(name="Uzer")
+@Entity(name = "Uzer")
 data class User(
-        @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
-        @Column(nullable = false, unique = true) val name: String,
-        @Enumerated(EnumType.STRING) @Column(nullable = false) val role: Role
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
+    @Column(nullable = false, unique = true) val name: String,
+    @Enumerated(EnumType.STRING) @Column(nullable = false) val role: Role
 ) {
 
     constructor(name: String, role: Role) : this(0, name, role)
 
-
     override fun toString() = "User[id=$id, name=$name, role=$role]"
-
 }
-
 
 enum class Role {
     TRAINER,
