@@ -3,20 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^4.8.2",
-    "@material-ui/icons": "^4.5.1",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "http-proxy-middleware": "^0.20.0",
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.3.0",
     "use-persisted-state": "^0.3.0"
   },
   "devDependencies": {
     "@babel/polyfill": "^7.8.7",
+    "@testing-library/jest-dom": "^5.11.1",
+    "@testing-library/react": "^10.4.7",
+    "@testing-library/user-event": "^12.0.14",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.1.0",
     "babel-polyfill": "^6.26.0",
@@ -27,9 +25,10 @@
     "css-loader": "^3.4.0",
     "html-webpack-plugin": "^3.2.0",
     "prettier": "^1.19.1",
+    "react-scripts": "^3.4.1",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
-    "webpack-dev-server": "^3.2.1"
+    "webpack-dev-server": "^3.11.0"
   },
   "scripts": {
     "start": "webpack-dev-server --mode development --host 0.0.0.0",
