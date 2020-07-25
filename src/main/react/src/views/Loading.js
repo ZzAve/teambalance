@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from "react";
-import {SpinnerWithText} from "../components/SpinnerWithText";
+import React, { useEffect, useState } from "react";
+import { SpinnerWithText } from "../components/SpinnerWithText";
 
 const Texts = [
   "Netten aan het opspannen",
@@ -10,7 +10,6 @@ const Texts = [
   "Wachtwoord controleren",
   "💵 💲 💰" // emojis
 ];
-
 
 const Loading = () => {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -43,7 +42,6 @@ const Loading = () => {
     }, 750);
 
   return <SpinnerWithText text={text} size={"lg"} />;
-
 };
 
 export default Loading;
