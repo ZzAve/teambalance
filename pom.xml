@@ -18,8 +18,8 @@
         <java.version>1.8</java.version>
         <kotlin.version>1.3.72</kotlin.version>
         <!-- installed node/npm version: lts/carbon -->
-        <node.version>v8.16.2</node.version>
-        <npm.version>6.4.1</npm.version>
+        <node.version>v12.18.0</node.version>
+        <npm.version>6.14.4</npm.version>
         <springfox-swagger.version>3.0.0</springfox-swagger.version>
     </properties>
 
