@@ -7,3 +7,4 @@ node
 node_modules
 src/main/webapp
 .env
+/cloud_sql_proxy
