@@ -2,6 +2,21 @@ app:
   bank:
     secret-value: ${API_SECRET}
     api-key: ${BUNQ_APIKEY}
+    bank-account-id: ${BUNQ_BANK_ACCOUNT_ID}
+    transaction-limit: 20 # up this when pagination is built (max is 200 from bunq)
+    cache:
+      balance:
+        enabled: true
+        expire-after-write: 60s
+        refresh-after-write: 30s
+        maximum-size: 1
+      transactions:
+        enabled: true
+        expire-after-write: 60s
+        refresh-after-write: 30s
+        maximum-size: 1
+
+
 
 spring:
   security:

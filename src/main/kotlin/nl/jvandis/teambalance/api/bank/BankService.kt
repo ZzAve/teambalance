@@ -2,18 +2,33 @@ package nl.jvandis.teambalance.api.bank
 
 import com.bunq.sdk.model.generated.`object`.Amount
 import com.bunq.sdk.model.generated.endpoint.Payment
-import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.stereotype.Service
+import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.TimeUnit
 import kotlin.math.min
 
-private const val TEAM_BANK_ACCOUNT_ID = 1547165
 private val FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS").withZone(ZoneId.of("UTC"))
-private const val DEFAULT_LIMIT = 200
+
+data class CacheConfig(
+    val enabled: Boolean = true,
+    val expireAfterWrite: Duration,
+    val refreshAfterWrite: Duration?,
+    val maximumSize: Long
+)
+
+@ConstructorBinding
+@ConfigurationProperties("app.bank.cache")
+data class BankCacheConfig(
+    val balance: CacheConfig,
+    val transactions: CacheConfig
+)
 
 /**
  * BankService resolves bankrelated questions
@@ -23,47 +38,42 @@ private const val DEFAULT_LIMIT = 200
  */
 @Service
 class BankService(
-    private val bunqRepository: BunqRepository
+    private val bunqRepository: BunqRepository,
+    private val bankCacheConfig: BankCacheConfig,
+    @Value("\${app.bank.bank-account-id}") private val bankAccountId: Int,
+    @Value("\${app.bank.transaction-limit}") private val transactionLimit: Int
+
 ) {
-    private val balanceCache: Cache<Int, String> = Caffeine.newBuilder()
-        .expireAfterWrite(30, TimeUnit.SECONDS)
-        .maximumSize(1)
-        .build()
+    private val balanceCache: AsyncLoadingCache<Int, String> =
+        setupCache(bankCacheConfig.balance) { accountId: Int -> updateBalance(accountId) }
 
-    private val transactionsCache: Cache<Int, Transactions> = Caffeine.newBuilder()
-        .expireAfterWrite(30, TimeUnit.SECONDS)
-        .maximumSize(1)
-        .build()
+    private val transactionsCache: AsyncLoadingCache<Int, Transactions> =
+        setupCache(bankCacheConfig.transactions) { accountId: Int -> updateTransactions(accountId) }
 
-    fun getBalance(): String = balanceCache.getIfPresent(TEAM_BANK_ACCOUNT_ID) ?: updateBalance()
+    fun getBalance(): String = balanceCache[bankAccountId].get()
 
-    private fun updateBalance(): String =
-        bunqRepository.getMonetaryAccountBank(TEAM_BANK_ACCOUNT_ID).balance
+    fun getTransactions(limit: Int, offset: Int = 0): Transactions =
+        transactionsCache[bankAccountId].get()
+            .filter(limit, offset)
+
+    private fun updateBalance(accountId: Int): String {
+        return bunqRepository.getMonetaryAccountBank(accountId).balance
             .let {
                 parseAmount(it)
             }.also {
-                balanceCache.put(TEAM_BANK_ACCOUNT_ID, it)
                 bunqRepository.updateContext()
             }
+    }
 
-    fun getTransactions(limit: Int, offset: Int = 0): Transactions =
-        (transactionsCache.getIfPresent(TEAM_BANK_ACCOUNT_ID) ?: updateTransactions())
-            .filter(limit, offset)
-
-    private fun updateTransactions(): Transactions =
-        bunqRepository.getAllPayment(TEAM_BANK_ACCOUNT_ID, DEFAULT_LIMIT).let {
+    private fun updateTransactions(accountId: Int): Transactions {
+        return bunqRepository.getAllPayment(accountId, transactionLimit).let {
             Transactions(
                 transactions = it.map { payment -> payment.toDomain() },
                 limit = it.size
             )
         }.also {
-            transactionsCache.put(TEAM_BANK_ACCOUNT_ID, it)
             bunqRepository.updateContext()
         }
-
-    private fun parseAmount(balance: Amount): String {
-        val currencySymbol = if (balance.currency == "EUR") "€" else balance.currency
-        return "$currencySymbol ${balance.value}"
     }
 
     private fun Payment.toDomain() = Transaction(
@@ -73,16 +83,28 @@ class BankService(
         date = created.toZonedDateTime()
     )
 
-    private fun String.toZonedDateTime() = ZonedDateTime.parse(this, FORMATTER).withZoneSameInstant(ZoneId.of("Europe/Paris"))
-}
+    private fun parseAmount(balance: Amount): String {
+        val currencySymbol = if (balance.currency == "EUR") "€" else balance.currency
+        return "$currencySymbol ${balance.value}"
+    }
 
-private fun Transactions.filter(limit: Int, offset: Int): Transactions {
-    // filter limit
-    val allowedUpperLimit = min(transactions.size, offset + limit)
-    val allowedLowerLimit = min(transactions.size - 1, offset)
-    val filteredTransactions = transactions.subList(allowedLowerLimit, allowedUpperLimit)
-    return Transactions(
-        transactions = filteredTransactions,
-        limit = filteredTransactions.size
-    )
+    private fun String.toZonedDateTime() =
+        ZonedDateTime.parse(this, FORMATTER).withZoneSameInstant(ZoneId.of("Europe/Paris"))
+
+    private fun Transactions.filter(limit: Int, offset: Int): Transactions {
+        val allowedUpperLimit = min(transactions.size, offset + limit)
+        val allowedLowerLimit = min(transactions.size - 1, offset)
+        val filteredTransactions = transactions.subList(allowedLowerLimit, allowedUpperLimit)
+        return Transactions(
+            transactions = filteredTransactions,
+            limit = filteredTransactions.size
+        )
+    }
+
+    private fun <K, V> setupCache(config: CacheConfig, loadingFunction: (K) -> V): AsyncLoadingCache<K, V> =
+        Caffeine.newBuilder()
+            .expireAfterWrite(config.expireAfterWrite)
+            .apply { if (config.refreshAfterWrite != null) refreshAfterWrite(config.refreshAfterWrite) }
+            .maximumSize(if (config.enabled) config.maximumSize else 0)
+            .buildAsync<K, V> { key -> loadingFunction(key) }
 }
