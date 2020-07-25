@@ -1,19 +1,20 @@
 import React from "react";
 import Aes from "crypto-js/aes";
-import CryptoJS from "crypto-js";
-import {authenticationApiClient} from "./AuthenticationApiClient";
-import {TimeoutError} from "./Exceptions";
+import Utf8 from "crypto-js/enc-utf8";
+import { authenticationApiClient } from "./AuthenticationApiClient";
+import { TimeoutError } from "./Exceptions";
 
 const _key = "apiSecret";
 const PRIVATE_ENCRYPTION_KEY =
   "ZtptKHnNIhr7gqycuyDlSE8mIpBGaJJsiU3IEB7dQvtsO9vUMGctHdZtzOzoLH8shjzSUoO6YMMz3elMGU16YDooJXgtxSObUXZkxh6XnPY6QSz1HwL5W1uwpFv4oqzIzHbp8lTYGS1mCmuUbuKu87S8fhMhyUJwr1NG00R1bCXDkemdVXvD4ChwZDrsehxGuu3EHYGXGTyp5Sf3Q8bZC28ktZcNnf78D57kRo2wIgPdbi2j60SNOAvR4g34WXFU";
 
-
 let _secret = undefined;
 let _authenticated = false;
-let _authenticationCheck = new Promise(resolve => {resolve(false)});
+let _authenticationCheck = new Promise(resolve => {
+  resolve(false);
+});
 
-const getSecretFromLocalStorage = () =>{
+const getSecretFromLocalStorage = () => {
   // debugger
   let item = localStorage.getItem(_key);
   if (item === null || item === "null") {
@@ -23,7 +24,7 @@ const getSecretFromLocalStorage = () =>{
   // Decrypt
   let cipher = item.toString();
   let decrypt = Aes.decrypt(cipher, PRIVATE_ENCRYPTION_KEY);
-  item = decrypt.toString(CryptoJS.enc.Utf8);
+  item = Utf8.stringify(decrypt);
 
   return item;
 };
@@ -43,7 +44,7 @@ const storeSecret = newSecret => {
   }
 };
 
-const setSecret = (newSecret) => {
+const setSecret = newSecret => {
   storeSecret(newSecret);
   _secret = newSecret;
 };
@@ -51,68 +52,67 @@ const setSecret = (newSecret) => {
 const getSecret = () => _secret;
 
 const isAuthenticated = () => _authenticated;
-const checkAuthentication = () =>_authenticationCheck;
+const checkAuthentication = () => _authenticationCheck;
 
-const _doAuthenticate = (passphrase) =>
-    authenticationApiClient.authenticate(passphrase)
-        .then(result => {
-          console.log(`Successful authentication ${result.message}`);
-          setSecret(passphrase);
-        });
+const _doAuthenticate = passphrase =>
+  authenticationApiClient.authenticate(passphrase).then(result => {
+    console.log(`Successful authentication ${result.message}`);
+    setSecret(passphrase);
+  });
 
-const authenticate = (passphrase) => {
+const authenticate = passphrase => {
   let isAuthenticated = _doAuthenticate(passphrase);
 
-    _authenticationCheck = new Promise((resolve) =>
-        isAuthenticated
-            .then(_ => true)
-            .catch(_ => false)
-            .then(it => {
-                _authenticated = it;
-                resolve(it)
-            })
-    );
+  _authenticationCheck = new Promise(resolve =>
+    isAuthenticated
+      .then(_ => true)
+      .catch(_ => false)
+      .then(it => {
+        _authenticated = it;
+        resolve(it);
+      })
+  );
 
   return isAuthenticated;
 };
 
 const logout = () => {
-    setSecret(null);
-    _authenticated = false;
-    _authenticationCheck = new Promise(resolve => {resolve(_authenticated)});
-
+  setSecret(null);
+  _authenticated = false;
+  _authenticationCheck = new Promise(resolve => {
+    resolve(_authenticated);
+  });
 };
 const recursiveAuth = async (pass, number = 1) => {
-    if (number >10) {
-        throw Error("Too many tries");
-    }
+  if (number > 10) {
+    throw Error("Too many tries");
+  }
 
-    try {
-        console.debug(`Trying to recursive auth ${number}`);
-        await _doAuthenticate(pass)
-    } catch (e) {
-        if (e instanceof TimeoutError) {
-            await recursiveAuth(pass, ++number)
-        } else {
-            console.debug("Unknown error occured", e);
-            throw e;
-        }
+  try {
+    console.debug(`Trying to recursive auth ${number}`);
+    await _doAuthenticate(pass);
+  } catch (e) {
+    if (e instanceof TimeoutError) {
+      await recursiveAuth(pass, ++number);
+    } else {
+      console.debug("Unknown error occured", e);
+      throw e;
     }
+  }
 };
 
-const startupAuth = (passphrase) => {
-    _authenticationCheck = new Promise((resolve) => {
-        return recursiveAuth(passphrase)
-            .then((result) => {
-                _authenticated = true;
-                resolve(true)
-            })
-            .catch(_ => {
-                _authenticated = false;
-                resolve(false)
-            })
-    })
-
+const startupAuth = passphrase => {
+  _authenticationCheck = new Promise(resolve => {
+    return recursiveAuth(passphrase)
+      .then(result => {
+        _authenticated = true;
+        resolve(true);
+      })
+      .catch(_ => {
+        _authenticated = false;
+        resolve(false);
+      });
+  });
 };
 
 setTimeout(() => {

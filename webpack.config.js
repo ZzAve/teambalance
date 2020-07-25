@@ -5,21 +5,24 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const htmlPlugin = new HtmlWebPackPlugin({
   template: path.join(__dirname, "src/main/react/index.html"),
   filename: "./index.html"
-
 });
 
 module.exports = {
   entry: [
-      'babel-polyfill',
-      path.join(__dirname, "src/main/react")
+    path.join(__dirname, "src/main/react/index.js"),
+    path.join(__dirname, "src/main/react/polyfill.js")
   ],
   output: {
     path: path.resolve(__dirname, "src/main/webapp/"),
-    filename: "main.js",
+    filename: "[name].bundle.js",
+    chunkFilename: "[name].bundle.js",
     publicPath: "/"
-
   },
-
+  optimization: {
+    splitChunks: {
+      chunks: "all"
+    }
+  },
   devtool: "cheap-module-source-map",
   module: {
     rules: [
@@ -44,8 +47,8 @@ module.exports = {
   plugins: [
     htmlPlugin,
     new CopyWebpackPlugin([
-        // "src/main/react/images"
-      {from: "react/images", to: "images", context: "src/main" },
+      // "src/main/react/images"
+      { from: "react/images", to: "images", context: "src/main" },
       // { from: "react/manifest.json", to: "webapp/", context: "src/main" },
       "src/main/react/manifest.json"
     ])
