@@ -1,12 +1,13 @@
-import { SpinnerWithText } from "./SpinnerWithText";
+import { SpinnerWithText } from "../SpinnerWithText";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import React, { useEffect, useState } from "react";
-import { trainingsApiClient } from "../utils/TrainingsApiClient";
-import { ViewType, withLoading } from "../utils/util";
+import { trainingsApiClient } from "../../utils/TrainingsApiClient";
+import { ViewType, withLoading } from "../../utils/util";
 import { Card, CardHeader } from "@material-ui/core";
 import TrainingsList from "./TrainingsList";
 import TrainingsTable from "./TrainingsTable";
+import PageItem from "../PageItem";
 
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
@@ -48,17 +49,11 @@ const Trainings = ({ refresh, view }) => {
     );
   } else if (view === ViewType.Table) {
     return (
-      <Grid item xs={12}>
-        <Card>
-          <CardHeader title="Trainingen" />
-        </Card>
-        <Card>
-          <TrainingsTable
-            trainings={trainings}
-            updateTrigger={updateTrainings}
-          />
-        </Card>
-      </Grid>
+      <PageItem title="Trainingen">
+        <TrainingsTable trainings={trainings} updateTrigger={updateTrainings} />
+
+        {/*</Grid>*/}
+      </PageItem>
     );
   } else {
     return (

@@ -1,8 +1,8 @@
 import Grid from "@material-ui/core/Grid";
 import React from "react";
 import Typography from "@material-ui/core/Typography";
-import Attendees from "./Attendees";
-import { formattedDate, formattedTime } from "../utils/util";
+import Attendees from "../Attendees";
+import { formattedDate, formattedTime } from "../../utils/util";
 
 const TrainingsList = ({ trainings, updateTrigger }) => (
   <Grid container spacing={5}>

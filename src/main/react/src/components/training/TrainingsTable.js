@@ -1,6 +1,6 @@
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
-import { formattedDate, formattedTime } from "../utils/util";
+import { formattedDate, formattedTime } from "../../utils/util";
 import Grid from "@material-ui/core/Grid";
 import TableContainer from "@material-ui/core/TableContainer";
 import Paper from "@material-ui/core/Paper";
@@ -11,6 +11,10 @@ import React from "react";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { Button } from "@material-ui/core";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import Hidden from "@material-ui/core/Hidden";
+import AddIcon from "@material-ui/icons/Add";
+import { Link } from "react-router-dom";
 
 const TrainingsTable = ({ trainings, updateTrigger }) => {
   const parseAttendees = attendees =>
@@ -63,22 +67,32 @@ const TrainingsTable = ({ trainings, updateTrigger }) => {
   );
 
   return (
-    <Grid container spacing={1}>
-      <TableContainer component={Paper}>
-        <Table aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Datum</TableCell>
-              <TableCell align="right">Tijd</TableCell>
-              <TableCell align="right">Location</TableCell>
-              <TableCell align="right">Opmerking</TableCell>
-              <TableCell align="right">Deelnemers</TableCell>
-              <TableCell align="right">Aanpassen</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>{getTableBody()}</TableBody>
-        </Table>
-      </TableContainer>
+    <Grid container spacing={5}>
+      <Grid item xs={12}>
+        <Link to="/admin/new-training">
+          <Button variant="contained" color="primary">
+            <AddIcon spacing={5} />
+            <Hidden xsDown>Nieuwe training</Hidden>
+          </Button>
+        </Link>
+      </Grid>
+      <Grid item xs={12}>
+        <TableContainer component={Paper}>
+          <Table aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Datum</TableCell>
+                <TableCell align="right">Tijd</TableCell>
+                <TableCell align="right">Location</TableCell>
+                <TableCell align="right">Opmerking</TableCell>
+                <TableCell align="right">Deelnemers</TableCell>
+                <TableCell align="right">Aanpassen</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>{getTableBody()}</TableBody>
+          </Table>
+        </TableContainer>
+      </Grid>
     </Grid>
   );
 };
