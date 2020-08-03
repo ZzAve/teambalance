@@ -16,21 +16,16 @@ data class UpdateTrainingRequest(
 )
 
 data class PotentialTraining(
-    val startTime: Long,
+    val startTime: Instant,
     val location: String,
     val comment: String,
     val attendees: List<Long>
 ) {
-    fun internalize(users: Iterable<User>): Training {
-        val training = Training(
-            startTime = Instant.ofEpochMilli(startTime),
-            comment = comment,
-            location = location
-        )
-
-        users.map { it.toAttendee(training) }
-        return training
-    }
+    fun internalize(): Training = Training(
+        startTime = startTime,
+        comment = comment,
+        location = location
+    )
 }
 
 fun User.toAttendee(event: Event) = Attendee(
@@ -38,7 +33,7 @@ fun User.toAttendee(event: Event) = Attendee(
     event = event
 )
 
-fun List<Attendee>.toTrainingResponse(trainingId: Long) = map {
+fun Iterable<Attendee>.toTrainingResponse(trainingId: Long) = map {
     AttendeeResponse(
         id = it.id,
         eventId = trainingId,

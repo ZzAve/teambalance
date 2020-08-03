@@ -69,7 +69,7 @@ const Admin = ({ refresh }) => {
 const NewTraining = ({}) => {
   return (
     <PageItem title={"Nieuwe training"}>
-      <TrainingDetails id={2} />
+      <TrainingDetails />
     </PageItem>
   );
 };

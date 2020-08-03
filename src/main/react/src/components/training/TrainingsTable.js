@@ -53,9 +53,11 @@ const TrainingsTable = ({ trainings, updateTrigger }) => {
         return (
           <TableRow key={row.id}>
             <TableCell component="th" scope="row">
-              {formattedDate(row.date)}
+              {formattedDate(new Date(row.startTime))}
             </TableCell>
-            <TableCell align="right">{formattedTime(row.date)}</TableCell>
+            <TableCell align="right">
+              {formattedTime(new Date(row.startTime))}
+            </TableCell>
             <TableCell align="right">{row.location}</TableCell>
             <TableCell align="right">{row.comment}</TableCell>
             <TableCell align="right">{parseAttendees(row.attendees)}</TableCell>

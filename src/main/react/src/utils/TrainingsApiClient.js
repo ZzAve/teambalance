@@ -8,6 +8,17 @@ const getTrainings = (since, includeAttendees = true) => {
   );
 };
 
+const createTraining = ({ location, comment, startTime, attendees }) => {
+  return trainingsClient.callWithBody(
+    "trainings",
+    { comment, location, startTime, attendees },
+    { method: "POST" }
+  );
+};
+
+const updateTraining = ({ id, location, comment, startTime, attendees }) => {
+  return trainingsClient.callWithBody("trainings/${id}", {}, { method: "PUT" });
+};
 const updateAttendee = (attendeeId, availability) => {
   return trainingsClient
     .callWithBody(
@@ -29,5 +40,7 @@ const updateAttendee = (attendeeId, availability) => {
 export const trainingsApiClient = {
   ...trainingsClient,
   getTrainings,
+  createTraining,
+  updateTraining,
   updateAttendee
 };

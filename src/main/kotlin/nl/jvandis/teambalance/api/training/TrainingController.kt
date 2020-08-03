@@ -82,11 +82,23 @@ class TrainingController(
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    fun postUser(@RequestBody potentialTraining: PotentialTraining): Training {
+    fun postUser(@RequestBody potentialTraining: PotentialTraining): TrainingResponse {
         log.info("postTraining $potentialTraining")
         val users = userRepository.findAll()
-        val training = potentialTraining.internalize(users)
-        return eventRepository.save(training)
+        val training = potentialTraining.internalize()
+
+        val attendees = users.map { it.toAttendee(training) }
+
+        val savedTraining = eventRepository.save(training)
+        val savedAttendeesResponse = attendeeRepository.saveAll(attendees).toTrainingResponse(savedTraining.id)
+
+        return TrainingResponse(
+            id = savedTraining.id,
+            comment = training.comment,
+            location = savedTraining.location,
+            startTime = savedTraining.startTime,
+            attendees = savedAttendeesResponse
+        )
     }
 
     @ResponseStatus(HttpStatus.CREATED)

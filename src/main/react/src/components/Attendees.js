@@ -80,7 +80,7 @@ const Attendees = ({ attendees, onUpdate }) => {
   );
 };
 
-const Attendee = ({ attendee, onSelection }) => {
+export const Attendee = ({ attendee, onSelection }) => {
   return (
     <Button
       variant="contained"
