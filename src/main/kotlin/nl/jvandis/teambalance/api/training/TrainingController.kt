@@ -12,6 +12,7 @@ import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -39,7 +40,7 @@ class TrainingController(
     @GetMapping
     fun getTrainings(
         @RequestParam(value = "includeAttendees", defaultValue = "false") includeAttendees: Boolean,
-        @RequestParam(value = "since", required = false) since: LocalDateTime?,
+        @RequestParam(value = "since", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: LocalDateTime?,
         @RequestParam(value = "limit", defaultValue = "50") limit: Int
 
     ): TrainingsResponse {

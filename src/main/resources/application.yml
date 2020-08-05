@@ -36,8 +36,11 @@ spring:
     instance-connection-name: ${INSTANCE_CONNECTION_NAME}
     database-name: ${DATABASE_NAME}
 
-  jackson.serialization:
-    WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS: false
+  jackson:
+    date-format: "yyyy-MM-dd HH:mm:ss"
+
+    serialization:
+      WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS: false
 
 springfox:
   documentation:

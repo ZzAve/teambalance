@@ -15,6 +15,7 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @ExceptionHandler(InvalidSecretException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     fun handleSecretExceptions(e: InvalidSecretException) =
         ResponseEntity.status(HttpStatus.FORBIDDEN)
             .body(
@@ -25,19 +26,25 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
             )
 
     @ExceptionHandler(ConstraintViolationException::class)
-    fun handleConstraintViolationException(e: ConstraintViolationException) = ResponseEntity
-        .badRequest()
-        .body(
-            Error(
-                status = HttpStatus.BAD_REQUEST,
-                reason = e.message ?: "Please verify your input arguments"
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun constraintException(exception: ConstraintViolationException): ResponseEntity<Error> {
+        log.warn("Malformed params", exception)
+        return ResponseEntity
+            .badRequest()
+            .body(
+                Error(
+                    HttpStatus.BAD_REQUEST,
+                    exception.constraintViolations
+                        .map { it.message }
+                        .toString()
+                )
             )
-        )
+    }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleBadInputArguments(e: MethodArgumentTypeMismatchException): ResponseEntity<Error> {
-        log.info("Invalid request arguments received: ", e.message)
+        log.info("Invalid request arguments received: ", e)
         return ResponseEntity
             .badRequest()
             .body(
