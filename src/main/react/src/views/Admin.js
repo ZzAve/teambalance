@@ -1,6 +1,6 @@
 import Grid from "@material-ui/core/Grid";
 import PageItem from "../components/PageItem";
-import React from "react";
+import React, { useState } from "react";
 import Trainings from "../components/training/Trainings";
 import Typography from "@material-ui/core/Typography";
 import { BrowserRouter as Router, Link, Switch } from "react-router-dom";
@@ -11,59 +11,72 @@ import { Button } from "@material-ui/core";
 import Hidden from "@material-ui/core/Hidden";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import TrainingDetails from "../components/training/TrainingDetails";
+import Redirect from "react-router-dom/es/Redirect";
 
 const Admin = ({ refresh }) => {
+  const [goBack, triggerGoBack] = useState(false);
+
+  if (goBack) {
+    return <Redirect to="/" />;
+  }
+
   return (
-    <Router>
+    <>
       <PageItem title="⚠️ Admin pagina, Let op!" md={6}>
         <Typography variant="h6">
           Je begeeft je nu op de 'admin' pagina's. Pas op voor de lactacyd{" "}
         </Typography>
-        <Link to="/">
-          <Button variant="contained" color="primary">
-            <ArrowBackIcon spacing={5} />
-            <Hidden xsDown> Terug naar de veiligheid</Hidden>
-          </Button>
-        </Link>
+        {/*<Link to="/">*/}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => triggerGoBack(true)}
+        >
+          <ArrowBackIcon spacing={5} />
+          <Hidden xsDown> Terug naar de veiligheid</Hidden>
+        </Button>
+        {/*</Link>*/}
       </PageItem>
 
-      <PageItem title="TOC" md={6}>
-        <ul>
-          <li>
-            <Link to="/admin">Admin</Link>
-          </li>
-          <li>
-            <Link to="/admin/trainings">Trainingen</Link>
-          </li>
-          <li>
-            <Link to="/admin/matches">Wedstrijden</Link>
-          </li>
-        </ul>
-        {/*<Typography variant="h6">Trainingen</Typography>*/}
-        {/*<Typography variant="h6">Wedstrijden</Typography>*/}
-        {/*<Typography variant="h6">Overig</Typography>*/}
-        {/*<Typography variant="h6">???</Typography>*/}
-      </PageItem>
+      <Router>
+        <PageItem title="TOC" md={6}>
+          <ul>
+            <li>
+              <Link to="/admin">Admin</Link>
+            </li>
+            <li>
+              <Link to="/admin/trainings">Trainingen</Link>
+            </li>
+            <li>
+              <Link to="/admin/matches">Wedstrijden</Link>
+            </li>
+          </ul>
+          {/*<Typography variant="h6">Trainingen</Typography>*/}
+          {/*<Typography variant="h6">Wedstrijden</Typography>*/}
+          {/*<Typography variant="h6">Overig</Typography>*/}
+          {/*<Typography variant="h6">???</Typography>*/}
+        </PageItem>
 
-      <Switch>
-        <PrivateRoute
-          path="/admin/trainings"
-          component={Trainings}
-          view={ViewType.Table}
-          refresh={refresh}
-          allowChanges={true}
-        />
-        <PrivateRoute
-          path="/admin/new-training"
-          component={NewTraining}
-          view={ViewType.Table}
-          refresh={refresh}
-        />
-        <PrivateRoute path="/admin/loading" component={Loading} />
-        <PrivateRoute path="/admin/matches" component={SelectItemPlease} />
-        <PrivateRoute path="/" component={HiAdmin} />
-      </Switch>
-    </Router>
+        <Switch>
+          <PrivateRoute
+            path="/admin/trainings"
+            component={Trainings}
+            view={ViewType.Table}
+            refresh={refresh}
+            allowChanges={true}
+          />
+          <PrivateRoute
+            path="/admin/new-training"
+            component={NewTraining}
+            view={ViewType.Table}
+            refresh={refresh}
+          />
+          <PrivateRoute path="/admin/loading" component={Loading} />
+          <PrivateRoute path="/admin/matches" component={SelectItemPlease} />
+          <PrivateRoute path="/" component={HiAdmin} />
+        </Switch>
+      </Router>
+    </>
   );
 };
 
