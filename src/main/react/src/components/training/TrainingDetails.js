@@ -5,26 +5,21 @@ import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { withLoading } from "../../utils/util";
 import DateFnsUtils from "@date-io/date-fns"; // choose your lib
 import nlLocale from "date-fns/locale/nl";
-import { Link } from "react-router-dom";
-
+import { Link, Redirect } from "react-router-dom";
 import {
   KeyboardDatePicker,
   KeyboardTimePicker,
   MuiPickersUtilsProvider
 } from "@material-ui/pickers";
 import TextField from "@material-ui/core/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
 import Button from "@material-ui/core/Button";
 import { usersApiClient } from "../../utils/UsersApiClient";
-import Typography from "@material-ui/core/Typography";
-import { TrainingUsers } from "./TrainingUsers";
-// import Link from "react-router-dom/modules/Link";
+import { Alert, AlertTitle } from "@material-ui/lab";
 
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
 
-const TrainingDetails = ({ id, isNewTraining }) => {
+const TrainingDetails = ({ location, id, isNewTraining }) => {
   const [training, setTraining] = useState({});
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,13 +41,12 @@ const TrainingDetails = ({ id, isNewTraining }) => {
       const data = await trainingsApiClient.getTrainings(
         nowMinus6Hours.toJSON()
       );
-      setTraining(data.trainings[0] || {}); //.first(d => d.id === id) || {});
+      setTraining(data[0] || {}); //.first(d => d.id === id) || {});
     }
   };
 
   const fetchUsers = async () => {
     const data = await usersApiClient.getUsers();
-    // debugger;
     setUsers(data.users || []); //.first(d => d.id === id) || {});
   };
 
@@ -61,14 +55,31 @@ const TrainingDetails = ({ id, isNewTraining }) => {
   }
 
   return (
-    <TrainingFrom training={training} users={users} isNewTraining={true} />
+    <TrainingForm
+      location={location}
+      training={training}
+      users={users}
+      isNewTraining={true}
+    />
   );
 };
 
 export default TrainingDetails;
 
-export const TrainingFrom = ({ training, users, isNewTraining }) => {
-  const getInitialSelectedTime = training => {
+const Message = {
+  SUCCESS: "success",
+  INFO: "info",
+  WARN: "warning",
+  ERROR: "error"
+};
+
+export const TrainingForm = ({
+  location = {},
+  training,
+  users,
+  isNewTraining
+}) => {
+  const getInitialSelectedDate = training => {
     return () => {
       if (!!training.startTime) {
         return training.startTime;
@@ -83,53 +94,66 @@ export const TrainingFrom = ({ training, users, isNewTraining }) => {
   };
 
   const [id] = useState(training.id);
-  const [location, setLocation] = useState(training.location);
-  const [selectedDate, setSelectedDate] = useState(
-    training.startTime || new Date()
-  );
+  const [eventLocation, setEventLocation] = useState(training.location);
   const [selectedTime, setSelectedTime] = useState(
-    getInitialSelectedTime(training)
+    getInitialSelectedDate(training)
   );
   const [comment, setComment] = useState(training.comment);
 
+  const [trainingSaved, setTrainingSaved] = useState(false);
+  const [message, setMessage] = useState(undefined);
   useEffect(() => {
     console.log(training);
   }, []);
 
-  // Method needs to be checked with apiClient
   const handleSaveTraining = async x => {
-    console.log(`SelectedDate : ${selectedDate}`);
-    console.log(`SelectedTime : ${selectedTime}`);
-    const startTime = new Date();
-    startTime.setFullYear(selectedDate.getFullYear());
-    startTime.setMonth(selectedDate.getMonth());
-    startTime.setDate(selectedDate.getDate());
-    startTime.setHours(selectedTime.getHours());
-    startTime.setMinutes(selectedTime.getMinutes());
-    startTime.setSeconds(0);
+    console.log(`startTime: ${selectedTime}`);
+    try {
+      let isCreate = id === undefined;
+      if (isCreate) {
+        await trainingsApiClient.createTraining({
+          location: eventLocation,
+          startTime: selectedTime,
+          comment: comment,
+          attendees: []
+        });
+      } else {
+        await trainingsApiClient.updateTraining({
+          id: id,
+          location: eventLocation,
+          startTime: selectedTime,
+          comment: comment,
+          attendees: []
+        });
+      }
 
-    console.log(`startTime: ${startTime}`);
-    // Determine CREATE or PUT (by id)
-    if (id === undefined) {
-      await trainingsApiClient.createTraining({
-        location: location,
-        startTime: startTime,
-        comment: comment,
-        attendees: []
+      setMessage({
+        message: `${isCreate ? "Creatie" : "Update"} successvol`,
+        level: Message.SUCCESS
       });
-    } else {
-      await trainingsApiClient.updateTraining({
-        id: id,
-        location: location,
-        startTime: startTime,
-        comment: comment,
-        attendees: []
-      });
+      setTrainingSaved(true);
+    } catch (e) {
+      setMessage({ message: `Er ging iets fout: ${e}`, level: Message.ERROR });
     }
   };
+
+  if (trainingSaved) {
+    debugger;
+    const { from } = location.state || {
+      from: { pathname: "/admin/trainings" }
+    };
+
+    return <Redirect to={from} />;
+  }
+
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils} locale={nlLocale}>
       <Grid container spacing={3}>
+        {!!message && (
+          <Grid item xs={12}>
+            <Alert severity={message.level}>{message.message}</Alert>
+          </Grid>
+        )}
         <Grid item xs={12}>
           <TextField
             // required
@@ -143,36 +167,30 @@ export const TrainingFrom = ({ training, users, isNewTraining }) => {
         </Grid>
         <Grid item xs={12}>
           <TextField
-            // required={!!isNewTraining}
             required
             id="location"
             name="location"
             label="Locatie"
-            value={location}
+            value={eventLocation}
             onChange={e => {
-              setLocation(e.target.value);
+              setEventLocation(e.target.value);
             }}
             fullWidth
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <KeyboardDatePicker
-            value={selectedDate}
-            onChange={setSelectedDate}
-            // className={classes.textField}
-            // required
+            value={selectedTime}
+            onChange={setSelectedTime}
             id="startDate"
             name="startDate"
             label="Datum"
             fullWidth
-            // autoComplete="shipping address-line1"
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <KeyboardTimePicker
             value={selectedTime}
-            // className={classes.textField}
-            // required
             id="startTime"
             name="startTime"
             label="Starttijd"
@@ -180,7 +198,6 @@ export const TrainingFrom = ({ training, users, isNewTraining }) => {
             ampm={false}
             onChange={setSelectedTime}
             fullWidth
-            // autoComplete="shipping address-line1"
           />
         </Grid>
         <Grid item xs={12}>
@@ -191,11 +208,10 @@ export const TrainingFrom = ({ training, users, isNewTraining }) => {
             fullWidth
             value={comment}
             onChange={e => setComment(e.target.value)}
-            // autoComplete="shipping address-line2"
           />
         </Grid>
-        <TrainingUsers training={training} users={users} />
-
+        {/*// TODO: Do something with attendees?*/}
+        {/*<TrainingUsers training={training} users={users} />*/}
         <Grid
           item
           container
@@ -203,7 +219,6 @@ export const TrainingFrom = ({ training, users, isNewTraining }) => {
           alignItems="flex-end"
           justify="flex-end"
         >
-          {/*<Grid item xs={6}></Grid>*/}
           <Grid item>
             <Button
               variant="contained"

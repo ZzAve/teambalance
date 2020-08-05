@@ -12,7 +12,7 @@ import PageItem from "../PageItem";
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
 
-const Trainings = ({ refresh, view }) => {
+const Trainings = ({ refresh, view, allowChanges = false }) => {
   const [trainings, setTrainings] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,7 +24,7 @@ const Trainings = ({ refresh, view }) => {
 
   const updateTrainings = async () => {
     const data = await trainingsApiClient.getTrainings(nowMinus6Hours.toJSON());
-    await setTrainings(data.trainings || []);
+    await setTrainings(data || []);
   };
 
   if (isLoading) {
@@ -50,7 +50,11 @@ const Trainings = ({ refresh, view }) => {
   } else if (view === ViewType.Table) {
     return (
       <PageItem title="Trainingen">
-        <TrainingsTable trainings={trainings} updateTrigger={updateTrainings} />
+        <TrainingsTable
+          trainings={trainings}
+          updateTrigger={updateTrainings}
+          allowChanges={allowChanges}
+        />
 
         {/*</Grid>*/}
       </PageItem>

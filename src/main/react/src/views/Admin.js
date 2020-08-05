@@ -51,6 +51,7 @@ const Admin = ({ refresh }) => {
           component={Trainings}
           view={ViewType.Table}
           refresh={refresh}
+          allowChanges={true}
         />
         <PrivateRoute
           path="/admin/new-training"
@@ -66,10 +67,11 @@ const Admin = ({ refresh }) => {
   );
 };
 
-const NewTraining = ({}) => {
+const NewTraining = opts => {
+  // debugger;
   return (
     <PageItem title={"Nieuwe training"}>
-      <TrainingDetails />
+      <TrainingDetails location={opts.location} id={2} />
     </PageItem>
   );
 };

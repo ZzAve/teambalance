@@ -16,7 +16,7 @@ import Hidden from "@material-ui/core/Hidden";
 import AddIcon from "@material-ui/icons/Add";
 import { Link } from "react-router-dom";
 
-const TrainingsTable = ({ trainings, updateTrigger }) => {
+const TrainingsTable = ({ trainings, updateTrigger, allowChanges = false }) => {
   const parseAttendees = attendees =>
     attendees.map(it => `${it.user.name} (${it.user.role})`).join(", ");
 
@@ -61,7 +61,11 @@ const TrainingsTable = ({ trainings, updateTrigger }) => {
             <TableCell align="right">{row.location}</TableCell>
             <TableCell align="right">{row.comment}</TableCell>
             <TableCell align="right">{parseAttendees(row.attendees)}</TableCell>
-            <TableCell align="right">{getUpdateIcons(row)}</TableCell>
+            {allowChanges ? (
+              <TableCell align="right">{getUpdateIcons(row)}</TableCell>
+            ) : (
+              ""
+            )}
           </TableRow>
         );
       })}
@@ -88,7 +92,11 @@ const TrainingsTable = ({ trainings, updateTrigger }) => {
                 <TableCell align="right">Location</TableCell>
                 <TableCell align="right">Opmerking</TableCell>
                 <TableCell align="right">Deelnemers</TableCell>
-                <TableCell align="right">Aanpassen</TableCell>
+                {allowChanges ? (
+                  <TableCell align="right">Aanpassen</TableCell>
+                ) : (
+                  ""
+                )}
               </TableRow>
             </TableHead>
             <TableBody>{getTableBody()}</TableBody>
