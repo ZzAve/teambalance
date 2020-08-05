@@ -7,14 +7,14 @@ import DateFnsUtils from "@date-io/date-fns"; // choose your lib
 import nlLocale from "date-fns/locale/nl";
 import { Link, Redirect } from "react-router-dom";
 import {
-  KeyboardDatePicker,
-  KeyboardTimePicker,
-  MuiPickersUtilsProvider
+  DatePicker,
+  MuiPickersUtilsProvider,
+  TimePicker
 } from "@material-ui/pickers";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { usersApiClient } from "../../utils/UsersApiClient";
-import { Alert, AlertTitle } from "@material-ui/lab";
+import { Alert } from "@material-ui/lab";
 
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
@@ -179,17 +179,19 @@ export const TrainingForm = ({
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <KeyboardDatePicker
+          <DatePicker
             value={selectedTime}
             onChange={setSelectedTime}
             id="startDate"
             name="startDate"
             label="Datum"
+            autoOk
+            showTodayButton={true}
             fullWidth
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <KeyboardTimePicker
+          <TimePicker
             value={selectedTime}
             id="startTime"
             name="startTime"
@@ -197,6 +199,7 @@ export const TrainingForm = ({
             minutesStep={15}
             ampm={false}
             onChange={setSelectedTime}
+            autoOk
             fullWidth
           />
         </Grid>
