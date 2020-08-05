@@ -44,6 +44,7 @@ const App = () => {
         <TopBar handleRefresh={handleRefresh} refresh={topBarShouldRefresh} />
         <Router>
           <Grid container spacing={2} alignItems="flex-start">
+            <Grid item xs={12} />
             <Suspense fallback={<Loading />}>
               <Switch>
                 <PublicRoute

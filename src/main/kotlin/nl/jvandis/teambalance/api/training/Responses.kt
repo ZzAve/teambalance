@@ -3,34 +3,29 @@ package nl.jvandis.teambalance.api.training
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.users.User
-import java.time.Instant
+import java.time.LocalDateTime
 
 data class UserAddRequest(
     val userId: Long
 )
 
 data class UpdateTrainingRequest(
-    val startTime: Long?,
+    val startTime: LocalDateTime?,
     val location: String?,
     val comment: String?
 )
 
 data class PotentialTraining(
-    val startTime: Long,
+    val startTime: LocalDateTime,
     val location: String,
     val comment: String,
     val attendees: List<Long>
 ) {
-    fun internalize(users: Iterable<User>): Training {
-        val training = Training(
-            startTime = Instant.ofEpochMilli(startTime),
-            comment = comment,
-            location = location
-        )
-
-        users.map { it.toAttendee(training) }
-        return training
-    }
+    fun internalize(): Training = Training(
+        startTime = startTime,
+        comment = comment,
+        location = location
+    )
 }
 
 fun User.toAttendee(event: Event) = Attendee(
@@ -38,7 +33,7 @@ fun User.toAttendee(event: Event) = Attendee(
     event = event
 )
 
-fun List<Attendee>.toTrainingResponse(trainingId: Long) = map {
+fun Iterable<Attendee>.toTrainingResponse(trainingId: Long) = map {
     AttendeeResponse(
         id = it.id,
         eventId = trainingId,
@@ -50,7 +45,7 @@ fun List<Attendee>.toTrainingResponse(trainingId: Long) = map {
 data class TrainingsResponse(val trainings: List<TrainingResponse>)
 data class TrainingResponse(
     val id: Long,
-    val startTime: Instant,
+    val startTime: LocalDateTime,
     val location: String,
     val comment: String?,
     val attendees: List<AttendeeResponse>?

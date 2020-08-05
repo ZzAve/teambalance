@@ -6,6 +6,7 @@ import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
+import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.attendees.toResponse
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import java.time.Instant
+import java.time.LocalDateTime
 
 @RestController
 @Api(tags = ["trainings"])
@@ -38,7 +39,7 @@ class TrainingController(
     @GetMapping
     fun getTrainings(
         @RequestParam(value = "includeAttendees", defaultValue = "false") includeAttendees: Boolean,
-        @RequestParam(value = "since", required = false) since: Instant?,
+        @RequestParam(value = "since", required = false) since: LocalDateTime?,
         @RequestParam(value = "limit", defaultValue = "50") limit: Int
 
     ): TrainingsResponse {
@@ -82,12 +83,26 @@ class TrainingController(
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    fun postUser(@RequestBody potentialTraining: PotentialTraining): Training {
+    fun postUser(@RequestBody potentialTraining: PotentialTraining): TrainingResponse {
         log.info("postTraining $potentialTraining")
         val users = userRepository.findAll()
-        val training = potentialTraining.internalize(users)
-        return eventRepository.save(training)
+        val training = potentialTraining.internalize()
+
+        val attendees = users.map { it.toAttendee(training) }
+
+        val savedTraining = eventRepository.save(training)
+        val savedAttendeesResponse = attendeeRepository.saveAll(attendees).toTrainingResponse(savedTraining.id)
+
+        return savedTraining.toResponse(savedAttendeesResponse)
     }
+
+    private fun Training.toResponse(savedAttendeesResponse: List<AttendeeResponse>) = TrainingResponse(
+        id = id,
+        comment = comment,
+        location = location,
+        startTime = startTime,
+        attendees = savedAttendeesResponse
+    )
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{training-id}/attendee")
@@ -118,15 +133,17 @@ class TrainingController(
         @PathVariable(value = "training-id") trainingId: Long,
         @RequestBody updateTrainingRequest: UpdateTrainingRequest
 
-    ): Training {
+    ): TrainingResponse {
         return eventRepository
             .findByIdOrNull(trainingId)
-            ?.let { if (it is Training) it else null }
             ?.let {
                 val updatedTraining = it.createUpdatedTraining(updateTrainingRequest)
                 eventRepository.save(updatedTraining)
-            } ?: throw InvalidTrainingException(trainingId)
-    }
+            }
+            ?.toResponse(emptyList())
+            ?: throw InvalidTrainingException(trainingId)
+
+   }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{training-id}")
@@ -148,7 +165,7 @@ class TrainingController(
     }
 
     private fun Training.createUpdatedTraining(updateTrainingRequestBody: UpdateTrainingRequest) = copy(
-        startTime = updateTrainingRequestBody.startTime?.let(Instant::ofEpochMilli) ?: startTime,
+        startTime = updateTrainingRequestBody.startTime ?: startTime,
         comment = updateTrainingRequestBody.comment ?: comment,
         location = updateTrainingRequestBody.location ?: location
     )
