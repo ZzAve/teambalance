@@ -3,20 +3,20 @@ package nl.jvandis.teambalance.api.training
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.users.User
-import java.time.Instant
+import java.time.LocalDateTime
 
 data class UserAddRequest(
     val userId: Long
 )
 
 data class UpdateTrainingRequest(
-    val startTime: Long?,
+    val startTime: LocalDateTime?,
     val location: String?,
     val comment: String?
 )
 
 data class PotentialTraining(
-    val startTime: Instant,
+    val startTime: LocalDateTime,
     val location: String,
     val comment: String,
     val attendees: List<Long>
@@ -45,7 +45,7 @@ fun Iterable<Attendee>.toTrainingResponse(trainingId: Long) = map {
 data class TrainingsResponse(val trainings: List<TrainingResponse>)
 data class TrainingResponse(
     val id: Long,
-    val startTime: Instant,
+    val startTime: LocalDateTime,
     val location: String,
     val comment: String?,
     val attendees: List<AttendeeResponse>?
