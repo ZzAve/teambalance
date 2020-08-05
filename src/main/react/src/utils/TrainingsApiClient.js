@@ -4,14 +4,23 @@ const trainingsClient = ApiClient("trainings");
 
 const internalizeTraining = externalTraining => ({
   ...externalTraining,
-  startTime: new Date(externalTraining.startTime)
+  startTime: new Date(externalTraining.startTime),
+  attendees: externalTraining.attendees || []
 });
 
 const getTrainings = (since, includeAttendees = true) => {
   let trainings = trainingsClient.call(
-    `trainings?since=${since}&includeAttendees=${includeAttendees}`
+    `trainings?since=${since}&include-attendees=${includeAttendees}`
   );
   return trainings.then(x => x.trainings.map(internalizeTraining));
+};
+
+const getTraining = (id, includeAttendees = true) => {
+  let training = trainingsClient.call(
+    `trainings/${id}?include-attendees=${includeAttendees}`
+  );
+
+  return training.map(internalizeTraining);
 };
 
 const createTraining = ({ location, comment, startTime, attendees }) => {
@@ -50,6 +59,7 @@ const updateAttendee = (attendeeId, availability) => {
 export const trainingsApiClient = {
   ...trainingsClient,
   getTrainings,
+  getTraining,
   createTraining,
   updateTraining,
   updateAttendee

@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import { Link } from "react-router-dom";
 
 export const TrainingUsers = ({ training, users }) => {
   const [singleUserCheck, setSingleUserCheck] = useState([]);
@@ -55,6 +57,8 @@ export const TrainingUsers = ({ training, users }) => {
     }));
   };
 
+  const handleSaveAttendees = x => {};
+
   const attendingPeople = ({ users }) => (
     <Grid item container spacing={5}>
       <Grid item xs={12}>
@@ -89,9 +93,29 @@ export const TrainingUsers = ({ training, users }) => {
   );
 
   return (
-    <Grid item xs={12} sm={6}>
-      <Typography variant="h6">Teamgenoten </Typography>
-      {attendingPeople({ attendees: singleUserCheck, users: users })}
+    <Grid container>
+      <Grid item xs={12} sm={6}>
+        <Typography variant="h6">Teamgenoten </Typography>
+        {attendingPeople({ users: users })}
+      </Grid>
+      <Grid item container spacing={5} alignItems="flex-end" justify="flex-end">
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSaveAttendees}
+          >
+            Opslaan
+          </Button>
+        </Grid>
+        <Grid item>
+          <Link to={"/admin/trainings"}>
+            <Button variant="contained" color="secondary">
+              Annuleren
+            </Button>
+          </Link>
+        </Grid>
+      </Grid>
     </Grid>
   );
 };

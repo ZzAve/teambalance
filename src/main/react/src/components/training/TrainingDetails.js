@@ -15,6 +15,8 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { usersApiClient } from "../../utils/UsersApiClient";
 import { Alert } from "@material-ui/lab";
+import { TrainingUsers } from "./TrainingUsers";
+import Typography from "@material-ui/core/Typography";
 
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
@@ -23,6 +25,7 @@ const TrainingDetails = ({ location, id, isNewTraining }) => {
   const [training, setTraining] = useState({});
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState(undefined);
 
   useEffect(() => {
     console.log(`[TrainingDetails] loaded`);
@@ -38,16 +41,28 @@ const TrainingDetails = ({ location, id, isNewTraining }) => {
 
   const fetchTraining = async () => {
     if (id !== undefined) {
-      const data = await trainingsApiClient.getTrainings(
-        nowMinus6Hours.toJSON()
-      );
-      setTraining(data[0] || {}); //.first(d => d.id === id) || {});
+      try {
+        const data = await trainingsApiClient.getTraining(id);
+        setTraining(data || {});
+      } catch (e) {
+        setMessage({
+          message: `Er ging iets met met het ophalen van data voor training ${id} `,
+          level: Message.ERROR
+        });
+      }
     }
   };
 
   const fetchUsers = async () => {
-    const data = await usersApiClient.getUsers();
-    setUsers(data.users || []); //.first(d => d.id === id) || {});
+    try {
+      const data = await usersApiClient.getUsers();
+      setUsers(data.users || []); //.first(d => d.id === id) || {});
+    } catch (e) {
+      setMessage({
+        message: `Er ging iets met met het ophalen van de gebruikers`,
+        level: Message.ERROR
+      });
+    }
   };
 
   if (isLoading) {
@@ -55,12 +70,31 @@ const TrainingDetails = ({ location, id, isNewTraining }) => {
   }
 
   return (
-    <TrainingForm
-      location={location}
-      training={training}
-      users={users}
-      isNewTraining={true}
-    />
+    <Grid container spacing={2}>
+      {!!message && (
+        <Grid item xs={12}>
+          <Alert severity={message.level}>{message.message}</Alert>
+        </Grid>
+      )}
+      <Grid item xs={12}>
+        <Typography variant="h6">Training Details</Typography>
+        <TrainingForm
+          location={location}
+          training={training}
+          users={users}
+          isNewTraining={isNewTraining}
+          setMessage={setMessage}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <Typography variant="h6">Training attendees</Typography>
+        <TrainingUsers
+          users={users}
+          training={training}
+          setMessage={setMessage}
+        />
+      </Grid>
+    </Grid>
   );
 };
 
@@ -76,8 +110,8 @@ const Message = {
 export const TrainingForm = ({
   location = {},
   training,
-  users,
-  isNewTraining
+  isNewTraining,
+  setMessage
 }) => {
   const getInitialSelectedDate = training => {
     return () => {
@@ -100,14 +134,12 @@ export const TrainingForm = ({
   );
   const [comment, setComment] = useState(training.comment);
 
-  const [trainingSaved, setTrainingSaved] = useState(false);
-  const [message, setMessage] = useState(undefined);
+  const [done, setDone] = useState(false);
   useEffect(() => {
     console.log(training);
   }, []);
 
   const handleSaveTraining = async x => {
-    console.log(`startTime: ${selectedTime}`);
     try {
       let isCreate = id === undefined;
       if (isCreate) {
@@ -131,14 +163,13 @@ export const TrainingForm = ({
         message: `${isCreate ? "Creatie" : "Update"} successvol`,
         level: Message.SUCCESS
       });
-      setTrainingSaved(true);
+      setDone(true);
     } catch (e) {
       setMessage({ message: `Er ging iets fout: ${e}`, level: Message.ERROR });
     }
   };
 
-  if (trainingSaved) {
-    debugger;
+  if (done) {
     const { from } = location.state || {
       from: { pathname: "/admin/trainings" }
     };
@@ -149,11 +180,6 @@ export const TrainingForm = ({
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils} locale={nlLocale}>
       <Grid container spacing={3}>
-        {!!message && (
-          <Grid item xs={12}>
-            <Alert severity={message.level}>{message.message}</Alert>
-          </Grid>
-        )}
         <Grid item xs={12}>
           <TextField
             // required
@@ -213,8 +239,7 @@ export const TrainingForm = ({
             onChange={e => setComment(e.target.value)}
           />
         </Grid>
-        {/*// TODO: Do something with attendees?*/}
-        {/*<TrainingUsers training={training} users={users} />*/}
+
         <Grid
           item
           container
@@ -232,11 +257,9 @@ export const TrainingForm = ({
             </Button>
           </Grid>
           <Grid item>
-            <Link to={"/admin/trainings"}>
-              <Button variant="contained" color="secondary">
-                Annuleren
-              </Button>
-            </Link>
+            <Button variant="contained" color="secondary" onClick={setDone}>
+              Annuleren
+            </Button>
           </Grid>
         </Grid>
       </Grid>

@@ -1,7 +1,7 @@
 package nl.jvandis.teambalance.api.users
 
-import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserRepository : CrudRepository<User, Long>
+interface UserRepository : PagingAndSortingRepository<User, Long>

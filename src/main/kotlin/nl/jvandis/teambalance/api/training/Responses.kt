@@ -43,7 +43,12 @@ fun Iterable<Attendee>.toTrainingResponse(trainingId: Long) = map {
     )
 }
 
-data class TrainingsResponse(val trainings: List<TrainingResponse>)
+data class TrainingsResponse(
+    val totalSize: Long,
+    val totalPages: Int,
+    val page: Int,
+    val size: Int,
+    val trainings: List<TrainingResponse>)
 data class TrainingResponse(
     val id: Long,
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")

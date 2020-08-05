@@ -7,16 +7,18 @@ import Paper from "@material-ui/core/Paper";
 import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableBody from "@material-ui/core/TableBody";
-import React from "react";
+import React, { useState } from "react";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { Button } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import Hidden from "@material-ui/core/Hidden";
 import AddIcon from "@material-ui/icons/Add";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
-const TrainingsTable = ({ trainings, updateTrigger, allowChanges = false }) => {
+const TrainingsTable = ({ trainings, allowChanges = false }) => {
+  const [goTo, setGoTo] = useState(undefined);
+
   const parseAttendees = attendees =>
     attendees.map(it => `${it.user.name} (${it.user.role})`).join(", ");
 
@@ -72,15 +74,24 @@ const TrainingsTable = ({ trainings, updateTrigger, allowChanges = false }) => {
     </>
   );
 
+  if (goTo !== undefined) {
+    console.log(goTo);
+    return <Redirect to={goTo} />;
+  }
+
   return (
     <Grid container spacing={5}>
       <Grid item xs={12}>
-        <Link to="/admin/new-training">
-          <Button variant="contained" color="primary">
-            <AddIcon spacing={5} />
-            <Hidden xsDown>Nieuwe training</Hidden>
-          </Button>
-        </Link>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            setGoTo("/admin/new-training");
+          }}
+        >
+          <AddIcon spacing={5} />
+          <Hidden xsDown>Nieuwe training</Hidden>
+        </Button>
       </Grid>
       <Grid item xs={12}>
         <TableContainer component={Paper}>

@@ -11,6 +11,8 @@ import nl.jvandis.teambalance.api.attendees.toResponse
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
+import kotlin.math.min
 
 @RestController
 @Api(tags = ["trainings"])
@@ -39,37 +42,54 @@ class TrainingController(
 
     @GetMapping
     fun getTrainings(
-        @RequestParam(value = "includeAttendees", defaultValue = "false") includeAttendees: Boolean,
-        @RequestParam(value = "since", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: LocalDateTime?,
-        @RequestParam(value = "limit", defaultValue = "50") limit: Int
-
+        @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
+        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
+        @RequestParam(
+            value = "since",
+            defaultValue = "2020-09-01T00:00"
+        ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: LocalDateTime,
+        @RequestParam(value = "limit", defaultValue = "10") limit: Int,
+        @RequestParam(value = "page", defaultValue = "1") page: Int
     ): TrainingsResponse {
         log.info("GetAllTrainings")
-        return eventRepository.findAll()
-            .filterNotNull()
-            .filter { since == null || since < it.startTime }
-            .take(limit)
-            .map {
-                val attendees = if (includeAttendees) attendeeRepository.findAllByEventIdIn(listOf(it.id)).toTrainingResponse(it.id) else null
-                TrainingResponse(
-                    id = it.id,
-                    comment = it.comment,
-                    location = it.location,
-                    startTime = it.startTime,
-                    attendees = attendees
-
+        return eventRepository.findAllWithStartTimeAfter(
+            since,
+            PageRequest.of(page - 1, limit, Sort.by("startTime").ascending())
+        )
+            .let {
+                TrainingsResponse(
+                    totalPages = it.totalPages,
+                    totalSize = it.totalElements,
+                    page = it.number + 1,
+                    size = min(it.size, it.content.size),
+                    trainings = it.content.map { training ->
+                        training.toTrainingResponse(includeAttendees)
+                    }
                 )
-            }.let(::TrainingsResponse)
+            }
+    }
+
+    private fun Training.toTrainingResponse(includeAttendees: Boolean): TrainingResponse {
+        val attendees = if (includeAttendees) attendeeRepository.findAllByEventIdIn(listOf(id))
+            .toTrainingResponse(id) else null
+        return TrainingResponse(
+            id = id,
+            comment = comment,
+            location = location,
+            startTime = startTime,
+            attendees = attendees
+        )
     }
 
     @GetMapping("/{training-id}")
     fun getTraining(
         @PathVariable("training-id") trainingId: Long,
-        @RequestParam(value = "includeAttendees", defaultValue = "false") includeAttendees: Boolean
+        @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean
     ): TrainingResponse {
         log.info("Get training $trainingId")
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
-        val attendees = if (!includeAttendees) null else attendeeRepository.findAllByEventIdIn(listOf(trainingId)).toResponse()
+        val attendees =
+            if (!includeAttendees) null else attendeeRepository.findAllByEventIdIn(listOf(trainingId)).toResponse()
 
         return training.let {
             TrainingResponse(
@@ -84,7 +104,7 @@ class TrainingController(
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    fun postUser(@RequestBody potentialTraining: PotentialTraining): TrainingResponse {
+    fun createTraining(@RequestBody potentialTraining: PotentialTraining): TrainingResponse {
         log.info("postTraining $potentialTraining")
         val users = userRepository.findAll()
         val training = potentialTraining.internalize()
@@ -143,14 +163,13 @@ class TrainingController(
             }
             ?.toResponse(emptyList())
             ?: throw InvalidTrainingException(trainingId)
-
-   }
+    }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{training-id}")
     fun deleteTraining(
         @PathVariable(value = "training-id") trainingId: Long,
-        @RequestParam(value = "deleteAttendees", defaultValue = "false") deleteAttendees: Boolean
+        @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean
     ) {
         log.info("Deleting training: $trainingId")
 

@@ -56,14 +56,14 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     }
 
     @ExceptionHandler(InvalidIdException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     fun handleInvalidRequestArguments(e: InvalidIdException): ResponseEntity<Error> {
         return ResponseEntity
-            .badRequest()
+            .status(HttpStatus.NOT_FOUND)
             .body(
                 Error(
-                    status = HttpStatus.BAD_REQUEST,
-                    reason = "Could not apply operation because Id was invalid (${e.type} id ${e.id}) "
+                    status = HttpStatus.NOT_FOUND,
+                    reason = "Could not find ${e.type} item with Id ${e.id} "
                 )
             )
     }

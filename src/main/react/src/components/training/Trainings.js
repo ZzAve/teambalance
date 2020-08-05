@@ -55,8 +55,6 @@ const Trainings = ({ refresh, view, allowChanges = false }) => {
           updateTrigger={updateTrainings}
           allowChanges={allowChanges}
         />
-
-        {/*</Grid>*/}
       </PageItem>
     );
   } else {

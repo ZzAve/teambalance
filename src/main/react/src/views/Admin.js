@@ -11,7 +11,7 @@ import { Button } from "@material-ui/core";
 import Hidden from "@material-ui/core/Hidden";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import TrainingDetails from "../components/training/TrainingDetails";
-import Redirect from "react-router-dom/es/Redirect";
+import { Redirect } from "react-router-dom";
 
 const Admin = ({ refresh }) => {
   const [goBack, triggerGoBack] = useState(false);
@@ -26,7 +26,6 @@ const Admin = ({ refresh }) => {
         <Typography variant="h6">
           Je begeeft je nu op de 'admin' pagina's. Pas op voor de lactacyd{" "}
         </Typography>
-        {/*<Link to="/">*/}
         <Button
           variant="contained"
           color="primary"
@@ -35,7 +34,6 @@ const Admin = ({ refresh }) => {
           <ArrowBackIcon spacing={5} />
           <Hidden xsDown> Terug naar de veiligheid</Hidden>
         </Button>
-        {/*</Link>*/}
       </PageItem>
 
       <Router>
@@ -51,10 +49,6 @@ const Admin = ({ refresh }) => {
               <Link to="/admin/matches">Wedstrijden</Link>
             </li>
           </ul>
-          {/*<Typography variant="h6">Trainingen</Typography>*/}
-          {/*<Typography variant="h6">Wedstrijden</Typography>*/}
-          {/*<Typography variant="h6">Overig</Typography>*/}
-          {/*<Typography variant="h6">???</Typography>*/}
         </PageItem>
 
         <Switch>
@@ -71,6 +65,13 @@ const Admin = ({ refresh }) => {
             view={ViewType.Table}
             refresh={refresh}
           />
+          <PrivateRoute
+            path="/admin/edit-training/:id"
+            component={ChangeTraining}
+            view={ViewType.Table}
+            refresh={refresh}
+          />
+
           <PrivateRoute path="/admin/loading" component={Loading} />
           <PrivateRoute path="/admin/matches" component={SelectItemPlease} />
           <PrivateRoute path="/" component={HiAdmin} />
@@ -80,11 +81,22 @@ const Admin = ({ refresh }) => {
   );
 };
 
-const NewTraining = opts => {
+const ChangeTraining = ({ computedMatch, ...rest }) => {
+  if (((computedMatch || {}).params || {}).id === undefined) {
+    return <Redirect to={"/admin/trainings"} />;
+  }
+
+  return (
+    <PageItem title={"Training aanpassen"}>
+      <TrainingDetails location={location} id={computedMatch.params.id} />
+    </PageItem>
+  );
+};
+const NewTraining = ({ location }) => {
   // debugger;
   return (
     <PageItem title={"Nieuwe training"}>
-      <TrainingDetails location={opts.location} id={2} />
+      <TrainingDetails location={location} />
     </PageItem>
   );
 };
