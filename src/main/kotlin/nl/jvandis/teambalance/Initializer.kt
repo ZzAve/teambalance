@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.random.Random
 
-@Configuration
+// @Configuration
 class Initializer(
     private val userRepository: UserRepository,
     private val eventRepository: EventRepository,
@@ -25,11 +25,11 @@ class Initializer(
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
-    @Bean
+    // @Bean
     fun sendDatabase(): InitializingBean? {
 
         return InitializingBean {
-            if (true) {
+            if (false) {
                 userRepository.saveAll(
                     listOf(
                         User("Julius", Role.DIAGONAL),

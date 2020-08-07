@@ -16,8 +16,6 @@ app:
         refresh-after-write: 30s
         maximum-size: 1
 
-
-
 spring:
   security:
     user:
@@ -27,7 +25,7 @@ spring:
     properties.hibernate.jdbc.lob.non_contextual_creation: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
-    hibernate.ddl-auto: create-drop # TODO set to validate
+    hibernate.ddl-auto: validate
     generate-ddl: true
   datasource:
     username: ${POSTGRES_USERNAME}

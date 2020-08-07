@@ -2,12 +2,12 @@ import Grid from "@material-ui/core/Grid";
 import Balance from "../components/Balance";
 import Topup from "../components/Topup";
 import PageItem from "../components/PageItem";
-import {Button, Card, CardHeader} from "@material-ui/core";
+import { Button, Card, CardHeader } from "@material-ui/core";
 import Transactions from "../components/Transactions";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Trainings from "../components/training/Trainings";
-import {ViewType} from "../utils/util";
-import {Redirect} from "react-router-dom";
+import { ViewType } from "../utils/util";
+import { Redirect } from "react-router-dom";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import Hidden from "@material-ui/core/Hidden";
 
