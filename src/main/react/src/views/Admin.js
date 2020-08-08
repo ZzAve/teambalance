@@ -89,12 +89,15 @@ const ChangeTraining = ({ computedMatch, ...rest }) => {
 
   return (
     <PageItem title={"Training aanpassen"}>
-      <TrainingDetails location={location} id={computedMatch.params.id} />
+      <TrainingDetails
+        location={location}
+        id={computedMatch.params.id}
+        showAttendees={true}
+      />
     </PageItem>
   );
 };
 const NewTraining = ({ location }) => {
-  // debugger;
   return (
     <PageItem title={"Nieuwe training"}>
       <TrainingDetails location={location} />

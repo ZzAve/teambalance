@@ -21,7 +21,7 @@ import Typography from "@material-ui/core/Typography";
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
 
-const TrainingDetails = ({ location, id, isNewTraining }) => {
+const TrainingDetails = ({ location, id, showAttendees = false }) => {
   const [training, setTraining] = useState({});
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,18 +83,22 @@ const TrainingDetails = ({ location, id, isNewTraining }) => {
           location={location}
           training={training}
           users={users}
-          isNewTraining={isNewTraining}
+          isNewTraining={showAttendees}
           setMessage={setMessage}
         />
       </Grid>
-      <Grid item xs={12}>
-        <Typography variant="h6">Teamgenoten</Typography>
-        <TrainingUsers
-          users={users}
-          training={training}
-          setMessage={setMessage}
-        />
-      </Grid>
+      {!!showAttendees ? (
+        <Grid item xs={12}>
+          <Typography variant="h6">Teamgenoten</Typography>
+          <TrainingUsers
+            users={users}
+            training={training}
+            setMessage={setMessage}
+          />
+        </Grid>
+      ) : (
+        <> </>
+      )}
     </Grid>
   );
 };
