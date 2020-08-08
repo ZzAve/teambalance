@@ -6,6 +6,8 @@ import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.InvalidAttendeeException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
+import nl.jvandis.teambalance.api.SECRET_HEADER
+import nl.jvandis.teambalance.api.SecretService
 import nl.jvandis.teambalance.api.training.EventRepository
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -34,16 +37,19 @@ import org.springframework.web.bind.annotation.RestController
 class AttendeeController(
     private val attendeeRepository: AttendeeRepository,
     private val eventRepository: EventRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val secretService: SecretService
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
     fun getAttendees(
-        @RequestParam(value = "eventIds", defaultValue = "") eventIds: List<Long>,
-        @RequestParam(value = "userIds", defaultValue = "") userIds: List<Long>
+        @RequestParam(value = "event-ids", defaultValue = "") eventIds: List<Long>,
+        @RequestParam(value = "user-ids", defaultValue = "") userIds: List<Long>,
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): AttendeesResponse {
         log.info("Get attendees (filter eventIds: $eventIds,userIds: $userIds")
+        secretService.ensureSecret(secret)
 
         val attendees = when {
             eventIds.isEmpty() && userIds.isEmpty() -> attendeeRepository.findAll()
@@ -63,9 +69,11 @@ class AttendeeController(
 
     @GetMapping("/{id}")
     fun getAttendee(
-        @PathVariable(value = "id") attendeeId: Long
+        @PathVariable(value = "id") attendeeId: Long,
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): AttendeeResponse {
         log.info("Get attendees $attendeeId")
+        secretService.ensureSecret(secret)
 
         val attendee = attendeeRepository.findByIdOrNull(attendeeId) ?: throw InvalidAttendeeException(attendeeId)
 
@@ -74,8 +82,10 @@ class AttendeeController(
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    fun addAttendee(@RequestBody potentialAttendee: PotentialAttendee): AttendeeResponse {
+    fun addAttendee(@RequestBody potentialAttendee: PotentialAttendee,
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?): AttendeeResponse {
         log.info("Adding attendee: $potentialAttendee")
+        secretService.ensureSecret(secret)
 
         val user = userRepository.findByIdOrNull(potentialAttendee.userId)
             ?: throw InvalidUserException(potentialAttendee.userId)
@@ -99,8 +109,11 @@ class AttendeeController(
     @PutMapping("{id}")
     fun updateAttendee(
         @PathVariable("id") attendeeId: Long,
-        @RequestBody attendeeStateUpdate: AttendeeStateUpdate
+        @RequestBody attendeeStateUpdate: AttendeeStateUpdate,
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): AttendeeResponse {
+        secretService.ensureSecret(secret)
+
         val attendee = attendeeRepository.findByIdOrNull(attendeeId)
             ?: throw InvalidAttendeeException(attendeeId)
 
@@ -114,9 +127,12 @@ class AttendeeController(
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun deleteAttendee(
-        @PathVariable("id") id: Long
+        @PathVariable("id") id: Long,
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ) {
         log.info("Deleting attendee x")
+        secretService.ensureSecret(secret)
+
         attendeeRepository.deleteById(id)
     }
 
@@ -124,9 +140,12 @@ class AttendeeController(
     @DeleteMapping()
     fun deleteAttendeeByUserIdAndEventId(
         @RequestParam("user-id") userId: Long,
-        @RequestParam("event-id") eventId: Long
+        @RequestParam("event-id") eventId: Long,
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ) {
         log.info("Deleting user $userId from training $eventId")
+        secretService.ensureSecret(secret)
+
         val attendee =
             attendeeRepository.findByUserIdAndEventId(userId, eventId)
                 .firstOrNull()

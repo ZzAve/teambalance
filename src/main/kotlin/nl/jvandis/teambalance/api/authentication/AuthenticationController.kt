@@ -22,7 +22,9 @@ class AuthenticationController(
 ) {
 
     @GetMapping
-    fun authenticate(@RequestHeader(value = SECRET_HEADER, required = false) secret: String?): Success {
+    fun authenticate(
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
+    ): Success {
         secretService.ensureSecret(secret)
         return Success()
     }

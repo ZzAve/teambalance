@@ -3,6 +3,8 @@ package nl.jvandis.teambalance.api.users
 import io.swagger.annotations.Api
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidUserException
+import nl.jvandis.teambalance.api.SECRET_HEADER
+import nl.jvandis.teambalance.api.SecretService
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Sort
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -24,26 +27,42 @@ import org.springframework.web.bind.annotation.RestController
 @Api(tags = ["users"])
 @RequestMapping(path = ["/api/users"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class UserController(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val secretService: SecretService
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
+
     @GetMapping
-    fun getUsers(): Users {
+    fun getUsers(
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
+    ): Users {
         log.info("getUsers")
+        secretService.ensureSecret(secret)
+
         return Users(users = userRepository.findAll(Sort.by("name")).filterNotNull())
     }
 
     @GetMapping("/{id}")
-    fun getUser(@PathVariable(value = "id") userId: Long): User {
+    fun getUser(
+        @PathVariable(value = "id") userId: Long,
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
+    ): User {
         log.info("getUser $userId")
+        secretService.ensureSecret(secret)
+
         return userRepository.findByIdOrNull(userId) ?: throw InvalidUserException(userId)
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    fun postUser(@RequestBody potentialUser: PotentialUser) {
+    fun postUser(
+        @RequestBody potentialUser: PotentialUser,
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
+    ) {
         log.info("postUser $potentialUser")
+        secretService.ensureSecret(secret)
+
         val user = potentialUser.internalize()
         userRepository.save(user)
     }
@@ -51,9 +70,13 @@ class UserController(
     @PutMapping("/{id}")
     fun updateUser(
         @PathVariable(value = "id") userId: Long,
-        @RequestBody potentialUserUpdate: PotentialUserUpdate
+        @RequestBody potentialUserUpdate: PotentialUserUpdate,
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
+
     ): User {
         log.info("updatingUser: $potentialUserUpdate")
+        secretService.ensureSecret(secret)
+
         return userRepository
             .findByIdOrNull(userId)
             ?.let {
@@ -73,9 +96,12 @@ class UserController(
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun updateUser(
-        @PathVariable(value = "id") userId: Long
+        @PathVariable(value = "id") userId: Long,
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ) {
         log.info("deletingUser: $userId")
+        secretService.ensureSecret(secret)
+
         try {
             userRepository.deleteById(userId)
         } catch (e: DataIntegrityViolationException) {

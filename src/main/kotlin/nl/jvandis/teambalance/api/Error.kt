@@ -10,7 +10,7 @@ data class Error(
 open class InvalidIdException(val id: Long, val type: String) : RuntimeException()
 class InvalidUserException(id: Long) : InvalidIdException(id, "user")
 class InvalidTrainingException(id: Long) : InvalidIdException(id, "training")
-class InvalidAttendeeException(id: Long) : InvalidIdException(id, "training")
+class InvalidAttendeeException(id: Long) : InvalidIdException(id, "attendee")
 
 class InvalidSecretException(msg: String) : RuntimeException(msg)
 
