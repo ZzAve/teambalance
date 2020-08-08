@@ -2,7 +2,6 @@ import { SpinnerWithText } from "./SpinnerWithText";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import React, { useState } from "react";
-import { trainingsApiClient } from "../utils/TrainingsApiClient";
 import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
 import ClearIcon from "@material-ui/icons/Clear";
@@ -10,6 +9,7 @@ import HelpIcon from "@material-ui/icons/Help";
 import WarningIcon from "@material-ui/icons/Warning";
 import { withLoading } from "../utils/util";
 import { attendeesApiClient } from "../utils/AttendeesApiClient";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
 const colorMap = {
   PRESENT: "primary",
@@ -68,7 +68,7 @@ const Attendees = ({ attendees, onUpdate }) => {
       {!selectedAttendee ? (
         attendeesResponse()
       ) : (
-        <Grid item xs={12}>
+        <Grid container item xs={12}>
           <AttendeeRefinement
             attendee={selectedAttendee}
             onSuccess={onRefinementSuccess}
@@ -90,7 +90,8 @@ export const Attendee = ({ attendee, onSelection }) => {
         onSelection(attendee);
       }}
     >
-      {attendee.user.name} | {attendee.state.substring(0, 1)}
+      {attendee.user.name}
+      {/*| {attendee.state.substring(0, 1)}*/}
     </Button>
   );
 };
@@ -125,13 +126,14 @@ const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
 
   const attendeeOptions = () => {
     return (
-      <Grid container spacing={1}>
+      <Grid item container spacing={1}>
         <Grid item>{getButton("PRESENT", <CheckIcon />)}</Grid>
         <Grid item>{getButton("ABSENT", <ClearIcon />)}</Grid>
         <Grid item>{getButton("UNCERTAIN", <HelpIcon />)}</Grid>
         <Grid item>
-          <Button variant="text" onClick={() => onBack()}>
-            Terug
+          <Button variant="contained" color="default" onClick={() => onBack()}>
+            <ArrowBackIcon />
+            <Typography>Terug</Typography>
           </Button>
         </Grid>
       </Grid>
@@ -139,11 +141,12 @@ const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
   };
 
   return (
-    <Grid container spacing={1}>
+    <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Typography>
-          {attendee.user.name} | {attendee.user.role}{" "}
-        </Typography>
+        {/*<Typography>*/}
+        {/*  {attendee.user.name}*/}
+        {/*  /!*| {attendee.user.role}*!/*/}
+        {/*</Typography>*/}
         <Typography>Is {attendee.user.name} op de training?</Typography>
       </Grid>
 

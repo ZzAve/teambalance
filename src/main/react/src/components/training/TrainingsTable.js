@@ -16,11 +16,20 @@ import Hidden from "@material-ui/core/Hidden";
 import AddIcon from "@material-ui/icons/Add";
 import { Link, Redirect } from "react-router-dom";
 
+const stateEmoji = {
+  PRESENT: "💪",
+  ABSENT: "👎",
+  NOT_RESPONDED: "🤷‍♂️",
+  UNKNOWN: "🤞"
+};
+
+const emojifi = state => stateEmoji[state] || stateEmoji.UNKNOWN;
+
 const TrainingsTable = ({ trainings, allowChanges = false }) => {
   const [goTo, setGoTo] = useState(undefined);
 
   const parseAttendees = attendees =>
-    attendees.map(it => `${it.user.name} (${it.user.role})`).join(", ");
+    attendees.map(it => `${it.user.name}  (${emojifi(it.state)})`).join(", ");
 
   const getUpdateIcons = row => (
     <Grid container spacing={1}>
