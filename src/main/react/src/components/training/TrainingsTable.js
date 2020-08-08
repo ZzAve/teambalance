@@ -31,13 +31,13 @@ const TrainingsTable = ({ trainings, allowChanges = false }) => {
   const parseAttendees = attendees =>
     attendees.map(it => `${it.user.name}  (${emojifi(it.state)})`).join(", ");
 
-  const getUpdateIcons = row => (
+  const getUpdateIcons = ({ id }) => (
     <Grid container spacing={1}>
       <Grid item xs>
         <Button
           variant="contained"
           color="primary"
-          onClick={() => alert("aanpassen. Nu nog even niet")}
+          onClick={() => setGoTo(`/admin/edit-training/${id}`)}
         >
           <EditIcon />
 
