@@ -10,6 +10,9 @@ import TopBar from "./components/TopBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
+import Trainings from "./components/training/Trainings";
+import { ViewType } from "./utils/util";
+import TrainingsPage from "./views/TrainingsPage";
 
 const Admin = lazy(() => import("./views/Admin.js"));
 const Login = lazy(() => import("./views/Login.js"));
@@ -55,6 +58,11 @@ const App = () => {
                 <PrivateRoute
                   path="/admin"
                   component={Admin}
+                  refresh={shouldRefresh}
+                />
+                <PrivateRoute
+                  path="/trainings"
+                  component={TrainingsPage}
                   refresh={shouldRefresh}
                 />
                 <PrivateRoute path="/loading" component={Loading} />

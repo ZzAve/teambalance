@@ -8,9 +8,9 @@ const internalizeTraining = externalTraining => ({
   attendees: externalTraining.attendees || []
 });
 
-const getTrainings = (since, includeAttendees = true) => {
+const getTrainings = (since, limit, includeAttendees = true) => {
   let trainings = trainingsClient.call(
-    `trainings?since=${since}&include-attendees=${includeAttendees}`
+    `trainings?since=${since}&include-attendees=${includeAttendees}&limit=${limit}`
   );
   return trainings.then(x => x.trainings.map(internalizeTraining));
 };

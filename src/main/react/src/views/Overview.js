@@ -12,10 +12,10 @@ import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import Hidden from "@material-ui/core/Hidden";
 
 const Overview = ({ refresh }) => {
-  const [goAdmin, triggerGoAdmin] = useState(false);
+  const [goTo, setGoTo] = useState(undefined);
 
-  if (goAdmin) {
-    return <Redirect to="/admin" />;
+  if (goTo !== undefined) {
+    return <Redirect to={goTo} />;
   }
 
   return (
@@ -49,7 +49,7 @@ const Overview = ({ refresh }) => {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => triggerGoAdmin(true)}
+              onClick={() => setGoTo("/admin")}
             >
               <Hidden xsDown>Admin dingen </Hidden>
               <ArrowForwardIcon spacing={5} />
@@ -58,8 +58,27 @@ const Overview = ({ refresh }) => {
           </PageItem>
         </Grid>
         <Grid container spacing={2}>
-          <PageItem title="Aanstaande trainingen (met prutsdata voor nu)">
-            <Trainings refresh={refresh} view={ViewType.List} />
+          <PageItem title="Aanstaande trainingen">
+            <Grid container spacing={2}>
+              <Trainings refresh={refresh} view={ViewType.List} limit={2} />
+
+              <Grid
+                container
+                item
+                justify-content="flex-end"
+                justify="flex-end"
+              >
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setGoTo("/trainings")}
+                  >
+                    Meer
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
           </PageItem>
         </Grid>
       </Grid>

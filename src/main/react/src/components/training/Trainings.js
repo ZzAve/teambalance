@@ -12,7 +12,7 @@ import PageItem from "../PageItem";
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
 
-const Trainings = ({ refresh, view, allowChanges = false }) => {
+const Trainings = ({ refresh, view, allowChanges = false, limit = 1 }) => {
   const [trainings, setTrainings] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,7 +23,10 @@ const Trainings = ({ refresh, view, allowChanges = false }) => {
   }, [refresh]);
 
   const updateTrainings = async () => {
-    const data = await trainingsApiClient.getTrainings(nowMinus6Hours.toJSON());
+    const data = await trainingsApiClient.getTrainings(
+      nowMinus6Hours.toJSON(),
+      limit
+    );
     await setTrainings(data || []);
   };
 
@@ -33,7 +36,7 @@ const Trainings = ({ refresh, view, allowChanges = false }) => {
 
   if (view === ViewType.List) {
     return (
-      <Grid container spacing={1}>
+      <Grid item container spacing={1}>
         <Grid item xs={12}>
           <Typography>
             Wanneer kan Chris zijn waarde weer laten zien?

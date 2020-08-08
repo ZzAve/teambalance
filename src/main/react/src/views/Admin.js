@@ -58,6 +58,7 @@ const Admin = ({ refresh }) => {
             view={ViewType.Table}
             refresh={refresh}
             allowChanges={true}
+            limit={50}
           />
           <PrivateRoute
             path="/admin/new-training"
