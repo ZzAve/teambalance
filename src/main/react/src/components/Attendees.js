@@ -9,6 +9,7 @@ import ClearIcon from "@material-ui/icons/Clear";
 import HelpIcon from "@material-ui/icons/Help";
 import WarningIcon from "@material-ui/icons/Warning";
 import { withLoading } from "../utils/util";
+import { attendeesApiClient } from "../utils/AttendeesApiClient";
 
 const colorMap = {
   PRESENT: "primary",
@@ -99,7 +100,7 @@ const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
 
   const handleClick = availability =>
     withLoading(setIsLoading, () =>
-      trainingsApiClient.updateAttendee(attendee.id, availability)
+      attendeesApiClient.updateAttendee(attendee.id, availability)
     )
       .then(onSuccess)
       .catch(() => {

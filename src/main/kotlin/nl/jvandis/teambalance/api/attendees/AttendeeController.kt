@@ -2,6 +2,7 @@ package nl.jvandis.teambalance.api.attendees
 
 import io.swagger.annotations.Api
 import nl.jvandis.teambalance.api.DataConstraintViolationException
+import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.InvalidAttendeeException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
@@ -11,9 +12,12 @@ import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -43,7 +47,10 @@ class AttendeeController(
 
         val attendees = when {
             eventIds.isEmpty() && userIds.isEmpty() -> attendeeRepository.findAll()
-            eventIds.isNotEmpty() && userIds.isNotEmpty() -> attendeeRepository.findALlByEventIdInAndUserIdIn(eventIds, userIds)
+            eventIds.isNotEmpty() && userIds.isNotEmpty() -> attendeeRepository.findALlByEventIdInAndUserIdIn(
+                eventIds,
+                userIds
+            )
             eventIds.isNotEmpty() -> attendeeRepository.findAllByEventIdIn(eventIds)
             else -> attendeeRepository.findAllByUserIdIn(userIds)
         }
@@ -113,6 +120,25 @@ class AttendeeController(
         attendeeRepository.deleteById(id)
     }
 
+    @ResponseStatus(NO_CONTENT)
+    @DeleteMapping()
+    fun deleteAttendeeByUserIdAndEventId(
+        @RequestParam("user-id") userId: Long,
+        @RequestParam("event-id") eventId: Long
+    ) {
+        log.info("Deleting user $userId from training $eventId")
+        val attendee =
+            attendeeRepository.findByUserIdAndEventId(userId, eventId)
+                .firstOrNull()
+                ?.let {
+
+                    log.info(it.toString())
+                    attendeeRepository.delete(it)
+                    // attendeeRepository.deleteById(userId)
+                }
+                ?: throw AttendeeNotFoundException(userId, eventId)
+    }
+
     private fun Attendee.toResponse() =
         AttendeeResponse(
             id = id,
@@ -120,12 +146,23 @@ class AttendeeController(
             user = user,
             state = availability
         )
+
+    @ExceptionHandler(AttendeeNotFoundException::class)
+    fun attendeeNotFoundException(e: AttendeeNotFoundException) = ResponseEntity.status(NOT_FOUND)
+        .body(
+            Error(
+                status = NOT_FOUND,
+                reason ="Could not find attendee for user ${e.userId} on event ${e.eventId}"
+            )
+        )
 }
+
+data class AttendeeNotFoundException(val userId: Long, val eventId: Long) : RuntimeException()
 
 data class PotentialAttendee(
     val eventId: Long,
     val userId: Long,
-    val state: Availability
+    val state: Availability = Availability.NOT_RESPONDED
 )
 
 data class AttendeeStateUpdate(

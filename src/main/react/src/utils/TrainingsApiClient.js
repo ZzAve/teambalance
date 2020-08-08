@@ -20,7 +20,7 @@ const getTraining = (id, includeAttendees = true) => {
     `trainings/${id}?include-attendees=${includeAttendees}`
   );
 
-  return training.map(internalizeTraining);
+  return training.then(x => internalizeTraining(x));
 };
 
 const createTraining = ({ location, comment, startTime, attendees }) => {
@@ -38,29 +38,11 @@ const updateTraining = ({ id, location, comment, startTime, attendees }) => {
     { method: "PUT" }
   );
 };
-const updateAttendee = (attendeeId, availability) => {
-  return trainingsClient
-    .callWithBody(
-      `attendees/${attendeeId}`,
-      { availability: availability },
-      { method: "PUT" },
-      trainingsClient.defaultTimeout,
-      250
-    )
-    .then(data => {
-      return data;
-    })
-    .catch(e => {
-      // TODO: Error handling
-      console.error(e);
-    });
-};
 
 export const trainingsApiClient = {
   ...trainingsClient,
   getTrainings,
   getTraining,
   createTraining,
-  updateTraining,
-  updateAttendee
+  updateTraining
 };

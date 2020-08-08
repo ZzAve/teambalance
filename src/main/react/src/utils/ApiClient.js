@@ -54,6 +54,10 @@ export const ApiClient = () => {
       timeout
     ).then(res => {
       _throwIfNotOk(path, res);
+      if (res.status === 204) {
+        return {};
+      }
+
       return res.json();
     });
 
@@ -72,6 +76,9 @@ export const ApiClient = () => {
       timeout
     ).then(res => {
       _throwIfNotOk(path, res);
+      if (res.status === 204) {
+        return {};
+      }
       return res.json();
     });
 

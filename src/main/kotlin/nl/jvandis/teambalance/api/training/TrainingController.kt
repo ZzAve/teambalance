@@ -126,7 +126,7 @@ class TrainingController(
     )
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/{training-id}/attendee")
+    @PostMapping("/{training-id}/attendees")
     fun addAttendee(
         @PathVariable(value = "training-id") trainingId: Long,
         @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,

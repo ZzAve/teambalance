@@ -5,6 +5,7 @@ import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidUserException
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NO_CONTENT
@@ -30,7 +31,7 @@ class UserController(
     @GetMapping
     fun getUsers(): Users {
         log.info("getUsers")
-        return Users(users = userRepository.findAll().filterNotNull())
+        return Users(users = userRepository.findAll(Sort.by("name")).filterNotNull())
     }
 
     @GetMapping("/{id}")

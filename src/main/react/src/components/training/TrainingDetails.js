@@ -45,8 +45,9 @@ const TrainingDetails = ({ location, id, isNewTraining }) => {
         const data = await trainingsApiClient.getTraining(id);
         setTraining(data || {});
       } catch (e) {
+        console.log(e);
         setMessage({
-          message: `Er ging iets met met het ophalen van data voor training ${id} `,
+          message: `Er ging iets mis met het ophalen van data voor training ${id} `,
           level: Message.ERROR
         });
       }
@@ -59,7 +60,7 @@ const TrainingDetails = ({ location, id, isNewTraining }) => {
       setUsers(data.users || []); //.first(d => d.id === id) || {});
     } catch (e) {
       setMessage({
-        message: `Er ging iets met met het ophalen van de gebruikers`,
+        message: `Er ging iets mis met het ophalen van de gebruikers`,
         level: Message.ERROR
       });
     }
@@ -87,7 +88,7 @@ const TrainingDetails = ({ location, id, isNewTraining }) => {
         />
       </Grid>
       <Grid item xs={12}>
-        <Typography variant="h6">Training attendees</Typography>
+        <Typography variant="h6">Teamgenoten</Typography>
         <TrainingUsers
           users={users}
           training={training}
@@ -100,7 +101,7 @@ const TrainingDetails = ({ location, id, isNewTraining }) => {
 
 export default TrainingDetails;
 
-const Message = {
+export const Message = {
   SUCCESS: "success",
   INFO: "info",
   WARN: "warning",
