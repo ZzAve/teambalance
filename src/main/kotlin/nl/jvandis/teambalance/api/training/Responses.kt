@@ -18,7 +18,7 @@ data class UpdateTrainingRequest(
 data class PotentialTraining(
     val startTime: LocalDateTime,
     val location: String,
-    val comment: String,
+    val comment: String?,
     val attendees: List<Long>
 ) {
     fun internalize(): Training = Training(

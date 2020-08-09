@@ -41,7 +41,7 @@ data class Training(
     override val location: String,
     override val comment: String? = null
 ) : Event(id, startTime, location, comment) {
-    constructor(startTime: LocalDateTime, location: String, comment: String) :
+    constructor(startTime: LocalDateTime, location: String, comment: String?) :
         this(id = 0, startTime = startTime, location = location, comment = comment)
 }
 

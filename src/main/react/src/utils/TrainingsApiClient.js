@@ -23,10 +23,17 @@ const getTraining = (id, includeAttendees = true) => {
   return training.then(x => internalizeTraining(x));
 };
 
+const externalizeDateTime = t => {
+  const externalDateTime = new Date(t);
+  // Very dirty hack(!)
+  externalDateTime.setMinutes(t.getMinutes() - t.getTimezoneOffset());
+  return externalDateTime.toISOString().slice(0, -1);
+};
+
 const createTraining = ({ location, comment, startTime, attendees }) => {
   return trainingsClient.callWithBody(
     "trainings",
-    { comment, location, startTime, attendees },
+    { comment, location, startTime: externalizeDateTime(startTime), attendees },
     { method: "POST" }
   );
 };
@@ -34,7 +41,7 @@ const createTraining = ({ location, comment, startTime, attendees }) => {
 const updateTraining = ({ id, location, comment, startTime, attendees }) => {
   return trainingsClient.callWithBody(
     `trainings/${id}`,
-    { comment, location, startTime, attendees },
+    { comment, location, startTime: externalizeDateTime(startTime), attendees },
     { method: "PUT" }
   );
 };
