@@ -10,10 +10,7 @@ import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InitializingBean
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 import kotlin.random.Random
 
 // @Configuration

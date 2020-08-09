@@ -82,8 +82,10 @@ class AttendeeController(
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    fun addAttendee(@RequestBody potentialAttendee: PotentialAttendee,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?): AttendeeResponse {
+    fun addAttendee(
+        @RequestBody potentialAttendee: PotentialAttendee,
+        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
+    ): AttendeeResponse {
         log.info("Adding attendee: $potentialAttendee")
         secretService.ensureSecret(secret)
 
@@ -171,7 +173,7 @@ class AttendeeController(
         .body(
             Error(
                 status = NOT_FOUND,
-                reason ="Could not find attendee for user ${e.userId} on event ${e.eventId}"
+                reason = "Could not find attendee for user ${e.userId} on event ${e.eventId}"
             )
         )
 }

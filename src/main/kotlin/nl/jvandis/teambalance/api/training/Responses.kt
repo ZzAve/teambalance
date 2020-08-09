@@ -47,7 +47,8 @@ data class TrainingsResponse(
     val totalPages: Int,
     val page: Int,
     val size: Int,
-    val trainings: List<TrainingResponse>)
+    val trainings: List<TrainingResponse>
+)
 data class TrainingResponse(
     val id: Long,
     val startTime: LocalDateTime,

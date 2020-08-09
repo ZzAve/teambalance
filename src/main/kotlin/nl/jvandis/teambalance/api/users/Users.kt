@@ -17,9 +17,9 @@ data class User(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
     @Column(nullable = false, unique = true) val name: String,
     @Enumerated(EnumType.STRING) @Column(nullable = false) val role: Role,
-    @Column(nullable = false) val isActive : Boolean = true,
-    @Column(nullable = false) val showForTrainings : Boolean = true,
-    @Column(nullable = false) val showForMatches : Boolean = true
+    @Column(nullable = false) val isActive: Boolean = true,
+    @Column(nullable = false) val showForTrainings: Boolean = true,
+    @Column(nullable = false) val showForMatches: Boolean = true
 ) {
 
     constructor(name: String, role: Role) : this(0, name, role)

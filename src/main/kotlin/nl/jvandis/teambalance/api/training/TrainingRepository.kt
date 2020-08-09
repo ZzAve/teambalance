@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
 @Repository
-interface TrainingRepository : PagingAndSortingRepository<Training, Long>{
+interface TrainingRepository : PagingAndSortingRepository<Training, Long> {
     @Query("select a from Training a where a.startTime >= :startTime")
     fun findAllWithStartTimeAfter(
         @Param("startTime") since: LocalDateTime,
