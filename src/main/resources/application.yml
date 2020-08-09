@@ -35,9 +35,8 @@ spring:
     database-name: ${DATABASE_NAME}
 
   jackson:
-    date-format: "yyyy-MM-dd HH:mm:ss"
-
     serialization:
+      write_dates_as_timestamps: false
       WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS: false
 
 springfox:

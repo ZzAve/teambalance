@@ -1,6 +1,5 @@
 package nl.jvandis.teambalance.api.training
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.users.User
@@ -51,7 +50,6 @@ data class TrainingsResponse(
     val trainings: List<TrainingResponse>)
 data class TrainingResponse(
     val id: Long,
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     val startTime: LocalDateTime,
     val location: String,
     val comment: String?,
