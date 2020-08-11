@@ -129,6 +129,7 @@ export const TrainingForm = ({
         let date = new Date();
         date.setHours(20);
         date.setMinutes(0);
+        date.setSeconds(0, 0);
         return date;
       }
     };
@@ -141,6 +142,8 @@ export const TrainingForm = ({
   );
   const [comment, setComment] = useState(training.comment);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [addAnother, setAddAnother] = useState(false);
   const [done, setDone] = useState(false);
   useEffect(() => {
@@ -148,33 +151,38 @@ export const TrainingForm = ({
   }, []);
 
   const handleSaveTraining = async x => {
-    try {
-      let isCreate = id === undefined;
-      if (isCreate) {
-        await trainingsApiClient.createTraining({
-          location: eventLocation,
-          startTime: selectedTime,
-          comment: comment,
-          attendees: []
+    await withLoading(setIsLoading, async () => {
+      try {
+        let isCreate = id === undefined;
+        if (isCreate) {
+          await trainingsApiClient.createTraining({
+            location: eventLocation,
+            startTime: selectedTime,
+            comment: comment,
+            attendees: []
+          });
+        } else {
+          await trainingsApiClient.updateTraining({
+            id: id,
+            location: eventLocation,
+            startTime: selectedTime,
+            comment: comment,
+            attendees: []
+          });
+        }
+
+        setMessage({
+          message: `${isCreate ? "Creatie" : "Update"} successvol`,
+          level: Message.SUCCESS
         });
-      } else {
-        await trainingsApiClient.updateTraining({
-          id: id,
-          location: eventLocation,
-          startTime: selectedTime,
-          comment: comment,
-          attendees: []
+        setDone(true);
+      } catch (e) {
+        setMessage({
+          message: `Er ging iets fout: ${e}`,
+          level: Message.ERROR
         });
       }
-
-      setMessage({
-        message: `${isCreate ? "Creatie" : "Update"} successvol`,
-        level: Message.SUCCESS
-      });
-      setDone(true);
-    } catch (e) {
-      setMessage({ message: `Er ging iets fout: ${e}`, level: Message.ERROR });
-    }
+    });
   };
 
   if (done && !addAnother) {
@@ -183,6 +191,10 @@ export const TrainingForm = ({
     };
 
     return <Redirect to={from} />;
+  }
+
+  if (isLoading) {
+    return <SpinnerWithText text="versturen training" />;
   }
 
   return (
@@ -232,7 +244,10 @@ export const TrainingForm = ({
             label="Starttijd"
             minutesStep={15}
             ampm={false}
-            onChange={setSelectedTime}
+            onChange={x => {
+              debugger;
+              setSelectedTime(x);
+            }}
             autoOk
             fullWidth
           />
@@ -280,7 +295,14 @@ export const TrainingForm = ({
             </Button>
           </Grid>
           <Grid item>
-            <Button variant="contained" color="secondary" onClick={setDone}>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => {
+                setDone(true);
+                setAddAnother(false);
+              }}
+            >
               Annuleren
             </Button>
           </Grid>
