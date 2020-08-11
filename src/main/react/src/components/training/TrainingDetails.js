@@ -17,6 +17,8 @@ import { usersApiClient } from "../../utils/UsersApiClient";
 import { Alert } from "@material-ui/lab";
 import { TrainingUsers } from "./TrainingUsers";
 import Typography from "@material-ui/core/Typography";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import CheckBox from "@material-ui/core/Checkbox";
 
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
@@ -139,6 +141,7 @@ export const TrainingForm = ({
   );
   const [comment, setComment] = useState(training.comment);
 
+  const [addAnother, setAddAnother] = useState(false);
   const [done, setDone] = useState(false);
   useEffect(() => {
     console.log(training);
@@ -174,7 +177,7 @@ export const TrainingForm = ({
     }
   };
 
-  if (done) {
+  if (done && !addAnother) {
     const { from } = location.state || {
       from: { pathname: "/admin/trainings" }
     };
@@ -252,6 +255,21 @@ export const TrainingForm = ({
           alignItems="flex-end"
           justify="flex-end"
         >
+          <Grid item>
+            <FormControlLabel
+              control={
+                <CheckBox
+                  checked={!!addAnother}
+                  onChange={x => {
+                    setAddAnother(x.target.checked);
+                    setDone(false);
+                  }}
+                  name="addAnother"
+                />
+              }
+              label="Nog een training toevoegen"
+            />
+          </Grid>
           <Grid item>
             <Button
               variant="contained"
