@@ -3,7 +3,12 @@ import PageItem from "../components/PageItem";
 import React, { useState } from "react";
 import Trainings from "../components/training/Trainings";
 import Typography from "@material-ui/core/Typography";
-import { BrowserRouter as Router, Link, Switch } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Link,
+  Redirect,
+  Switch
+} from "react-router-dom";
 import { PrivateRoute } from "../components/PrivateRoute";
 import Loading from "./Loading";
 import { ViewType } from "../utils/util";
@@ -11,7 +16,9 @@ import { Button } from "@material-ui/core";
 import Hidden from "@material-ui/core/Hidden";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import TrainingDetails from "../components/training/TrainingDetails";
-import { Redirect } from "react-router-dom";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItem from "@material-ui/core/ListItem";
+import List from "@material-ui/core/List";
 
 const Admin = ({ refresh }) => {
   const [goBack, triggerGoBack] = useState(false);
@@ -38,17 +45,25 @@ const Admin = ({ refresh }) => {
 
       <Router>
         <PageItem title="TOC" md={6}>
-          <ul>
-            <li>
-              <Link to="/admin">Admin</Link>
-            </li>
-            <li>
-              <Link to="/admin/trainings">Trainingen</Link>
-            </li>
-            <li>
-              <Link to="/admin/matches">Wedstrijden</Link>
-            </li>
-          </ul>
+          <List component="nav" aria-label="main mailbox folders">
+            <Link to="/admin">
+              <ListItem button>
+                <ListItemText primary="Admin"></ListItemText>
+              </ListItem>
+            </Link>
+
+            <Link to="/admin/trainings">
+              <ListItem button>
+                <ListItemText primary="Trainingen"></ListItemText>
+              </ListItem>
+            </Link>
+
+            <Link to="/admin/matches">
+              <ListItem button>
+                <ListItemText primary="Wedstrijden"></ListItemText>
+              </ListItem>
+            </Link>
+          </List>
         </PageItem>
 
         <Switch>
@@ -109,7 +124,7 @@ const HiAdmin = ({}) => {
     <PageItem title="Hi admin">
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Typography variant="p"> Je bent een admin</Typography>
+          <Typography variant="body1"> Je bent een admin</Typography>
         </Grid>
         <Grid item xs={12}>
           <img src="https://media.giphy.com/media/Ufc2geerZac4U/giphy.gif" />
@@ -123,7 +138,7 @@ const SelectItemPlease = ({}) => {
   return (
     <PageItem title="Kies">
       <Typography variant="h6"> kies iets in de TOC</Typography>
-      <Typography variant="p">
+      <Typography variant="body1">
         {" "}
         (deze optie is (nog) niet beschikbaar)
       </Typography>
