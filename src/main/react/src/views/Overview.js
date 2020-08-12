@@ -10,6 +10,7 @@ import { ViewType } from "../utils/util";
 import { Redirect } from "react-router-dom";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import Hidden from "@material-ui/core/Hidden";
+import Typography from "@material-ui/core/Typography";
 
 const Overview = ({ refresh }) => {
   const [goTo, setGoTo] = useState(undefined);
@@ -58,7 +59,14 @@ const Overview = ({ refresh }) => {
         <Grid container spacing={2}>
           <PageItem title="Aanstaande trainingen">
             <Grid container spacing={4}>
-              <Trainings refresh={refresh} view={ViewType.List} limit={2} />
+              <Grid item xs={12}>
+                <Typography>
+                  Wanneer kan Chris zijn waarde weer laten zien?
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Trainings refresh={refresh} view={ViewType.List} limit={2} />
+              </Grid>
               <Grid
                 container
                 item

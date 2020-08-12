@@ -11,10 +11,8 @@ import React, { useState } from "react";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { Button } from "@material-ui/core";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import Hidden from "@material-ui/core/Hidden";
-import AddIcon from "@material-ui/icons/Add";
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
+import Attendees from "../Attendees";
 
 const stateEmoji = {
   PRESENT: "💪",
@@ -25,7 +23,7 @@ const stateEmoji = {
 
 const emojifi = state => stateEmoji[state] || stateEmoji.UNKNOWN;
 
-const TrainingsTable = ({ trainings, allowChanges = false }) => {
+const TrainingsTable = ({ trainings, allowChanges = false, updateTrigger }) => {
   const [goTo, setGoTo] = useState(undefined);
 
   const parseAttendees = attendees =>
@@ -40,8 +38,6 @@ const TrainingsTable = ({ trainings, allowChanges = false }) => {
           onClick={() => setGoTo(`/admin/edit-training/${id}`)}
         >
           <EditIcon />
-
-          {/*<Hidden xsDown>Aanpassen</Hidden>*/}
         </Button>
       </Grid>
       <Grid item xs>
@@ -51,8 +47,6 @@ const TrainingsTable = ({ trainings, allowChanges = false }) => {
           onClick={() => alert("verwijderen. binnenkort echt")}
         >
           <DeleteIcon />
-
-          {/*<Hidden xsDown>Verwijderen</Hidden>*/}
         </Button>
       </Grid>
     </Grid>
@@ -71,12 +65,12 @@ const TrainingsTable = ({ trainings, allowChanges = false }) => {
             </TableCell>
             <TableCell align="right">{row.location}</TableCell>
             <TableCell align="right">{row.comment}</TableCell>
-            <TableCell align="right">{parseAttendees(row.attendees)}</TableCell>
-            {allowChanges ? (
-              <TableCell align="right">{getUpdateIcons(row)}</TableCell>
-            ) : (
-              ""
-            )}
+            <TableCell>
+              <Attendees attendees={row.attendees} onUpdate={updateTrigger} />
+            </TableCell>
+            <TableCell hidden={!allowChanges} align="right">
+              {allowChanges ? getUpdateIcons(row) : <> </>}
+            </TableCell>
           </TableRow>
         );
       })}
@@ -89,40 +83,24 @@ const TrainingsTable = ({ trainings, allowChanges = false }) => {
   }
 
   return (
-    <Grid container spacing={5}>
-      <Grid item xs={12}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            setGoTo("/admin/new-training");
-          }}
-        >
-          <AddIcon spacing={5} />
-          <Hidden xsDown>Nieuwe training</Hidden>
-        </Button>
-      </Grid>
-      <Grid item xs={12}>
-        <TableContainer component={Paper}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Datum</TableCell>
-                <TableCell align="right">Tijd</TableCell>
-                <TableCell align="right">Location</TableCell>
-                <TableCell align="right">Opmerking</TableCell>
-                <TableCell align="right">Deelnemers</TableCell>
-                {allowChanges ? (
-                  <TableCell align="right">Aanpassen</TableCell>
-                ) : (
-                  ""
-                )}
-              </TableRow>
-            </TableHead>
-            <TableBody>{getTableBody()}</TableBody>
-          </Table>
-        </TableContainer>
-      </Grid>
+    <Grid container item xs={12}>
+      <TableContainer component={Paper}>
+        <Table aria-label="simple table" size="medium">
+          <TableHead>
+            <TableRow>
+              <TableCell>Datum</TableCell>
+              <TableCell align="right">Tijd</TableCell>
+              <TableCell align="right">Location</TableCell>
+              <TableCell align="right">Opmerking</TableCell>
+              <TableCell align="center">Deelnemers</TableCell>
+              <TableCell align="right">
+                {allowChanges ? "Aanpassen" : <> </>}
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>{getTableBody()}</TableBody>
+        </Table>
+      </TableContainer>
     </Grid>
   );
 };

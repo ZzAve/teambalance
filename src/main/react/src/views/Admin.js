@@ -19,6 +19,7 @@ import TrainingDetails from "../components/training/TrainingDetails";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItem from "@material-ui/core/ListItem";
 import List from "@material-ui/core/List";
+import AddIcon from "@material-ui/icons/Add";
 
 const Admin = ({ refresh }) => {
   const [goBack, triggerGoBack] = useState(false);
@@ -69,11 +70,8 @@ const Admin = ({ refresh }) => {
         <Switch>
           <PrivateRoute
             path="/admin/trainings"
-            component={Trainings}
-            view={ViewType.Table}
+            component={TrainingOverView}
             refresh={refresh}
-            allowChanges={true}
-            limit={50}
           />
           <PrivateRoute
             path="/admin/new-training"
@@ -97,6 +95,34 @@ const Admin = ({ refresh }) => {
   );
 };
 
+const TrainingOverView = ({ refresh }) => {
+  return (
+    <PageItem title="Trainingen">
+      <Grid item container spacing={5}>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              setGoTo("/admin/new-training");
+            }}
+          >
+            <AddIcon spacing={5} />
+            <Hidden xsDown>Nieuwe training</Hidden>
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <Trainings
+            refresh={refresh}
+            view={ViewType.Table}
+            allowChanges={true}
+            limit={50}
+          />
+        </Grid>
+      </Grid>
+    </PageItem>
+  );
+};
 const ChangeTraining = ({ computedMatch, ...rest }) => {
   if (((computedMatch || {}).params || {}).id === undefined) {
     return <Redirect to={"/admin/trainings"} />;

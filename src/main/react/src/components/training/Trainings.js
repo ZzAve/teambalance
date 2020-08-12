@@ -4,10 +4,8 @@ import Typography from "@material-ui/core/Typography";
 import React, { useEffect, useState } from "react";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { ViewType, withLoading } from "../../utils/util";
-import { Card, CardHeader } from "@material-ui/core";
 import TrainingsList from "./TrainingsList";
 import TrainingsTable from "./TrainingsTable";
-import PageItem from "../PageItem";
 
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
@@ -33,14 +31,10 @@ const Trainings = ({ refresh, view, allowChanges = false, limit = 1 }) => {
     return <SpinnerWithText text="ophalen trainingen" />;
   }
 
+  // debugger;
   if (view === ViewType.List) {
     return (
-      <Grid item container spacing={1}>
-        <Grid item xs={12}>
-          <Typography>
-            Wanneer kan Chris zijn waarde weer laten zien?
-          </Typography>
-        </Grid>
+      <Grid item container xs={12} spacing={1}>
         <Grid item xs={12}>
           <TrainingsList
             trainings={trainings}
@@ -51,17 +45,17 @@ const Trainings = ({ refresh, view, allowChanges = false, limit = 1 }) => {
     );
   } else if (view === ViewType.Table) {
     return (
-      <PageItem title="Trainingen">
+      <Grid item container xs={12} spacing={1}>
         <TrainingsTable
           trainings={trainings}
           updateTrigger={updateTrainings}
           allowChanges={allowChanges}
         />
-      </PageItem>
+      </Grid>
     );
   } else {
     return (
-      <Grid container item spacing={1}>
+      <Grid item container xs={12} spacing={1}>
         <Grid item xs={12}>
           <Typography variant="h6">
             Could not view "Trainings" in view '{view}'
