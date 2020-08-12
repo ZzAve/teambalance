@@ -249,6 +249,7 @@
                         <goals>
                             <goal>npm</goal>
                         </goals>
+                        <phase>compile</phase>
                         <configuration>
                             <arguments>ci</arguments>
                         </configuration>

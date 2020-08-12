@@ -3,7 +3,7 @@ runtime: java11
 instance_class: B2
 # Explicitly set the memory limit and maximum heap size for the Spring Boot app
 env_variables:
-  JAVA_TOOL_OPTIONS: "-XX:MaxRAM=256m -XX:ActiveProcessorCount=2 -Xmx64m -Dspring.profile.active=cloud"
+  JAVA_TOOL_OPTIONS: "-XX:MaxRAM=256m -XX:ActiveProcessorCount=2 -Xmx64m -Dspring.profiles.active=cloud"
   BUNQ_APIKEY: <your-api-key>
   API_SECRET: <your-secret>>
   BUNQ_BANK_ACCOUNT_ID: <your-bank-account-id-from-bunq>
