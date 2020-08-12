@@ -30,7 +30,7 @@ const TrainingDetails = ({ location, id, showAttendees = false }) => {
   const [message, setMessage] = useState(undefined);
 
   useEffect(() => {
-    console.log(`[TrainingDetails] loaded`);
+    console.debug(`[TrainingDetails] loaded`);
     withLoading(setIsLoading, fetchTrainingAndUsers).then();
   }, []);
 
@@ -145,7 +145,7 @@ export const TrainingForm = ({
   const [addAnother, setAddAnother] = useState(false);
   const [done, setDone] = useState(false);
   useEffect(() => {
-    console.log(training);
+    console.debug(["TrainingForm] Loaded!"]);
   }, []);
 
   const handleSaveTraining = async x => {

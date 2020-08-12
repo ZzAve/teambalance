@@ -84,7 +84,7 @@ const TrainingsTable = ({ trainings, allowChanges = false }) => {
   );
 
   if (goTo !== undefined) {
-    console.log(goTo);
+    console.log(`Navigating to: ${goTo}`);
     return <Redirect to={goTo} />;
   }
 

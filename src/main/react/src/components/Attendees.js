@@ -77,32 +77,27 @@ const Attendees = ({ attendees, onUpdate }) => {
     );
   };
 
-  const attendeeOverview = () => {
-    return (
-      <>
-        {attendees.map(it => (
-          <Grid key={it.id} item>
-            <Attendee attendee={it} onSelection={handleAttendeeClick} />
-          </Grid>
-        ))}
-        <Grid key={"total"} item>
-          <Button
-            variant="outlined"
-            color="default"
-            onClick={() => {
-              setAttendeeSummaryDetail(x => {
-                console.log(`Setting attendeeSummaryDetail from ${x} to ${!x}`);
-                return !x;
-              });
-            }}
-          >
-            {getAttendeesSummary(attendees)}
-            {/*| {attendee.state.substring(0, 1)}*/}
-          </Button>
+  const attendeeOverview = () => (
+    <>
+      {attendees.map(it => (
+        <Grid key={it.id} item>
+          <Attendee attendee={it} onSelection={handleAttendeeClick} />
         </Grid>
-      </>
-    );
-  };
+      ))}
+      <Grid key={"total"} item>
+        <Button
+          variant="outlined"
+          color="default"
+          onClick={() => {
+            setAttendeeSummaryDetail(x => !x);
+          }}
+        >
+          {getAttendeesSummary(attendees)}
+          {/*| {attendee.state.substring(0, 1)}*/}
+        </Button>
+      </Grid>
+    </>
+  );
 
   return (
     <Grid container spacing={1}>
@@ -119,14 +114,12 @@ const Attendees = ({ attendees, onUpdate }) => {
       {!selectedAttendee ? (
         attendeeOverview()
       ) : (
-        <Grid container item xs={12}>
-          <AttendeeRefinement
-            attendee={selectedAttendee}
-            onSuccess={onRefinementSuccess}
-            onFailure={onRefinementFailure}
-            onBack={onRefinementBack}
-          />
-        </Grid>
+        <AttendeeRefinement
+          attendee={selectedAttendee}
+          onSuccess={onRefinementSuccess}
+          onFailure={onRefinementFailure}
+          onBack={onRefinementBack}
+        />
       )}
     </Grid>
   );
@@ -142,7 +135,6 @@ export const Attendee = ({ attendee, onSelection }) => {
       }}
     >
       {attendee.user.name}
-      {/*| {attendee.state.substring(0, 1)}*/}
     </Button>
   );
 };
@@ -163,7 +155,7 @@ const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
         return onFailure;
       });
 
-  const getButton = (state, content) => {
+  const AttendeeButton = (state, content) => {
     return (
       <Button
         variant="contained"
@@ -178,9 +170,9 @@ const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
   const attendeeOptions = () => {
     return (
       <Grid item container spacing={1}>
-        <Grid item>{getButton("PRESENT", <CheckIcon />)}</Grid>
-        <Grid item>{getButton("ABSENT", <ClearIcon />)}</Grid>
-        <Grid item>{getButton("UNCERTAIN", <HelpIcon />)}</Grid>
+        <Grid item>{AttendeeButton("PRESENT", <CheckIcon />)}</Grid>
+        <Grid item>{AttendeeButton("ABSENT", <ClearIcon />)}</Grid>
+        <Grid item>{AttendeeButton("UNCERTAIN", <HelpIcon />)}</Grid>
         <Grid item>
           <Button variant="contained" color="default" onClick={() => onBack()}>
             <ArrowBackIcon />
@@ -192,12 +184,8 @@ const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
   };
 
   return (
-    <Grid container spacing={2}>
+    <Grid container item spacing={2}>
       <Grid item xs={12}>
-        {/*<Typography>*/}
-        {/*  {attendee.user.name}*/}
-        {/*  /!*| {attendee.user.role}*!/*/}
-        {/*</Typography>*/}
         <Typography>Is {attendee.user.name} op de training?</Typography>
       </Grid>
 

@@ -17,7 +17,7 @@ const Trainings = ({ refresh, view, allowChanges = false, limit = 1 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    console.log(`[Trainings] refresh: ${refresh}`);
+    console.debug(`[Trainings] refresh: ${refresh}`);
     withLoading(setIsLoading, updateTrainings).then();
   }, [refresh]);
 

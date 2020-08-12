@@ -15,11 +15,11 @@ export const TrainingUsers = ({ training, users, setMessage }) => {
     const selectedUserMap = {};
     users.forEach(user => {
       let checked = attendeeUserIds.some(it => it === user.id);
-      console.log(`Setting ${user.id} to ${checked}`);
+      // console.log(`Setting ${user.id} to ${checked}`);
       selectedUserMap[user.id] = checked;
     });
 
-    console.log(selectedUserMap);
+    // console.log(selectedUserMap);
     setSingleUserCheck(selectedUserMap);
     setAllUsersCheckBox(attendeeUserIds.length === users.length);
   }, [users, training]);
