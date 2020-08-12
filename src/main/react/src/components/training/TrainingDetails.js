@@ -5,7 +5,7 @@ import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { withLoading } from "../../utils/util";
 import DateFnsUtils from "@date-io/date-fns"; // choose your lib
 import nlLocale from "date-fns/locale/nl";
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import {
   DatePicker,
   MuiPickersUtilsProvider,
@@ -127,9 +127,7 @@ export const TrainingForm = ({
       } else {
         // Initialize to 20:00
         let date = new Date();
-        date.setHours(20);
-        date.setMinutes(0);
-        date.setSeconds(0, 0);
+        date.setHours(20, 0, 0, 0);
         return date;
       }
     };
@@ -282,7 +280,7 @@ export const TrainingForm = ({
                   name="addAnother"
                 />
               }
-              label="Nog een training toevoegen"
+              label="Nog eentje toevoegen"
             />
           </Grid>
           <Grid item>

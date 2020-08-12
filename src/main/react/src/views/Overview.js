@@ -45,7 +45,6 @@ const Overview = ({ refresh }) => {
       <Grid item xs={12} md={6}>
         <Grid container spacing={2}>
           <PageItem title="Admin snuff">
-            {/*<Link to="/admin">*/}
             <Button
               variant="contained"
               color="primary"
@@ -54,14 +53,12 @@ const Overview = ({ refresh }) => {
               <Hidden xsDown>Admin dingen </Hidden>
               <ArrowForwardIcon spacing={5} />
             </Button>
-            {/*</Link>*/}
           </PageItem>
         </Grid>
         <Grid container spacing={2}>
           <PageItem title="Aanstaande trainingen">
-            <Grid container spacing={2}>
+            <Grid container spacing={4}>
               <Trainings refresh={refresh} view={ViewType.List} limit={2} />
-
               <Grid
                 container
                 item

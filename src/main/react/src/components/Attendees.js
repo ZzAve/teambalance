@@ -25,6 +25,7 @@ const Attendees = ({ attendees, onUpdate }) => {
   const [selectedAttendee, setSelectedAttendee] = useState(null);
   const [errorMessage, setErrorMessage] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
+  const [withAttendeeSummaryDetail, setAttendeeSummaryDetail] = useState(false);
 
   const handleAttendeeClick = attendee => {
     setSelectedAttendee(attendee);
@@ -43,30 +44,80 @@ const Attendees = ({ attendees, onUpdate }) => {
     setSelectedAttendee(null);
   };
 
-  const attendeesResponse = () =>
-    attendees.map(it => (
-      <Grid key={it.id} item>
-        <Attendee attendee={it} onSelection={handleAttendeeClick} />
-      </Grid>
-    ));
-
   if (attendees == null) return "NO ATTENDEES";
   if (isLoading) return <SpinnerWithText text="Verwerken update" size={"sm"} />;
+
+  const getAttendeesSummary = attendees => {
+    const allPresent = attendees.filter(x => x.state === "PRESENT");
+    const coach = allPresent.filter(x =>
+      ["TRAINER", "COACH"].includes(x.user.role)
+    ).length;
+    const allPlayers = allPresent.length - coach;
+
+    let detail = "";
+    const numberOfAttendeesFor = role => {
+      return allPresent.filter(x => x.user.role === role).length;
+    };
+
+    if (withAttendeeSummaryDetail) {
+      const sv = numberOfAttendeesFor("SETTER");
+      const pl = numberOfAttendeesFor("PASSER");
+      const mid = numberOfAttendeesFor("MID");
+      const dia = numberOfAttendeesFor("DIAGONAL");
+      const tl = numberOfAttendeesFor("OTHER");
+      detail = `SPEL: ${sv}, P/L: ${pl}, MID: ${mid}, DIA: ${dia}, TL: ${tl}, `;
+    }
+
+    return (
+      <Typography variant="body2">
+        <em>
+          Σ {allPlayers}, {detail} COACH: {coach > 0 ? " ✅" : " ❌"}
+        </em>
+      </Typography>
+    );
+  };
+
+  const attendeeOverview = () => {
+    return (
+      <>
+        {attendees.map(it => (
+          <Grid key={it.id} item>
+            <Attendee attendee={it} onSelection={handleAttendeeClick} />
+          </Grid>
+        ))}
+        <Grid key={"total"} item>
+          <Button
+            variant="outlined"
+            color="default"
+            onClick={() => {
+              setAttendeeSummaryDetail(x => {
+                console.log(`Setting attendeeSummaryDetail from ${x} to ${!x}`);
+                return !x;
+              });
+            }}
+          >
+            {getAttendeesSummary(attendees)}
+            {/*| {attendee.state.substring(0, 1)}*/}
+          </Button>
+        </Grid>
+      </>
+    );
+  };
+
   return (
     <Grid container spacing={1}>
       {!!errorMessage ? (
         <Grid item xs={12}>
           <Typography>
-            {" "}
             <WarningIcon spacing={2} /> {errorMessage}{" "}
           </Typography>
         </Grid>
       ) : (
-        <> </>
+        ""
       )}
 
       {!selectedAttendee ? (
-        attendeesResponse()
+        attendeeOverview()
       ) : (
         <Grid container item xs={12}>
           <AttendeeRefinement

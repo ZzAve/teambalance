@@ -8,7 +8,7 @@ const TrainingsList = ({ trainings, updateTrigger }) => (
   <Grid container spacing={5}>
     {trainings.map(it => (
       <Grid key={it.id} item xs={12}>
-        <Training training={it} onUpdate={updateTrigger} />
+        <TrainingListItem training={it} onUpdate={updateTrigger} />
       </Grid>
     ))}
   </Grid>
@@ -19,24 +19,24 @@ const TrainingsList = ({ trainings, updateTrigger }) => (
  * - training overview showing all attendees
  * - training showing attendance of a single attendee with availability to change
  */
-const Training = ({ training, onUpdate }) => {
+const TrainingListItem = ({ training, onUpdate }) => {
   const startDateTime = new Date(training.startTime);
-  const comment = !!training.comment && `| (${training.comment})`;
-
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
-        <Typography variant="h6">
-          {" "}
-          Training {formattedDate(startDateTime)} om{" "}
-          <em>{formattedTime(startDateTime)}</em>{" "}
-        </Typography>
-        <Typography variant="subtitle1">
-          @ {training.location} {comment}
-        </Typography>
+      <Grid item xs={12} lg={4}>
+        <Typography variant="h6">{formattedDate(startDateTime)}</Typography>
+        <Typography variant="body1">{formattedTime(startDateTime)}</Typography>
+        <Typography variant="body1">@ {training.location}</Typography>
+        {!!training.comment ? (
+          <Typography variant="body1">
+            <em>{training.comment}</em>
+          </Typography>
+        ) : (
+          ""
+        )}
       </Grid>
 
-      <Grid item xs={12}>
+      <Grid item xs={12} lg={8}>
         <Attendees attendees={training.attendees} onUpdate={onUpdate} />
       </Grid>
     </Grid>

@@ -18,7 +18,6 @@ const Trainings = ({ refresh, view, allowChanges = false, limit = 1 }) => {
 
   useEffect(() => {
     console.log(`[Trainings] refresh: ${refresh}`);
-    // if (secret == null ) return;
     withLoading(setIsLoading, updateTrainings).then();
   }, [refresh]);
 
@@ -42,7 +41,7 @@ const Trainings = ({ refresh, view, allowChanges = false, limit = 1 }) => {
             Wanneer kan Chris zijn waarde weer laten zien?
           </Typography>
         </Grid>
-        <Grid item xs>
+        <Grid item xs={12}>
           <TrainingsList
             trainings={trainings}
             updateTrigger={updateTrainings}
@@ -62,7 +61,7 @@ const Trainings = ({ refresh, view, allowChanges = false, limit = 1 }) => {
     );
   } else {
     return (
-      <Grid container spacing={1}>
+      <Grid container item spacing={1}>
         <Grid item xs={12}>
           <Typography variant="h6">
             Could not view "Trainings" in view '{view}'
