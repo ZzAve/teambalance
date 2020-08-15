@@ -33,15 +33,6 @@ fun User.toAttendee(event: Event) = Attendee(
     event = event
 )
 
-fun Iterable<Attendee>.toTrainingResponse(trainingId: Long) = map {
-    AttendeeResponse(
-        id = it.id,
-        eventId = trainingId,
-        state = it.availability,
-        user = it.user
-    )
-}
-
 data class TrainingsResponse(
     val totalSize: Long,
     val totalPages: Int,

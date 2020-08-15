@@ -30,6 +30,8 @@ spring:
   datasource:
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
+    hikari:
+      maximum-pool-size: 2
   cloud.gcp.sql:
     instance-connection-name: ${INSTANCE_CONNECTION_NAME}
     database-name: ${DATABASE_NAME}

@@ -59,21 +59,37 @@ class TrainingController(
         log.info("GetAllTrainings")
         secretService.ensureSecret(secret)
 
-        return eventRepository.findAllWithStartTimeAfter(
-            since,
-            PageRequest.of(page - 1, limit, Sort.by("startTime").ascending())
-        )
-            .let {
-                TrainingsResponse(
-                    totalPages = it.totalPages,
-                    totalSize = it.totalElements,
-                    page = it.number + 1,
-                    size = min(it.size, it.content.size),
-                    trainings = it.content.map { training ->
-                        training.toTrainingResponse(includeAttendees)
-                    }
-                )
+        // In case of testing performance again :)
+        // measureTiming(50) { doGetTrainings(page, limit, since, includeAttendees)}
+
+        return doGetTrainings(page, limit, since, includeAttendees)
+    }
+
+    private fun doGetTrainings(
+        page: Int,
+        limit: Int,
+        since: LocalDateTime,
+        includeAttendees: Boolean
+    ): TrainingsResponse {
+        val pageRequest = PageRequest.of(page - 1, limit, Sort.by("startTime").ascending())
+        val trainingsPage = eventRepository.findAllWithStartTimeAfter(since, pageRequest)
+
+        val attendees = if (includeAttendees) {
+            val trainingIds = trainingsPage.content.map { it.id }
+            attendeeRepository.findAllByEventIdIn(trainingIds)
+                .groupBy { it.event.id }
+        } else emptyMap()
+
+        return TrainingsResponse(
+            totalPages = trainingsPage.totalPages,
+            totalSize = trainingsPage.totalElements,
+            page = trainingsPage.number + 1,
+            size = min(trainingsPage.size, trainingsPage.content.size),
+            trainings = trainingsPage.content.map { t ->
+                val relevantAttendees = attendees[t.id] ?: emptyList()
+                t.toTrainingsResponse(relevantAttendees)
             }
+        )
     }
 
     @GetMapping("/{training-id}")
@@ -87,18 +103,9 @@ class TrainingController(
         secretService.ensureSecret(secret)
 
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
-        val attendees =
-            if (!includeAttendees) null else attendeeRepository.findAllByEventIdIn(listOf(trainingId)).toResponse()
+        val attendees = if (!includeAttendees) emptyList() else attendeeRepository.findAllByEventIdIn(listOf(trainingId))
 
-        return training.let {
-            TrainingResponse(
-                id = it.id,
-                location = it.location,
-                comment = it.comment,
-                startTime = it.startTime,
-                attendees = attendees
-            )
-        }
+        return training.toTrainingsResponse(attendees)
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -116,7 +123,7 @@ class TrainingController(
         val attendees = users.map { it.toAttendee(training) }
 
         val savedTraining = eventRepository.save(training)
-        val savedAttendeesResponse = attendeeRepository.saveAll(attendees).toTrainingResponse(savedTraining.id)
+        val savedAttendeesResponse = attendeeRepository.saveAll(attendees).map { a -> a.toResponse() }
 
         return savedTraining.toResponse(savedAttendeesResponse)
     }
@@ -195,17 +202,18 @@ class TrainingController(
         location = updateTrainingRequestBody.location ?: location
     )
 
-    private fun Training.toResponse(savedAttendeesResponse: List<AttendeeResponse>) = TrainingResponse(
+    private fun Training.toTrainingsResponse(attendees: List<Attendee>): TrainingResponse {
+        val attendeesResponse = attendees.map { a -> a.toResponse() }
+        return toResponse(attendeesResponse)
+    }
+
+    private fun Training.toResponse(attendeesResponse: List<AttendeeResponse>) = TrainingResponse(
         id = id,
         comment = comment,
         location = location,
         startTime = startTime,
-        attendees = savedAttendeesResponse
+        attendees = attendeesResponse
     )
-
-    private fun Training.toTrainingResponse(includeAttendees: Boolean): TrainingResponse {
-        val attendees = if (includeAttendees) attendeeRepository.findAllByEventIdIn(listOf(id))
-            .toTrainingResponse(id) else emptyList()
-        return this.toResponse(attendees)
-    }
 }
+
+data class EnrichedTraining(val training: Training, val attendees: List<Attendee>)
