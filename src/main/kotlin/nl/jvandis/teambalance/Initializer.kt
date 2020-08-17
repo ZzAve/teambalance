@@ -3,7 +3,7 @@ package nl.jvandis.teambalance
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.attendees.Availability
-import nl.jvandis.teambalance.api.training.EventRepository
+import nl.jvandis.teambalance.api.event.EventRepository
 import nl.jvandis.teambalance.api.training.Training
 import nl.jvandis.teambalance.api.users.Role
 import nl.jvandis.teambalance.api.users.User

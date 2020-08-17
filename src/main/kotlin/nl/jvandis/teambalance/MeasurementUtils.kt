@@ -7,9 +7,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sqrt
 import kotlin.system.measureTimeMillis
 
-
 private val log = LoggerFactory.getLogger("MeasurementUtils")
-
 
 fun measureTiming(
     repetitions: Int = 50,

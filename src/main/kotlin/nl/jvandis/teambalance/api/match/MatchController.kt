@@ -1,14 +1,15 @@
-package nl.jvandis.teambalance.api.training
+package nl.jvandis.teambalance.api.match
 
 import io.swagger.annotations.Api
 import nl.jvandis.teambalance.api.DataConstraintViolationException
-import nl.jvandis.teambalance.api.InvalidTrainingException
+import nl.jvandis.teambalance.api.InvalidMatchException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.SECRET_HEADER
 import nl.jvandis.teambalance.api.SecretService
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
+import nl.jvandis.teambalance.api.training.UserAddRequest
 import nl.jvandis.teambalance.api.users.UserRepository
 import nl.jvandis.teambalance.api.users.toAttendee
 import org.slf4j.LoggerFactory
@@ -30,13 +31,14 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
+import javax.validation.Valid
 import kotlin.math.min
 
 @RestController
-@Api(tags = ["trainings"])
-@RequestMapping(path = ["/api/trainings"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class TrainingController(
-    private val eventRepository: TrainingRepository,
+@Api(tags = ["matches"])
+@RequestMapping(path = ["/api/matches"], produces = [MediaType.APPLICATION_JSON_VALUE])
+class MatchController(
+    private val matchRepository: MatchRepository,
     private val userRepository: UserRepository,
     private val attendeeRepository: AttendeeRepository,
     private val secretService: SecretService
@@ -44,34 +46,23 @@ class TrainingController(
     private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
-    fun getTrainings(
+    fun getMatches(
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
-        @RequestParam(
-            value = "since",
-            defaultValue = "2020-09-01T00:00"
-        ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: LocalDateTime,
+        @RequestParam(value = "since", defaultValue = "2020-09-01T00:00")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: LocalDateTime,
         @RequestParam(value = "limit", defaultValue = "10") limit: Int,
         @RequestParam(value = "page", defaultValue = "1") page: Int,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
-    ): TrainingsResponse {
-        log.info("GetAllTrainings")
+    ): MatchesResponse {
+        log.info("GetAllMatches")
         secretService.ensureSecret(secret)
 
         // In case of testing performance again :)
-        // measureTiming(50) {
-        //     getEventsAndAttendees(
-        //         repository = eventRepository,
-        //         attendeeRepository = attendeeRepository,
-        //         page = page,
-        //         limit = limit,
-        //         since = since,
-        //         includeAttendees = includeAttendees
-        //     ).toResponse()
-        // }
+        // measureTiming(50) { getEventsAndAttendees(matchRepository, attendeeRepository, page, limit, since, includeAttendees).toResponse()}
 
         return getEventsAndAttendees(
-            eventsRepository = eventRepository,
+            eventsRepository = matchRepository,
             attendeeRepository = attendeeRepository,
             page = page,
             limit = limit,
@@ -80,73 +71,71 @@ class TrainingController(
         ).toResponse()
     }
 
-    private fun Pair<Page<Training>, Map<Long, List<Attendee>>>.toResponse(
-    ): TrainingsResponse {
-        val trainingsPage = first
+    private fun Pair<Page<Match>, Map<Long, List<Attendee>>>.toResponse(): MatchesResponse {
+        val matchesPage = first
         val attendees = second
-
-        return TrainingsResponse(
-            totalPages = trainingsPage.totalPages,
-            totalSize = trainingsPage.totalElements,
-            page = trainingsPage.number + 1,
-            size = min(trainingsPage.size, trainingsPage.content.size),
-            trainings = trainingsPage.content.map { t ->
+        return MatchesResponse(
+            totalPages = matchesPage.totalPages,
+            totalSize = matchesPage.totalElements,
+            page = matchesPage.number + 1,
+            size = min(matchesPage.size, matchesPage.content.size),
+            matches = matchesPage.content.map { t ->
                 val relevantAttendees = attendees[t.id] ?: emptyList()
-                t.externalizeWithAttendees(relevantAttendees)
+                t.externaliseWithAttendees(relevantAttendees)
             }
         )
     }
 
-    @GetMapping("/{training-id}")
-    fun getTraining(
-        @PathVariable("training-id") trainingId: Long,
+    @GetMapping("/{match-id}")
+    fun getMatch(
+        @PathVariable("match-id") matchId: Long,
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
-    ): TrainingResponse {
-        log.info("Get training $trainingId")
+    ): MatchResponse {
+        log.info("Get match $matchId")
         secretService.ensureSecret(secret)
 
-        val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
+        val match = matchRepository.findByIdOrNull(matchId) ?: throw InvalidMatchException(matchId)
         val attendees =
-            if (!includeAttendees) emptyList() else attendeeRepository.findAllByEventIdIn(listOf(trainingId))
+            if (!includeAttendees) emptyList() else attendeeRepository.findAllByEventIdIn(listOf(matchId))
 
-        return training.externalizeWithAttendees(attendees)
+        return match.externaliseWithAttendees(attendees)
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    fun createTraining(
-        @RequestBody potentialTraining: PotentialTraining,
+    fun createMatch(
+        @RequestBody @Valid potentialMatch: PotentialMatch,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
-    ): TrainingResponse {
-        log.info("postTraining $potentialTraining")
+    ): MatchResponse {
+        log.info("postMatch $potentialMatch")
         secretService.ensureSecret(secret)
 
         val users = userRepository.findAll()
-        val training = potentialTraining.internalize()
+        val match = potentialMatch.internalize()
 
-        val attendees = users.map { it.toAttendee(training) }
+        val attendees = users.map { it.toAttendee(match) }
 
-        val savedTraining = eventRepository.save(training)
+        val savedMatch = matchRepository.save(match)
         val savedAttendees = attendeeRepository.saveAll(attendees).toList()
 
-        return savedTraining.externalizeWithAttendees(savedAttendees)
+        return savedMatch.externaliseWithAttendees(savedAttendees)
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/{training-id}/attendees")
+    @PostMapping("/{match-id}/attendees")
     fun addAttendee(
-        @PathVariable(value = "training-id") trainingId: Long,
+        @PathVariable(value = "match-id") matchId: Long,
         @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,
         @RequestBody user: UserAddRequest,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ): List<Attendee> {
-        log.info("Adding: $user (or all: $addAll) to training $trainingId")
+        log.info("Adding: $user (or all: $addAll) to match $matchId")
         secretService.ensureSecret(secret)
 
-        val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
+        val match = matchRepository.findByIdOrNull(matchId) ?: throw InvalidMatchException(matchId)
         val users = if (addAll) {
             userRepository.findAll()
         } else {
@@ -157,48 +146,48 @@ class TrainingController(
         }
 
         return users.map { u ->
-            attendeeRepository.save(u.toAttendee(training))
+            attendeeRepository.save(u.toAttendee(match))
         }
     }
 
-    @PutMapping("/{training-id}")
-    fun updateTraining(
-        @PathVariable(value = "training-id") trainingId: Long,
-        @RequestBody updateTrainingRequest: UpdateTrainingRequest,
+    @PutMapping("/{match-id}")
+    fun updateMatch(
+        @PathVariable(value = "match-id") matchId: Long,
+        @RequestBody updateMatchRequest: UpdateMatchRequest,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
-    ): TrainingResponse {
+    ): MatchResponse {
         secretService.ensureSecret(secret)
 
-        return eventRepository
-            .findByIdOrNull(trainingId)
+        return matchRepository
+            .findByIdOrNull(matchId)
             ?.let {
-                val updatedTraining = it.createUpdatedTraining(updateTrainingRequest)
-                eventRepository.save(updatedTraining)
+                val updatedMatch = it.createUpdatedMatch(updateMatchRequest)
+                matchRepository.save(updatedMatch)
             }
-            ?.externalizeWithAttendees(emptyList())
-            ?: throw InvalidTrainingException(trainingId)
+            ?.externalise(emptyList())
+            ?: throw InvalidMatchException(matchId)
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{training-id}")
-    fun deleteTraining(
-        @PathVariable(value = "training-id") trainingId: Long,
+    @DeleteMapping("/{match-id}")
+    fun deleteMatch(
+        @PathVariable(value = "match-id") matchId: Long,
         @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ) {
-        log.info("Deleting training: $trainingId")
+        log.info("Deleting match: $matchId")
         secretService.ensureSecret(secret)
 
         if (deleteAttendees) {
-            attendeeRepository.findAllByEventIdIn(listOf(trainingId))
+            attendeeRepository.findAllByEventIdIn(listOf(matchId))
                 .let { attendeeRepository.deleteAll(it) }
         }
         try {
-            eventRepository.deleteById(trainingId)
+            matchRepository.deleteById(matchId)
         } catch (e: DataIntegrityViolationException) {
-            throw DataConstraintViolationException("Training $trainingId could not be deleted. There are still attendees bound to this training")
+            throw DataConstraintViolationException("Match $matchId could not be deleted. There are still attendees bound to this match")
         }
     }
 }

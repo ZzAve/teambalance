@@ -9,11 +9,3 @@ data class AttendeeResponse(
     val state: Availability,
     val user: User
 )
-
-fun Attendee.toResponse() = AttendeeResponse(
-    id =id,
-    eventId = event.id,
-    state = availability,
-    user = user
-)
-

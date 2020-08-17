@@ -8,7 +8,7 @@ import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.SECRET_HEADER
 import nl.jvandis.teambalance.api.SecretService
-import nl.jvandis.teambalance.api.training.EventRepository
+import nl.jvandis.teambalance.api.event.EventRepository
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException

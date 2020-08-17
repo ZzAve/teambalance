@@ -21,7 +21,6 @@ data class User(
     @Column(nullable = false) val showForTrainings: Boolean = true,
     @Column(nullable = false) val showForMatches: Boolean = true
 ) {
-
     constructor(name: String, role: Role) : this(0, name, role)
 
     override fun toString() = "User[id=$id, name=$name, role=$role, isActive=$isActive, showForTrainings=$showForTrainings, showForMatches=$showForMatches]"
