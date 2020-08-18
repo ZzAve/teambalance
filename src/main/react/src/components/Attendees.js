@@ -10,10 +10,24 @@ import WarningIcon from "@material-ui/icons/Warning";
 import { withLoading } from "../utils/util";
 import { attendeesApiClient } from "../utils/AttendeesApiClient";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import { EventsType } from "./events/utils";
 
 const colorMap = {
   PRESENT: "primary",
   ABSENT: "secondary"
+};
+
+const texts = {
+  is_present_on_event: {
+    [EventsType.TRAINING]: "Is {name} op de training?",
+    [EventsType.MATCH]: "Is {name} bij de wedstrijd?",
+    [EventsType.OTHER]: "Is {name} erbij?"
+  }
+};
+
+const getText = (eventsType, name, args) => {
+  const typpe = EventsType[eventsType] || EventsType.OTHER;
+  return (texts[name][typpe] || name).formatUnicorn(args);
 };
 
 const buttonColor = state => colorMap[state] || "default";
@@ -21,7 +35,7 @@ const buttonColor = state => colorMap[state] || "default";
 /**
  * Function Attendees component
  */
-const Attendees = ({ attendees, onUpdate }) => {
+const Attendees = ({ eventsType, attendees, onUpdate, size = "medium" }) => {
   const [selectedAttendee, setSelectedAttendee] = useState(null);
   const [errorMessage, setErrorMessage] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,11 +83,9 @@ const Attendees = ({ attendees, onUpdate }) => {
     }
 
     return (
-      <Typography variant="body2">
-        <em>
-          Σ {allPlayers}, {detail} COACH: {coach > 0 ? " ✅" : " ❌"}
-        </em>
-      </Typography>
+      <em>
+        Σ {allPlayers}, {detail} COACH: {coach > 0 ? " ✅" : " ❌"}
+      </em>
     );
   };
 
@@ -81,11 +93,16 @@ const Attendees = ({ attendees, onUpdate }) => {
     <>
       {attendees.map(it => (
         <Grid key={it.id} item>
-          <Attendee attendee={it} onSelection={handleAttendeeClick} />
+          <Attendee
+            size={size}
+            attendee={it}
+            onSelection={handleAttendeeClick}
+          />
         </Grid>
       ))}
       <Grid key={"total"} item>
         <Button
+          size={size}
           variant="outlined"
           color="default"
           onClick={() => {
@@ -93,7 +110,6 @@ const Attendees = ({ attendees, onUpdate }) => {
           }}
         >
           {getAttendeesSummary(attendees)}
-          {/*| {attendee.state.substring(0, 1)}*/}
         </Button>
       </Grid>
     </>
@@ -115,6 +131,8 @@ const Attendees = ({ attendees, onUpdate }) => {
         attendeeOverview()
       ) : (
         <AttendeeRefinement
+          size={size}
+          eventsType={eventsType}
           attendee={selectedAttendee}
           onSuccess={onRefinementSuccess}
           onFailure={onRefinementFailure}
@@ -125,9 +143,10 @@ const Attendees = ({ attendees, onUpdate }) => {
   );
 };
 
-export const Attendee = ({ attendee, onSelection }) => {
+export const Attendee = ({ size, attendee, onSelection }) => {
   return (
     <Button
+      size={size}
       variant="contained"
       color={buttonColor(attendee.state)}
       onClick={() => {
@@ -139,7 +158,14 @@ export const Attendee = ({ attendee, onSelection }) => {
   );
 };
 
-const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
+const AttendeeRefinement = ({
+  eventsType,
+  attendee,
+  size,
+  onSuccess,
+  onFailure,
+  onBack
+}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = availability =>
@@ -158,6 +184,7 @@ const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
   const AttendeeButton = (state, content) => {
     return (
       <Button
+        size={size}
         variant="contained"
         color={buttonColor(state)}
         onClick={() => handleClick(state)}
@@ -174,7 +201,12 @@ const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
         <Grid item>{AttendeeButton("ABSENT", <ClearIcon />)}</Grid>
         <Grid item>{AttendeeButton("UNCERTAIN", <HelpIcon />)}</Grid>
         <Grid item>
-          <Button variant="contained" color="default" onClick={() => onBack()}>
+          <Button
+            size={size}
+            variant="contained"
+            color="default"
+            onClick={() => onBack()}
+          >
             <ArrowBackIcon />
             <Typography>Terug</Typography>
           </Button>
@@ -186,7 +218,11 @@ const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
   return (
     <Grid container item spacing={2}>
       <Grid item xs={12}>
-        <Typography>Is {attendee.user.name} op de training?</Typography>
+        <Typography>
+          {getText(eventsType, "is_present_on_event", {
+            name: attendee.user.name
+          })}
+        </Typography>
       </Grid>
 
       {isLoading ? (

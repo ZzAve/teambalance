@@ -10,18 +10,12 @@ import TopBar from "./components/TopBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import Trainings from "./components/training/Trainings";
-import { ViewType } from "./utils/util";
-import TrainingsPage from "./views/TrainingsPage";
+import EventsPage from "./views/EventsPage";
+import { EventsType } from "./components/events/utils";
 
 const Admin = lazy(() => import("./views/Admin.js"));
 const Login = lazy(() => import("./views/Login.js"));
 const Overview = lazy(() => import("./views/Overview.js"));
-
-// Determine which view to show.
-
-// For now, default with 'login'
-// Based on events this changes.
 
 const App = () => {
   const [topBarShouldRefresh, setTopBarShouldRefresh] = useState(false);
@@ -62,7 +56,14 @@ const App = () => {
                 />
                 <PrivateRoute
                   path="/trainings"
-                  component={TrainingsPage}
+                  eventsType={EventsType.TRAINING}
+                  component={EventsPage}
+                  refresh={shouldRefresh}
+                />
+                <PrivateRoute
+                  path="/matches"
+                  eventsType={EventsType.MATCH}
+                  component={EventsPage}
                   refresh={shouldRefresh}
                 />
                 <PrivateRoute path="/loading" component={Loading} />

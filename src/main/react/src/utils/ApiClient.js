@@ -85,9 +85,17 @@ export const ApiClient = () => {
     return _resultWithMinDelay(apiResult, minDelay);
   };
 
+  const externalizeDateTime = t => {
+    const externalDateTime = new Date(t);
+    // Very dirty hack(!)
+    externalDateTime.setMinutes(t.getMinutes() - t.getTimezoneOffset());
+    return externalDateTime.toISOString().slice(0, -1);
+  };
+
   return {
     callWithBody: performApiCallWithBody,
     call: performApiCall,
+    externalizeDateTime,
     defaultTimeout: DEFAULT_TIMEOUT,
     defaultMinDelay: DEFAULT_MIN_DELAY
   };

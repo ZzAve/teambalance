@@ -2,10 +2,10 @@ import Grid from "@material-ui/core/Grid";
 import React, { useEffect, useState } from "react";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
-import { Message } from "./TrainingDetails";
+import { Message } from "./EventDetails";
 import { attendeesApiClient } from "../../utils/AttendeesApiClient";
 
-export const TrainingUsers = ({ training, users, setMessage }) => {
+export const EventUsers = ({ training, users, setMessage }) => {
   const [singleUserCheck, setSingleUserCheck] = useState([]);
   const [allUsersCheckBox, setAllUsersCheckBox] = useState(false);
 
@@ -105,7 +105,7 @@ export const TrainingUsers = ({ training, users, setMessage }) => {
       {/*  />*/}
       {/*</Grid>*/}
       {users.map(it => (
-        <Grid item>
+        <Grid item key={it.id}>
           <FormControlLabel
             key={it.id}
             control={

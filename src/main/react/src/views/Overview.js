@@ -5,12 +5,13 @@ import PageItem from "../components/PageItem";
 import { Button, Card, CardHeader } from "@material-ui/core";
 import Transactions from "../components/Transactions";
 import React, { useState } from "react";
-import Trainings from "../components/training/Trainings";
+import Events from "../components/events/Events";
 import { ViewType } from "../utils/util";
 import { Redirect } from "react-router-dom";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import Hidden from "@material-ui/core/Hidden";
 import Typography from "@material-ui/core/Typography";
+import { EventsType } from "../components/events/utils";
 
 const Overview = ({ refresh }) => {
   const [goTo, setGoTo] = useState(undefined);
@@ -21,6 +22,78 @@ const Overview = ({ refresh }) => {
 
   return (
     <>
+      <Grid item xs={12} md={6}>
+        <Grid container spacing={2}>
+          <PageItem title="Aanstaande trainingen">
+            <Grid item container spacing={4}>
+              <Grid item xs={12}>
+                <Typography>
+                  Wanneer kan Chris zijn waarde weer laten zien?
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Events
+                  eventsType={EventsType.TRAINING}
+                  refresh={refresh}
+                  view={ViewType.List}
+                  limit={2}
+                />
+              </Grid>
+              <Grid
+                container
+                item
+                justify-content="flex-end"
+                justify="flex-end"
+              >
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setGoTo("/trainings")}
+                  >
+                    Meer
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </PageItem>
+          {/*</Grid>*/}
+          {/*<Grid item container spacing={2}>*/}
+          <PageItem title="Aanstaande wedstrijden">
+            <Grid item container spacing={4}>
+              <Grid item xs={12}>
+                <Typography>
+                  Wanneer huffen we onszelf weer dicatoriaal naar de top?
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Events
+                  eventsType={EventsType.MATCH}
+                  refresh={refresh}
+                  view={ViewType.List}
+                  limit={2}
+                />
+              </Grid>
+              <Grid
+                container
+                item
+                justify-content="flex-end"
+                justify="flex-end"
+              >
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setGoTo("/matches")}
+                  >
+                    Meer
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </PageItem>
+        </Grid>
+      </Grid>
       <Grid item xs={12} md={6}>
         <Grid container spacing={2}>
           <PageItem title="De bierstand">
@@ -41,50 +114,18 @@ const Overview = ({ refresh }) => {
               <Transactions refresh={refresh} />
             </Card>
           </Grid>
-        </Grid>
-      </Grid>
-      <Grid item xs={12} md={6}>
-        <Grid container spacing={2}>
-          <PageItem title="Admin snuff">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setGoTo("/admin")}
-            >
-              <Hidden xsDown>Admin dingen </Hidden>
-              <ArrowForwardIcon spacing={5} />
-            </Button>
-          </PageItem>
-        </Grid>
-        <Grid container spacing={2}>
-          <PageItem title="Aanstaande trainingen">
-            <Grid container spacing={4}>
-              <Grid item xs={12}>
-                <Typography>
-                  Wanneer kan Chris zijn waarde weer laten zien?
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Trainings refresh={refresh} view={ViewType.List} limit={2} />
-              </Grid>
-              <Grid
-                container
-                item
-                justify-content="flex-end"
-                justify="flex-end"
+          <Grid item container spacing={2}>
+            <PageItem title="Admin snuff">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setGoTo("/admin")}
               >
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => setGoTo("/trainings")}
-                  >
-                    Meer
-                  </Button>
-                </Grid>
-              </Grid>
-            </Grid>
-          </PageItem>
+                <Hidden xsDown>Admin dingen </Hidden>
+                <ArrowForwardIcon spacing={5} />
+              </Button>
+            </PageItem>
+          </Grid>
         </Grid>
       </Grid>
     </>

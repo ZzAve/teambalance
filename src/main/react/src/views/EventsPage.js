@@ -2,15 +2,29 @@ import Grid from "@material-ui/core/Grid";
 import PageItem from "../components/PageItem";
 import { Button } from "@material-ui/core";
 import React, { useState } from "react";
-import Trainings from "../components/training/Trainings";
+import Events from "../components/events/Events";
 import { ViewType } from "../utils/util";
 import { Redirect } from "react-router-dom";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import Hidden from "@material-ui/core/Hidden";
 import Switch from "@material-ui/core/Switch";
 import Typography from "@material-ui/core/Typography";
+import { EventsType } from "../components/events/utils";
 
-const TrainingsPage = ({ refresh }) => {
+const texts = {
+  coming_events: {
+    [EventsType.TRAINING]: "Aanstaande trainingen",
+    [EventsType.MATCH]: "Aanstaande wedstrijden",
+    [EventsType.OTHER]: "Aanstaande evenementen"
+  }
+};
+
+const getText = (eventsType, name) => {
+  const typpe = EventsType[eventsType] || EventsType.OTHER;
+  return texts[name][typpe] || name;
+};
+
+const EventsPage = ({ eventsType, refresh }) => {
   const [goTo, setGoTo] = useState(undefined);
   const [showList, setShowList] = useState(true);
 
@@ -33,7 +47,7 @@ const TrainingsPage = ({ refresh }) => {
         </PageItem>
       </Grid>
       <Grid container item xs={12}>
-        <PageItem title="Aanstaande trainingen">
+        <PageItem title={getText(eventsType, "coming_events")}>
           <Grid container spacing={4}>
             <Grid
               component="label"
@@ -58,7 +72,8 @@ const TrainingsPage = ({ refresh }) => {
               </Grid>
             </Grid>
             <Grid item xs={12}>
-              <Trainings
+              <Events
+                eventsType={eventsType}
                 refresh={refresh}
                 view={showList ? ViewType.List : ViewType.Table}
                 limit={50}
@@ -71,4 +86,4 @@ const TrainingsPage = ({ refresh }) => {
   );
 };
 
-export default TrainingsPage;
+export default EventsPage;
