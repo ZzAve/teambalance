@@ -7,23 +7,25 @@ import java.time.LocalDateTime
 data class UpdateMatchRequest(
     val startTime: LocalDateTime?,
     val location: String?,
+    val opponent: String?,
+    val homeAway: Place?,
     val comment: String?
 )
 
 data class PotentialMatch(
     val startTime: LocalDateTime,
     val location: String,
-    val comment: String?,
-    val homeAway: Place,
     val opponent: String,
+    val homeAway: Place,
+    val comment: String?,
     val attendees: List<Long>
 ) {
     fun internalize(): Match = Match(
         startTime = startTime,
-        comment = comment,
         location = location,
         opponent = opponent,
-        homeAway = homeAway
+        homeAway = homeAway,
+        comment = comment
     )
 }
 

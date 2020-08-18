@@ -37,8 +37,10 @@ data class Match(
 
     fun createUpdatedMatch(updateMatchRequestBody: UpdateMatchRequest) = copy(
         startTime = updateMatchRequestBody.startTime ?: startTime,
-        comment = updateMatchRequestBody.comment ?: comment,
-        location = updateMatchRequestBody.location ?: location
+        location = updateMatchRequestBody.location ?: location,
+        opponent = updateMatchRequestBody.opponent ?: opponent,
+        homeAway = updateMatchRequestBody.homeAway ?: homeAway,
+        comment = updateMatchRequestBody.comment ?: comment
     )
 
     fun externaliseWithAttendees(attendees: List<Attendee>): MatchResponse {
