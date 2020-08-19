@@ -27,7 +27,27 @@ const texts = {
 
 const getText = (eventsType, name, args) => {
   const typpe = EventsType[eventsType] || EventsType.OTHER;
-  return (texts[name][typpe] || name).formatUnicorn(args);
+  return formatUnicorn(texts[name][typpe] || name)(args);
+};
+
+const formatUnicorn = unicorn => {
+  let str = unicorn;
+  return function() {
+    if (arguments.length) {
+      let t = typeof arguments[0];
+      let key;
+      let args =
+        "string" === t || "number" === t
+          ? Array.prototype.slice.call(arguments)
+          : arguments[0];
+
+      for (key in args) {
+        str = str.replace(new RegExp("\\{" + key + "\\}", "gi"), args[key]);
+      }
+    }
+
+    return str;
+  };
 };
 
 const buttonColor = state => colorMap[state] || "default";
