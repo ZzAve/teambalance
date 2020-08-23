@@ -48,7 +48,7 @@ class AttendeeController(
         @RequestParam(value = "user-ids", defaultValue = "") userIds: List<Long>,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): AttendeesResponse {
-        log.info("Get attendees (filter eventIds: $eventIds,userIds: $userIds")
+        log.debug("Get attendees (filter eventIds: $eventIds,userIds: $userIds")
         secretService.ensureSecret(secret)
 
         val attendees = when {
@@ -72,7 +72,7 @@ class AttendeeController(
         @PathVariable(value = "id") attendeeId: Long,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): AttendeeResponse {
-        log.info("Get attendees $attendeeId")
+        log.debug("Get attendees $attendeeId")
         secretService.ensureSecret(secret)
 
         val attendee = attendeeRepository.findByIdOrNull(attendeeId) ?: throw InvalidAttendeeException(attendeeId)
@@ -86,7 +86,7 @@ class AttendeeController(
         @RequestBody potentialAttendee: PotentialAttendee,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): AttendeeResponse {
-        log.info("Adding attendee: $potentialAttendee")
+        log.debug("Adding attendee: $potentialAttendee")
         secretService.ensureSecret(secret)
 
         val user = userRepository.findByIdOrNull(potentialAttendee.userId)
@@ -132,7 +132,7 @@ class AttendeeController(
         @PathVariable("id") id: Long,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ) {
-        log.info("Deleting attendee x")
+        log.debug("Deleting attendee x")
         secretService.ensureSecret(secret)
 
         attendeeRepository.deleteById(id)
@@ -145,19 +145,15 @@ class AttendeeController(
         @RequestParam("event-id") eventId: Long,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ) {
-        log.info("Deleting user $userId from training $eventId")
+        log.debug("Deleting user $userId from training $eventId")
         secretService.ensureSecret(secret)
 
-        val attendee =
-            attendeeRepository.findByUserIdAndEventId(userId, eventId)
-                .firstOrNull()
-                ?.let {
-
-                    log.info(it.toString())
-                    attendeeRepository.delete(it)
-                    // attendeeRepository.deleteById(userId)
-                }
-                ?: throw AttendeeNotFoundException(userId, eventId)
+        attendeeRepository.findByUserIdAndEventId(userId, eventId)
+            .firstOrNull()
+            ?.let {
+                attendeeRepository.delete(it)
+            }
+            ?: throw AttendeeNotFoundException(userId, eventId)
     }
 
     private fun Attendee.toResponse() =

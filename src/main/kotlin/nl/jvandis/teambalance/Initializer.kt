@@ -22,6 +22,11 @@ class Initializer(
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
+
+    // @Bean
+    fun test() {
+        log.info("When am I logged?")
+    }
     // @Bean
     fun sendDatabase(): InitializingBean? {
 

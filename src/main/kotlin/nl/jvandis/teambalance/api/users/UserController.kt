@@ -37,7 +37,7 @@ class UserController(
     fun getUsers(
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): Users {
-        log.info("getUsers")
+        log.debug("getUsers")
         secretService.ensureSecret(secret)
 
         return Users(users = userRepository.findAll(Sort.by("name")).filterNotNull())
@@ -48,7 +48,7 @@ class UserController(
         @PathVariable(value = "id") userId: Long,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): User {
-        log.info("getUser $userId")
+        log.debug("getUser $userId")
         secretService.ensureSecret(secret)
 
         return userRepository.findByIdOrNull(userId) ?: throw InvalidUserException(userId)
@@ -60,7 +60,7 @@ class UserController(
         @RequestBody potentialUser: PotentialUser,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ) {
-        log.info("postUser $potentialUser")
+        log.debug("postUser $potentialUser")
         secretService.ensureSecret(secret)
 
         val user = potentialUser.internalize()
@@ -74,7 +74,7 @@ class UserController(
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ): User {
-        log.info("updatingUser: $potentialUserUpdate")
+        log.debug("updatingUser: $potentialUserUpdate")
         secretService.ensureSecret(secret)
 
         return userRepository
@@ -99,7 +99,7 @@ class UserController(
         @PathVariable(value = "id") userId: Long,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ) {
-        log.info("deletingUser: $userId")
+        log.debug("deletingUser: $userId")
         secretService.ensureSecret(secret)
 
         try {

@@ -55,7 +55,7 @@ class MatchController(
         @RequestParam(value = "page", defaultValue = "1") page: Int,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): MatchesResponse {
-        log.info("GetAllMatches")
+        log.debug("GetAllMatches")
         secretService.ensureSecret(secret)
 
         // In case of testing performance again :)
@@ -93,7 +93,7 @@ class MatchController(
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ): MatchResponse {
-        log.info("Get match $matchId")
+        log.debug("Get match $matchId")
         secretService.ensureSecret(secret)
 
         val match = matchRepository.findByIdOrNull(matchId) ?: throw InvalidMatchException(matchId)
@@ -109,7 +109,7 @@ class MatchController(
         @RequestBody @Valid potentialMatch: PotentialMatch,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): MatchResponse {
-        log.info("postMatch $potentialMatch")
+        log.debug("postMatch $potentialMatch")
         secretService.ensureSecret(secret)
 
         val users = userRepository.findAll()
@@ -132,7 +132,7 @@ class MatchController(
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ): List<Attendee> {
-        log.info("Adding: $user (or all: $addAll) to match $matchId")
+        log.debug("Adding: $user (or all: $addAll) to match $matchId")
         secretService.ensureSecret(secret)
 
         val match = matchRepository.findByIdOrNull(matchId) ?: throw InvalidMatchException(matchId)
@@ -177,7 +177,7 @@ class MatchController(
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ) {
-        log.info("Deleting match: $matchId")
+        log.debug("Deleting match: $matchId")
         secretService.ensureSecret(secret)
 
         if (deleteAttendees) {

@@ -55,7 +55,7 @@ class TrainingController(
         @RequestParam(value = "page", defaultValue = "1") page: Int,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): TrainingsResponse {
-        log.info("GetAllTrainings")
+        log.debug("GetAllTrainings")
         secretService.ensureSecret(secret)
 
         // In case of testing performance again :)
@@ -104,7 +104,7 @@ class TrainingController(
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ): TrainingResponse {
-        log.info("Get training $trainingId")
+        log.debug("Get training $trainingId")
         secretService.ensureSecret(secret)
 
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
@@ -120,7 +120,7 @@ class TrainingController(
         @RequestBody potentialTraining: PotentialTraining,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): TrainingResponse {
-        log.info("postTraining $potentialTraining")
+        log.debug("postTraining $potentialTraining")
         secretService.ensureSecret(secret)
 
         val users = userRepository.findAll()
@@ -143,7 +143,7 @@ class TrainingController(
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ): List<Attendee> {
-        log.info("Adding: $user (or all: $addAll) to training $trainingId")
+        log.debug("Adding: $user (or all: $addAll) to training $trainingId")
         secretService.ensureSecret(secret)
 
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
@@ -188,7 +188,7 @@ class TrainingController(
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ) {
-        log.info("Deleting training: $trainingId")
+        log.debug("Deleting training: $trainingId")
         secretService.ensureSecret(secret)
 
         if (deleteAttendees) {
