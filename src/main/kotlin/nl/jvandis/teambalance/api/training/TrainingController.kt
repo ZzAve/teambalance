@@ -80,8 +80,7 @@ class TrainingController(
         ).toResponse()
     }
 
-    private fun Pair<Page<Training>, Map<Long, List<Attendee>>>.toResponse(
-    ): TrainingsResponse {
+    private fun Pair<Page<Training>, Map<Long, List<Attendee>>>.toResponse(): TrainingsResponse {
         val trainingsPage = first
         val attendees = second
 

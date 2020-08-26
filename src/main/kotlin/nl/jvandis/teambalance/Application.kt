@@ -18,6 +18,6 @@ fun main(args: Array<String>) {
     val applicationContext = SpringApplication.run(Application::class.java, *args)
 
     applicationContext.getBean(BankService::class.java).getBalance()
-    applicationContext.getBean(BankService::class.java).getTransactions(1,0)
-    log.info("Retrieved balance and transactions to warm up caache")
+    applicationContext.getBean(BankService::class.java).getTransactions(1, 0)
+    log.info("Retrieved balance and transactions to warm up cache")
 }

@@ -1,7 +1,5 @@
 package nl.jvandis.teambalance.api.event
 
-import nl.jvandis.teambalance.api.attendees.Attendee
-import nl.jvandis.teambalance.api.training.TrainingResponse
 import org.springframework.data.jpa.repository.Temporal
 import java.time.LocalDateTime
 import javax.persistence.Column

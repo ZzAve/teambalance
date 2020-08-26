@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 interface TeamEventsRepository<T : Event> {
     fun findAllWithStartTimeAfter(
-    since: LocalDateTime,
-    pageable: Pageable
+        since: LocalDateTime,
+        pageable: Pageable
     ): Page<T>
 }
