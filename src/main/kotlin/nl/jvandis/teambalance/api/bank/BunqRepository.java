@@ -28,6 +28,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 public class BunqRepository {
 
@@ -105,18 +107,52 @@ public class BunqRepository {
         this.requestSpendingMoneyIfNeeded();
     }
 
+    private Semaphore semaphore = new Semaphore(1);
+
     public MonetaryAccountBank getMonetaryAccountBank(int id) {
-        return MonetaryAccountBank.get(id).getValue();
+        boolean permit = false;
+        try {
+            permit = semaphore.tryAcquire(5, TimeUnit.SECONDS);
+            if (permit) {
+                return MonetaryAccountBank.get(id).getValue();
+            } else {
+                System.out.println("Could not acquire semaphore");
+                throw new RuntimeException("Could not acquire semaphore");
+            }
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (permit) {
+                semaphore.release();
+            }
+        }
     }
 
     public List<Payment> getAllPayment(int accountId, int count) {
-        Pagination pagination = new Pagination();
-        pagination.setCount(count);
+        boolean permit = false;
+        try {
+            permit = semaphore.tryAcquire(5, TimeUnit.SECONDS);
+            if (permit) {
 
-        return Payment.list(
-                accountId,
-                pagination.getUrlParamsCountOnly()
-        ).getValue();
+                Pagination pagination = new Pagination();
+                pagination.setCount(count);
+
+                return Payment.list(
+                        accountId,
+                        pagination.getUrlParamsCountOnly()
+                ).getValue();
+            } else {
+                System.out.println("Could not acquire semaphore");
+                throw new RuntimeException("Could not acquire semaphore");
+            }
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (permit) {
+                semaphore.release();
+            }
+        }
+
     }
 
     public void updateContext() {
