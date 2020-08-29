@@ -16,6 +16,10 @@ app:
         refresh-after-write: 30s
         maximum-size: 1
 
+
+
+server:
+  forward-headers-strategy: NATIVE
 spring:
   security:
     user:
@@ -32,6 +36,8 @@ spring:
     password: ${POSTGRES_PASSWORD}
     hikari:
       maximum-pool-size: 2
+#    url: jdbc:postgresql://localhost:5432/${DATABASE_NAME}
+#    url: jdbc:postgresql://sql_proxy:5432/${DATABASE_NAME}
   cloud.gcp.sql:
     instance-connection-name: ${INSTANCE_CONNECTION_NAME}
     database-name: ${DATABASE_NAME}

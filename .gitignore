@@ -1,10 +1,14 @@
 .idea
 *.iml
+
 target
 /*.conf
 src/main/appengine/app.yaml
+
 node
 node_modules
+
 src/main/webapp
 .env
+
 /cloud_sql_proxy
