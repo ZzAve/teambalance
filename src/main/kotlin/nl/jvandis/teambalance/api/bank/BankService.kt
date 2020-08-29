@@ -7,6 +7,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import java.time.Duration
 import java.time.ZoneId
@@ -38,7 +39,7 @@ data class BankCacheConfig(
  */
 @Service
 class BankService(
-    private val bunqRepository: BunqRepository,
+    @Lazy private val bunqRepository: BunqRepository,
     private val bankCacheConfig: BankCacheConfig,
     @Value("\${app.bank.bank-account-id}") private val bankAccountId: Int,
     @Value("\${app.bank.transaction-limit}") private val transactionLimit: Int

@@ -9,12 +9,3 @@ data class AttendeeResponse(
     val state: Availability,
     val user: User
 )
-
-fun List<Attendee>.toResponse() = map {
-    AttendeeResponse(
-        id = it.id,
-        eventId = it.event.id,
-        state = it.availability,
-        user = it.user
-    )
-}

@@ -3,20 +3,17 @@ package nl.jvandis.teambalance
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.attendees.Availability
-import nl.jvandis.teambalance.api.training.EventRepository
+import nl.jvandis.teambalance.api.event.EventRepository
 import nl.jvandis.teambalance.api.training.Training
 import nl.jvandis.teambalance.api.users.Role
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InitializingBean
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 import kotlin.random.Random
 
-@Configuration
+// @Configuration
 class Initializer(
     private val userRepository: UserRepository,
     private val eventRepository: EventRepository,
@@ -25,11 +22,16 @@ class Initializer(
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
-    @Bean
+
+    // @Bean
+    fun test() {
+        log.info("When am I logged?")
+    }
+    // @Bean
     fun sendDatabase(): InitializingBean? {
 
         return InitializingBean {
-            if (true) {
+            if (false) {
                 userRepository.saveAll(
                     listOf(
                         User("Julius", Role.DIAGONAL),

@@ -4,7 +4,7 @@ import { authenticationManager } from "./AuthenticationManager";
 import { InvalidSecretException } from "./Exceptions";
 
 const DEFAULT_TIMEOUT = 5000; //ms
-const DEFAULT_MIN_DELAY = 750; //ms
+const DEFAULT_MIN_DELAY = 250; //ms
 
 const _mergeFetchOptions = (options, secret) => ({
   ...options,
@@ -54,6 +54,10 @@ export const ApiClient = () => {
       timeout
     ).then(res => {
       _throwIfNotOk(path, res);
+      if (res.status === 204) {
+        return {};
+      }
+
       return res.json();
     });
 
@@ -72,15 +76,26 @@ export const ApiClient = () => {
       timeout
     ).then(res => {
       _throwIfNotOk(path, res);
+      if (res.status === 204) {
+        return {};
+      }
       return res.json();
     });
 
     return _resultWithMinDelay(apiResult, minDelay);
   };
 
+  const externalizeDateTime = t => {
+    const externalDateTime = new Date(t);
+    // Very dirty hack(!)
+    externalDateTime.setMinutes(t.getMinutes() - t.getTimezoneOffset());
+    return externalDateTime.toISOString().slice(0, -1);
+  };
+
   return {
     callWithBody: performApiCallWithBody,
     call: performApiCall,
+    externalizeDateTime,
     defaultTimeout: DEFAULT_TIMEOUT,
     defaultMinDelay: DEFAULT_MIN_DELAY
   };

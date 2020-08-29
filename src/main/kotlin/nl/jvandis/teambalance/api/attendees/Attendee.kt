@@ -1,6 +1,6 @@
 package nl.jvandis.teambalance.api.attendees
 
-import nl.jvandis.teambalance.api.training.Event
+import nl.jvandis.teambalance.api.event.Event
 import nl.jvandis.teambalance.api.training.Training
 import nl.jvandis.teambalance.api.users.Role
 import nl.jvandis.teambalance.api.users.User
@@ -47,6 +47,13 @@ data class Attendee(
         user = user,
         availability = availability,
         event = event
+    )
+
+    fun externalize() = AttendeeResponse(
+        id = id,
+        eventId = event.id,
+        state = availability,
+        user = user
     )
 }
 

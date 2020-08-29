@@ -95,6 +95,7 @@ public class BunqRepository {
     public BunqRepository(ApiEnvironmentType environmentType,
                           String apiKey,
                           Boolean saveSessionToFile) throws UnknownHostException {
+        log.info("Starting BunqRepository");
         this.environmentType = environmentType;
         this.apiKey = apiKey;
         this.saveSessionToFile = saveSessionToFile;
@@ -104,6 +105,23 @@ public class BunqRepository {
         this.requestSpendingMoneyIfNeeded();
     }
 
+    public MonetaryAccountBank getMonetaryAccountBank(int id) {
+        return MonetaryAccountBank.get(id).getValue();
+    }
+
+    public List<Payment> getAllPayment(int accountId, int count) {
+        Pagination pagination = new Pagination();
+        pagination.setCount(count);
+
+        return Payment.list(
+                accountId,
+                pagination.getUrlParamsCountOnly()
+        ).getValue();
+    }
+
+    public void updateContext() {
+        safeSave(BunqContext.getApiContext());
+    }
 
     private ApiContext createApiConfig() throws UnknownHostException {
         ArrayList<String> permittedIps = new ArrayList<>();
@@ -163,10 +181,6 @@ public class BunqRepository {
         }
     }
 
-    public void updateContext() {
-        safeSave(BunqContext.getApiContext());
-    }
-
     /**
      * @return String
      */
@@ -206,20 +220,6 @@ public class BunqRepository {
      */
     private void setupCurrentUser() {
         this.user = User.get().getValue();
-    }
-
-    public MonetaryAccountBank getMonetaryAccountBank(int id) {
-        return MonetaryAccountBank.get(id).getValue();
-    }
-
-    public List<Payment> getAllPayment(int accountId, int count) {
-        Pagination pagination = new Pagination();
-        pagination.setCount(count);
-
-        return Payment.list(
-                accountId,
-                pagination.getUrlParamsCountOnly()
-        ).getValue();
     }
 
 

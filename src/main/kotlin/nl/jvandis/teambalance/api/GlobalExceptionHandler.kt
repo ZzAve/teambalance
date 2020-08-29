@@ -3,15 +3,16 @@ package nl.jvandis.teambalance.api
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import javax.validation.ConstraintViolationException
 
 @ControllerAdvice
-class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
+class GlobalExceptionHandler {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @ExceptionHandler(InvalidSecretException::class)
@@ -55,15 +56,43 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
             )
     }
 
-    @ExceptionHandler(InvalidIdException::class)
+    @ExceptionHandler(HttpMessageNotReadableException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun handleInvalidRequestArguments(e: InvalidIdException): ResponseEntity<Error> {
+    fun handleMissingKotlinParameterException(e: HttpMessageNotReadableException): ResponseEntity<Error> {
+        log.info("Invalid request arguments received: ", e)
         return ResponseEntity
             .badRequest()
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = "Could not apply operation because Id was invalid (${e.type} id ${e.id}) "
+                    reason = "Please verify your input arguments"
+                )
+            )
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<Error> {
+        log.info("Invalid request arguments received: ", e)
+        return ResponseEntity
+            .badRequest()
+            .body(
+                Error(
+                    status = HttpStatus.BAD_REQUEST,
+                    reason = "Please verify your input arguments"
+                )
+            )
+    }
+
+    @ExceptionHandler(InvalidIdException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun handleInvalidRequestArguments(e: InvalidIdException): ResponseEntity<Error> {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                Error(
+                    status = HttpStatus.NOT_FOUND,
+                    reason = "Could not find ${e.type} item with Id ${e.id} "
                 )
             )
     }

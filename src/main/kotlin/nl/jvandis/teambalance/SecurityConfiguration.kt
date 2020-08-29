@@ -26,12 +26,13 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             .authorizeRequests()
             .antMatchers("/api/bank/**").permitAll()
             .antMatchers("/api/authentication/**").permitAll()
-            .antMatchers("/api/users/**").permitAll() // TO BE NOT AVAILABLE FOR EVERYBODY
-            .antMatchers("/api/trainings/**").permitAll() // TO BE NOT AVAILABLEF FOR EVERYBODY
-            .antMatchers("/api/attendees/**").permitAll() // TO BE NOT AVAILABLEF FOR EVERYBODY
+            .antMatchers("/api/users/**").permitAll()
+            .antMatchers("/api/trainings/**").permitAll()
+            .antMatchers("/api/attendees/**").permitAll()
+            .antMatchers("/api/matches/**").permitAll()
             .antMatchers("/login").permitAll()
             .antMatchers("/_ah/**").permitAll()
-            .antMatchers("/swagger-ui.html").fullyAuthenticated()
+            .antMatchers("/internal/**").fullyAuthenticated()
             .antMatchers("/swagger-ui/**").fullyAuthenticated()
             .antMatchers("/webjars/**").fullyAuthenticated()
             .antMatchers("/**.html").permitAll()

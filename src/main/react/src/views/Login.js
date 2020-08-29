@@ -66,7 +66,6 @@ const Login = ({ location, handleRefresh }) => {
     return <Loading />;
   }
 
-  console.log(`[Login] ${JSON.stringify(location)} ... ${handleRefresh}`);
   return (
     <Grid item xs={12}>
       <Grid container spacing={2}>

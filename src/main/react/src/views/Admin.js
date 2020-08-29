@@ -1,17 +1,54 @@
 import Grid from "@material-ui/core/Grid";
 import PageItem from "../components/PageItem";
 import React, { useState } from "react";
-import Trainings from "../components/training/Trainings";
+import Events from "../components/events/Events";
 import Typography from "@material-ui/core/Typography";
-import { BrowserRouter as Router, Link, Switch } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Link,
+  Redirect,
+  Switch
+} from "react-router-dom";
 import { PrivateRoute } from "../components/PrivateRoute";
 import Loading from "./Loading";
 import { ViewType } from "../utils/util";
 import { Button } from "@material-ui/core";
 import Hidden from "@material-ui/core/Hidden";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import TrainingDetails from "../components/training/TrainingDetails";
-import Redirect from "react-router-dom/es/Redirect";
+import EventDetails from "../components/events/EventDetails";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItem from "@material-ui/core/ListItem";
+import List from "@material-ui/core/List";
+import AddIcon from "@material-ui/icons/Add";
+import { EventsType } from "../components/events/utils";
+
+const texts = {
+  event_type_name: {
+    [EventsType.TRAINING]: "Trainingen",
+    [EventsType.MATCH]: "Wedstrijden",
+    [EventsType.OTHER]: "Evenementen"
+  },
+  new_event_button_text: {
+    [EventsType.TRAINING]: "nieuwe training",
+    [EventsType.MATCH]: "nieuwe wedstrijd",
+    [EventsType.OTHER]: "nieuw evenement"
+  },
+  edit_event_pageitem_label: {
+    [EventsType.TRAINING]: "Training aanpassen",
+    [EventsType.MATCH]: "Wedstrijd aanpassen",
+    [EventsType.OTHER]: "Evenement aanpassen"
+  },
+  new_event_pageitem_label: {
+    [EventsType.TRAINING]: "Nieuwe training",
+    [EventsType.MATCH]: "Nieuwe wedstrijd",
+    [EventsType.OTHER]: "Nieuw evenement "
+  }
+};
+
+const getText = (eventsType, name) => {
+  const typpe = EventsType[eventsType] || EventsType.OTHER;
+  return texts[name][typpe] || name;
+};
 
 const Admin = ({ refresh }) => {
   const [goBack, triggerGoBack] = useState(false);
@@ -26,7 +63,6 @@ const Admin = ({ refresh }) => {
         <Typography variant="h6">
           Je begeeft je nu op de 'admin' pagina's. Pas op voor de lactacyd{" "}
         </Typography>
-        {/*<Link to="/">*/}
         <Button
           variant="contained"
           color="primary"
@@ -35,44 +71,71 @@ const Admin = ({ refresh }) => {
           <ArrowBackIcon spacing={5} />
           <Hidden xsDown> Terug naar de veiligheid</Hidden>
         </Button>
-        {/*</Link>*/}
       </PageItem>
 
       <Router>
         <PageItem title="TOC" md={6}>
-          <ul>
-            <li>
-              <Link to="/admin">Admin</Link>
-            </li>
-            <li>
-              <Link to="/admin/trainings">Trainingen</Link>
-            </li>
-            <li>
-              <Link to="/admin/matches">Wedstrijden</Link>
-            </li>
-          </ul>
-          {/*<Typography variant="h6">Trainingen</Typography>*/}
-          {/*<Typography variant="h6">Wedstrijden</Typography>*/}
-          {/*<Typography variant="h6">Overig</Typography>*/}
-          {/*<Typography variant="h6">???</Typography>*/}
+          <List component="nav" aria-label="main mailbox folders">
+            <Link to="/admin">
+              <ListItem button>
+                <ListItemText primary="Admin" />
+              </ListItem>
+            </Link>
+
+            <Link to="/admin/trainings">
+              <ListItem button>
+                <ListItemText primary="Trainingen" />
+              </ListItem>
+            </Link>
+
+            <Link to="/admin/matches">
+              <ListItem button>
+                <ListItemText primary="Wedstrijden" />
+              </ListItem>
+            </Link>
+          </List>
         </PageItem>
 
         <Switch>
           <PrivateRoute
             path="/admin/trainings"
-            component={Trainings}
-            view={ViewType.Table}
+            eventsType={EventsType.TRAINING}
+            component={EventsOverview}
             refresh={refresh}
-            allowChanges={true}
+          />
+          <PrivateRoute
+            path="/admin/matches"
+            eventsType={EventsType.MATCH}
+            component={EventsOverview}
+            refresh={refresh}
           />
           <PrivateRoute
             path="/admin/new-training"
-            component={NewTraining}
+            eventsType={EventsType.TRAINING}
+            component={NewEvent}
+            refresh={refresh}
+          />
+          <PrivateRoute
+            path="/admin/new-match"
+            eventsType={EventsType.MATCH}
+            component={NewEvent}
+            refresh={refresh}
+          />
+          <PrivateRoute
+            path="/admin/edit-training/:id"
+            eventsType={EventsType.TRAINING}
+            component={ChangeEvent}
+            refresh={refresh}
+          />
+          <PrivateRoute
+            path="/admin/edit-match/:id"
+            eventsType={EventsType.MATCH}
+            component={ChangeEvent}
             view={ViewType.Table}
             refresh={refresh}
           />
+
           <PrivateRoute path="/admin/loading" component={Loading} />
-          <PrivateRoute path="/admin/matches" component={SelectItemPlease} />
           <PrivateRoute path="/" component={HiAdmin} />
         </Switch>
       </Router>
@@ -80,20 +143,98 @@ const Admin = ({ refresh }) => {
   );
 };
 
-const NewTraining = opts => {
-  // debugger;
+const EventsOverview = ({ eventsType, refresh }) => {
+  const [goTo, setGoTo] = useState(undefined);
+
+  const handleClickEditEvent = () => {
+    if (eventsType === EventsType.TRAINING) {
+      setGoTo("/admin/new-training");
+    } else if (eventsType === EventsType.MATCH) {
+      setGoTo("/admin/new-match");
+    } else {
+      console.error(`Could not create new event for type ${eventsType}`);
+    }
+  };
+
+  if (goTo !== undefined) {
+    console.log(`Navigating to: ${goTo}`);
+    return <Redirect to={goTo} />;
+  }
+
   return (
-    <PageItem title={"Nieuwe training"}>
-      <TrainingDetails location={opts.location} id={2} />
+    <PageItem title={getText(eventsType, "event_type_name")}>
+      <Grid item container spacing={5}>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              handleClickEditEvent();
+            }}
+          >
+            <AddIcon spacing={5} />
+            <Hidden xsDown>
+              {getText(eventsType, "new_event_button_text")}
+            </Hidden>
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <Events
+            eventsType={eventsType}
+            refresh={refresh}
+            view={ViewType.Table}
+            allowChanges={true}
+            limit={50}
+          />
+        </Grid>
+      </Grid>
     </PageItem>
   );
 };
+
+const ChangeEvent = ({ computedMatch, eventsType, ...rest }) => {
+  const id = +((computedMatch || {}).params || {}).id;
+  if (id === undefined || isNaN(id)) {
+    return (
+      <Redirect
+        to={{
+          pathname:
+            eventsType === EventsType.TRAINING
+              ? "/admin/trainings"
+              : eventsType === EventsType.MATCH
+              ? "/admin/matches"
+              : "/admin"
+        }}
+      />
+    );
+  }
+
+  return (
+    <PageItem title={getText(eventsType, "edit_event_pageitem_label")}>
+      <EventDetails
+        eventsType={eventsType}
+        location={location}
+        id={computedMatch.params.id}
+        showAttendees={true}
+      />
+    </PageItem>
+  );
+};
+
+const NewEvent = ({ eventsType, location }) => {
+  return (
+    <PageItem title={getText(eventsType, "new_event_pageitem_label")}>
+      <EventDetails eventsType={eventsType} location={location} />
+    </PageItem>
+  );
+};
+
 const HiAdmin = ({}) => {
   return (
     <PageItem title="Hi admin">
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Typography variant="p"> Je bent een admin</Typography>
+          <Typography variant="body1"> Je bent een admin</Typography>
         </Grid>
         <Grid item xs={12}>
           <img src="https://media.giphy.com/media/Ufc2geerZac4U/giphy.gif" />
@@ -102,17 +243,4 @@ const HiAdmin = ({}) => {
     </PageItem>
   );
 };
-
-const SelectItemPlease = ({}) => {
-  return (
-    <PageItem title="Kies">
-      <Typography variant="h6"> kies iets in de TOC</Typography>
-      <Typography variant="p">
-        {" "}
-        (deze optie is (nog) niet beschikbaar)
-      </Typography>
-    </PageItem>
-  );
-};
-
 export default Admin;

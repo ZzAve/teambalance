@@ -2,17 +2,52 @@ import { SpinnerWithText } from "./SpinnerWithText";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import React, { useState } from "react";
-import { trainingsApiClient } from "../utils/TrainingsApiClient";
 import Button from "@material-ui/core/Button";
 import CheckIcon from "@material-ui/icons/Check";
 import ClearIcon from "@material-ui/icons/Clear";
 import HelpIcon from "@material-ui/icons/Help";
 import WarningIcon from "@material-ui/icons/Warning";
 import { withLoading } from "../utils/util";
+import { attendeesApiClient } from "../utils/AttendeesApiClient";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import { EventsType } from "./events/utils";
 
 const colorMap = {
   PRESENT: "primary",
   ABSENT: "secondary"
+};
+
+const texts = {
+  is_present_on_event: {
+    [EventsType.TRAINING]: "Is {name} op de training?",
+    [EventsType.MATCH]: "Is {name} bij de wedstrijd?",
+    [EventsType.OTHER]: "Is {name} erbij?"
+  }
+};
+
+const getText = (eventsType, name, args) => {
+  const typpe = EventsType[eventsType] || EventsType.OTHER;
+  return formatUnicorn(texts[name][typpe] || name)(args);
+};
+
+const formatUnicorn = unicorn => {
+  let str = unicorn;
+  return function() {
+    if (arguments.length) {
+      let t = typeof arguments[0];
+      let key;
+      let args =
+        "string" === t || "number" === t
+          ? Array.prototype.slice.call(arguments)
+          : arguments[0];
+
+      for (key in args) {
+        str = str.replace(new RegExp("\\{" + key + "\\}", "gi"), args[key]);
+      }
+    }
+
+    return str;
+  };
 };
 
 const buttonColor = state => colorMap[state] || "default";
@@ -20,10 +55,11 @@ const buttonColor = state => colorMap[state] || "default";
 /**
  * Function Attendees component
  */
-const Attendees = ({ attendees, onUpdate }) => {
+const Attendees = ({ eventsType, attendees, onUpdate, size = "medium" }) => {
   const [selectedAttendee, setSelectedAttendee] = useState(null);
   const [errorMessage, setErrorMessage] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
+  const [withAttendeeSummaryDetail, setAttendeeSummaryDetail] = useState(false);
 
   const handleAttendeeClick = attendee => {
     setSelectedAttendee(attendee);
@@ -42,64 +78,119 @@ const Attendees = ({ attendees, onUpdate }) => {
     setSelectedAttendee(null);
   };
 
-  const attendeesResponse = () =>
-    attendees.map(it => (
-      <Grid key={it.id} item>
-        <Attendee attendee={it} onSelection={handleAttendeeClick} />
-      </Grid>
-    ));
-
   if (attendees == null) return "NO ATTENDEES";
   if (isLoading) return <SpinnerWithText text="Verwerken update" size={"sm"} />;
+
+  const getAttendeesSummary = attendees => {
+    const allPresent = attendees.filter(x => x.state === "PRESENT");
+    const coach = allPresent.filter(x =>
+      ["TRAINER", "COACH"].includes(x.user.role)
+    ).length;
+    const allPlayers = allPresent.length - coach;
+
+    let detail = "";
+    const numberOfAttendeesFor = role => {
+      return allPresent.filter(x => x.user.role === role).length;
+    };
+
+    if (withAttendeeSummaryDetail) {
+      const sv = numberOfAttendeesFor("SETTER");
+      const pl = numberOfAttendeesFor("PASSER");
+      const mid = numberOfAttendeesFor("MID");
+      const dia = numberOfAttendeesFor("DIAGONAL");
+      const tl = numberOfAttendeesFor("OTHER");
+      detail = `SPEL: ${sv}, P/L: ${pl}, MID: ${mid}, DIA: ${dia}, TL: ${tl}, `;
+    }
+
+    return (
+      <em>
+        Σ {allPlayers}, {detail} COACH: {coach > 0 ? " ✅" : " ❌"}
+      </em>
+    );
+  };
+
+  const attendeeOverview = () => (
+    <>
+      {attendees.map(it => (
+        <Grid key={it.id} item>
+          <Attendee
+            size={size}
+            attendee={it}
+            onSelection={handleAttendeeClick}
+          />
+        </Grid>
+      ))}
+      <Grid key={"total"} item>
+        <Button
+          size={size}
+          variant="outlined"
+          color="default"
+          onClick={() => {
+            setAttendeeSummaryDetail(x => !x);
+          }}
+        >
+          {getAttendeesSummary(attendees)}
+        </Button>
+      </Grid>
+    </>
+  );
+
   return (
     <Grid container spacing={1}>
       {!!errorMessage ? (
         <Grid item xs={12}>
           <Typography>
-            {" "}
             <WarningIcon spacing={2} /> {errorMessage}{" "}
           </Typography>
         </Grid>
       ) : (
-        <> </>
+        ""
       )}
 
       {!selectedAttendee ? (
-        attendeesResponse()
+        attendeeOverview()
       ) : (
-        <Grid item xs={12}>
-          <AttendeeRefinement
-            attendee={selectedAttendee}
-            onSuccess={onRefinementSuccess}
-            onFailure={onRefinementFailure}
-            onBack={onRefinementBack}
-          />
-        </Grid>
+        <AttendeeRefinement
+          size={size}
+          eventsType={eventsType}
+          attendee={selectedAttendee}
+          onSuccess={onRefinementSuccess}
+          onFailure={onRefinementFailure}
+          onBack={onRefinementBack}
+        />
       )}
     </Grid>
   );
 };
 
-export const Attendee = ({ attendee, onSelection }) => {
+export const Attendee = ({ size, attendee, onSelection }) => {
   return (
     <Button
+      size={size}
       variant="contained"
       color={buttonColor(attendee.state)}
       onClick={() => {
         onSelection(attendee);
       }}
     >
-      {attendee.user.name} | {attendee.state.substring(0, 1)}
+      {attendee.user.name}
     </Button>
   );
 };
 
-const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
+const AttendeeRefinement = ({
+  eventsType,
+  attendee,
+  size,
+  onSuccess,
+  onFailure,
+  onBack
+}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = availability =>
     withLoading(setIsLoading, () =>
-      trainingsApiClient.updateAttendee(attendee.id, availability)
+      attendeesApiClient.updateAttendee(attendee.id, availability)
     )
       .then(onSuccess)
       .catch(() => {
@@ -110,9 +201,10 @@ const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
         return onFailure;
       });
 
-  const getButton = (state, content) => {
+  const AttendeeButton = (state, content) => {
     return (
       <Button
+        size={size}
         variant="contained"
         color={buttonColor(state)}
         onClick={() => handleClick(state)}
@@ -124,13 +216,19 @@ const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
 
   const attendeeOptions = () => {
     return (
-      <Grid container spacing={1}>
-        <Grid item>{getButton("PRESENT", <CheckIcon />)}</Grid>
-        <Grid item>{getButton("ABSENT", <ClearIcon />)}</Grid>
-        <Grid item>{getButton("UNCERTAIN", <HelpIcon />)}</Grid>
+      <Grid item container spacing={1}>
+        <Grid item>{AttendeeButton("PRESENT", <CheckIcon />)}</Grid>
+        <Grid item>{AttendeeButton("ABSENT", <ClearIcon />)}</Grid>
+        <Grid item>{AttendeeButton("UNCERTAIN", <HelpIcon />)}</Grid>
         <Grid item>
-          <Button variant="text" onClick={() => onBack()}>
-            Terug
+          <Button
+            size={size}
+            variant="contained"
+            color="default"
+            onClick={() => onBack()}
+          >
+            <ArrowBackIcon />
+            <Typography>Terug</Typography>
           </Button>
         </Grid>
       </Grid>
@@ -138,12 +236,13 @@ const AttendeeRefinement = ({ attendee, onSuccess, onFailure, onBack }) => {
   };
 
   return (
-    <Grid container spacing={1}>
+    <Grid container item spacing={2}>
       <Grid item xs={12}>
         <Typography>
-          {attendee.user.name} | {attendee.user.role}{" "}
+          {getText(eventsType, "is_present_on_event", {
+            name: attendee.user.name
+          })}
         </Typography>
-        <Typography>Is {attendee.user.name} op de training?</Typography>
       </Grid>
 
       {isLoading ? (

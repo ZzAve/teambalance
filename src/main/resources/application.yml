@@ -16,8 +16,6 @@ app:
         refresh-after-write: 30s
         maximum-size: 1
 
-
-
 spring:
   security:
     user:
@@ -27,19 +25,20 @@ spring:
     properties.hibernate.jdbc.lob.non_contextual_creation: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
-    hibernate.ddl-auto: create-drop # TODO set to validate
+    hibernate.ddl-auto: validate
     generate-ddl: true
   datasource:
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
+    hikari:
+      maximum-pool-size: 2
   cloud.gcp.sql:
     instance-connection-name: ${INSTANCE_CONNECTION_NAME}
     database-name: ${DATABASE_NAME}
 
   jackson:
-    date-format: "yyyy-MM-dd HH:mm:ss"
-
     serialization:
+      write_dates_as_timestamps: false
       WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS: false
 
 springfox:

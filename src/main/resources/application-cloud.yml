@@ -4,3 +4,5 @@ management:
   endpoints:
     web:
       base-path: /_ah
+
+spring.jpa.hibernate.ddl-auto: validate
