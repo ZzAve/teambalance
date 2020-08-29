@@ -1,0 +1,38 @@
+# We don't want to start from scratch.
+# That is why we tell node here to use the current node image as base.
+FROM node:alpine3.11
+
+# Create an application directory
+RUN mkdir -p /app
+
+# The /app directory should act as the main application directory
+WORKDIR /app
+
+# Copy the app package and package-lock.json file
+COPY package*.json .
+COPY webpack.config.js .
+
+# Install node packages
+RUN npm ci
+
+# Copy or project directory (locally) in the current directory of our docker image (/app)
+COPY src/main/react src/main/react
+
+# Build the app
+RUN npm run build
+
+##
+FROM node:12
+
+RUN mkdir -p /app
+WORKDIR /app
+
+COPY package*.json .
+
+npm ci --only-production
+
+# Copy the jar to the production image from the builder stage.
+COPY --from=builder /app/src/main/webapp/ src/main/webapp
+
+# Run the web service on container startup.
+CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/teambalance.jar"]

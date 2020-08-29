@@ -1,0 +1,19 @@
+# docker-compose.yml
+# https://cloud.google.com/community/tutorials/cloud-run-local-dev-docker-compose
+version: '3'
+
+services:
+  app:
+    build: .
+    image: teambalance-app:local
+    ports:
+      # Service will be accessible on the host at port 9090.
+      - "8080:${PORT:-8080}"
+    environment:
+      # /run/docs/reference/container-contract
+      PORT: ${PORT:-8080}
+      SPRING.PROFILES.ACTIVE: cloud
+      JAVA_TOOL_OPTIONS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+
+    env_file:
+      - .env

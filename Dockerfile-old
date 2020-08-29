@@ -1,0 +1,57 @@
+# Use the official maven/Java 8 image to create a build artifact.
+# https://hub.docker.com/_/maven
+FROM maven:3.6.3-openjdk-8-slim as builder-backend
+
+# Copy local code to the container image.
+RUN mkdir -p /app
+WORKDIR /app
+
+COPY pom.xml .
+RUN mvn initialize
+RUN mvn dependency:go-offline -B
+
+COPY webpack.config.js ./
+COPY package*.json ./
+
+
+COPY src ./src
+
+# Build a release artifact.
+RUN mvn verify -DskipTests
+
+RUN mkdir target/dependency
+RUN cd target/dependency; jar -xf ../*.jar; cd ..
+
+##########
+#######
+####
+
+# Use AdoptOpenJDK for base image.
+# It's important to use OpenJDK 8u191 or above that has container support enabled.
+# https://hub.docker.com/r/adoptopenjdk/openjdk8
+# https://docs.docker.com/develop/develop-images/multistage-build/#use-multi-stage-builds
+FROM adoptopenjdk/openjdk8:jdk8u262-b10-alpine-slim
+
+RUN mkdir -p /app
+WORKDIR /app
+
+# Copy the jar to the production image from the builder stage.
+COPY --from=builder-backend /app/target/dependency /target/dependency/
+#COPY package*.json .
+
+# Copy the jar to the production image from the builder stage.
+#RUN mkdir -p /src/main/webapp
+
+#COPY --from=builder-backend /app/src/main/webapp/ src/main/webapp
+
+# Run the web service on container startup.
+#CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/teambalance.jar"]
+
+
+FROM openjdk:8-jdk-alpine
+VOLUME /tmp
+ARG DEPENDENCY=target/dependency
+COPY ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY ${DEPENDENCY}/META-INF /app/META-INF
+COPY ${DEPENDENCY}/BOOT-INF/classes /app
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-cp","app:app/lib/*","nl.jvandis.teambalance.ApplicationKt"]

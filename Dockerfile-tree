@@ -1,0 +1,15 @@
+# Use the official maven/Java 8 image to create a build artifact.
+# https://hub.docker.com/_/maven
+FROM alpine
+
+RUN apk update && apk add tree
+
+RUN mkdir -p /app
+WORKDIR /app
+
+COPY . .
+
+WORKDIR ../
+# Run the web service on container startup.
+ENTRYPOINT ["tree"]
+CMD []
