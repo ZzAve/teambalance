@@ -1,29 +1,28 @@
 package nl.jvandis.teambalance.api.authentication
 
-import io.swagger.annotations.Api
-import nl.jvandis.teambalance.api.Error
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Error
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Header
+import io.swagger.v3.oas.annotations.tags.Tag
+import nl.jvandis.teambalance.api.ErrorResponse
 import nl.jvandis.teambalance.api.InvalidSecretException
 import nl.jvandis.teambalance.api.SECRET_HEADER
 import nl.jvandis.teambalance.api.SecretService
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
 
-@RestController
-@Api(tags = ["authentication"], position = Int.MIN_VALUE)
-@RequestMapping(path = ["api/authentication"], produces = [MediaType.APPLICATION_JSON_VALUE])
+@Tag( name= "authentication")
+@Controller(value = "api/authentication", produces = [MediaType.APPLICATION_JSON])
 class AuthenticationController(
     private val secretService: SecretService
 ) {
 
-    @GetMapping
+    @Get
     fun authenticate(
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
+        @Header(value = SECRET_HEADER) secret: String?
     ): Success {
         secretService.ensureSecret(secret)
         return Success()
@@ -33,11 +32,11 @@ class AuthenticationController(
         val message: String = "You have managed to get access. Well done"
     )
 
-    @ExceptionHandler(InvalidSecretException::class)
-    fun handleSecretExceptions(e: InvalidSecretException) =
-        ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+    @Error(InvalidSecretException::class)
+    fun handleSecretExceptions(request: HttpRequest<*>, e: InvalidSecretException): HttpResponse<ErrorResponse> =
+        HttpResponse.status<ErrorResponse>(HttpStatus.UNAUTHORIZED, "Check your credentials")
             .body(
-                Error(
+                ErrorResponse(
                     status = HttpStatus.UNAUTHORIZED,
                     reason = e.message ?: "Unauthorized"
                 )

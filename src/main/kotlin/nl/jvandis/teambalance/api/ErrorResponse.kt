@@ -1,8 +1,8 @@
 package nl.jvandis.teambalance.api
 
-import org.springframework.http.HttpStatus
+import io.micronaut.http.HttpStatus
 
-data class Error(
+data class ErrorResponse(
     val status: HttpStatus,
     val reason: String
 )

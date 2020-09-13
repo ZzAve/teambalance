@@ -1,42 +1,41 @@
 package nl.jvandis.teambalance.api.bank
 
-import io.swagger.annotations.Api
+import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Header
+import io.micronaut.http.annotation.QueryValue
+import io.micronaut.validation.Validated
+import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.api.SECRET_HEADER
 import nl.jvandis.teambalance.api.SecretService
 import org.slf4j.LoggerFactory
-import org.springframework.http.MediaType
-import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import javax.inject.Inject
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 
-@RestController
+@Controller(value = "/api/bank", produces = [MediaType.APPLICATION_JSON])
 @Validated
-@Api(value = "Bank", tags = ["bank"])
-@RequestMapping(path = ["/api/bank"], produces = [MediaType.APPLICATION_JSON_VALUE])
+@Tag(name = "Bank")
 class BankController(
-    private val bankService: BankService,
-    private val secretService: SecretService
+    @Inject private val secretService: SecretService,
+    @Inject private val bankService: BankService
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @GetMapping("/balance")
+    @Get("/balance")
     fun getBalance(
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
+        @Header(value = SECRET_HEADER) secret: String?
     ): BalanceResponse {
         secretService.ensureSecret(secret)
 
         return bankService.getBalance().toResponse()
     }
 
-    @GetMapping("/transactions")
+    @Get("/transactions")
     fun getTransactions(
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?,
-        @RequestParam(value = "limit", defaultValue = "10") @Max(50) @Min(1) limit: Int
+        @Header(value = SECRET_HEADER) secret: String?,
+        @QueryValue(value = "limit", defaultValue = "10") @Max(50) @Min(1) limit: Int
     ): TransactionsResponse {
         secretService.ensureSecret(secret)
 

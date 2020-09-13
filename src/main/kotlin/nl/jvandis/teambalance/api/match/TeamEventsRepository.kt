@@ -1,8 +1,8 @@
 package nl.jvandis.teambalance.api.match
 
+import io.micronaut.data.model.Page
+import io.micronaut.data.model.Pageable
 import nl.jvandis.teambalance.api.event.Event
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import java.time.LocalDateTime
 
 interface TeamEventsRepository<T : Event> {

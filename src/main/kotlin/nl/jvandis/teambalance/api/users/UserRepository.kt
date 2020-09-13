@@ -1,7 +1,6 @@
-package nl.jvandis.teambalance.api.users
-
-import org.springframework.data.repository.PagingAndSortingRepository
-import org.springframework.stereotype.Repository
-
-@Repository
-interface UserRepository : PagingAndSortingRepository<User, Long>
+// package nl.jvandis.teambalance.api.users
+//
+// import io.micronaut.data.annotation.Repository
+//
+// @Repository
+// interface UserRepository : PagingAndSortingRepository<User, Long>

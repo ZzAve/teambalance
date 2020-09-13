@@ -35,6 +35,9 @@ data class Match(
             homeAway = homeAway
         )
 
+    constructor() : this(LocalDateTime.MIN, "unknown","") {
+    }
+
     fun createUpdatedMatch(updateMatchRequestBody: UpdateMatchRequest) = copy(
         startTime = updateMatchRequestBody.startTime ?: startTime,
         location = updateMatchRequestBody.location ?: location,

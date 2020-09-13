@@ -109,3 +109,34 @@ for a service account](https://cloud.google.com/sdk/gcloud/reference/auth/applic
 ### Won't have:
  - Integration with CMS systems for customisation purposes
  
+ 
+ # Micronaut migration
+ 
+ ## Feature openapi documentation
+ 
+ - [Micronaut OpenAPI Support documentation](https://micronaut-projects.github.io/micronaut-openapi/latest/guide/index.html)
+ 
+ - [https://www.openapis.org](https://www.openapis.org)
+ 
+ ## Feature jdbc-hikari documentation
+ 
+ - [Micronaut Hikari JDBC Connection Pool documentation](https://micronaut-projects.github.io/micronaut-sql/latest/guide/index.html#jdbc)
+ 
+ ## Feature testcontainers documentation
+ 
+ - [https://www.testcontainers.org/](https://www.testcontainers.org/)
+ 
+ ## Feature http-client documentation
+ 
+ - [Micronaut Micronaut HTTP Client documentation](https://docs.micronaut.io/latest/guide/index.html#httpClient)
+ 
+ ## Feature security documentation
+ 
+ - [Micronaut Micronaut Security documentation](https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html)
+ 
+ ## Feature cache-caffeine documentation
+ 
+ - [Micronaut Caffeine Cache documentation](https://micronaut-projects.github.io/micronaut-cache/latest/guide/index.html)
+ 
+ - [https://github.com/ben-manes/caffeine](https://github.com/ben-manes/caffeine)
+ 

@@ -16,6 +16,8 @@ data class Training(
     constructor(startTime: LocalDateTime, location: String, comment: String?) :
         this(id = 0, startTime = startTime, location = location, comment = comment)
 
+    constructor() : this(LocalDateTime.MIN, "unknown",null)
+
     fun createUpdatedTraining(updateTrainingRequestBody: UpdateTrainingRequest) = copy(
         startTime = updateTrainingRequestBody.startTime ?: startTime,
         comment = updateTrainingRequestBody.comment ?: comment,

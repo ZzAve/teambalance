@@ -1,13 +1,13 @@
 package nl.jvandis.teambalance.api
 
+import io.micronaut.context.annotation.Value
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Service
 import java.util.Base64
+import javax.inject.Singleton
 
 const val SECRET_HEADER = "X-Secret"
 
-@Service
+@Singleton
 class SecretService(
     @Value("\${app.bank.secret-value}") private val validSecretValue: String
 ) {

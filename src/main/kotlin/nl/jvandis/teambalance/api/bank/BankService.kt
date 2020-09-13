@@ -4,32 +4,33 @@ import com.bunq.sdk.model.generated.`object`.Amount
 import com.bunq.sdk.model.generated.endpoint.Payment
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
-import org.springframework.context.annotation.Lazy
-import org.springframework.stereotype.Service
+import io.micronaut.context.annotation.ConfigurationInject
+import io.micronaut.context.annotation.ConfigurationProperties
+import io.micronaut.context.annotation.Value
 import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.min
 
 private val FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS").withZone(ZoneId.of("UTC"))
 
-data class CacheConfig(
-    val enabled: Boolean = true,
-    val expireAfterWrite: Duration,
-    val refreshAfterWrite: Duration?,
-    val maximumSize: Long
-)
 
-@ConstructorBinding
 @ConfigurationProperties("app.bank.cache")
-data class BankCacheConfig(
+data class BankCacheConfig @ConfigurationInject constructor(
     val balance: CacheConfig,
     val transactions: CacheConfig
-)
+) {
+    @ConfigurationProperties("balance") // FIXME: configuration is always from 'balance' instead of by propertyName
+    data class CacheConfig @ConfigurationInject constructor(
+        val enabled: Boolean = true,
+        val expireAfterWrite: Duration,
+        val refreshAfterWrite: Duration?,
+        val maximumSize: Long
+    )
+}
 
 /**
  * BankService resolves bankrelated questions
@@ -37,10 +38,10 @@ data class BankCacheConfig(
  * Its main function is to retrieve information from the BunqRepository and make it available in domain objects.
  * Makes use of a BunqReposity to connect to the bunqAPI
  */
-@Service
+@Singleton
 class BankService(
-    @Lazy private val bunqRepository: BunqRepository,
-    private val bankCacheConfig: BankCacheConfig,
+    @Inject private val bunqRepository: BunqRepository,
+    @Inject private val bankCacheConfig: BankCacheConfig,
     @Value("\${app.bank.bank-account-id}") private val bankAccountId: Int,
     @Value("\${app.bank.transaction-limit}") private val transactionLimit: Int
 
@@ -102,7 +103,7 @@ class BankService(
         )
     }
 
-    private fun <K, V> setupCache(config: CacheConfig, loadingFunction: (K) -> V): AsyncLoadingCache<K, V> =
+    private fun <K, V> setupCache(config: BankCacheConfig.CacheConfig, loadingFunction: (K) -> V): AsyncLoadingCache<K, V> =
         Caffeine.newBuilder()
             .expireAfterWrite(config.expireAfterWrite)
             .apply { if (config.refreshAfterWrite != null) refreshAfterWrite(config.refreshAfterWrite) }

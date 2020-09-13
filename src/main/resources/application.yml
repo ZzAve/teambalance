@@ -4,18 +4,38 @@ app:
     api-key: ${BUNQ_APIKEY}
     bank-account-id: ${BUNQ_BANK_ACCOUNT_ID}
     transaction-limit: 20 # up this when pagination is built (max is 200 from bunq)
+    saveSessionToFile: true #tmp
     cache:
       balance:
         enabled: true
         expire-after-write: 60s
         refresh-after-write: 30s
         maximum-size: 1
+      # FIXME: Current impl uses balance config for both
       transactions:
         enabled: true
         expire-after-write: 60s
         refresh-after-write: 30s
         maximum-size: 1
 
+
+micronaut:
+  security:
+    enabled: false
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      redoc:
+        paths: classpath:META-INF/swagger/views/redoc
+        mapping: /redoc/**
+      rapidoc:
+        paths: classpath:META-INF/swagger/views/rapidoc
+        mapping: /rapidoc/**
+      swagger-ui:
+        paths: classpath:META-INF/swagger/views/swagger-ui
+        mapping: /swagger-ui/**
 
 
 server:
