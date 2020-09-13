@@ -26,10 +26,12 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public class BunqRepository {
 
@@ -85,6 +87,12 @@ public class BunqRepository {
      */
     private static final double BALANCE_ZERO = 0.0;
 
+    /**
+     * Concurrency constants
+     */
+
+    private static final Duration acquireMaxWaitDuration = Duration.ofSeconds(5);
+
     private ApiEnvironmentType environmentType;
 
     private final String apiKey;
@@ -107,42 +115,35 @@ public class BunqRepository {
         this.requestSpendingMoneyIfNeeded();
     }
 
-    private Semaphore semaphore = new Semaphore(1);
+    private static Semaphore semaphore = new Semaphore(1);
 
     public MonetaryAccountBank getMonetaryAccountBank(int id) {
-        boolean permit = false;
-        try {
-            permit = semaphore.tryAcquire(5, TimeUnit.SECONDS);
-            if (permit) {
-                return MonetaryAccountBank.get(id).getValue();
-            } else {
-                System.out.println("Could not acquire semaphore");
-                throw new RuntimeException("Could not acquire semaphore");
-            }
-        } catch (InterruptedException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (permit) {
-                semaphore.release();
-            }
-        }
+        return withSemaphore(() -> MonetaryAccountBank.get(id).getValue());
     }
 
     public List<Payment> getAllPayment(int accountId, int count) {
+        return withSemaphore(() -> {
+            Pagination pagination = new Pagination();
+            pagination.setCount(count);
+            return Payment.list(
+                    accountId,
+                    pagination.getUrlParamsCountOnly()
+            ).getValue();
+
+        });
+    }
+    public void updateContext() {
+        safeSave(BunqContext.getApiContext());
+    }
+
+    private <T> T withSemaphore(Supplier<T> action){
         boolean permit = false;
         try {
-            permit = semaphore.tryAcquire(5, TimeUnit.SECONDS);
+            permit = semaphore.tryAcquire(acquireMaxWaitDuration.getSeconds(), TimeUnit.SECONDS);
             if (permit) {
-
-                Pagination pagination = new Pagination();
-                pagination.setCount(count);
-
-                return Payment.list(
-                        accountId,
-                        pagination.getUrlParamsCountOnly()
-                ).getValue();
+                return action.get();
             } else {
-                System.out.println("Could not acquire semaphore");
+                log.warn("Could not acquire semaphore");
                 throw new RuntimeException("Could not acquire semaphore");
             }
         } catch (InterruptedException e) {
@@ -152,11 +153,6 @@ public class BunqRepository {
                 semaphore.release();
             }
         }
-
-    }
-
-    public void updateContext() {
-        safeSave(BunqContext.getApiContext());
     }
 
     private ApiContext createApiConfig() throws UnknownHostException {
