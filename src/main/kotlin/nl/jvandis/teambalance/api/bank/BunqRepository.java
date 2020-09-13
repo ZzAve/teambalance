@@ -26,8 +26,12 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public class BunqRepository {
 
@@ -83,6 +87,12 @@ public class BunqRepository {
      */
     private static final double BALANCE_ZERO = 0.0;
 
+    /**
+     * Concurrency constants
+     */
+
+    private static final Duration acquireMaxWaitDuration = Duration.ofSeconds(5);
+
     private ApiEnvironmentType environmentType;
 
     private final String apiKey;
@@ -105,22 +115,44 @@ public class BunqRepository {
         this.requestSpendingMoneyIfNeeded();
     }
 
+    private static Semaphore semaphore = new Semaphore(1);
+
     public MonetaryAccountBank getMonetaryAccountBank(int id) {
-        return MonetaryAccountBank.get(id).getValue();
+        return withSemaphore(() -> MonetaryAccountBank.get(id).getValue());
     }
 
     public List<Payment> getAllPayment(int accountId, int count) {
-        Pagination pagination = new Pagination();
-        pagination.setCount(count);
+        return withSemaphore(() -> {
+            Pagination pagination = new Pagination();
+            pagination.setCount(count);
+            return Payment.list(
+                    accountId,
+                    pagination.getUrlParamsCountOnly()
+            ).getValue();
 
-        return Payment.list(
-                accountId,
-                pagination.getUrlParamsCountOnly()
-        ).getValue();
+        });
     }
-
     public void updateContext() {
         safeSave(BunqContext.getApiContext());
+    }
+
+    private <T> T withSemaphore(Supplier<T> action){
+        boolean permit = false;
+        try {
+            permit = semaphore.tryAcquire(acquireMaxWaitDuration.getSeconds(), TimeUnit.SECONDS);
+            if (permit) {
+                return action.get();
+            } else {
+                log.warn("Could not acquire semaphore");
+                throw new RuntimeException("Could not acquire semaphore");
+            }
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (permit) {
+                semaphore.release();
+            }
+        }
     }
 
     private ApiContext createApiConfig() throws UnknownHostException {
