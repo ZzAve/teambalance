@@ -4,7 +4,11 @@ import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.event.Event
 import nl.jvandis.teambalance.api.event.Place
+import toCalendar
+import toLocalDateTime
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Calendar
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EnumType
@@ -13,19 +17,19 @@ import javax.persistence.Enumerated
 @Entity
 data class Match(
     override val id: Long,
-    override val startTime: LocalDateTime,
+    override val startTime: Calendar,
     override val location: String,
     override val comment: String? = null,
     @Column(nullable = false) val opponent: String,
     @Column(nullable = false) @Enumerated(EnumType.STRING) val homeAway: Place
 ) : Event(id, startTime, location, comment) {
-    constructor(startTime: LocalDateTime, location: String, comment: String?) :
+    constructor(startTime: Calendar, location: String, comment: String?) :
         this(
             0, startTime, location, comment, "opponent",
             Place.HOME
         )
 
-    constructor(startTime: LocalDateTime, location: String, comment: String?, opponent: String, homeAway: Place) :
+    constructor(startTime: Calendar, location: String, comment: String?, opponent: String, homeAway: Place) :
         this(
             id = 0,
             startTime = startTime,
@@ -35,11 +39,11 @@ data class Match(
             homeAway = homeAway
         )
 
-    constructor() : this(LocalDateTime.MIN, "unknown","") {
+    constructor() : this(Calendar.getInstance(), "unknown", "") {
     }
 
     fun createUpdatedMatch(updateMatchRequestBody: UpdateMatchRequest) = copy(
-        startTime = updateMatchRequestBody.startTime ?: startTime,
+        startTime = updateMatchRequestBody.startTime?.toCalendar() ?: startTime,
         location = updateMatchRequestBody.location ?: location,
         opponent = updateMatchRequestBody.opponent ?: opponent,
         homeAway = updateMatchRequestBody.homeAway ?: homeAway,
@@ -55,7 +59,7 @@ data class Match(
         id = id,
         comment = comment,
         location = location,
-        startTime = startTime,
+        startTime = startTime.toLocalDateTime(),
         opponent = opponent,
         homeAway = homeAway,
         attendees = attendeesResponse

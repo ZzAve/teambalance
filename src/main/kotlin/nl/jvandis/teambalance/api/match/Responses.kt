@@ -2,6 +2,7 @@ package nl.jvandis.teambalance.api.match
 
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.event.Place
+import toCalendar
 import java.time.LocalDateTime
 
 data class UpdateMatchRequest(
@@ -21,7 +22,7 @@ data class PotentialMatch(
     val attendees: List<Long>
 ) {
     fun internalize(): Match = Match(
-        startTime = startTime,
+        startTime = startTime.toCalendar(),
         location = location,
         opponent = opponent,
         homeAway = homeAway,

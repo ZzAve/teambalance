@@ -115,6 +115,7 @@ private val log = LoggerFactory.getLogger("GlobalExceptionHandler")
 @Requires(classes = [Throwable::class, ExceptionHandler::class])
 class UnhandledExceptionHandler : ExceptionHandler<Throwable, HttpResponse<ErrorResponse>> {
     override fun handle(request: HttpRequest<*>?, exception: Throwable?): HttpResponse<ErrorResponse> {
+        log.error("Unhandled exception", exception)
         return HttpResponse
             .status<ErrorResponse>(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(

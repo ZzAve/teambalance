@@ -5,6 +5,7 @@ import nl.jvandis.teambalance.api.training.Training
 import nl.jvandis.teambalance.api.users.Role
 import nl.jvandis.teambalance.api.users.User
 import org.slf4j.LoggerFactory
+import toCalendar
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -29,7 +30,7 @@ data class Attendee(
     companion object {
         private val log = LoggerFactory.getLogger(Attendee::class.java)
         private val dummyUser = User("dummy", Role.COACH)
-        private val dummyEvent = Training(LocalDateTime.MIN, "", "")
+        private val dummyEvent = Training(LocalDateTime.MIN.toCalendar(), "", "")
     }
 
     /**

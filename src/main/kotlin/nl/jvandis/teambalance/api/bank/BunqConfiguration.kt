@@ -2,12 +2,9 @@ package nl.jvandis.teambalance.api.bank
 
 import com.bunq.sdk.context.ApiEnvironmentType
 import io.micronaut.context.annotation.Bean
-import io.micronaut.context.annotation.Configuration
-import io.micronaut.context.annotation.Context
 import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Value
 import org.slf4j.LoggerFactory
-import javax.inject.Singleton
 
 @Factory
 class BunqConfiguration(

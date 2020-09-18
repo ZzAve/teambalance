@@ -18,8 +18,8 @@ app:
         refresh-after-write: 30s
         maximum-size: 1
 
-
 micronaut:
+  openapi.views.spec: redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop
   security:
     enabled: false
   router:
@@ -37,6 +37,30 @@ micronaut:
         paths: classpath:META-INF/swagger/views/swagger-ui
         mapping: /swagger-ui/**
 
+datasources:
+  default:
+    jdbcUrl: "jdbc:postgresql:///${DATABASE_NAME}\
+      ?cloudSqlInstance=${INSTANCE_CONNECTION_NAME}\
+      &socketFactory=com.google.cloud.sql.postgres.SocketFactory\
+      &user=${POSTGRES_USERNAME}\
+      &password=${POSTGRES_PASSWORD}"
+    dialect: POSTGRES
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+#    dataSourceClassName: org.postgresql.Driver
+    driverClassName: org.postgresql.Driver
+    schema-generate: VALIDATE
+    maximumPoolSize: 2
+
+jpa:
+  default:
+    properties:
+      hibernate:
+        bytecode:
+          provider: none
+        hbm2ddl:
+          auto: validate
+        show_sql: false
 
 server:
   forward-headers-strategy: NATIVE

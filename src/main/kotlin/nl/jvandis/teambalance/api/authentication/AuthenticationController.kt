@@ -15,11 +15,10 @@ import nl.jvandis.teambalance.api.SECRET_HEADER
 import nl.jvandis.teambalance.api.SecretService
 
 @Tag( name= "authentication")
-@Controller(value = "api/authentication", produces = [MediaType.APPLICATION_JSON])
+@Controller(value = "/api/authentication", produces = [MediaType.APPLICATION_JSON])
 class AuthenticationController(
     private val secretService: SecretService
 ) {
-
     @Get
     fun authenticate(
         @Header(value = SECRET_HEADER) secret: String?
@@ -27,10 +26,6 @@ class AuthenticationController(
         secretService.ensureSecret(secret)
         return Success()
     }
-
-    data class Success(
-        val message: String = "You have managed to get access. Well done"
-    )
 
     @Error(InvalidSecretException::class)
     fun handleSecretExceptions(request: HttpRequest<*>, e: InvalidSecretException): HttpResponse<ErrorResponse> =
@@ -42,3 +37,7 @@ class AuthenticationController(
                 )
             )
 }
+
+data class Success(
+    val message: String = "You have managed to get access. Well done"
+)

@@ -1,6 +1,7 @@
-// package nl.jvandis.teambalance.api.users
-//
-// import io.micronaut.data.annotation.Repository
-//
-// @Repository
-// interface UserRepository : PagingAndSortingRepository<User, Long>
+package nl.jvandis.teambalance.api.users
+
+import io.micronaut.data.annotation.Repository
+import io.micronaut.data.repository.PageableRepository
+
+@Repository
+interface UserRepository : PageableRepository<User, Long>

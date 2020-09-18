@@ -1,3 +1,7 @@
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Calendar
+
 // package nl.jvandis.teambalance.api.event
 //
 // import io.micronaut.data.model.Page
@@ -26,3 +30,17 @@
 //
 //     return Pair(events, attendees)
 // }
+
+
+fun Calendar.toLocalDateTime(): LocalDateTime {
+    val tz = timeZone
+    val zid = if(tz == null)  ZoneId.systemDefault() else tz.toZoneId()
+    return LocalDateTime.ofInstant(this.toInstant(), zid)
+}
+
+fun LocalDateTime.toCalendar(): Calendar {
+    val calendar = Calendar.getInstance()
+    calendar.clear()
+    calendar.set(year, monthValue - 1, dayOfMonth, hour, minute, second)
+    return calendar
+}

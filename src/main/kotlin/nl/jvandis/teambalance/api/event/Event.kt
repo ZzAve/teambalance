@@ -1,6 +1,8 @@
 package nl.jvandis.teambalance.api.event
 
+import toCalendar
 import java.time.LocalDateTime
+import java.util.Calendar
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -21,7 +23,7 @@ abstract class Event(
 
     @Column(nullable = false, unique = true)
     @Temporal(TemporalType.TIMESTAMP)
-    open val startTime: LocalDateTime,
+    open val startTime: Calendar,
 
     @Column(nullable = false)
     open val location: String,
@@ -29,5 +31,5 @@ abstract class Event(
     @Column(nullable = true)
     open val comment: String?
 ) {
-    constructor() : this(startTime = LocalDateTime.MIN, location = "", comment = null)
+    constructor() : this(startTime = LocalDateTime.MIN.toCalendar(), location = "", comment = null)
 }

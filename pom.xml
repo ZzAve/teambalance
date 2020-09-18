@@ -113,6 +113,12 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>com.google.cloud.sql</groupId>
+      <artifactId>postgres-socket-factory</artifactId>
+      <version>1.1.0</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>io.micronaut.security</groupId>
       <artifactId>micronaut-security</artifactId>
       <scope>compile</scope>
@@ -304,10 +310,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <fork>true</fork>
-          <compilerArgs>
-            <arg>-J-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</arg>
-          </compilerArgs>
+<!--          <fork>true</fork>-->
+<!--          <compilerArgs>-->
+<!--            <arg>-J-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</arg>-->
+<!--          </compilerArgs>-->
           <proc>none</proc>
           <source>${jdk.version}</source>
           <target>${jdk.version}</target>

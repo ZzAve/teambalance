@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.training
 
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
+import toCalendar
 import java.time.LocalDateTime
 
 data class UserAddRequest(
@@ -20,7 +21,7 @@ data class PotentialTraining(
     val attendees: List<Long>
 ) {
     fun internalize(): Training = Training(
-        startTime = startTime,
+        startTime = startTime.toCalendar(),
         comment = comment,
         location = location
     )
