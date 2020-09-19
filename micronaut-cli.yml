@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: nl.jvandis.teambalance
+testFramework: junit
+sourceLanguage: kotlin
+buildTool: maven
+features: [annotation-api, app-name, cache-caffeine, data, data-jpa, docker, file-watch, http-client, jdbc-hikari, junit, kotlin, kotlin-application, logback, maven, netty-server, openapi, postgres, readme, security, security-annotations, shade, testcontainers, yaml]
