@@ -11,10 +11,18 @@ import { withLoading } from "../utils/util";
 import { attendeesApiClient } from "../utils/AttendeesApiClient";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { EventsType } from "./events/utils";
+import { withStyles } from "@material-ui/styles";
+
+const styledBy = (property, mapping) => props => mapping[props[property]];
 
 const colorMap = {
   PRESENT: "primary",
-  ABSENT: "secondary"
+  ABSENT: "secondary",
+  UNCERTAIN: "default"
+};
+
+const additionalColorMap = {
+  UNCERTAIN: "ternary"
 };
 
 const texts = {
@@ -50,7 +58,24 @@ const formatUnicorn = unicorn => {
   };
 };
 
+const AttendeeStyledButton = withStyles({
+  root: {
+    "&:hover": {
+      background: styledBy("additional-color", {
+        ternary: "#cbb38a"
+      })
+    },
+    background: styledBy("additional-color", {
+      ternary: "#E8D5B5"
+    })
+  },
+  label: {
+    textTransform: "capitalize"
+  }
+})(Button);
+
 const buttonColor = state => colorMap[state] || "default";
+const additionalButtonColor = state => additionalColorMap[state] || "default";
 
 /**
  * Function Attendees component
@@ -121,7 +146,7 @@ const Attendees = ({ eventsType, attendees, onUpdate, size = "medium" }) => {
         </Grid>
       ))}
       <Grid key={"total"} item>
-        <Button
+        <AttendeeStyledButton
           size={size}
           variant="outlined"
           color="default"
@@ -130,7 +155,7 @@ const Attendees = ({ eventsType, attendees, onUpdate, size = "medium" }) => {
           }}
         >
           {getAttendeesSummary(attendees)}
-        </Button>
+        </AttendeeStyledButton>
       </Grid>
     </>
   );
@@ -165,16 +190,17 @@ const Attendees = ({ eventsType, attendees, onUpdate, size = "medium" }) => {
 
 export const Attendee = ({ size, attendee, onSelection }) => {
   return (
-    <Button
+    <AttendeeStyledButton
       size={size}
       variant="contained"
       color={buttonColor(attendee.state)}
+      additional-color={additionalButtonColor(attendee.state)}
       onClick={() => {
         onSelection(attendee);
       }}
     >
       {attendee.user.name}
-    </Button>
+    </AttendeeStyledButton>
   );
 };
 
@@ -203,14 +229,15 @@ const AttendeeRefinement = ({
 
   const AttendeeButton = (state, content) => {
     return (
-      <Button
+      <AttendeeStyledButton
         size={size}
         variant="contained"
         color={buttonColor(state)}
+        additional-color={additionalButtonColor(state)}
         onClick={() => handleClick(state)}
       >
         {content}
-      </Button>
+      </AttendeeStyledButton>
     );
   };
 
@@ -221,7 +248,7 @@ const AttendeeRefinement = ({
         <Grid item>{AttendeeButton("ABSENT", <ClearIcon />)}</Grid>
         <Grid item>{AttendeeButton("UNCERTAIN", <HelpIcon />)}</Grid>
         <Grid item>
-          <Button
+          <AttendeeStyledButton
             size={size}
             variant="contained"
             color="default"
@@ -229,7 +256,7 @@ const AttendeeRefinement = ({
           >
             <ArrowBackIcon />
             <Typography>Terug</Typography>
-          </Button>
+          </AttendeeStyledButton>
         </Grid>
       </Grid>
     );
