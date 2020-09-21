@@ -22,7 +22,7 @@ const colorMap = {
 };
 
 const additionalColorMap = {
-  UNCERTAIN: "ternary"
+  UNCERTAIN: "tertiary"
 };
 
 const texts = {
@@ -62,11 +62,11 @@ const AttendeeStyledButton = withStyles({
   root: {
     "&:hover": {
       background: styledBy("additional-color", {
-        ternary: "#cbb38a"
+        tertiary: "#cbb38a"
       })
     },
     background: styledBy("additional-color", {
-      ternary: "#E8D5B5"
+      tertiary: "#E8D5B5"
     })
   },
   label: {
