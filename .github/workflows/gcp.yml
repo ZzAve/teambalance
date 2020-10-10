@@ -44,6 +44,6 @@ jobs:
         uses: vroy/gha-kotlin-linter@v2
 
       - name: Build and Publish app to Google App Engine
-        uses: ./mvnw clean package appengine:deploy
+        uses: mvn -B clean package appengine:deploy
 
 
