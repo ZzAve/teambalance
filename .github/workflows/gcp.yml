@@ -41,7 +41,10 @@ jobs:
           java-version: 1.8
 
       - name: Kotlin Linter
-        uses: vroy/gha-kotlin-linter@v2
+        run: mvn antrun:run@ktlint --non-recursive
 
-      - name: Build and Publish app to Google App Engine
-        run: mvn -B clean package appengine:deploy
+      - name: Get dependencies
+        run: mvn dependency:go-offline -B
+
+#      - name: Build and Publish app to Google App Engine
+#        run: mvn -B clean package appengine:deploy
