@@ -40,7 +40,7 @@ const EventListItem = ({ eventsType, event, onUpdate }) => {
   const startDateTime = new Date(event.startTime);
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} lg={4}>
+      <Grid item xs={12} sm={4}>
         <Typography variant="h6">📅 {formattedDate(startDateTime)}</Typography>
         <Typography variant="body1">
           ⏰ {formattedTime(startDateTime)}
@@ -61,8 +61,7 @@ const EventListItem = ({ eventsType, event, onUpdate }) => {
           ""
         )}
       </Grid>
-
-      <Grid item xs={12} lg={8}>
+      <Grid item xs={12} sm={8}>
         <Attendees
           attendees={event.attendees}
           onUpdate={onUpdate}
