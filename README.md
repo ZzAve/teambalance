@@ -46,6 +46,7 @@ Technology
 
 
 ### Deploying to PRO:
+Any commit to master, will attempt a deployment to pro.
 
 [Find reference docs here](https://cloud.google.com/appengine/docs/standard/java/tools/uploadinganapp)
 
@@ -53,6 +54,7 @@ Technology
 ```bash
 ./mvnw clean package appengine:deploy
 ```
+
 
 ### Connect to the database
 Teambalance makes use of a Postgres db that lives in GCP.
@@ -82,24 +84,31 @@ To be able to run this locally, one should make sure to be connected to gcloud, 
 for a service account](https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login)
 
 ## TODO:
+As with most projects, it's hardly ever considered finished.
+
 ### Must have:
- - ~~Ability to contribute to team balance~~
- - ~~View latest contribution to team balance~~
- - ~~Training overview including player availability~~
- - Match overview including player availability
- - Training admin screen (add/change/remove trainings)
- - Match admin screen (add/change/remove matches)
+ - ~~Dec 2019 Ability to contribute to team balance~~
+ - ~~Dec 2019 View latest contribution to team balance~~
+ - ~~June 2020 Training overview including player availability~~
+ - ~~Aug 2020 Match overview including player availability~~
+ - ~~Aug 2020 Training admin screen (add/change/remove trainings)~~
+    - Allow to remove trainings
+ - ~~Aug 2020 Match admin screen (add/change/remove matches)~~
+    - Allow to remove trainings
  - ~~Use polling mechanism when back-end is still down.~~
- - Ensure training endpoint are also protected
+    - Handle back-end being down better in the front-end (500's should result in a 'whoops' screen?)
+ - ~~Aug 2020 Ensure training endpoint are also protected~~
  - Use 'proper' authentication mechanism.
+ - Decouple front-end and back-end to seperate deployables
+ - Try google run
  
 ### Should have:
- - ~~Debounce was introduced to ensure every API call takes at least 500 ms (for UX purposes). This only works if a call is successful. Should also work for unsuccessful ones.~~
- - Github actions, used to deploy to Google cloud on every merge to master 
- - Stg env for testing purposes (use a different application version, but don't take all traffic ?)
+ - ~~Jan 2020 Debounce was introduced to ensure every API call takes at least 500 ms (for UX purposes). This only works if a call is successful. Should also work for unsuccessful ones.~~
+ - ~~October 2020 Github actions, used to deploy to Google cloud on every merge to master~~ 
+ - ~~April 2020Stg env for testing purposes (use a different application version, but don't take all traffic ?)~~
  
 ### Could have
- - Availabilities and agenda for non training/match events (like team uitje)
+ - ~~Oct 2020 Availabilities and agenda for non training/match events (like team uitje)~~
  - Upload receipts and tie them to payments
  - Stats on team balanc contributors
  - Link to Nevobo site with competition
