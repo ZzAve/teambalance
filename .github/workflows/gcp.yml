@@ -43,8 +43,5 @@ jobs:
       - name: Kotlin Linter
         run: mvn antrun:run@ktlint --non-recursive
 
-      - name: Get dependencies
-        run: mvn dependency:go-offline -B
-
-#      - name: Build and Publish app to Google App Engine
-#        run: mvn -B clean package appengine:deploy
+      - name: Build and Publish app to Google App Engine
+        run: mvn -B clean package appengine:deploy
