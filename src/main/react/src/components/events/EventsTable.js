@@ -28,6 +28,8 @@ const EventsTable = ({
       setGoTo(`/admin/edit-training/${id}`);
     } else if (eventsType === EventsType.MATCH) {
       setGoTo(`/admin/edit-match/${id}`);
+    } else if (eventsType === EventsType.MISC) {
+      setGoTo(`/admin/edit-misc-event/${id}`);
     } else {
       console.error(`Could not edit event for type ${eventsType}`);
     }
@@ -75,6 +77,7 @@ const EventsTable = ({
                 size="small"
                 attendees={row.attendees}
                 onUpdate={updateTrigger}
+                showSummary={false}
               />
             </TableCell>
             <TableCell hidden={!allowChanges} align="right">
@@ -104,10 +107,10 @@ const EventsTable = ({
             <TableCell align="right">{row.comment}</TableCell>
             <TableCell>
               <Attendees
-                eventsType={eventsType}
                 attendees={row.attendees}
                 onUpdate={updateTrigger}
                 size="small"
+                showSummary={false}
               />
             </TableCell>
             <TableCell hidden={!allowChanges} align="right">
@@ -160,6 +163,11 @@ const EventsTable = ({
             <>
               <TableHead>{getTableHeadMatch()}</TableHead>
               <TableBody>{getTableBodyMatch()}</TableBody>
+            </>
+          ) : eventsType === EventsType.MISC ? (
+            <>
+              <TableHead>{getTableHeadTraining()}</TableHead>
+              <TableBody>{getTableBodyTraining()}</TableBody>
             </>
           ) : (
             "🤷‍♂️"

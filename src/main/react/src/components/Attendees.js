@@ -27,12 +27,16 @@ const additionalColorMap = {
 
 const texts = {
   is_present_on_event: {
-    [EventsType.TRAINING]: "Is {name} op de training?",
-    [EventsType.MATCH]: "Is {name} bij de wedstrijd?",
+    // [EventsType.TRAINING]: "Is {name} op de training?",
+    // [EventsType.MATCH]: "Is {name} bij de wedstrijd?",
+    // [EventsType.MISC]: "Is {name} erbij?",
     [EventsType.OTHER]: "Is {name} erbij?"
   }
 };
 
+const getSimpleText = (name, args) => {
+  return getText(EventsType.OTHER, name, args);
+};
 const getText = (eventsType, name, args) => {
   const typpe = EventsType[eventsType] || EventsType.OTHER;
   return formatUnicorn(texts[name][typpe] || name)(args);
@@ -80,7 +84,12 @@ const additionalButtonColor = state => additionalColorMap[state] || "default";
 /**
  * Function Attendees component
  */
-const Attendees = ({ eventsType, attendees, onUpdate, size = "medium" }) => {
+const Attendees = ({
+  attendees,
+  onUpdate,
+  size = "medium",
+  showSummary = false
+}) => {
   const [selectedAttendee, setSelectedAttendee] = useState(null);
   const [errorMessage, setErrorMessage] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
@@ -145,18 +154,22 @@ const Attendees = ({ eventsType, attendees, onUpdate, size = "medium" }) => {
           />
         </Grid>
       ))}
-      <Grid key={"total"} item>
-        <AttendeeStyledButton
-          size={size}
-          variant="outlined"
-          color="default"
-          onClick={() => {
-            setAttendeeSummaryDetail(x => !x);
-          }}
-        >
-          {getAttendeesSummary(attendees)}
-        </AttendeeStyledButton>
-      </Grid>
+      {showSummary ? (
+        <Grid key={"total"} item>
+          <AttendeeStyledButton
+            size={size}
+            variant="outlined"
+            color="default"
+            onClick={() => {
+              setAttendeeSummaryDetail(x => !x);
+            }}
+          >
+            {getAttendeesSummary(attendees)}
+          </AttendeeStyledButton>
+        </Grid>
+      ) : (
+        ""
+      )}
     </>
   );
 
@@ -177,7 +190,6 @@ const Attendees = ({ eventsType, attendees, onUpdate, size = "medium" }) => {
       ) : (
         <AttendeeRefinement
           size={size}
-          eventsType={eventsType}
           attendee={selectedAttendee}
           onSuccess={onRefinementSuccess}
           onFailure={onRefinementFailure}
@@ -205,7 +217,6 @@ export const Attendee = ({ size, attendee, onSelection }) => {
 };
 
 const AttendeeRefinement = ({
-  eventsType,
   attendee,
   size,
   onSuccess,
@@ -266,7 +277,7 @@ const AttendeeRefinement = ({
     <Grid container item spacing={2}>
       <Grid item xs={12}>
         <Typography>
-          {getText(eventsType, "is_present_on_event", {
+          {getSimpleText("is_present_on_event", {
             name: attendee.user.name
           })}
         </Typography>

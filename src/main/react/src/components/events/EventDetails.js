@@ -10,6 +10,7 @@ import Typography from "@material-ui/core/Typography";
 import { EventForm } from "./EventForm";
 import { EventsType } from "./utils";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
+import { eventsApiClient } from "../../utils/MiscEventsApiClient";
 
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
@@ -18,11 +19,13 @@ const texts = {
   fetch_event_form: {
     [EventsType.TRAINING]: "ophalen trainingsformulier",
     [EventsType.MATCH]: "ophalen wedstrijdformulier",
+    [EventsType.MISC]: "ophalen eventformulier",
     [EventsType.OTHER]: "ophalen ..."
   },
   event_details_header: {
     [EventsType.TRAINING]: "Training Details",
     [EventsType.MATCH]: "Wedstrijd Details",
+    [EventsType.MISC]: "Evenement Details",
     [EventsType.OTHER]: "Details"
   }
 };
@@ -63,7 +66,7 @@ const EventDetails = ({ eventsType, location, id, showAttendees = false }) => {
             level: Message.ERROR
           });
         }
-      } else if (eventsType === EventsType.MATCH)
+      } else if (eventsType === EventsType.MATCH) {
         try {
           const data = await matchesApiClient.getMatch(id);
           setEvent(data || {});
@@ -74,6 +77,27 @@ const EventDetails = ({ eventsType, location, id, showAttendees = false }) => {
             level: Message.ERROR
           });
         }
+      } else if (eventsType === EventsType.MISC) {
+        try {
+          const data = await eventsApiClient.getEvent(id);
+          setEvent(data || {});
+        } catch (e) {
+          console.log(e);
+          setMessage({
+            message: `Er ging iets mis met het ophalen van data voor overig event ${id} `,
+            level: Message.ERROR
+          });
+        }
+      } else {
+        console.error(
+          `Event details for EventType ${eventsType} are not supported`
+        );
+        setEvent({});
+        setMessage({
+          message: `Dit type event word niet ondersteund. Are you a wizard 🧙‍♂️? ( event ${id} )`,
+          level: Message.ERROR
+        });
+      }
     }
   };
 

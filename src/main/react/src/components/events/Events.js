@@ -3,11 +3,12 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import React, { useEffect, useState } from "react";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
+import { eventsApiClient } from "../../utils/MiscEventsApiClient";
+import { matchesApiClient } from "../../utils/MatchesApiClient";
 import { ViewType, withLoading } from "../../utils/util";
 import EventsList from "./EventsList";
 import EventsTable from "./EventsTable";
 import { EventsType } from "./utils";
-import { matchesApiClient } from "../../utils/MatchesApiClient";
 
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
@@ -16,6 +17,7 @@ const texts = {
   fetch_events: {
     [EventsType.TRAINING]: "ophalen trainingen",
     [EventsType.MATCH]: "ophalen wedstrijden",
+    [EventsType.MISC]: "ophalen events",
     [EventsType.OTHER]: "ophalen ..."
   }
 };
@@ -53,8 +55,14 @@ const Events = ({
         limit
       );
       await setEvents(data || []);
+    } else if (eventsType === EventsType.MISC) {
+      const data = await eventsApiClient.getEvents(
+        nowMinus6Hours.toJSON(),
+        limit
+      );
+      await setEvents(data || []);
     } else {
-      console.log("NO SUPPORT FOR OTHER yet(?)");
+      console.warn("NO SUPPORT FOR OTHER EVENTS yet(?)");
     }
   };
 
