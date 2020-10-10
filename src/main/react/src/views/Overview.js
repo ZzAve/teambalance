@@ -57,8 +57,6 @@ const Overview = ({ refresh }) => {
               </Grid>
             </Grid>
           </PageItem>
-          {/*</Grid>*/}
-          {/*<Grid item container spacing={2}>*/}
           <PageItem title="Aanstaande wedstrijden">
             <Grid item container spacing={4}>
               <Grid item xs={12}>
@@ -85,6 +83,37 @@ const Overview = ({ refresh }) => {
                     variant="contained"
                     color="primary"
                     onClick={() => setGoTo("/matches")}
+                  >
+                    Meer
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </PageItem>
+          <PageItem title="Aanstaande andere evenementen en uitjes">
+            <Grid item container spacing={4}>
+              <Grid item xs={12}>
+                <Typography>Wanneer moeten we iets anders doen?</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Events
+                  eventsType={EventsType.MISC}
+                  refresh={refresh}
+                  view={ViewType.List}
+                  limit={2}
+                />
+              </Grid>
+              <Grid
+                container
+                item
+                justify-content="flex-end"
+                justify="flex-end"
+              >
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setGoTo("/misc-events")}
                   >
                     Meer
                   </Button>

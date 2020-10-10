@@ -66,6 +66,12 @@ const App = () => {
                   component={EventsPage}
                   refresh={shouldRefresh}
                 />
+                <PrivateRoute
+                  path="/misc-events"
+                  eventsType={EventsType.MISC}
+                  component={EventsPage}
+                  refresh={shouldRefresh}
+                />
                 <PrivateRoute path="/loading" component={Loading} />
                 <PrivateRoute
                   path="/"

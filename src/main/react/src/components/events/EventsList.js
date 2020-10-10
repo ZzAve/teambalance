@@ -19,6 +19,18 @@ const EventsList = ({ eventsType, events, updateTrigger }) => (
   </Grid>
 );
 
+function formattedHomeVsAway(event) {
+  return (
+    <>
+      {event.homeAway === HomeAway.HOME
+        ? "THUIS"
+        : event.homeAway === HomeAway.AWAY
+        ? "UIT"
+        : ""}
+    </>
+  );
+}
+
 /**
  * Event has 2 states
  * - event overview showing all attendees
@@ -28,20 +40,14 @@ const EventListItem = ({ eventsType, event, onUpdate }) => {
   const startDateTime = new Date(event.startTime);
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} lg={4}>
+      <Grid item xs={12} sm={4}>
         <Typography variant="h6">📅 {formattedDate(startDateTime)}</Typography>
         <Typography variant="body1">
           ⏰ {formattedTime(startDateTime)}
         </Typography>
         {!!event.opponent ? (
           <Typography variant="body1">
-            👥 {event.opponent} (
-            {event.homeAway === HomeAway.HOME
-              ? "THUIS"
-              : event.homeAway === HomeAway.AWAY
-              ? "UIT"
-              : ""}
-            )
+            👥 {event.opponent} ({formattedHomeVsAway(event)})
           </Typography>
         ) : (
           ""
@@ -55,12 +61,13 @@ const EventListItem = ({ eventsType, event, onUpdate }) => {
           ""
         )}
       </Grid>
-
-      <Grid item xs={12} lg={8}>
+      <Grid item xs={12} sm={8}>
         <Attendees
-          eventsType={eventsType}
           attendees={event.attendees}
           onUpdate={onUpdate}
+          showSummary={[EventsType.TRAINING, EventsType.MATCH].includes(
+            eventsType
+          )}
         />
       </Grid>
     </Grid>

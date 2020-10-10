@@ -15,6 +15,7 @@ const texts = {
   coming_events: {
     [EventsType.TRAINING]: "Aanstaande trainingen",
     [EventsType.MATCH]: "Aanstaande wedstrijden",
+    [EventsType.MISC]: "Aanstaande evenementen",
     [EventsType.OTHER]: "Aanstaande evenementen"
   }
 };

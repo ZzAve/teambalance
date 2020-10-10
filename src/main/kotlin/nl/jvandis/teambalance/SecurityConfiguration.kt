@@ -30,6 +30,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             .antMatchers("/api/trainings/**").permitAll()
             .antMatchers("/api/attendees/**").permitAll()
             .antMatchers("/api/matches/**").permitAll()
+            .antMatchers("/api/miscellaneous-events/**").permitAll()
             .antMatchers("/login").permitAll()
             .antMatchers("/_ah/**").permitAll()
             .antMatchers("/internal/**").fullyAuthenticated()

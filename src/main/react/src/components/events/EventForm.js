@@ -20,11 +20,13 @@ import { EventsType, HomeAway } from "./utils";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import Radio from "@material-ui/core/Radio";
+import { eventsApiClient } from "../../utils/MiscEventsApiClient";
 
 const texts = {
   send_event: {
     [EventsType.TRAINING]: "versturen training",
     [EventsType.MATCH]: "versturen wedstrijd",
+    [EventsType.MISC]: "versturen event",
     [EventsType.OTHER]: "versturen ..."
   }
 };
@@ -33,6 +35,54 @@ const getText = (eventsType, name) => {
   const typpe = EventsType[eventsType] || EventsType.OTHER;
   return texts[name][typpe] || name;
 };
+
+const createEvent = async (
+  eventsType,
+  { location, startTime, comment, opponent, homeAway }
+) => {
+  const apiCallArgs = {
+    location,
+    startTime,
+    comment,
+    opponent,
+    homeAway,
+    attendees: []
+  };
+
+  if (eventsType === EventsType.TRAINING) {
+    await trainingsApiClient.createTraining(apiCallArgs);
+  } else if (eventsType === EventsType.MATCH) {
+    await matchesApiClient.createMatch(apiCallArgs);
+  } else if (eventsType === EventsType.MISC) {
+    await eventsApiClient.createEvent(apiCallArgs);
+  } else {
+    console.error(`Creating event for type ${eventsType} not supported`);
+  }
+};
+
+async function updateEvent(
+  eventsType,
+  { eventId, location, startTime, comment, opponent, homeAway }
+) {
+  const apiCallArgs = {
+    id: eventId,
+    location,
+    startTime,
+    comment,
+    opponent,
+    homeAway,
+    attendees: []
+  };
+  if (eventsType === EventsType.TRAINING) {
+    await trainingsApiClient.updateTraining(apiCallArgs);
+  } else if (eventsType === EventsType.MATCH) {
+    await matchesApiClient.updateMatch(apiCallArgs);
+  } else if (eventsType === EventsType.MISC) {
+    await eventsApiClient.updateEvent(apiCallArgs);
+  } else {
+    console.error(`Updating event for type ${eventsType} not supported`);
+  }
+}
 
 export const EventForm = ({ eventsType, location = {}, event, setMessage }) => {
   const getInitialSelectedDate = training => {
@@ -65,74 +115,51 @@ export const EventForm = ({ eventsType, location = {}, event, setMessage }) => {
     console.debug(`[EventForm ${eventsType}] Loaded!`);
   }, []);
 
-  async function createEvent() {
-    if (eventsType === EventsType.TRAINING) {
-      await trainingsApiClient.createTraining({
-        location: eventLocation,
-        startTime: selectedTime,
-        comment: comment,
-        attendees: []
-      });
-    } else if (eventsType === EventsType.MATCH) {
-      await matchesApiClient.createMatch({
+  async function save() {
+    let isCreate = id === undefined;
+    if (isCreate) {
+      await createEvent(eventsType, {
         location: eventLocation,
         startTime: selectedTime,
         comment: comment,
         opponent: opponent,
-        homeAway: homeAway,
-        attendees: []
+        homeAway: homeAway
       });
     } else {
-      console.error(`Creating event for type ${eventsType} not supported`);
-    }
-  }
-
-  async function updateEvent() {
-    if (eventsType === EventsType.TRAINING) {
-      return trainingsApiClient.updateTraining({
-        id: id,
-        location: eventLocation,
-        startTime: selectedTime,
-        comment: comment,
-        attendees: []
-      });
-    } else if (eventsType === EventsType.MATCH) {
-      await matchesApiClient.updateMatch({
-        id: id,
+      await updateEvent(eventsType, {
+        eventId: id,
         location: eventLocation,
         startTime: selectedTime,
         comment: comment,
         opponent: opponent,
-        homeAway: homeAway,
-        attendees: []
+        homeAway: homeAway
       });
-    } else {
-      console.error(`Creating event for type ${eventsType} not supported`);
     }
+    return isCreate;
   }
 
   const handleSaveEvent = async x => {
-    await withLoading(setIsLoading, async () => {
+    let successfulSave = await withLoading(setIsLoading, async () => {
       try {
-        let isCreate = id === undefined;
-        if (isCreate) {
-          await createEvent();
-        } else {
-          await updateEvent();
-        }
-
+        const isCreateEvent = await save();
         setMessage({
-          message: `${isCreate ? "Creatie" : "Update"} successvol`,
+          message: `${isCreateEvent ? "Creatie" : "Update"} successvol`,
           level: Message.SUCCESS
         });
-        setDone(true);
+        return true;
       } catch (e) {
         setMessage({
           message: `Er ging iets fout: ${e}`,
           level: Message.ERROR
         });
+        return false;
       }
     });
+
+    // Check if done
+    if (successfulSave) {
+      setDone(true);
+    }
   };
 
   if (done && !addAnother) {
@@ -143,6 +170,8 @@ export const EventForm = ({ eventsType, location = {}, event, setMessage }) => {
             ? "/admin/trainings"
             : eventsType === EventsType.MATCH
             ? "/admin/matches"
+            : eventsType === EventsType.MISC
+            ? "/admin/misc-events"
             : "/admin"
       }
     };

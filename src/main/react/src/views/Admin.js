@@ -26,21 +26,25 @@ const texts = {
   event_type_name: {
     [EventsType.TRAINING]: "Trainingen",
     [EventsType.MATCH]: "Wedstrijden",
+    [EventsType.MISC]: "Overige Evenementen",
     [EventsType.OTHER]: "Evenementen"
   },
   new_event_button_text: {
     [EventsType.TRAINING]: "nieuwe training",
     [EventsType.MATCH]: "nieuwe wedstrijd",
+    [EventsType.MISC]: "nieuw evenement",
     [EventsType.OTHER]: "nieuw evenement"
   },
   edit_event_pageitem_label: {
     [EventsType.TRAINING]: "Training aanpassen",
     [EventsType.MATCH]: "Wedstrijd aanpassen",
+    [EventsType.MISC]: "Evenement aanpassen",
     [EventsType.OTHER]: "Evenement aanpassen"
   },
   new_event_pageitem_label: {
     [EventsType.TRAINING]: "Nieuwe training",
     [EventsType.MATCH]: "Nieuwe wedstrijd",
+    [EventsType.MISC]: "Nieuw evenement",
     [EventsType.OTHER]: "Nieuw evenement "
   }
 };
@@ -93,6 +97,11 @@ const Admin = ({ refresh }) => {
                 <ListItemText primary="Wedstrijden" />
               </ListItem>
             </Link>
+            <Link to="/admin/misc-events">
+              <ListItem button>
+                <ListItemText primary="Overige events" />
+              </ListItem>
+            </Link>
           </List>
         </PageItem>
 
@@ -110,6 +119,12 @@ const Admin = ({ refresh }) => {
             refresh={refresh}
           />
           <PrivateRoute
+            path="/admin/misc-events"
+            eventsType={EventsType.MISC}
+            component={EventsOverview}
+            refresh={refresh}
+          />
+          <PrivateRoute
             path="/admin/new-training"
             eventsType={EventsType.TRAINING}
             component={NewEvent}
@@ -118,6 +133,12 @@ const Admin = ({ refresh }) => {
           <PrivateRoute
             path="/admin/new-match"
             eventsType={EventsType.MATCH}
+            component={NewEvent}
+            refresh={refresh}
+          />
+          <PrivateRoute
+            path="/admin/new-misc-event"
+            eventsType={EventsType.MISC}
             component={NewEvent}
             refresh={refresh}
           />
@@ -132,6 +153,12 @@ const Admin = ({ refresh }) => {
             eventsType={EventsType.MATCH}
             component={ChangeEvent}
             view={ViewType.Table}
+            refresh={refresh}
+          />
+          <PrivateRoute
+            path="/admin/edit-misc-event/:id"
+            eventsType={EventsType.MISC}
+            component={ChangeEvent}
             refresh={refresh}
           />
 
@@ -151,6 +178,8 @@ const EventsOverview = ({ eventsType, refresh }) => {
       setGoTo("/admin/new-training");
     } else if (eventsType === EventsType.MATCH) {
       setGoTo("/admin/new-match");
+    } else if (eventsType === EventsType.MISC) {
+      setGoTo("/admin/new-misc-event");
     } else {
       console.error(`Could not create new event for type ${eventsType}`);
     }
@@ -203,6 +232,8 @@ const ChangeEvent = ({ computedMatch, eventsType, ...rest }) => {
               ? "/admin/trainings"
               : eventsType === EventsType.MATCH
               ? "/admin/matches"
+              : eventsType === EventsType.MISC
+              ? "/admin/misc-events"
               : "/admin"
         }}
       />
