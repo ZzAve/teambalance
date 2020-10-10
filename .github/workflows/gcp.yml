@@ -15,7 +15,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup gcloud environment
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - run: gcloud info
 
       - name: Cache local Maven repository
         uses: actions/cache@v2
@@ -29,11 +39,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+
       - name: Kotlin Linter
         uses: vroy/gha-kotlin-linter@v2
-      - name: Build with Maven
-        run: mvn -B clean verify --file pom.xml
-      - name: Publish app to Google App Engine
-        uses: zxyle/publish-gae-action@v2.3.0
+
+      - name: Build and Publish app to Google App Engine
+        uses: ./mvnw clean package appengine:deploy
 
 
