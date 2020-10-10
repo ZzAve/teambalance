@@ -3,7 +3,6 @@
 
 target
 /*.conf
-src/main/appengine/app.yaml
 
 node
 node_modules
