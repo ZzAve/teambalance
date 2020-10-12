@@ -83,7 +83,7 @@ const EventsTable = ({
             <TableCell align="right">
               {formattedTime(new Date(row.startTime))}
             </TableCell>
-            <TableCell align="right">"Hello i'm a title"{row.title}</TableCell>
+            <TableCell align="right">{row.title}</TableCell>
             <TableCell align="right">{row.location}</TableCell>
             <TableCell align="right">{row.comment}</TableCell>
             <TableCell className={classes.attendees}>
