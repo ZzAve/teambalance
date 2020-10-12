@@ -38,10 +38,11 @@ const getText = (eventsType, name) => {
 
 const createEvent = async (
   eventsType,
-  { location, startTime, comment, opponent, homeAway }
+  { location, startTime, title, comment, opponent, homeAway }
 ) => {
   const apiCallArgs = {
     location,
+    title,
     startTime,
     comment,
     opponent,
@@ -62,11 +63,12 @@ const createEvent = async (
 
 async function updateEvent(
   eventsType,
-  { eventId, location, startTime, comment, opponent, homeAway }
+  { eventId, location, title, startTime, comment, opponent, homeAway }
 ) {
   const apiCallArgs = {
     id: eventId,
     location,
+    title,
     startTime,
     comment,
     opponent,
@@ -106,6 +108,7 @@ export const EventForm = ({ eventsType, location = {}, event, setMessage }) => {
   const [opponent, setOpponent] = useState(event.opponent);
   const [homeAway, setHomeAway] = useState(event.homeAway || HomeAway.HOME);
   const [comment, setComment] = useState(event.comment);
+  const [title, setTitle] = useState(event.title);
 
   const [isLoading, setIsLoading] = useState(false);
   const [addAnother, setAddAnother] = useState(false);
@@ -121,6 +124,7 @@ export const EventForm = ({ eventsType, location = {}, event, setMessage }) => {
       await createEvent(eventsType, {
         location: eventLocation,
         startTime: selectedTime,
+        title: title,
         comment: comment,
         opponent: opponent,
         homeAway: homeAway
@@ -130,6 +134,7 @@ export const EventForm = ({ eventsType, location = {}, event, setMessage }) => {
         eventId: id,
         location: eventLocation,
         startTime: selectedTime,
+        title: title,
         comment: comment,
         opponent: opponent,
         homeAway: homeAway
@@ -219,13 +224,26 @@ export const EventForm = ({ eventsType, location = {}, event, setMessage }) => {
             minutesStep={15}
             ampm={false}
             onChange={x => {
-              debugger;
               setSelectedTime(x);
             }}
             autoOk
             fullWidth
           />
         </Grid>
+        {eventsType === EventsType.MISC ? (
+          <Grid item xs={12}>
+            <TextField
+              id="title"
+              name="title"
+              label="Titel"
+              fullWidth
+              value={title || ""}
+              onChange={e => setTitle(e.target.value)}
+            />
+          </Grid>
+        ) : (
+          ""
+        )}
         {eventsType === EventsType.MATCH ? (
           <>
             <Grid item xs={12}>

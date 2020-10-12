@@ -70,7 +70,6 @@ const Events = ({
     return <SpinnerWithText text={getText(eventsType, "fetch_events")} />;
   }
 
-  // debugger;
   if (view === ViewType.List) {
     return (
       <Grid item container xs={12} spacing={1}>

@@ -21,7 +21,7 @@ const useStyles = makeStyles(() =>
       minWidth: "960px"
     },
     attendees: {
-      width: "10%"
+      width: "20%"
     }
   })
 );
@@ -83,7 +83,6 @@ const EventsTable = ({
             <TableCell align="right">
               {formattedTime(new Date(row.startTime))}
             </TableCell>
-            <TableCell align="right">{row.title}</TableCell>
             <TableCell align="right">{row.location}</TableCell>
             <TableCell align="right">{row.comment}</TableCell>
             <TableCell className={classes.attendees}>
@@ -136,6 +135,37 @@ const EventsTable = ({
     </>
   );
 
+  const getTableBodyOther = () => (
+    <>
+      {events.map(row => {
+        return (
+          <TableRow key={row.id}>
+            <TableCell component="th" scope="row">
+              {formattedDate(new Date(row.startTime))}
+            </TableCell>
+            <TableCell align="right">
+              {formattedTime(new Date(row.startTime))}
+            </TableCell>
+            <TableCell align="right">{row.title}</TableCell>
+            <TableCell align="right">{row.location}</TableCell>
+            <TableCell align="right">{row.comment}</TableCell>
+            <TableCell className={classes.attendees}>
+              <Attendees
+                size="small"
+                attendees={row.attendees}
+                onUpdate={updateTrigger}
+                showSummary={false}
+              />
+            </TableCell>
+            <TableCell hidden={!allowChanges} align="right">
+              {allowChanges ? getUpdateIcons(row) : <> </>}
+            </TableCell>
+          </TableRow>
+        );
+      })}
+    </>
+  );
+
   if (goTo !== undefined) {
     console.log(`Navigating to: ${goTo}`);
     return <Redirect to={goTo} />;
@@ -146,7 +176,6 @@ const EventsTable = ({
       <TableCell>Datum</TableCell>
       <TableCell align="right">Tijd</TableCell>
       <TableCell align="right">Location</TableCell>
-      <TableCell align="right">Titel</TableCell>
       <TableCell align="right">Opmerking</TableCell>
       <TableCell align="center">Deelnemers</TableCell>
       {allowChanges ? <TableCell align="right">Aanpassen</TableCell> : <></>}
@@ -158,6 +187,17 @@ const EventsTable = ({
       <TableCell>Datum</TableCell>
       <TableCell align="right">Tijd</TableCell>
       <TableCell align="right">Tegenstander</TableCell>
+      <TableCell align="right">Location</TableCell>
+      <TableCell align="right">Opmerking</TableCell>
+      <TableCell align="center">Deelnemers</TableCell>
+      {allowChanges ? <TableCell align="right">Aanpassen</TableCell> : <></>}
+    </TableRow>
+  );
+
+  const getTableHeadOther = () => (
+    <TableRow>
+      <TableCell>Datum</TableCell>
+      <TableCell align="right">Tijd</TableCell>
       <TableCell align="right">Titel</TableCell>
       <TableCell align="right">Location</TableCell>
       <TableCell align="right">Opmerking</TableCell>
@@ -182,8 +222,8 @@ const EventsTable = ({
             </>
           ) : eventsType === EventsType.MISC ? (
             <>
-              <TableHead>{getTableHeadTraining()}</TableHead>
-              <TableBody>{getTableBodyTraining()}</TableBody>
+              <TableHead>{getTableHeadOther()}</TableHead>
+              <TableBody>{getTableBodyOther()}</TableBody>
             </>
           ) : (
             "🤷‍♂️"
