@@ -41,16 +41,19 @@ const EventListItem = ({ eventsType, event, onUpdate }) => {
   const titleVariant = !event.title ? "body1" : "h6";
   const dateTimeVariant = !!event.title ? "body1" : "h6";
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={6} md={12} lg={4}>
+    <Grid container spacing={1}>
+      <Grid item xs={12}>
         {!!event.title ? (
           <Typography variant={titleVariant}>{event.title}</Typography>
         ) : (
           ""
         )}
+      </Grid>
+      <Grid item xs={12} sm={6} md={12} lg={4}>
         <Typography variant={dateTimeVariant}>
           📅 {formattedDate(startDateTime)}
         </Typography>
+        {!!event.title ? "" : ""}
         <Typography variant="body1">
           ⏰ {formattedTime(startDateTime)}
         </Typography>
