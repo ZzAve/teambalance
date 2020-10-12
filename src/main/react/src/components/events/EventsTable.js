@@ -10,10 +10,21 @@ import TableBody from "@material-ui/core/TableBody";
 import React, { useState } from "react";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { Button } from "@material-ui/core";
+import { Button, createStyles, makeStyles } from "@material-ui/core";
 import { Redirect } from "react-router-dom";
 import Attendees from "../Attendees";
 import { EventsType } from "./utils";
+
+const useStyles = makeStyles(() =>
+  createStyles({
+    root: {
+      minWidth: "960px"
+    },
+    attendees: {
+      width: "10%"
+    }
+  })
+);
 
 const EventsTable = ({
   eventsType,
@@ -22,6 +33,8 @@ const EventsTable = ({
   updateTrigger
 }) => {
   const [goTo, setGoTo] = useState(undefined);
+
+  const classes = useStyles();
 
   const handleClickEditEvent = id => {
     if (eventsType === EventsType.TRAINING) {
@@ -70,9 +83,10 @@ const EventsTable = ({
             <TableCell align="right">
               {formattedTime(new Date(row.startTime))}
             </TableCell>
+            <TableCell align="right">"Hello i'm a title"{row.title}</TableCell>
             <TableCell align="right">{row.location}</TableCell>
             <TableCell align="right">{row.comment}</TableCell>
-            <TableCell>
+            <TableCell className={classes.attendees}>
               <Attendees
                 size="small"
                 attendees={row.attendees}
@@ -105,7 +119,7 @@ const EventsTable = ({
               {row.location} ({row.homeAway === "HOME" ? "THUIS" : "UIT"})
             </TableCell>
             <TableCell align="right">{row.comment}</TableCell>
-            <TableCell>
+            <TableCell className={classes.attendees}>
               <Attendees
                 attendees={row.attendees}
                 onUpdate={updateTrigger}
@@ -132,6 +146,7 @@ const EventsTable = ({
       <TableCell>Datum</TableCell>
       <TableCell align="right">Tijd</TableCell>
       <TableCell align="right">Location</TableCell>
+      <TableCell align="right">Titel</TableCell>
       <TableCell align="right">Opmerking</TableCell>
       <TableCell align="center">Deelnemers</TableCell>
       {allowChanges ? <TableCell align="right">Aanpassen</TableCell> : <></>}
@@ -143,6 +158,7 @@ const EventsTable = ({
       <TableCell>Datum</TableCell>
       <TableCell align="right">Tijd</TableCell>
       <TableCell align="right">Tegenstander</TableCell>
+      <TableCell align="right">Titel</TableCell>
       <TableCell align="right">Location</TableCell>
       <TableCell align="right">Opmerking</TableCell>
       <TableCell align="center">Deelnemers</TableCell>
@@ -153,7 +169,7 @@ const EventsTable = ({
   return (
     <Grid container item xs={12}>
       <TableContainer component={Paper}>
-        <Table aria-label="simple table" size="medium">
+        <Table aria-label="simple table" size="medium" className={classes.root}>
           {eventsType === EventsType.TRAINING ? (
             <>
               <TableHead>{getTableHeadTraining()}</TableHead>

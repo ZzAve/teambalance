@@ -9,6 +9,15 @@ import Paper from "@material-ui/core/Paper";
 import { SpinnerWithText } from "./SpinnerWithText";
 import { BankApiClient as bankApiClient } from "../utils/BankApiClient";
 import { withLoading } from "../utils/util";
+import { createStyles, makeStyles } from "@material-ui/core";
+
+// const useStyles = makeStyles(() =>
+//   createStyles({
+//     root: {
+//       minWidth: "800px"
+//     }
+//   })
+// );
 
 export const Transactions = ({ refresh }) => {
   const [transactions, setTransactions] = useState([]);
