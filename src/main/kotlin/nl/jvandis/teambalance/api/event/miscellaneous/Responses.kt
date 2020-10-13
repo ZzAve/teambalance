@@ -19,7 +19,7 @@ data class PotentialMiscellaneousEvent(
     val title: String?,
     val location: String,
     val comment: String?,
-    val attendees: List<Long>
+    val userIds: List<Long>? = null
 ) {
     fun internalize(): MiscellaneousEvent = MiscellaneousEvent(
         startTime = startTime,
