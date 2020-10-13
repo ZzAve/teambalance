@@ -22,27 +22,26 @@ const getTraining = (id, includeAttendees = true) => {
 
   return training.then(x => internalizeTraining(x));
 };
-const createTraining = ({ location, comment, startTime, attendees }) => {
+const createTraining = ({ location, comment, startTime, userIds }) => {
   return trainingsClient.callWithBody(
     "trainings",
     {
       comment,
       location,
       startTime: trainingsClient.externalizeDateTime(startTime),
-      attendees
+      userIds
     },
     { method: "POST" }
   );
 };
 
-const updateTraining = ({ id, location, comment, startTime, attendees }) => {
+const updateTraining = ({ id, location, comment, startTime }) => {
   return trainingsClient.callWithBody(
     `trainings/${id}`,
     {
       comment,
       location,
-      startTime: trainingsClient.externalizeDateTime(startTime),
-      attendees
+      startTime: trainingsClient.externalizeDateTime(startTime)
     },
     { method: "PUT" }
   );

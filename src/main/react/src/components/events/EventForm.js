@@ -21,6 +21,8 @@ import { matchesApiClient } from "../../utils/MatchesApiClient";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import Radio from "@material-ui/core/Radio";
 import { eventsApiClient } from "../../utils/MiscEventsApiClient";
+import Typography from "@material-ui/core/Typography";
+import { ControlType, EventUsers } from "./EventUsers";
 
 const texts = {
   send_event: {
@@ -38,7 +40,7 @@ const getText = (eventsType, name) => {
 
 const createEvent = async (
   eventsType,
-  { location, startTime, title, comment, opponent, homeAway }
+  { location, startTime, title, comment, opponent, homeAway, userIds }
 ) => {
   const apiCallArgs = {
     location,
@@ -47,7 +49,7 @@ const createEvent = async (
     comment,
     opponent,
     homeAway,
-    attendees: []
+    userIds
   };
 
   if (eventsType === EventsType.TRAINING) {
@@ -72,8 +74,7 @@ async function updateEvent(
     startTime,
     comment,
     opponent,
-    homeAway,
-    attendees: []
+    homeAway
   };
   if (eventsType === EventsType.TRAINING) {
     await trainingsApiClient.updateTraining(apiCallArgs);
@@ -86,11 +87,17 @@ async function updateEvent(
   }
 }
 
-export const EventForm = ({ eventsType, location = {}, event, setMessage }) => {
-  const getInitialSelectedDate = training => {
+export const EventForm = ({
+  eventsType,
+  location = {},
+  users,
+  event,
+  setMessage
+}) => {
+  const getInitialSelectedDate = event => {
     return () => {
-      if (!!training.startTime) {
-        return training.startTime;
+      if (!!event.startTime) {
+        return event.startTime;
       } else {
         // Initialize to 20:00
         let date = new Date();
@@ -109,6 +116,7 @@ export const EventForm = ({ eventsType, location = {}, event, setMessage }) => {
   const [homeAway, setHomeAway] = useState(event.homeAway || HomeAway.HOME);
   const [comment, setComment] = useState(event.comment);
   const [title, setTitle] = useState(event.title);
+  const [userSelection, setUserSelection] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [addAnother, setAddAnother] = useState(false);
@@ -118,16 +126,20 @@ export const EventForm = ({ eventsType, location = {}, event, setMessage }) => {
     console.debug(`[EventForm ${eventsType}] Loaded!`);
   }, []);
 
+  const isCreateEvent = () => id === undefined;
+
   async function save() {
-    let isCreate = id === undefined;
-    if (isCreate) {
+    if (isCreateEvent()) {
       await createEvent(eventsType, {
         location: eventLocation,
         startTime: selectedTime,
         title: title,
         comment: comment,
         opponent: opponent,
-        homeAway: homeAway
+        homeAway: homeAway,
+        userIds: Object.entries(userSelection)
+          .filter(it => it[1] === true)
+          .map(it => it[0])
       });
     } else {
       await updateEvent(eventsType, {
@@ -140,15 +152,14 @@ export const EventForm = ({ eventsType, location = {}, event, setMessage }) => {
         homeAway: homeAway
       });
     }
-    return isCreate;
   }
 
   const handleSaveEvent = async x => {
     let successfulSave = await withLoading(setIsLoading, async () => {
       try {
-        const isCreateEvent = await save();
+        await save();
         setMessage({
-          message: `${isCreateEvent ? "Creatie" : "Update"} successvol`,
+          message: `${isCreateEvent() ? "Creatie" : "Update"} successvol`,
           level: Message.SUCCESS
         });
         return true;
@@ -305,6 +316,19 @@ export const EventForm = ({ eventsType, location = {}, event, setMessage }) => {
             fullWidth
             value={comment}
             onChange={e => setComment(e.target.value)}
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <Typography variant="h6">Teamgenoten</Typography>
+          <EventUsers
+            users={users}
+            event={event}
+            controlType={
+              isCreateEvent() ? ControlType.CHECKBOX : ControlType.SWITCH
+            }
+            setMessage={setMessage}
+            setUserSelection={setUserSelection}
           />
         </Grid>
 
