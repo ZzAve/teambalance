@@ -17,3 +17,4 @@ class InvalidAttendeeException(id: Long) : InvalidIdException(id, "attendee")
 class InvalidSecretException(msg: String) : RuntimeException(msg)
 
 class DataConstraintViolationException(override val message: String) : RuntimeException()
+class CreateEventException(override val message: String) : RuntimeException()

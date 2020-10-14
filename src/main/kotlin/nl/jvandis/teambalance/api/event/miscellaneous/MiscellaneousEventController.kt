@@ -1,8 +1,8 @@
 package nl.jvandis.teambalance.api.event.miscellaneous
 
 import io.swagger.annotations.Api
+import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
-import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.InvalidMiscellaneousEventException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.SECRET_HEADER
@@ -19,9 +19,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -119,7 +117,6 @@ class MiscellaneousEventController(
     @PostMapping
     fun createMiscellaneousEvent(
         @RequestBody potentialEvent: PotentialMiscellaneousEvent,
-        @RequestParam("add-all-users", defaultValue = "false") addAllUsers: Boolean,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): MiscellaneousEventResponse {
         log.debug("postEvent $potentialEvent")
@@ -130,13 +127,13 @@ class MiscellaneousEventController(
 
         val requestedUsersToAdd = allUsers.filter {
             potentialEvent.userIds?.any { a -> a == it.id }
-                ?: addAllUsers
+                ?: true
         }
 
         if (potentialEvent.userIds != null &&
             potentialEvent.userIds.size != requestedUsersToAdd.size
         ) {
-            throw IllegalArgumentException("Not all requested userIds exists unfortunately ${potentialEvent.userIds}. Please verify your userIds")
+            throw CreateEventException("Not all requested userIds exists unfortunately ${potentialEvent.userIds}. Please verify your userIds")
         }
 
         val attendees = requestedUsersToAdd.map { it.toAttendee(event) }
@@ -214,14 +211,4 @@ class MiscellaneousEventController(
             throw DataConstraintViolationException("Event $eventId could not be deleted. There are still attendees bound to this event")
         }
     }
-
-    @ExceptionHandler(IllegalArgumentException::class)
-    fun handleIllegalArgumentException(e: IllegalArgumentException) =
-        ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(
-                Error(
-                    status = HttpStatus.BAD_REQUEST,
-                    reason = e.message ?: "Forbidden"
-                )
-            )
 }

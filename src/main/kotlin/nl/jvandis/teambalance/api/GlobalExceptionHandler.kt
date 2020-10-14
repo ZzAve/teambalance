@@ -110,6 +110,16 @@ class GlobalExceptionHandler {
             )
     }
 
+    @ExceptionHandler(CreateEventException::class)
+    fun handleIllegalArgumentException(e: CreateEventException) =
+        ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(
+                Error(
+                    status = HttpStatus.BAD_REQUEST,
+                    reason = e.message ?: "Forbidden"
+                )
+            )
+
     @ExceptionHandler(Throwable::class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     fun handleUnhandledExceptions(t: Throwable): ResponseEntity<Error> {

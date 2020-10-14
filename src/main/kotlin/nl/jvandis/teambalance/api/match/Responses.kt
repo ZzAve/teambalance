@@ -18,7 +18,7 @@ data class PotentialMatch(
     val opponent: String,
     val homeAway: Place,
     val comment: String?,
-    val attendees: List<Long>
+    val userIds: List<Long>? = null
 ) {
     fun internalize(): Match = Match(
         startTime = startTime,

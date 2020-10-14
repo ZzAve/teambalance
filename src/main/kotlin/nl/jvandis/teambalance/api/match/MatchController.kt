@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.match
 
 import io.swagger.annotations.Api
+import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMatchException
 import nl.jvandis.teambalance.api.InvalidUserException
@@ -106,18 +107,29 @@ class MatchController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun createMatch(
-        @RequestBody @Valid potentialMatch: PotentialMatch,
+        @RequestBody @Valid potentialEvent: PotentialMatch,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): MatchResponse {
-        log.debug("postMatch $potentialMatch")
+        log.debug("postMatch $potentialEvent")
         secretService.ensureSecret(secret)
 
-        val users = userRepository.findAll()
-        val match = potentialMatch.internalize()
+        val allUsers = userRepository.findAll()
 
-        val attendees = users.map { it.toAttendee(match) }
+        val requestedUsersToAdd = allUsers.filter {
+            potentialEvent.userIds?.any { a -> a == it.id }
+                ?: true
+        }
 
+        if (potentialEvent.userIds != null &&
+            potentialEvent.userIds.size != requestedUsersToAdd.size
+        ) {
+            throw CreateEventException("Not all requested userIds exists unfortunately ${potentialEvent.userIds}. Please verify your userIds")
+        }
+
+        val match = potentialEvent.internalize()
         val savedMatch = matchRepository.save(match)
+
+        val attendees = requestedUsersToAdd.map { it.toAttendee(match) }
         val savedAttendees = attendeeRepository.saveAll(attendees).toList()
 
         return savedMatch.externaliseWithAttendees(savedAttendees)

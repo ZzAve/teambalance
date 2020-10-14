@@ -17,7 +17,7 @@ data class PotentialTraining(
     val startTime: LocalDateTime,
     val location: String,
     val comment: String?,
-    val attendees: List<Long>
+    val userIds: List<Long>? = null
 ) {
     fun internalize(): Training = Training(
         startTime = startTime,
