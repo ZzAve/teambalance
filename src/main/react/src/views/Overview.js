@@ -12,6 +12,8 @@ import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import Hidden from "@material-ui/core/Hidden";
 import Typography from "@material-ui/core/Typography";
 import { EventsType } from "../components/events/utils";
+import { Alert } from "@material-ui/lab";
+import AlertTitle from "@material-ui/lab/AlertTitle";
 
 const Overview = ({ refresh }) => {
   const [goTo, setGoTo] = useState(undefined);
@@ -22,6 +24,19 @@ const Overview = ({ refresh }) => {
 
   return (
     <>
+      <Grid item xs={12}>
+        <Alert severity="warning">
+          <AlertTitle>COVID-19</AlertTitle>
+          <Typography>
+            Ook rondom volleybal hangt veel onzekerheid wat betreft COVID-19 🦠.
+            Dat heeft wat invloed op de betrouwbaarheid van de data die hier
+            getoond wordt.
+          </Typography>
+          <Typography>
+            Check in met het team als je iets niet zeker weet. Blijf gezond 👨‍⚕️!
+          </Typography>
+        </Alert>
+      </Grid>
       <Grid item xs={12} md={6}>
         <Grid container spacing={2}>
           <PageItem title="Aanstaande trainingen">
