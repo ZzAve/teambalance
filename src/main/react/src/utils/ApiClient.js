@@ -44,7 +44,6 @@ export const ApiClient = () => {
     timeout = DEFAULT_TIMEOUT,
     minDelay = DEFAULT_MIN_DELAY
   ) => {
-    // debugger
     const apiResult = fetchWithTimeout(
       `/api/${path}`,
       {

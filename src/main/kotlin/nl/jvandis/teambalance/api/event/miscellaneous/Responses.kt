@@ -10,19 +10,22 @@ data class UserAddRequest(
 data class UpdateMiscellaneousEventRequest(
     val startTime: LocalDateTime?,
     val location: String?,
-    val comment: String?
+    val comment: String?,
+    val title: String?
 )
 
 data class PotentialMiscellaneousEvent(
     val startTime: LocalDateTime,
+    val title: String?,
     val location: String,
     val comment: String?,
-    val attendees: List<Long>
+    val userIds: List<Long>? = null
 ) {
     fun internalize(): MiscellaneousEvent = MiscellaneousEvent(
         startTime = startTime,
         comment = comment,
-        location = location
+        location = location,
+        title = title
     )
 }
 
@@ -37,6 +40,7 @@ data class MiscellaneousEventsResponse(
 data class MiscellaneousEventResponse(
     val id: Long,
     val startTime: LocalDateTime,
+    val title: String?,
     val location: String,
     val comment: String?,
     val attendees: List<AttendeeResponse>

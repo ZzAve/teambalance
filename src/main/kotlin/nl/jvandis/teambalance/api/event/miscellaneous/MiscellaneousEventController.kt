@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.event.miscellaneous
 
 import io.swagger.annotations.Api
+import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMiscellaneousEventException
 import nl.jvandis.teambalance.api.InvalidUserException
@@ -115,16 +116,27 @@ class MiscellaneousEventController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun createMiscellaneousEvent(
-        @RequestBody potentialMiscellaneousEvent: PotentialMiscellaneousEvent,
+        @RequestBody potentialEvent: PotentialMiscellaneousEvent,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): MiscellaneousEventResponse {
-        log.debug("postEvent $potentialMiscellaneousEvent")
+        log.debug("postEvent $potentialEvent")
         secretService.ensureSecret(secret)
 
-        val users = userRepository.findAll()
-        val event = potentialMiscellaneousEvent.internalize()
+        val allUsers = userRepository.findAll()
+        val event = potentialEvent.internalize()
 
-        val attendees = users.map { it.toAttendee(event) }
+        val requestedUsersToAdd = allUsers.filter {
+            potentialEvent.userIds?.any { a -> a == it.id }
+                ?: true
+        }
+
+        if (potentialEvent.userIds != null &&
+            potentialEvent.userIds.size != requestedUsersToAdd.size
+        ) {
+            throw CreateEventException("Not all requested userIds exists unfortunately ${potentialEvent.userIds}. Please verify your userIds")
+        }
+
+        val attendees = requestedUsersToAdd.map { it.toAttendee(event) }
 
         val savedEvent = eventRepository.save(event)
         val savedAttendees = attendeeRepository.saveAll(attendees).toList()

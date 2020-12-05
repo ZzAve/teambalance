@@ -38,10 +38,22 @@ function formattedHomeVsAway(event) {
  */
 const EventListItem = ({ eventsType, event, onUpdate }) => {
   const startDateTime = new Date(event.startTime);
+  const titleVariant = !event.title ? "body1" : "h6";
+  const dateTimeVariant = !!event.title ? "body1" : "h6";
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={4}>
-        <Typography variant="h6">📅 {formattedDate(startDateTime)}</Typography>
+    <Grid container spacing={1}>
+      <Grid item xs={12}>
+        {!!event.title ? (
+          <Typography variant={titleVariant}>{event.title}</Typography>
+        ) : (
+          ""
+        )}
+      </Grid>
+      <Grid item xs={12} sm={6} md={12} lg={4}>
+        <Typography variant={dateTimeVariant}>
+          📅 {formattedDate(startDateTime)}
+        </Typography>
+        {!!event.title ? "" : ""}
         <Typography variant="body1">
           ⏰ {formattedTime(startDateTime)}
         </Typography>
@@ -61,7 +73,7 @@ const EventListItem = ({ eventsType, event, onUpdate }) => {
           ""
         )}
       </Grid>
-      <Grid item xs={12} sm={8}>
+      <Grid item xs={12} sm={6} md={12} lg={8}>
         <Attendees
           attendees={event.attendees}
           onUpdate={onUpdate}

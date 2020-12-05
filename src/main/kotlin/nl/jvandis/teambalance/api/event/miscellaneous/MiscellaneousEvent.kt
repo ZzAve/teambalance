@@ -11,15 +11,17 @@ data class MiscellaneousEvent(
     override val id: Long,
     override val startTime: LocalDateTime,
     override val location: String,
-    override val comment: String? = null
+    override val comment: String? = null,
+    val title: String? = null
 ) : Event(id, startTime, location, comment) {
-    constructor(startTime: LocalDateTime, location: String, comment: String?) :
-        this(id = 0, startTime = startTime, location = location, comment = comment)
+    constructor(startTime: LocalDateTime, location: String, comment: String?, title: String?) :
+        this(id = 0, startTime = startTime, location = location, comment = comment, title = title)
 
     fun createUpdatedEvent(updateEventRequest: UpdateMiscellaneousEventRequest) = copy(
         startTime = updateEventRequest.startTime ?: startTime,
         comment = updateEventRequest.comment ?: comment,
-        location = updateEventRequest.location ?: location
+        location = updateEventRequest.location ?: location,
+        title = updateEventRequest.title ?: title
     )
 
     fun externalizeWithAttendees(attendees: List<Attendee>): MiscellaneousEventResponse {
@@ -30,6 +32,7 @@ data class MiscellaneousEvent(
     private fun externalize(attendeesResponse: List<AttendeeResponse>) = MiscellaneousEventResponse(
         id = id,
         comment = comment,
+        title = title,
         location = location,
         startTime = startTime,
         attendees = attendeesResponse

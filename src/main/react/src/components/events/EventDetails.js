@@ -35,7 +35,7 @@ const getText = (eventsType, name) => {
   return texts[name][typpe] || name;
 };
 
-const EventDetails = ({ eventsType, location, id, showAttendees = false }) => {
+const EventDetails = ({ eventsType, location, id }) => {
   const [event, setEvent] = useState({});
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -136,14 +136,6 @@ const EventDetails = ({ eventsType, location, id, showAttendees = false }) => {
           setMessage={setMessage}
         />
       </Grid>
-      {!!showAttendees ? (
-        <Grid item xs={12}>
-          <Typography variant="h6">Teamgenoten</Typography>
-          <EventUsers users={users} training={event} setMessage={setMessage} />
-        </Grid>
-      ) : (
-        <></>
-      )}
     </Grid>
   );
 };

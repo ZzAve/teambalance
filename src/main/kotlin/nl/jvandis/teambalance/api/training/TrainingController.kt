@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.training
 
 import io.swagger.annotations.Api
+import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
@@ -116,18 +117,29 @@ class TrainingController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun createTraining(
-        @RequestBody potentialTraining: PotentialTraining,
+        @RequestBody potentialEvent: PotentialTraining,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): TrainingResponse {
-        log.debug("postTraining $potentialTraining")
+        log.debug("postTraining $potentialEvent")
         secretService.ensureSecret(secret)
 
-        val users = userRepository.findAll()
-        val training = potentialTraining.internalize()
+        val allUsers = userRepository.findAll()
 
-        val attendees = users.map { it.toAttendee(training) }
+        val requestedUsersToAdd = allUsers.filter {
+            potentialEvent.userIds?.any { a -> a == it.id }
+                ?: true
+        }
 
+        if (potentialEvent.userIds != null &&
+            potentialEvent.userIds.size != requestedUsersToAdd.size
+        ) {
+            throw CreateEventException("Not all requested userIds exists unfortunately ${potentialEvent.userIds}. Please verify your userIds")
+        }
+
+        val training = potentialEvent.internalize()
         val savedTraining = eventRepository.save(training)
+
+        val attendees = requestedUsersToAdd.map { it.toAttendee(training) }
         val savedAttendees = attendeeRepository.saveAll(attendees).toList()
 
         return savedTraining.externalizeWithAttendees(savedAttendees)

@@ -29,7 +29,7 @@ const createMatch = ({
   startTime,
   opponent,
   homeAway,
-  attendees
+  userIds
 }) => {
   return matchesClient.callWithBody(
     "matches",
@@ -39,7 +39,7 @@ const createMatch = ({
       opponent,
       homeAway,
       comment,
-      attendees
+      userIds
     },
     { method: "POST" }
   );
@@ -51,8 +51,7 @@ const updateMatch = ({
   comment,
   startTime,
   opponent,
-  homeAway,
-  attendees
+  homeAway
 }) => {
   return matchesClient.callWithBody(
     `matches/${id}`,
@@ -61,8 +60,7 @@ const updateMatch = ({
       location,
       opponent,
       homeAway,
-      comment,
-      attendees
+      comment
     },
     { method: "PUT" }
   );

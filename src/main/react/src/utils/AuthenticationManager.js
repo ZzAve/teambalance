@@ -15,7 +15,6 @@ let _authenticationCheck = new Promise(resolve => {
 });
 
 const getSecretFromLocalStorage = () => {
-  // debugger
   let item = localStorage.getItem(_key);
   if (item === null || item === "null") {
     return null;

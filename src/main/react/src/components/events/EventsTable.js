@@ -10,10 +10,21 @@ import TableBody from "@material-ui/core/TableBody";
 import React, { useState } from "react";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { Button } from "@material-ui/core";
+import { Button, createStyles, makeStyles } from "@material-ui/core";
 import { Redirect } from "react-router-dom";
 import Attendees from "../Attendees";
 import { EventsType } from "./utils";
+
+const useStyles = makeStyles(() =>
+  createStyles({
+    root: {
+      minWidth: "960px"
+    },
+    attendees: {
+      width: "20%"
+    }
+  })
+);
 
 const EventsTable = ({
   eventsType,
@@ -22,6 +33,8 @@ const EventsTable = ({
   updateTrigger
 }) => {
   const [goTo, setGoTo] = useState(undefined);
+
+  const classes = useStyles();
 
   const handleClickEditEvent = id => {
     if (eventsType === EventsType.TRAINING) {
@@ -72,7 +85,7 @@ const EventsTable = ({
             </TableCell>
             <TableCell align="right">{row.location}</TableCell>
             <TableCell align="right">{row.comment}</TableCell>
-            <TableCell>
+            <TableCell className={classes.attendees}>
               <Attendees
                 size="small"
                 attendees={row.attendees}
@@ -105,11 +118,42 @@ const EventsTable = ({
               {row.location} ({row.homeAway === "HOME" ? "THUIS" : "UIT"})
             </TableCell>
             <TableCell align="right">{row.comment}</TableCell>
-            <TableCell>
+            <TableCell className={classes.attendees}>
               <Attendees
                 attendees={row.attendees}
                 onUpdate={updateTrigger}
                 size="small"
+                showSummary={false}
+              />
+            </TableCell>
+            <TableCell hidden={!allowChanges} align="right">
+              {allowChanges ? getUpdateIcons(row) : <> </>}
+            </TableCell>
+          </TableRow>
+        );
+      })}
+    </>
+  );
+
+  const getTableBodyOther = () => (
+    <>
+      {events.map(row => {
+        return (
+          <TableRow key={row.id}>
+            <TableCell component="th" scope="row">
+              {formattedDate(new Date(row.startTime))}
+            </TableCell>
+            <TableCell align="right">
+              {formattedTime(new Date(row.startTime))}
+            </TableCell>
+            <TableCell align="right">{row.title}</TableCell>
+            <TableCell align="right">{row.location}</TableCell>
+            <TableCell align="right">{row.comment}</TableCell>
+            <TableCell className={classes.attendees}>
+              <Attendees
+                size="small"
+                attendees={row.attendees}
+                onUpdate={updateTrigger}
                 showSummary={false}
               />
             </TableCell>
@@ -150,10 +194,22 @@ const EventsTable = ({
     </TableRow>
   );
 
+  const getTableHeadOther = () => (
+    <TableRow>
+      <TableCell>Datum</TableCell>
+      <TableCell align="right">Tijd</TableCell>
+      <TableCell align="right">Titel</TableCell>
+      <TableCell align="right">Location</TableCell>
+      <TableCell align="right">Opmerking</TableCell>
+      <TableCell align="center">Deelnemers</TableCell>
+      {allowChanges ? <TableCell align="right">Aanpassen</TableCell> : <></>}
+    </TableRow>
+  );
+
   return (
     <Grid container item xs={12}>
       <TableContainer component={Paper}>
-        <Table aria-label="simple table" size="medium">
+        <Table aria-label="simple table" size="medium" className={classes.root}>
           {eventsType === EventsType.TRAINING ? (
             <>
               <TableHead>{getTableHeadTraining()}</TableHead>
@@ -166,8 +222,8 @@ const EventsTable = ({
             </>
           ) : eventsType === EventsType.MISC ? (
             <>
-              <TableHead>{getTableHeadTraining()}</TableHead>
-              <TableBody>{getTableBodyTraining()}</TableBody>
+              <TableHead>{getTableHeadOther()}</TableHead>
+              <TableBody>{getTableBodyOther()}</TableBody>
             </>
           ) : (
             "🤷‍♂️"

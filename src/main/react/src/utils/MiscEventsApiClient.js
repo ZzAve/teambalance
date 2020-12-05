@@ -22,27 +22,28 @@ const getEvent = (id, includeAttendees = true) => {
 
   return event.then(x => internalizeEvent(x));
 };
-const createEvent = ({ location, comment, startTime, attendees }) => {
+const createEvent = ({ location, comment, title, startTime, userIds }) => {
   return eventsClient.callWithBody(
     "miscellaneous-events",
     {
       comment,
       location,
+      title,
       startTime: eventsClient.externalizeDateTime(startTime),
-      attendees
+      userIds
     },
     { method: "POST" }
   );
 };
 
-const updateEvent = ({ id, location, comment, startTime, attendees }) => {
+const updateEvent = ({ id, location, title, comment, startTime }) => {
   return eventsClient.callWithBody(
     `miscellaneous-events/${id}`,
     {
       comment,
       location,
-      startTime: eventsClient.externalizeDateTime(startTime),
-      attendees
+      title,
+      startTime: eventsClient.externalizeDateTime(startTime)
     },
     { method: "PUT" }
   );
