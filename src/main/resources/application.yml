@@ -35,15 +35,11 @@ spring:
     hibernate.ddl-auto: validate
     generate-ddl: true
   datasource:
-    username: ${sm://POSTGRES_USERNAME}
-    password: ${sm://POSTGRES_PASSWORD}
+    username: ${sm://DB_USERNAME}
+    password: ${sm://DB_PASSWORD}
+    url: ${sm://DB_URL}
     hikari:
       maximum-pool-size: 2
-#    url: jdbc:postgresql://localhost:5432/${DATABASE_NAME}
-#    url: jdbc:postgresql://sql_proxy:5432/${DATABASE_NAME}
-  cloud.gcp.sql:
-    instance-connection-name: ${sm://INSTANCE_CONNECTION_NAME}
-    database-name: ${sm://DATABASE_NAME}
 
   jackson:
     serialization:

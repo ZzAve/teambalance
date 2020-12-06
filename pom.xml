@@ -86,14 +86,10 @@
             <artifactId>spring-cloud-gcp-starter-secretmanager</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-gcp-starter-sql-postgresql</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.14</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.postgresql</groupId>-->
-<!--            <artifactId>postgresql</artifactId>-->
-<!--            <version>42.2.14</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>com.github.bunq</groupId>
             <artifactId>sdk_java</artifactId>

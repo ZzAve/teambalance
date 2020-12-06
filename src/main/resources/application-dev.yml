@@ -7,7 +7,7 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  cloud:
-    gcp:
-      sql:
-        database-name: ${sm://DATABASE_NAME_DEV}
+  datasource:
+    username: ${sm://DB_USERNAME_DEV}
+    password: ${sm://DB_PASSWORD_DEV}
+    url: ${sm://DB_URL_DEV}
