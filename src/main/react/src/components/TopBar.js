@@ -6,6 +6,7 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { Refresh } from "./Refresh";
 import { Logout } from "./Logout";
+import Hidden from "@material-ui/core/Hidden";
 
 const TopBar = ({ handleRefresh, refresh }) => {
   const [isAuth, setIsAuth] = useState(true);
@@ -23,7 +24,9 @@ const TopBar = ({ handleRefresh, refresh }) => {
       <Toolbar>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs>
-            <Typography variant="h6">Tovo Heren 5 Teampot</Typography>
+            <Typography variant="h6">
+              Tovo Heren 5 <Hidden smDown>Teampot</Hidden>
+            </Typography>
           </Grid>
 
           {isAuth ? (

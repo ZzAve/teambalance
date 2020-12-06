@@ -12,6 +12,9 @@ import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import EventsPage from "./views/EventsPage";
 import { EventsType } from "./components/events/utils";
+import { Alert } from "@material-ui/lab";
+import AlertTitle from "@material-ui/lab/AlertTitle";
+import Typography from "@material-ui/core/Typography";
 
 const Admin = lazy(() => import("./views/Admin.js"));
 const Login = lazy(() => import("./views/Login.js"));
@@ -39,9 +42,23 @@ const App = () => {
       <CssBaseline />
       <Container maxWidth="lg">
         <TopBar handleRefresh={handleRefresh} refresh={topBarShouldRefresh} />
-        <Router>
-          <Grid container spacing={2} alignItems="flex-start">
-            <Grid item xs={12} />
+        <Grid container spacing={2} alignItems="flex-start">
+          <Grid item xs={12} />
+          <Grid item xs={12}>
+            <Alert severity="warning">
+              <AlertTitle>COVID-19</AlertTitle>
+              <Typography>
+                Ook rondom volleybal hangt veel onzekerheid wat betreft COVID-19
+                🦠. Dat heeft wat invloed op de betrouwbaarheid van de data die
+                hier getoond wordt.
+              </Typography>
+              <Typography>
+                Check in met het team als je iets niet zeker weet. Blijf gezond
+                👨‍⚕️!
+              </Typography>
+            </Alert>
+          </Grid>
+          <Router>
             <Suspense fallback={<Loading />}>
               <Switch>
                 <PublicRoute
@@ -80,8 +97,8 @@ const App = () => {
                 />
               </Switch>
             </Suspense>
-          </Grid>
-        </Router>
+          </Router>
+        </Grid>
       </Container>
     </>
   );
