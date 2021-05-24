@@ -29,7 +29,7 @@
         <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
-        <postgresql.version>42.2.14</postgresql.version>
+        <postgresql.version>42.2.20</postgresql.version>
         <spring-cloud-gcp-dependencies.version>1.2.3.RELEASE</spring-cloud-gcp-dependencies.version>
         <springfox-swagger.version>3.0.0</springfox-swagger.version>
     </properties>
