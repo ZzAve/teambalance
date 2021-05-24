@@ -6,7 +6,11 @@ import com.bunq.sdk.context.BunqContext;
 import com.bunq.sdk.exception.BunqException;
 import com.bunq.sdk.exception.ForbiddenException;
 import com.bunq.sdk.http.Pagination;
-import com.bunq.sdk.model.generated.endpoint.*;
+import com.bunq.sdk.model.generated.endpoint.MonetaryAccountBank;
+import com.bunq.sdk.model.generated.endpoint.Payment;
+import com.bunq.sdk.model.generated.endpoint.RequestInquiry;
+import com.bunq.sdk.model.generated.endpoint.User;
+import com.bunq.sdk.model.generated.endpoint.SandboxUserPerson;
 import com.bunq.sdk.model.generated.object.Amount;
 import com.bunq.sdk.model.generated.object.Pointer;
 import com.google.gson.Gson;
@@ -182,7 +186,7 @@ public class BunqRepository {
             // Config is already present.
             apiContext = ApiContext.restore(this.determineBunqConfigFileName());
         } else if (ApiEnvironmentType.SANDBOX.equals(this.environmentType)) {
-            SandboxUser sandboxUser = generateNewSandboxUser();
+            SandboxUserPerson sandboxUser = generateNewSandboxUser();
             apiContext = ApiContext.create(ApiEnvironmentType.SANDBOX, sandboxUser.getApiKey(), DEVICE_SERVER_DESCRIPTION);
 
         } else {
@@ -255,7 +259,7 @@ public class BunqRepository {
     }
 
 
-    private SandboxUser generateNewSandboxUser() {
+    private SandboxUserPerson generateNewSandboxUser() {
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
@@ -275,7 +279,7 @@ public class BunqRepository {
                 JsonObject jsonObject = new Gson().fromJson(responseString, JsonObject.class);
                 JsonObject apiKEy = jsonObject.getAsJsonArray(FIELD_RESPONSE).get(INDEX_FIRST).getAsJsonObject().get(FIELD_API_KEY).getAsJsonObject();
 
-                return SandboxUser.fromJsonReader(new JsonReader(new StringReader(apiKEy.toString())));
+                return SandboxUserPerson.fromJsonReader(new JsonReader(new StringReader(apiKEy.toString())));
             } else {
                 throw new BunqException(String.format(ERROR_COULD_NOT_GENERATE_NEW_API_KEY, response.body().string()));
             }
