@@ -8,6 +8,7 @@ const htmlPlugin = new HtmlWebPackPlugin({
 });
 
 module.exports = {
+  mode: "production",
   entry: [
     path.join(__dirname, "src/main/react/index.js"),
     path.join(__dirname, "src/main/react/polyfill.js")
@@ -46,12 +47,13 @@ module.exports = {
 
   plugins: [
     htmlPlugin,
-    new CopyWebpackPlugin([
-      // "src/main/react/images"
-      { from: "react/images", to: "images", context: "src/main" },
-      // { from: "react/manifest.json", to: "webapp/", context: "src/main" },
-      "src/main/react/manifest.json"
-    ])
+    new CopyWebpackPlugin({
+          patterns:[
+            // "src/main/react/images"
+            {from: "react/images", to: "images", context: "src/main"},
+            {from: "react/manifest.json", to: "./", context: "src/main"}
+            // {from: "src/main/react/manifest.json", to: "./" }
+    ]})
   ],
 
   devServer: {
