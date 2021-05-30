@@ -5,6 +5,7 @@
     "default:separateMultipleMajorReleases",
     "default:enableVulnerabilityAlerts",
     ":maintainLockFilesMonthly",
-    ":dependencyDashboard"
+    ":dependencyDashboard",
+    "group:linters"
   ]
 }
