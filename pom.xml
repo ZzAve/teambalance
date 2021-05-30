@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.2.RELEASE</version>
+        <version>2.4.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>nl.jvandis</groupId>
@@ -30,14 +30,14 @@
         <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
         <postgresql.version>42.2.20</postgresql.version>
-        <spring-cloud-gcp-dependencies.version>1.2.3.RELEASE</spring-cloud-gcp-dependencies.version>
+        <spring-cloud-gcp-dependencies.version>2.0.2</spring-cloud-gcp-dependencies.version>
         <springfox-swagger.version>3.0.0</springfox-swagger.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springframework.cloud</groupId>
+                <groupId>com.google.cloud</groupId>
                 <artifactId>spring-cloud-gcp-dependencies</artifactId>
                 <version>${spring-cloud-gcp-dependencies.version}</version>
                 <type>pom</type>
@@ -85,7 +85,7 @@
             <artifactId>kotlin-reflect</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
+            <groupId>com.google.cloud</groupId>
             <artifactId>spring-cloud-gcp-starter-secretmanager</artifactId>
         </dependency>
         <dependency>
@@ -125,12 +125,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.vintage</groupId>
-                    <artifactId>junit-vintage-engine</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -271,7 +265,7 @@
                         <goals>
                             <goal>npm</goal>
                         </goals>
-                        <phase>generate-sources</phase>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <arguments>ci</arguments>
                         </configuration>
@@ -378,6 +372,10 @@
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>maven-central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
         </repository>
     </repositories>
 </project>
