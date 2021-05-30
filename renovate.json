@@ -1,5 +1,10 @@
 {
   "extends": [
-    "config:base"
+    "config:base",
+    "default:semanticCommits",
+    "default:separateMultipleMajorReleases",
+    "default:enableVulnerabilityAlerts",
+    ":maintainLockFilesMonthly",
+    ":dependencyDashboard"
   ]
 }
