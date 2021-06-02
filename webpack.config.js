@@ -7,6 +7,15 @@ const htmlPlugin = new HtmlWebPackPlugin({
   filename: "./index.html"
 });
 
+const copyWebpackPlugin = new CopyWebpackPlugin({
+  patterns: [
+    // "src/main/react/images"
+    {from: "react/images", to: "images", context: "src/main"},
+    {from: "react/manifest.json", to: "./", context: "src/main"}
+    // {from: "src/main/react/manifest.json", to: "./" }
+  ]
+});
+
 module.exports = {
   mode: "production",
   entry: [
@@ -47,13 +56,7 @@ module.exports = {
 
   plugins: [
     htmlPlugin,
-    new CopyWebpackPlugin({
-          patterns:[
-            // "src/main/react/images"
-            {from: "react/images", to: "images", context: "src/main"},
-            {from: "react/manifest.json", to: "./", context: "src/main"}
-            // {from: "src/main/react/manifest.json", to: "./" }
-    ]})
+    copyWebpackPlugin
   ],
 
   devServer: {
