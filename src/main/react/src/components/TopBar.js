@@ -12,7 +12,7 @@ const TopBar = ({ handleRefresh, refresh }) => {
   const [isAuth, setIsAuth] = useState(true);
 
   useEffect(() => {
-    authenticationManager.checkAuthentication().then(it => {
+    authenticationManager.checkAuthentication().then((it) => {
       console.debug(`[Topbar] Authentication result: ${it}`);
       setIsAuth(it);
     });

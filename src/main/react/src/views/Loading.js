@@ -8,7 +8,7 @@ const Texts = [
   "De fluim van de maand verzinnen",
   "De eentjes van de nulletjes scheiden",
   "Wachtwoord controleren",
-  "💵 💲 💰" // emojis
+  "💵 💲 💰", // emojis
 ];
 
 const Loading = () => {

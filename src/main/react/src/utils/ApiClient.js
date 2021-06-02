@@ -12,8 +12,8 @@ const _mergeFetchOptions = (options, secret) => ({
     "Content-Type": "application/json",
     Accept: "application/json",
     "X-Secret": btoa(secret),
-    ...options.headers
-  }
+    ...options.headers,
+  },
 });
 
 const _throwIfNotOk = (path, res) => {
@@ -48,10 +48,10 @@ export const ApiClient = () => {
       `/api/${path}`,
       {
         ..._mergeFetchOptions(options, authenticationManager.get()),
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       },
       timeout
-    ).then(res => {
+    ).then((res) => {
       _throwIfNotOk(path, res);
       if (res.status === 204) {
         return {};
@@ -73,7 +73,7 @@ export const ApiClient = () => {
       `/api/${path}`,
       _mergeFetchOptions(options, authenticationManager.get()),
       timeout
-    ).then(res => {
+    ).then((res) => {
       _throwIfNotOk(path, res);
       if (res.status === 204) {
         return {};
@@ -84,7 +84,7 @@ export const ApiClient = () => {
     return _resultWithMinDelay(apiResult, minDelay);
   };
 
-  const externalizeDateTime = t => {
+  const externalizeDateTime = (t) => {
     const externalDateTime = new Date(t);
     // Very dirty hack(!)
     externalDateTime.setMinutes(t.getMinutes() - t.getTimezoneOffset());
@@ -96,6 +96,6 @@ export const ApiClient = () => {
     call: performApiCall,
     externalizeDateTime,
     defaultTimeout: DEFAULT_TIMEOUT,
-    defaultMinDelay: DEFAULT_MIN_DELAY
+    defaultMinDelay: DEFAULT_MIN_DELAY,
   };
 };

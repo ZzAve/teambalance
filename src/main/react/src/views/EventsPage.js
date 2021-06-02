@@ -16,8 +16,8 @@ const texts = {
     [EventsType.TRAINING]: "Aanstaande trainingen",
     [EventsType.MATCH]: "Aanstaande wedstrijden",
     [EventsType.MISC]: "Aanstaande evenementen",
-    [EventsType.OTHER]: "Aanstaande evenementen"
-  }
+    [EventsType.OTHER]: "Aanstaande evenementen",
+  },
 };
 
 const getText = (eventsType, name) => {
@@ -64,7 +64,7 @@ const EventsPage = ({ eventsType, refresh }) => {
               <Grid item>
                 <Switch
                   checked={showList}
-                  onChange={x => setShowList(x.target.checked)}
+                  onChange={(x) => setShowList(x.target.checked)}
                   name="listVsTable"
                 />
               </Grid>

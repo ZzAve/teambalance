@@ -18,8 +18,8 @@ const texts = {
     [EventsType.TRAINING]: "ophalen trainingen",
     [EventsType.MATCH]: "ophalen wedstrijden",
     [EventsType.MISC]: "ophalen events",
-    [EventsType.OTHER]: "ophalen ..."
-  }
+    [EventsType.OTHER]: "ophalen ...",
+  },
 };
 
 const getText = (eventsType, name) => {
@@ -32,7 +32,7 @@ const Events = ({
   refresh,
   view,
   allowChanges = false,
-  limit = 1
+  limit = 1,
 }) => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);

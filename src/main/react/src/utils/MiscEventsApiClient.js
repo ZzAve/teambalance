@@ -2,17 +2,17 @@ import { ApiClient } from "./ApiClient";
 
 const eventsClient = ApiClient("miscellaneous-events");
 
-const internalizeEvent = externalEvent => ({
+const internalizeEvent = (externalEvent) => ({
   ...externalEvent,
   startTime: new Date(externalEvent.startTime),
-  attendees: externalEvent.attendees || []
+  attendees: externalEvent.attendees || [],
 });
 
 const getEvents = (since, limit, includeAttendees = true) => {
   let events = eventsClient.call(
     `miscellaneous-events?since=${since}&include-attendees=${includeAttendees}&limit=${limit}`
   );
-  return events.then(x => x.events.map(internalizeEvent));
+  return events.then((x) => x.events.map(internalizeEvent));
 };
 
 const getEvent = (id, includeAttendees = true) => {
@@ -20,7 +20,7 @@ const getEvent = (id, includeAttendees = true) => {
     `miscellaneous-events/${id}?include-attendees=${includeAttendees}`
   );
 
-  return event.then(x => internalizeEvent(x));
+  return event.then((x) => internalizeEvent(x));
 };
 const createEvent = ({ location, comment, title, startTime, userIds }) => {
   return eventsClient.callWithBody(
@@ -30,7 +30,7 @@ const createEvent = ({ location, comment, title, startTime, userIds }) => {
       location,
       title,
       startTime: eventsClient.externalizeDateTime(startTime),
-      userIds
+      userIds,
     },
     { method: "POST" }
   );
@@ -43,7 +43,7 @@ const updateEvent = ({ id, location, title, comment, startTime }) => {
       comment,
       location,
       title,
-      startTime: eventsClient.externalizeDateTime(startTime)
+      startTime: eventsClient.externalizeDateTime(startTime),
     },
     { method: "PUT" }
   );
@@ -54,5 +54,5 @@ export const eventsApiClient = {
   getEvents,
   getEvent,
   createEvent,
-  updateEvent
+  updateEvent,
 };

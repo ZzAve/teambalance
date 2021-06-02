@@ -18,7 +18,7 @@ const Login = ({ location, handleRefresh }) => {
   useEffect(() => {
     //On startup , try with current value in authenticationManager
     setTimeout(() => {
-      authenticationManager.checkAuthentication().then(isAuth => {
+      authenticationManager.checkAuthentication().then((isAuth) => {
         console.debug(
           `Checked authentiation: user is ${
             isAuth ? "" : "NOT"
@@ -38,23 +38,23 @@ const Login = ({ location, handleRefresh }) => {
       `);
   }, [input]);
 
-  const authenticate = passphrase =>
+  const authenticate = (passphrase) =>
     withLoading(setIsLoading, () =>
       authenticationManager.authenticate(passphrase)
     )
-      .catch(e => {
+      .catch((e) => {
         console.error("Login did not work", e);
       })
-      .then(_ => {
+      .then((_) => {
         setIsAuthenticated(true);
       });
 
-  const handleLogin = async e => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     await authenticate(input);
   };
 
-  const handleInput = e => setInput(e.target.value);
+  const handleInput = (e) => setInput(e.target.value);
 
   if (isAuthenticated) {
     const { from } = location.state || { from: { pathname: "/" } };
@@ -104,7 +104,7 @@ const Login = ({ location, handleRefresh }) => {
  * @param number
  * @returns {string}
  */
-const randomChars = number => {
+const randomChars = (number) => {
   let char = () => Math.floor(Math.random() * 36).toString(36);
   let outStr = "";
   while (outStr.length < number) {

@@ -20,7 +20,7 @@ const Balance = ({ refresh }) => {
     return <SpinnerWithText text="ophalen saldo" />;
   }
 
-  const calculateBeers = balance => {
+  const calculateBeers = (balance) => {
     const cents = balance.replace(/\D/g, "") / 100.0;
     return Math.round(cents / 2.67);
   };

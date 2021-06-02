@@ -7,7 +7,7 @@ export const useSharedState = (key, initialValue) => {
     if (!keys[key]) {
       keys[key] = {
         value: initialValue,
-        setStates: []
+        setStates: [],
       };
     }
 
@@ -22,9 +22,9 @@ export const useSharedState = (key, initialValue) => {
     };
   }, []);
 
-  const handleStateChange = newValue => {
+  const handleStateChange = (newValue) => {
     keys[key].value = newValue;
-    keys[key].setStates.forEach(setState => setState(newValue));
+    keys[key].setStates.forEach((setState) => setState(newValue));
   };
 
   // console.log(keys);

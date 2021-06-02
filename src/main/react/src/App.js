@@ -24,13 +24,13 @@ const App = () => {
   const [topBarShouldRefresh, setTopBarShouldRefresh] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
 
-  const handleRefresh = _ => {
+  const handleRefresh = (_) => {
     setTimeout(() => {
       setShouldRefresh(!shouldRefresh);
     });
   };
 
-  const refreshTopBar = _ => {
+  const refreshTopBar = (_) => {
     setTimeout(() => {
       setTopBarShouldRefresh(!topBarShouldRefresh);
     });
