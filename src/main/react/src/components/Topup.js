@@ -6,7 +6,7 @@ import Typography from "@material-ui/core/Typography";
 const bunqMeUrl = "https://bunq.me/tovoheren5";
 
 const Topup = () => {
-  const createTopUpLink = price => () =>
+  const createTopUpLink = (price) => () =>
     window.open(
       `${bunqMeUrl}?amount=${price}&description=Meer%20Muntjes%20Meer%20Beter`,
       "_blank"

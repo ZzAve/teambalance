@@ -2,17 +2,17 @@ import { ApiClient } from "./ApiClient";
 
 const trainingsClient = ApiClient("trainings");
 
-const internalizeTraining = externalTraining => ({
+const internalizeTraining = (externalTraining) => ({
   ...externalTraining,
   startTime: new Date(externalTraining.startTime),
-  attendees: externalTraining.attendees || []
+  attendees: externalTraining.attendees || [],
 });
 
 const getTrainings = (since, limit, includeAttendees = true) => {
   let trainings = trainingsClient.call(
     `trainings?since=${since}&include-attendees=${includeAttendees}&limit=${limit}`
   );
-  return trainings.then(x => x.trainings.map(internalizeTraining));
+  return trainings.then((x) => x.trainings.map(internalizeTraining));
 };
 
 const getTraining = (id, includeAttendees = true) => {
@@ -20,7 +20,7 @@ const getTraining = (id, includeAttendees = true) => {
     `trainings/${id}?include-attendees=${includeAttendees}`
   );
 
-  return training.then(x => internalizeTraining(x));
+  return training.then((x) => internalizeTraining(x));
 };
 const createTraining = ({ location, comment, startTime, userIds }) => {
   return trainingsClient.callWithBody(
@@ -29,7 +29,7 @@ const createTraining = ({ location, comment, startTime, userIds }) => {
       comment,
       location,
       startTime: trainingsClient.externalizeDateTime(startTime),
-      userIds
+      userIds,
     },
     { method: "POST" }
   );
@@ -41,7 +41,7 @@ const updateTraining = ({ id, location, comment, startTime }) => {
     {
       comment,
       location,
-      startTime: trainingsClient.externalizeDateTime(startTime)
+      startTime: trainingsClient.externalizeDateTime(startTime),
     },
     { method: "PUT" }
   );
@@ -52,5 +52,5 @@ export const trainingsApiClient = {
   getTrainings,
   getTraining,
   createTraining,
-  updateTraining
+  updateTraining,
 };

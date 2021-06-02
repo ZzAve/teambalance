@@ -6,7 +6,7 @@ import { SpinnerWithText } from "../SpinnerWithText";
 import {
   DatePicker,
   MuiPickersUtilsProvider,
-  TimePicker
+  TimePicker,
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import nlLocale from "date-fns/locale/nl";
@@ -29,8 +29,8 @@ const texts = {
     [EventsType.TRAINING]: "versturen training",
     [EventsType.MATCH]: "versturen wedstrijd",
     [EventsType.MISC]: "versturen event",
-    [EventsType.OTHER]: "versturen ..."
-  }
+    [EventsType.OTHER]: "versturen ...",
+  },
 };
 
 const getText = (eventsType, name) => {
@@ -49,7 +49,7 @@ const createEvent = async (
     comment,
     opponent,
     homeAway,
-    userIds
+    userIds,
   };
 
   if (eventsType === EventsType.TRAINING) {
@@ -74,7 +74,7 @@ async function updateEvent(
     startTime,
     comment,
     opponent,
-    homeAway
+    homeAway,
   };
   if (eventsType === EventsType.TRAINING) {
     await trainingsApiClient.updateTraining(apiCallArgs);
@@ -92,9 +92,9 @@ export const EventForm = ({
   location = {},
   users,
   event,
-  setMessage
+  setMessage,
 }) => {
-  const getInitialSelectedDate = event => {
+  const getInitialSelectedDate = (event) => {
     return () => {
       if (!!event.startTime) {
         return event.startTime;
@@ -138,8 +138,8 @@ export const EventForm = ({
         opponent: opponent,
         homeAway: homeAway,
         userIds: Object.entries(userSelection)
-          .filter(it => it[1] === true)
-          .map(it => it[0])
+          .filter((it) => it[1] === true)
+          .map((it) => it[0]),
       });
     } else {
       await updateEvent(eventsType, {
@@ -149,24 +149,24 @@ export const EventForm = ({
         title: title,
         comment: comment,
         opponent: opponent,
-        homeAway: homeAway
+        homeAway: homeAway,
       });
     }
   }
 
-  const handleSaveEvent = async x => {
+  const handleSaveEvent = async (x) => {
     let successfulSave = await withLoading(setIsLoading, async () => {
       try {
         await save();
         setMessage({
           message: `${isCreateEvent() ? "Creatie" : "Update"} successvol`,
-          level: Message.SUCCESS
+          level: Message.SUCCESS,
         });
         return true;
       } catch (e) {
         setMessage({
           message: `Er ging iets fout: ${e}`,
-          level: Message.ERROR
+          level: Message.ERROR,
         });
         return false;
       }
@@ -188,8 +188,8 @@ export const EventForm = ({
             ? "/admin/matches"
             : eventsType === EventsType.MISC
             ? "/admin/misc-events"
-            : "/admin"
-      }
+            : "/admin",
+      },
     };
 
     return <Redirect to={from} />;
@@ -234,7 +234,7 @@ export const EventForm = ({
             label="Starttijd"
             minutesStep={15}
             ampm={false}
-            onChange={x => {
+            onChange={(x) => {
               setSelectedTime(x);
             }}
             autoOk
@@ -249,7 +249,7 @@ export const EventForm = ({
               label="Titel"
               fullWidth
               value={title || ""}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </Grid>
         ) : (
@@ -264,7 +264,7 @@ export const EventForm = ({
                 name="opponent"
                 label="Tegenstander"
                 value={opponent}
-                onChange={e => {
+                onChange={(e) => {
                   setOpponent(e.target.value);
                 }}
                 fullWidth
@@ -275,7 +275,7 @@ export const EventForm = ({
                 aria-label="thuis-of-uit"
                 name="thuis-of-uit"
                 value={homeAway}
-                onChange={e => {
+                onChange={(e) => {
                   setHomeAway(e.target.value);
                 }}
               >
@@ -302,7 +302,7 @@ export const EventForm = ({
             name="location"
             label="Locatie"
             value={eventLocation}
-            onChange={e => {
+            onChange={(e) => {
               setEventLocation(e.target.value);
             }}
             fullWidth
@@ -315,7 +315,7 @@ export const EventForm = ({
             label="Opmerking"
             fullWidth
             value={comment}
-            onChange={e => setComment(e.target.value)}
+            onChange={(e) => setComment(e.target.value)}
           />
         </Grid>
 
@@ -344,7 +344,7 @@ export const EventForm = ({
               control={
                 <CheckBox
                   checked={!!addAnother}
-                  onChange={x => {
+                  onChange={(x) => {
                     setAddAnother(x.target.checked);
                     setDone(false);
                   }}

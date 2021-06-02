@@ -7,7 +7,7 @@ import {
   BrowserRouter as Router,
   Link,
   Redirect,
-  Switch
+  Switch,
 } from "react-router-dom";
 import { PrivateRoute } from "../components/PrivateRoute";
 import Loading from "./Loading";
@@ -27,26 +27,26 @@ const texts = {
     [EventsType.TRAINING]: "Trainingen",
     [EventsType.MATCH]: "Wedstrijden",
     [EventsType.MISC]: "Overige Evenementen",
-    [EventsType.OTHER]: "Evenementen"
+    [EventsType.OTHER]: "Evenementen",
   },
   new_event_button_text: {
     [EventsType.TRAINING]: "nieuwe training",
     [EventsType.MATCH]: "nieuwe wedstrijd",
     [EventsType.MISC]: "nieuw evenement",
-    [EventsType.OTHER]: "nieuw evenement"
+    [EventsType.OTHER]: "nieuw evenement",
   },
   edit_event_pageitem_label: {
     [EventsType.TRAINING]: "Training aanpassen",
     [EventsType.MATCH]: "Wedstrijd aanpassen",
     [EventsType.MISC]: "Evenement aanpassen",
-    [EventsType.OTHER]: "Evenement aanpassen"
+    [EventsType.OTHER]: "Evenement aanpassen",
   },
   new_event_pageitem_label: {
     [EventsType.TRAINING]: "Nieuwe training",
     [EventsType.MATCH]: "Nieuwe wedstrijd",
     [EventsType.MISC]: "Nieuw evenement",
-    [EventsType.OTHER]: "Nieuw evenement "
-  }
+    [EventsType.OTHER]: "Nieuw evenement ",
+  },
 };
 
 const getText = (eventsType, name) => {
@@ -234,7 +234,7 @@ const ChangeEvent = ({ computedMatch, eventsType, ...rest }) => {
               ? "/admin/matches"
               : eventsType === EventsType.MISC
               ? "/admin/misc-events"
-              : "/admin"
+              : "/admin",
         }}
       />
     );

@@ -2,17 +2,17 @@ import { ApiClient } from "./ApiClient";
 
 const matchesClient = ApiClient("matches");
 
-const internalizeMatch = externalMatch => ({
+const internalizeMatch = (externalMatch) => ({
   ...externalMatch,
   startTime: new Date(externalMatch.startTime),
-  attendees: externalMatch.attendees || []
+  attendees: externalMatch.attendees || [],
 });
 
 const getMatches = (since, limit, includeAttendees = true) => {
   let matches = matchesClient.call(
     `matches?since=${since}&include-attendees=${includeAttendees}&limit=${limit}`
   );
-  return matches.then(x => x.matches.map(internalizeMatch));
+  return matches.then((x) => x.matches.map(internalizeMatch));
 };
 
 const getMatch = (id, includeAttendees = true) => {
@@ -20,7 +20,7 @@ const getMatch = (id, includeAttendees = true) => {
     `matches/${id}?include-attendees=${includeAttendees}`
   );
 
-  return match.then(x => internalizeMatch(x));
+  return match.then((x) => internalizeMatch(x));
 };
 
 const createMatch = ({
@@ -29,7 +29,7 @@ const createMatch = ({
   startTime,
   opponent,
   homeAway,
-  userIds
+  userIds,
 }) => {
   return matchesClient.callWithBody(
     "matches",
@@ -39,7 +39,7 @@ const createMatch = ({
       opponent,
       homeAway,
       comment,
-      userIds
+      userIds,
     },
     { method: "POST" }
   );
@@ -51,7 +51,7 @@ const updateMatch = ({
   comment,
   startTime,
   opponent,
-  homeAway
+  homeAway,
 }) => {
   return matchesClient.callWithBody(
     `matches/${id}`,
@@ -60,7 +60,7 @@ const updateMatch = ({
       location,
       opponent,
       homeAway,
-      comment
+      comment,
     },
     { method: "PUT" }
   );
@@ -71,5 +71,5 @@ export const matchesApiClient = {
   getMatches,
   getMatch,
   createMatch,
-  updateMatch
+  updateMatch,
 };

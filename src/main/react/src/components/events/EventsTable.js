@@ -18,11 +18,11 @@ import { EventsType } from "./utils";
 const useStyles = makeStyles(() =>
   createStyles({
     root: {
-      minWidth: "960px"
+      minWidth: "960px",
     },
     attendees: {
-      width: "20%"
-    }
+      width: "20%",
+    },
   })
 );
 
@@ -30,13 +30,13 @@ const EventsTable = ({
   eventsType,
   events,
   allowChanges = false,
-  updateTrigger
+  updateTrigger,
 }) => {
   const [goTo, setGoTo] = useState(undefined);
 
   const classes = useStyles();
 
-  const handleClickEditEvent = id => {
+  const handleClickEditEvent = (id) => {
     if (eventsType === EventsType.TRAINING) {
       setGoTo(`/admin/edit-training/${id}`);
     } else if (eventsType === EventsType.MATCH) {
@@ -74,7 +74,7 @@ const EventsTable = ({
   // TODO expand table for Match events (maybe split impl?)
   const getTableBodyTraining = () => (
     <>
-      {events.map(row => {
+      {events.map((row) => {
         return (
           <TableRow key={row.id}>
             <TableCell component="th" scope="row">
@@ -104,7 +104,7 @@ const EventsTable = ({
 
   const getTableBodyMatch = () => (
     <>
-      {events.map(row => {
+      {events.map((row) => {
         return (
           <TableRow key={row.id}>
             <TableCell component="th" scope="row">
@@ -137,7 +137,7 @@ const EventsTable = ({
 
   const getTableBodyOther = () => (
     <>
-      {events.map(row => {
+      {events.map((row) => {
         return (
           <TableRow key={row.id}>
             <TableCell component="th" scope="row">

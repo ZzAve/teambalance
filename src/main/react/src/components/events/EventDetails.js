@@ -20,14 +20,14 @@ const texts = {
     [EventsType.TRAINING]: "ophalen trainingsformulier",
     [EventsType.MATCH]: "ophalen wedstrijdformulier",
     [EventsType.MISC]: "ophalen eventformulier",
-    [EventsType.OTHER]: "ophalen ..."
+    [EventsType.OTHER]: "ophalen ...",
   },
   event_details_header: {
     [EventsType.TRAINING]: "Training Details",
     [EventsType.MATCH]: "Wedstrijd Details",
     [EventsType.MISC]: "Evenement Details",
-    [EventsType.OTHER]: "Details"
-  }
+    [EventsType.OTHER]: "Details",
+  },
 };
 
 const getText = (eventsType, name) => {
@@ -63,7 +63,7 @@ const EventDetails = ({ eventsType, location, id }) => {
           console.log(e);
           setMessage({
             message: `Er ging iets mis met het ophalen van data voor training ${id} `,
-            level: Message.ERROR
+            level: Message.ERROR,
           });
         }
       } else if (eventsType === EventsType.MATCH) {
@@ -74,7 +74,7 @@ const EventDetails = ({ eventsType, location, id }) => {
           console.log(e);
           setMessage({
             message: `Er ging iets mis met het ophalen van data voor wedstrijd ${id} `,
-            level: Message.ERROR
+            level: Message.ERROR,
           });
         }
       } else if (eventsType === EventsType.MISC) {
@@ -85,7 +85,7 @@ const EventDetails = ({ eventsType, location, id }) => {
           console.log(e);
           setMessage({
             message: `Er ging iets mis met het ophalen van data voor overig event ${id} `,
-            level: Message.ERROR
+            level: Message.ERROR,
           });
         }
       } else {
@@ -95,7 +95,7 @@ const EventDetails = ({ eventsType, location, id }) => {
         setEvent({});
         setMessage({
           message: `Dit type event word niet ondersteund. Are you a wizard 🧙‍♂️? ( event ${id} )`,
-          level: Message.ERROR
+          level: Message.ERROR,
         });
       }
     }
@@ -108,7 +108,7 @@ const EventDetails = ({ eventsType, location, id }) => {
     } catch (e) {
       setMessage({
         message: `Er ging iets mis met het ophalen van de gebruikers`,
-        level: Message.ERROR
+        level: Message.ERROR,
       });
     }
   };
@@ -146,5 +146,5 @@ export const Message = {
   SUCCESS: "success",
   INFO: "info",
   WARN: "warning",
-  ERROR: "error"
+  ERROR: "error",
 };

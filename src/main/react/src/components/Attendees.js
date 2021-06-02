@@ -13,16 +13,16 @@ import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { EventsType } from "./events/utils";
 import { withStyles } from "@material-ui/styles";
 
-const styledBy = (property, mapping) => props => mapping[props[property]];
+const styledBy = (property, mapping) => (props) => mapping[props[property]];
 
 const colorMap = {
   PRESENT: "primary",
   ABSENT: "secondary",
-  UNCERTAIN: "default"
+  UNCERTAIN: "default",
 };
 
 const additionalColorMap = {
-  UNCERTAIN: "tertiary"
+  UNCERTAIN: "tertiary",
 };
 
 const texts = {
@@ -30,8 +30,8 @@ const texts = {
     // [EventsType.TRAINING]: "Is {name} op de training?",
     // [EventsType.MATCH]: "Is {name} bij de wedstrijd?",
     // [EventsType.MISC]: "Is {name} erbij?",
-    [EventsType.OTHER]: "Is {name} erbij?"
-  }
+    [EventsType.OTHER]: "Is {name} erbij?",
+  },
 };
 
 const getSimpleText = (name, args) => {
@@ -42,9 +42,9 @@ const getText = (eventsType, name, args) => {
   return formatUnicorn(texts[name][typpe] || name)(args);
 };
 
-const formatUnicorn = unicorn => {
+const formatUnicorn = (unicorn) => {
   let str = unicorn;
-  return function() {
+  return function () {
     if (arguments.length) {
       let t = typeof arguments[0];
       let key;
@@ -66,20 +66,20 @@ const AttendeeStyledButton = withStyles({
   root: {
     "&:hover": {
       background: styledBy("additional-color", {
-        tertiary: "#cbb38a"
-      })
+        tertiary: "#cbb38a",
+      }),
     },
     background: styledBy("additional-color", {
-      tertiary: "#E8D5B5"
-    })
+      tertiary: "#E8D5B5",
+    }),
   },
   label: {
-    textTransform: "capitalize"
-  }
+    textTransform: "capitalize",
+  },
 })(Button);
 
-const buttonColor = state => colorMap[state] || "default";
-const additionalButtonColor = state => additionalColorMap[state] || "default";
+const buttonColor = (state) => colorMap[state] || "default";
+const additionalButtonColor = (state) => additionalColorMap[state] || "default";
 
 /**
  * Function Attendees component
@@ -88,14 +88,14 @@ const Attendees = ({
   attendees,
   onUpdate,
   size = "medium",
-  showSummary = false
+  showSummary = false,
 }) => {
   const [selectedAttendee, setSelectedAttendee] = useState(null);
   const [errorMessage, setErrorMessage] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [withAttendeeSummaryDetail, setAttendeeSummaryDetail] = useState(false);
 
-  const handleAttendeeClick = attendee => {
+  const handleAttendeeClick = (attendee) => {
     setSelectedAttendee(attendee);
   };
 
@@ -115,16 +115,16 @@ const Attendees = ({
   if (attendees == null) return "NO ATTENDEES";
   if (isLoading) return <SpinnerWithText text="Verwerken update" size={"sm"} />;
 
-  const getAttendeesSummary = attendees => {
-    const allPresent = attendees.filter(x => x.state === "PRESENT");
-    const coach = allPresent.filter(x =>
+  const getAttendeesSummary = (attendees) => {
+    const allPresent = attendees.filter((x) => x.state === "PRESENT");
+    const coach = allPresent.filter((x) =>
       ["TRAINER", "COACH"].includes(x.user.role)
     ).length;
     const allPlayers = allPresent.length - coach;
 
     let detail = "";
-    const numberOfAttendeesFor = role => {
-      return allPresent.filter(x => x.user.role === role).length;
+    const numberOfAttendeesFor = (role) => {
+      return allPresent.filter((x) => x.user.role === role).length;
     };
 
     if (withAttendeeSummaryDetail) {
@@ -145,7 +145,7 @@ const Attendees = ({
 
   const attendeeOverview = () => (
     <>
-      {attendees.map(it => (
+      {attendees.map((it) => (
         <Grid key={it.id} item>
           <Attendee
             size={size}
@@ -161,7 +161,7 @@ const Attendees = ({
             variant="outlined"
             color="default"
             onClick={() => {
-              setAttendeeSummaryDetail(x => !x);
+              setAttendeeSummaryDetail((x) => !x);
             }}
           >
             {getAttendeesSummary(attendees)}
@@ -221,11 +221,11 @@ const AttendeeRefinement = ({
   size,
   onSuccess,
   onFailure,
-  onBack
+  onBack,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleClick = availability =>
+  const handleClick = (availability) =>
     withLoading(setIsLoading, () =>
       attendeesApiClient.updateAttendee(attendee.id, availability)
     )
@@ -278,7 +278,7 @@ const AttendeeRefinement = ({
       <Grid item xs={12}>
         <Typography>
           {getSimpleText("is_present_on_event", {
-            name: attendee.user.name
+            name: attendee.user.name,
           })}
         </Typography>
       </Grid>

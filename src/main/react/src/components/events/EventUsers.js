@@ -8,24 +8,24 @@ import Checkbox from "@material-ui/core/Checkbox";
 
 export const ControlType = {
   CHECKBOX: "CHECKBOX",
-  SWITCH: "SWITCH"
+  SWITCH: "SWITCH",
 };
 export const EventUsers = ({
   event,
   users,
   controlType,
   setMessage,
-  setUserSelection
+  setUserSelection,
 }) => {
   const [singleUserCheck, setSingleUserCheck] = useState([]);
   const [allUsersCheckBox, setAllUsersCheckBox] = useState(false);
 
   useEffect(() => {
-    let attendeeUserIds = (event.attendees || []).map(it => it.user.id);
+    let attendeeUserIds = (event.attendees || []).map((it) => it.user.id);
 
     const selectedUserMap = {};
-    users.forEach(user => {
-      const checked = attendeeUserIds.some(it => it === user.id);
+    users.forEach((user) => {
+      const checked = attendeeUserIds.some((it) => it === user.id);
       selectedUserMap[user.id] = checked;
     });
 
@@ -36,13 +36,13 @@ export const EventUsers = ({
 
   useEffect(() => {
     let hasUncheckedUsers = Object.values(singleUserCheck).some(
-      it => it === false
+      (it) => it === false
     );
     setAllUsersCheckBox(!hasUncheckedUsers);
     setUserSelection(singleUserCheck);
   }, [singleUserCheck]);
 
-  const setAllUsersCheckedStateTo = async isChecked => {
+  const setAllUsersCheckedStateTo = async (isChecked) => {
     console.log(`Setting  all users to ${isChecked}`);
     const selectedUserMap = {};
     for (const user of users) {
@@ -50,27 +50,27 @@ export const EventUsers = ({
       await handleSingleAttendeeChange({
         target: {
           name: user.id,
-          checked: isChecked
-        }
+          checked: isChecked,
+        },
       });
     }
     return selectedUserMap;
   };
 
-  const handleAllAttendeesChange = async x => {
+  const handleAllAttendeesChange = async (x) => {
     let isChecked = x.target.checked;
     await setAllUsersCheckedStateTo(isChecked);
   };
 
-  const handleSingleAttendeeChange = async x => {
+  const handleSingleAttendeeChange = async (x) => {
     const userId = x.target.name;
     const isChecked = x.target.checked;
 
     if (singleUserCheck[userId] === isChecked) return;
 
-    setSingleUserCheck(prevState => ({
+    setSingleUserCheck((prevState) => ({
       ...prevState,
-      [userId]: isChecked
+      [userId]: isChecked,
     }));
 
     if (controlType === ControlType.SWITCH) {
@@ -78,30 +78,30 @@ export const EventUsers = ({
         if (isChecked) {
           await attendeesApiClient.addAttendee({
             eventId: event.id,
-            userId: userId
+            userId: userId,
           });
         } else {
           await attendeesApiClient.removeAttendee({
             eventId: event.id,
-            userId: userId
+            userId: userId,
           });
         }
 
         setMessage({
           message: `💪 Geüpdate `,
-          level: Message.SUCCESS
+          level: Message.SUCCESS,
         });
       } catch (e) {
         console.error(e);
         setMessage({
           message: `Er ging iets mis met het updaten van de speler. `,
-          level: Message.ERROR
+          level: Message.ERROR,
         });
 
         //Revert state
-        setSingleUserCheck(prevState => ({
+        setSingleUserCheck((prevState) => ({
           ...prevState,
-          [userId]: !isChecked
+          [userId]: !isChecked,
         }));
       }
     }
@@ -129,7 +129,7 @@ export const EventUsers = ({
           label="Iedereen"
         />
       </Grid>
-      {users.map(it => (
+      {users.map((it) => (
         <Grid item key={it.id}>
           <FormControlLabel
             key={it.id}

@@ -10,7 +10,7 @@ export const fetchWithTimeout = (uri, options = {}, time = 5000) => {
   const timeout = setTimeout(() => {
     controller.abort();
   }, time);
-  return fetch(uri, config).catch(error => {
+  return fetch(uri, config).catch((error) => {
     // When we abort our `fetch`, the controller conveniently throws a named
     // error, allowing us to handle them separately from other errors.
     if (error.name === "AbortError") {

@@ -7,7 +7,7 @@ import { EventsType, HomeAway } from "./utils";
 
 const EventsList = ({ eventsType, events, updateTrigger }) => (
   <Grid container spacing={5}>
-    {events.map(it => (
+    {events.map((it) => (
       <Grid key={it.id} item xs={12}>
         <EventListItem
           eventsType={eventsType}

@@ -30,10 +30,10 @@ const updateAttendee = (attendeeId, availability) => {
       attendeesClient.defaultTimeout,
       250
     )
-    .then(data => {
+    .then((data) => {
       return data;
     })
-    .catch(e => {
+    .catch((e) => {
       // TODO: Error handling
       console.error(e);
     });
@@ -43,5 +43,5 @@ export const attendeesApiClient = {
   ...attendeesClient,
   addAttendee,
   removeAttendee,
-  updateAttendee
+  updateAttendee,
 };

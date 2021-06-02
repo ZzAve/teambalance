@@ -35,7 +35,7 @@ export const Transactions = ({ refresh }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {transactions.map(row => (
+          {transactions.map((row) => (
             <TableRow key={row.id}>
               <TableCell component="th" scope="row">
                 {row.date.toLocaleString()}
