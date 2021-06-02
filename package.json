@@ -46,7 +46,7 @@
     "webpack-dev-server": "3.11.2"
   },
   "scripts": {
-    "start": "webpack-dev-server --mode development --host 0.0.0.0",
+    "start": "webpack serve --mode development --host 0.0.0.0",
     "build": "webpack --mode production ./src/main/react",
     "lint": "prettier --check './src/main/react/**/*.js' ",
     "test": "echo \"Error: no test specified\" && exit 1"
