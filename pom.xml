@@ -15,7 +15,7 @@
     <description>Personal project to monitor team expenses on beer and brown fruit</description>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <kotlin.version>1.5.10</kotlin.version>
         <!-- installed node/npm version: lts/carbon -->
         <node.version>v12.18.0</node.version>
