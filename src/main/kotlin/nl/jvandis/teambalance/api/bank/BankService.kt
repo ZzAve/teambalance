@@ -4,6 +4,7 @@ import com.bunq.sdk.model.generated.`object`.Amount
 import com.bunq.sdk.model.generated.endpoint.Payment
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
+import nl.jvandis.teambalance.api.users.User
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
@@ -40,7 +41,8 @@ data class BankCacheConfig(
 @Service
 class BankService(
     @Lazy private val bunqRepository: BunqRepository,
-    private val bankCacheConfig: BankCacheConfig,
+    private val bankAccountAliasRepository: BankAccountAliasRepository,
+    bankCacheConfig: BankCacheConfig,
     @Value("\${app.bank.bank-account-id}") private val bankAccountId: Int,
     @Value("\${app.bank.transaction-limit}") private val transactionLimit: Int
 
@@ -68,8 +70,9 @@ class BankService(
 
     private fun updateTransactions(accountId: Int): Transactions {
         return bunqRepository.getAllPayment(accountId, transactionLimit).let {
+            val aliases = getAllAliases()
             Transactions(
-                transactions = it.map { payment -> payment.toDomain() },
+                transactions = it.map { payment -> payment.toDomain(aliases) },
                 limit = it.size
             )
         }.also {
@@ -77,32 +80,12 @@ class BankService(
         }
     }
 
-    fun getPotters(since: ZonedDateTime): Potters {
-        val relevantTransactions = getTransactions().transactions
-            .filter {
-                it.date > since &&
-                    it.type == TransactionType.DEBIT &&
-                    it.currency == "€"
-            }
-
-        val potters = relevantTransactions
-            .groupBy { x -> x.counterParty }
-            .map { Potter(it.key, it.value) }
-
-        return Potters(
-            potters = potters,
-            currency = "€",
-            amountOfTransactions = relevantTransactions.size,
-            from = since,
-            until = if (relevantTransactions.isNotEmpty()) relevantTransactions.last().date else since
-        )
-    }
-
-    private fun Payment.toDomain() = Transaction(
+    private fun Payment.toDomain(aliases: Map<String, User>) = Transaction(
         id = id,
         type = toTransactionType(),
         currency = amount.parseCurrency(),
         amount = amount.value,
+        user = counterpartyAlias.displayName.getAlias(aliases),
         counterParty = counterpartyAlias.displayName,
         date = created.toZonedDateTime()
     )
@@ -132,5 +115,13 @@ class BankService(
             .expireAfterWrite(config.expireAfterWrite)
             .apply { if (config.refreshAfterWrite != null) refreshAfterWrite(config.refreshAfterWrite) }
             .maximumSize(if (config.enabled) config.maximumSize else 0)
-            .buildAsync<K, V> { key -> loadingFunction(key) }
+            .buildAsync { key -> loadingFunction(key) }
+
+    private fun String.getAlias(aliases: Map<String, User>): User? {
+        return aliases[this]
+    }
+
+    private fun getAllAliases() = bankAccountAliasRepository
+        .findAll()
+        .associate { it.alias to it.user }
 }

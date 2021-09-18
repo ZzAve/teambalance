@@ -16,8 +16,6 @@ app:
         refresh-after-write: 30s
         maximum-size: 1
 
-
-
 server:
   forward-headers-strategy: NATIVE
 spring:

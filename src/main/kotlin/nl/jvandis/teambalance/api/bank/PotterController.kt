@@ -4,7 +4,6 @@ import io.swagger.annotations.Api
 import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.SECRET_HEADER
 import nl.jvandis.teambalance.api.SecretService
-import org.slf4j.LoggerFactory
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -23,44 +22,43 @@ import javax.validation.constraints.Min
 
 @RestController
 @Validated
-@Api(value = "Bank", tags = ["bank"])
+@Api(value = "Aliases", tags = ["aliases", "bank"])
 @RequestMapping(path = ["/api/bank"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class BankController(
-    private val bankService: BankService,
+class PotterController(
+    private val potterService: PotterService,
     private val secretService: SecretService
 ) {
-    private val log = LoggerFactory.getLogger(javaClass)
 
-    @GetMapping("/balance")
-    fun getBalance(
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
-    ): BalanceResponse {
-        secretService.ensureSecret(secret)
-
-        return bankService.getBalance().toResponse()
-    }
-
-    @GetMapping("/transactions")
-    fun getTransactions(
+    @GetMapping("/potters")
+    fun getPotters(
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?,
-        @RequestParam(value = "limit", defaultValue = "10") @Max(50) @Min(1) limit: Int
-    ): TransactionsResponse {
+        @RequestParam(value = "limit", defaultValue = "3") @Max(200) @Min(1) limit: Int,
+        @RequestParam(value = "sort", defaultValue = "desc") sort: Sort,
+        @RequestParam(value = "since", defaultValue = "2021-08-01T00:00:00+02:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) sinceInput: ZonedDateTime
+    ): PottersResponse {
         secretService.ensureSecret(secret)
 
-        return bankService.getTransactions(limit, 0).let {
-            TransactionsResponse(transactions = it.transactions.toResponse())
+        val sinceLowerLimit = ZonedDateTime.of(2021, 7, 31, 23, 59, 59, 0, ZoneId.of("Europe/Paris"))
+        if (sinceInput < sinceLowerLimit) {
+            throw IllegalArgumentException("Since input argument is before lower limit of $sinceLowerLimit. Input was $sinceInput")
         }
+        return potterService.getPotters(sinceInput).toPottersResponse(limit)
     }
 
-    private fun String.toResponse() = BalanceResponse(this)
+    private fun Potters.toPottersResponse(limit: Int) = PottersResponse(
+        toppers = potters.map { it.toPotterResponse(currency) }.sortedByDescending { it.amount }.take(limit),
+        floppers = potters.map { it.toPotterResponse(currency) }.sortedBy { it.amount }.take(limit),
+        amountOfConsideredTransactions = amountOfTransactions,
+        from = from,
+        until = until
+    )
 
-    private fun List<Transaction>.toResponse() = map {
-        TransactionResponse(
-            id = it.id,
-            type = it.type,
-            amount = "${it.currency} ${it.amount}",
-            counterParty = it.user?.name ?: it.counterParty,
-            timestamp = it.date.toEpochSecond()
+    private fun Potter.toPotterResponse(currency: String): PotterResponse {
+        val cumulativeAmount = transactions.fold(0.0) { acc, cur -> acc + cur.amount.toDouble() }
+        return PotterResponse(
+            name = name,
+            currency = currency,
+            amount = cumulativeAmount
         )
     }
 
