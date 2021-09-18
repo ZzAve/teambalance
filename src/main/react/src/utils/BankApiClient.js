@@ -14,6 +14,17 @@ const getTransactions = () => {
     .then((data) => internalize(data.transactions) || []);
 };
 
+const getPotters = () => {
+  return bankClient
+      .call("bank/potters")
+      .catch(x =>{
+        console.log(x)
+        return x
+      });
+      // .then((data) => internalizePotters(data.potters) || []);
+
+};
+
 const internalize = (transactions) => {
   return transactions.map((transaction) => ({
     id: transaction.id,
@@ -23,8 +34,20 @@ const internalize = (transactions) => {
   }));
 };
 
+const internalizePotters = (potters) => {
+  console.log(JSON.stringify(potters,null,4));
+  return potters.map((transaction) => ({
+    id: transaction.id,
+    amount: transaction.amount,
+    counterParty: transaction.counterParty,
+    date: new Date(transaction.timestamp * 1000),
+  }));
+};
+
+
 export const BankApiClient = {
   ...bankClient,
   getBalance,
   getTransactions,
+  getPotters,
 };

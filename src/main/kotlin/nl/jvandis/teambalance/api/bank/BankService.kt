@@ -53,14 +53,14 @@ class BankService(
 
     fun getBalance(): String = balanceCache[bankAccountId].get()
 
-    fun getTransactions(limit: Int, offset: Int = 0): Transactions =
+    fun getTransactions(limit: Int = transactionLimit, offset: Int = 0): Transactions =
         transactionsCache[bankAccountId].get()
             .filter(limit, offset)
 
     private fun updateBalance(accountId: Int): String {
         return bunqRepository.getMonetaryAccountBank(accountId).balance
             .let {
-                parseAmount(it)
+                "${it.parseCurrency()} ${it.value}"
             }.also {
                 bunqRepository.updateContext()
             }
@@ -77,16 +77,41 @@ class BankService(
         }
     }
 
+    fun getPotters(since: ZonedDateTime): Potters {
+        val relevantTransactions = getTransactions().transactions
+            .filter {
+                it.date > since &&
+                    it.type == TransactionType.DEBIT &&
+                    it.currency == "€"
+            }
+
+        val potters = relevantTransactions
+            .groupBy { x -> x.counterParty }
+            .map { Potter(it.key, it.value) }
+
+        return Potters(
+            potters = potters,
+            currency = "€",
+            amountOfTransactions = relevantTransactions.size,
+            from = since,
+            until = if (relevantTransactions.isNotEmpty()) relevantTransactions.last().date else since
+        )
+    }
+
     private fun Payment.toDomain() = Transaction(
         id = id,
-        amount = parseAmount(amount),
+        type = toTransactionType(),
+        currency = amount.parseCurrency(),
+        amount = amount.value,
         counterParty = counterpartyAlias.displayName,
         date = created.toZonedDateTime()
     )
 
-    private fun parseAmount(balance: Amount): String {
-        val currencySymbol = if (balance.currency == "EUR") "€" else balance.currency
-        return "$currencySymbol ${balance.value}"
+    private fun Payment.toTransactionType() =
+        if (amount.value.startsWith("-")) TransactionType.CREDIT else TransactionType.DEBIT
+
+    private fun Amount.parseCurrency(): String {
+        return if (currency == "EUR") "€" else currency
     }
 
     private fun String.toZonedDateTime() =

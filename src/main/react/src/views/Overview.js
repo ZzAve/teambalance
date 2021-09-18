@@ -1,6 +1,7 @@
 import Grid from "@material-ui/core/Grid";
 import Balance from "../components/Balance";
 import Topup from "../components/Topup";
+import Potters from "../components/Potters";
 import PageItem from "../components/PageItem";
 import { Button, Card, CardHeader } from "@material-ui/core";
 import Transactions from "../components/Transactions";
@@ -135,6 +136,15 @@ const Overview = ({ refresh }) => {
               </Grid>
             </Grid>
           </PageItem>
+          <Grid item xs={12}>
+            <PageItem title="Potters">
+              <Grid item container spacing={3} xs={12}>
+                <Grid item xs={12}>
+              <Potters refresh={refresh} />
+                </Grid>
+              </Grid>
+            </PageItem>
+          </Grid>
           <Grid item xs={12}>
             <Card>
               <CardHeader title="Transacties" />
