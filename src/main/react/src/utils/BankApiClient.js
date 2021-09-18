@@ -10,7 +10,7 @@ const getBalance = () => {
 
 const getTransactions = () => {
   return bankClient
-    .call("bank/transactions")
+    .call("bank/transactions?limit=20")
     .then((data) => internalize(data.transactions) || []);
 };
 
