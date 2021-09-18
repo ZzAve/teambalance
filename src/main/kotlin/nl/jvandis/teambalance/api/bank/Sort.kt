@@ -19,6 +19,6 @@ enum class Sort {
 
 class StringToEnumConverter : Converter<String, Sort> {
     override fun convert(source: String): Sort {
-        return Sort.fromValue(source);
+        return Sort.fromValue(source)
     }
 }

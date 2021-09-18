@@ -62,7 +62,7 @@ class BankController(
         secretService.ensureSecret(secret)
 
         val sinceLowerLimit = ZonedDateTime.of(2021, 7, 31, 23, 59, 59, 0, ZoneId.of("Europe/Paris"))
-        if (sinceInput < sinceLowerLimit){
+        if (sinceInput < sinceLowerLimit) {
             throw IllegalArgumentException("Since input argument is before lower limit of $sinceLowerLimit. Input was $sinceInput")
         }
         return bankService.getPotters(sinceInput).toPottersResponse(limit)
@@ -105,6 +105,4 @@ class BankController(
                     reason = e.message ?: "Bad request"
                 )
             )
-
-
 }
