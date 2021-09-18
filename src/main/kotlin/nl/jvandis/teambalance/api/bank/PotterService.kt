@@ -38,13 +38,12 @@ class PotterService(
         bankService.getTransactions().transactions
             .filter {
                 it.date > since &&
-                        it.type == TransactionType.DEBIT &&
-                        it.currency == "€"
+                    it.type == TransactionType.DEBIT &&
+                    it.currency == "€"
             }
             .filter { (it.user != null) && !irrelevantTeamRoles.contains(it.user.role) }
 
     companion object {
         private val irrelevantTeamRoles = setOf(Role.COACH, Role.TRAINER, Role.OTHER)
     }
-
 }

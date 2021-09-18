@@ -11,7 +11,6 @@ import javax.persistence.ManyToOne
 import javax.persistence.Table
 import javax.persistence.UniqueConstraint
 
-
 data class BankAccountAliases(
     val bankAccountAliases: List<BankAccountAlias>
 )
@@ -22,7 +21,7 @@ data class BankAccountAlias(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
     @Column(nullable = false, name = "alias") val alias: String,
     @ManyToOne @JoinColumn(name = "USER_ID") val user: User
-    ){
+) {
 
-    constructor(alias: String, user: User) : this(0,alias,user)
+    constructor(alias: String, user: User) : this(0, alias, user)
 }

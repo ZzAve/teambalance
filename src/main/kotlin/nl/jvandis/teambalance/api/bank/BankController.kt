@@ -5,7 +5,6 @@ import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.SECRET_HEADER
 import nl.jvandis.teambalance.api.SecretService
 import org.slf4j.LoggerFactory
-import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 

@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 import kotlin.random.Random
 
 @Configuration
-@Profile("never ") //don't use class unless 'never' profile is activated
+@Profile("never ") // don't use class unless 'never' profile is activated
 class Initializer(
     private val userRepository: UserRepository,
     private val eventRepository: EventRepository,
@@ -92,7 +92,6 @@ class Initializer(
             }
 
             log.info("After attendee additions", attendeeRepository.findAll())
-
 
             bankAccountAliasRepository.saveAll(
                 listOf(

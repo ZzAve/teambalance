@@ -40,7 +40,7 @@ class BankAccountAliasController(
         log.debug("getAliases")
         secretService.ensureSecret(secret)
 
-        //TODO add filter on userId
+        // TODO add filter on userId
         return BankAccountAliases(bankAccountAliases = bankAccountAliasRepository.findAll())
     }
 
@@ -88,8 +88,6 @@ class BankAccountAliasController(
         val user = userRepository.findByIdOrNull(this.userId) ?: throw InvalidUserException(userId)
         return BankAccountAlias(name, user)
     }
-
-
 }
 
 data class PotentialBankAccountAlias(
