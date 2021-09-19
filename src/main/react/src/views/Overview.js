@@ -134,17 +134,14 @@ const Overview = ({ refresh }) => {
               <Grid item xs={12}>
                 <Topup />
               </Grid>
+              <Grid item xs={12}>
+                <Typography>Wie spekt de pot het meeste en verdient een pluim?</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Potters refresh={refresh} />
+              </Grid>
             </Grid>
           </PageItem>
-          <Grid item xs={12}>
-            <PageItem title="Potters">
-              <Grid item container spacing={3} xs={12}>
-                <Grid item xs={12}>
-              <Potters refresh={refresh} />
-                </Grid>
-              </Grid>
-            </PageItem>
-          </Grid>
           <Grid item xs={12}>
             <Card>
               <CardHeader title="Transacties" />
