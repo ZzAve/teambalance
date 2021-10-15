@@ -39,7 +39,7 @@ const Login = ({ location, handleRefresh }) => {
   useEffect(() => {
     console.debug(`Current state:
             authenticated: ${isAuthenticated}
-            input: ${randomChars(Math.max(input.length, 0))}
+            input: ${randomChars(Math.max((input||"").length, 0))}
             isLoading: ${isLoading}
       `);
   }, [input]);
