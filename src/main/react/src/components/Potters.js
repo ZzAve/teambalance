@@ -6,9 +6,9 @@ import Typography from "@material-ui/core/Typography";
 import { Grid } from "@material-ui/core";
 
 export const Potters = ({ refresh }) => {
-  const [toppers, setToppers] = useState({});
-  const [floppers, setFloppers] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [toppers, setToppers] = useState([]);
+  const [floppers, setFloppers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     withLoading(setIsLoading, () =>
@@ -25,30 +25,33 @@ export const Potters = ({ refresh }) => {
 
   function renderItem(item, prefix) {
     return (
-      <Grid item xs={12} container spacing={1} alignItems={"center"}>
-        <Grid item xs={2}>
-          <Typography variant={"h4"}>{prefix}</Typography>
+      item && (
+        <Grid item xs={12} container spacing={1} alignItems={"center"}>
+          <Grid item xs={2}>
+            <Typography variant={"h4"}>{prefix}</Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <Typography>
+              {item.currency} {Number(item.amount).toFixed(2)}
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography>{item.name}</Typography>
+          </Grid>
         </Grid>
-        <Grid item xs={4}>
-          <Typography>
-            {item.currency} {Number(item.amount).toFixed(2)}
-          </Typography>
-        </Grid>
-        <Grid item xs={6}>
-          <Typography>{item.name}</Typography>
-        </Grid>
-      </Grid>
+      )
     );
   }
 
-  const renderTop3 = (items, title, prefixes) => (
-    <Grid container item xs={12} sm={6} spacing={1}>
-      <Typography variant={"h6"}>{title}</Typography>
-      {renderItem(items[0] || {}, prefixes[0])}
-      {renderItem(items[1] || {}, prefixes[1])}
-      {renderItem(items[2] || {}, prefixes[2])}
-    </Grid>
-  );
+  const renderTop3 = (items, title, prefixes) =>
+    Array.isArray(items) && items.length > 0 && (
+      <Grid container item xs={12} sm={6} spacing={1}>
+        <Typography variant={"h6"}>{title}</Typography>
+        {renderItem(items[0], prefixes[0])}
+        {renderItem(items[1], prefixes[1])}
+        {renderItem(items[2], prefixes[2])}
+      </Grid>
+    );
 
   return (
     <Grid container spacing={1}>
