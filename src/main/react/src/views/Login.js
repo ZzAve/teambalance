@@ -18,15 +18,21 @@ const Login = ({ location, handleRefresh }) => {
   useEffect(() => {
     //On startup , try with current value in authenticationManager
     setTimeout(() => {
-      authenticationManager.checkAuthentication().then((isAuth) => {
-        console.debug(
-          `Checked authentiation: user is ${
-            isAuth ? "" : "NOT"
-          } authenticated (${isAuth})`
-        );
-        setIsLoading(false);
-        setIsAuthenticated(isAuth);
-      });
+      authenticationManager
+        .checkAuthentication()
+        .then((isAuth) => {
+          console.debug(
+            `Checked authentiation: user is ${
+              isAuth ? "" : "NOT"
+            } authenticated (${isAuth})`
+          );
+          setIsLoading(false);
+          setIsAuthenticated(isAuth);
+        })
+        .finally(() => {
+          setInput(authenticationManager.get());
+        });
+      
     });
   }, []);
 

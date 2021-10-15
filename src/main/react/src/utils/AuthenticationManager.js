@@ -53,14 +53,15 @@ const getSecret = () => _secret;
 const isAuthenticated = () => _authenticated;
 const checkAuthentication = () => _authenticationCheck;
 
-const _doAuthenticate = (passphrase) =>
-  authenticationApiClient.authenticate(passphrase).then((result) => {
+const _doAuthenticate = (passphrase) =>{
+  setSecret(passphrase);
+  return authenticationApiClient.authenticate(passphrase).then((result) => {
     console.log(`Successful authentication ${result.message}`);
-    setSecret(passphrase);
   });
+}
 
 const authenticate = (passphrase) => {
-  let isAuthenticated = _doAuthenticate(passphrase);
+  let isAuthenticated = recursiveAuth(passphrase);
 
   _authenticationCheck = new Promise((resolve) =>
     isAuthenticated
@@ -103,7 +104,7 @@ const recursiveAuth = async (pass, number = 1) => {
 const startupAuth = (passphrase) => {
   _authenticationCheck = new Promise((resolve) => {
     return recursiveAuth(passphrase)
-      .then((result) => {
+      .then((_) => {
         _authenticated = true;
         resolve(true);
       })

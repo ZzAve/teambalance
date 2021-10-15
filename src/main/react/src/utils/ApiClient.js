@@ -1,7 +1,7 @@
 import { fetchWithTimeout } from "./fetchWithTimeout";
 import { delay } from "./util";
 import { authenticationManager } from "./AuthenticationManager";
-import { InvalidSecretException } from "./Exceptions";
+import {InvalidSecretException, TimeoutError} from "./Exceptions";
 
 const DEFAULT_TIMEOUT = 5000; //ms
 const DEFAULT_MIN_DELAY = 250; //ms
@@ -23,6 +23,10 @@ const _throwIfNotOk = (path, res) => {
       console.log("Status was 403");
       // setAuthenticated(false);
       throw new InvalidSecretException("nope");
+    }
+
+    if (res.status === 504) {
+      throw new TimeoutError("Respnse timed out")
     }
 
     throw Error(
