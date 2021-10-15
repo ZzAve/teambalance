@@ -30,7 +30,7 @@ const Login = ({ location, handleRefresh }) => {
           setIsAuthenticated(isAuth);
         })
         .finally(() => {
-          setInput(authenticationManager.get());
+          setInput(authenticationManager.get() || "");
         });
       
     });
