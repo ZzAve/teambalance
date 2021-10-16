@@ -1,6 +1,6 @@
 import Grid from "@material-ui/core/Grid";
 import PageItem from "../components/PageItem";
-import {Button, Card, CardContent, CardHeader} from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
@@ -29,15 +29,15 @@ const TransactionsPage = ({ refresh }) => {
           </Button>
         </PageItem>
       </Grid>
-        <Grid container item xs={12}>
-            <PageItem title="Potters">
-                <Potters refresh={refresh}/>
-            </PageItem>
-        </Grid>
       <Grid container item xs={12}>
-          <PageItem title="Transacties">
-            <Transactions refresh={refresh} withPagination={true} />
-          </PageItem>
+        <PageItem title="Potters">
+          <Potters refresh={refresh} />
+        </PageItem>
+      </Grid>
+      <Grid container item xs={12}>
+        <PageItem title="Transacties">
+          <Transactions refresh={refresh} withPagination={true} />
+        </PageItem>
       </Grid>
     </Grid>
   );

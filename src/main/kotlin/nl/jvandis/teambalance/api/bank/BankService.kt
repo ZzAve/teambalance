@@ -5,7 +5,6 @@ import com.bunq.sdk.model.generated.endpoint.Payment
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import nl.jvandis.teambalance.api.users.User
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.context.annotation.Lazy
@@ -36,7 +35,6 @@ data class BankBunqConfig(
     val saveSessionToFile: Boolean = false
 )
 
-
 @ConstructorBinding
 @ConfigurationProperties("app.bank")
 data class BankConfig(
@@ -46,7 +44,6 @@ data class BankConfig(
     val transactionLimit: Int,
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) val dateTimeLimit: ZonedDateTime
 )
-
 
 /**
  * BankService resolves bankrelated questions
@@ -81,7 +78,7 @@ class BankService(
             }
     }
 
-    //TODO: Fetch all transactions up to datelimit
+    // TODO: Fetch all transactions up to datelimit
     private fun updateTransactions(accountId: Int): Transactions {
         return bunqRepository.getAllPayment(accountId, bankConfig.transactionLimit).let {
             val aliases = getAllAliases()
@@ -94,8 +91,8 @@ class BankService(
             )
         }
             .also {
-            bunqRepository.updateContext()
-        }
+                bunqRepository.updateContext()
+            }
     }
 
     private fun Payment.toDomain(aliases: Map<String, User>) = Transaction(
