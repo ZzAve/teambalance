@@ -24,6 +24,7 @@ const getPotters = () => {
 const internalize = (transactions) => {
   return transactions.map((transaction) => ({
     id: transaction.id,
+    type: transaction.type,
     amount: transaction.amount,
     counterParty: transaction.counterParty,
     date: new Date(transaction.timestamp * 1000),

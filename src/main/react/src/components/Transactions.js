@@ -8,11 +8,25 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { SpinnerWithText } from "./SpinnerWithText";
 import { BankApiClient as bankApiClient } from "../utils/BankApiClient";
-import { withLoading } from "../utils/util";
+import {formattedDate, formattedTime, withLoading} from "../utils/util";
+import {createStyles, makeStyles} from "@material-ui/core";
+
+const useStyles = makeStyles(() =>
+    createStyles({
+      DEBIT: {
+        color: "green",
+      },
+      CREDIT: {
+        color: "red",
+      },
+    })
+);
 
 export const Transactions = ({ refresh }) => {
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const classes = useStyles();
 
   useEffect(() => {
     withLoading(setIsLoading, () =>
@@ -30,7 +44,8 @@ export const Transactions = ({ refresh }) => {
         <TableHead>
           <TableRow>
             <TableCell>Datum</TableCell>
-            <TableCell align="right">Wie</TableCell>
+            <TableCell>Tijd</TableCell>
+            <TableCell>Wie</TableCell>
             <TableCell align="right">Bedrag</TableCell>
           </TableRow>
         </TableHead>
@@ -38,10 +53,13 @@ export const Transactions = ({ refresh }) => {
           {transactions.map((row) => (
             <TableRow key={row.id}>
               <TableCell component="th" scope="row">
-                {row.date.toLocaleString()}
+                {formattedDate(row.date, { year: "numeric", weekday: "short",})}
               </TableCell>
-              <TableCell align="right">{row.counterParty}</TableCell>
-              <TableCell align="right">{row.amount}</TableCell>
+              <TableCell>
+                {formattedTime(row.date)}
+              </TableCell>
+              <TableCell>{row.counterParty}</TableCell>
+              <TableCell className={classes[row.type]} align="right">{row.amount}</TableCell>
             </TableRow>
           ))}
         </TableBody>

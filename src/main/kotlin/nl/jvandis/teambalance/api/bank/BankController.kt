@@ -55,7 +55,7 @@ class BankController(
         TransactionResponse(
             id = it.id,
             type = it.type,
-            amount = "${it.currency} ${it.amount}",
+            amount = "${it.currency}\u00A0${it.amount}", // non breakable whitespace
             counterParty = it.user?.name ?: it.counterParty,
             timestamp = it.date.toEpochSecond()
         )
