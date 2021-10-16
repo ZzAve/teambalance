@@ -4,7 +4,7 @@ import { authenticationManager } from "./AuthenticationManager";
 import {InvalidSecretException, TimeoutError} from "./Exceptions";
 
 const DEFAULT_TIMEOUT = 5000; //ms
-const DEFAULT_MIN_DELAY = 250; //ms
+const DEFAULT_MIN_DELAY = 400; //ms
 
 const _mergeFetchOptions = (options, secret) => ({
   ...options,

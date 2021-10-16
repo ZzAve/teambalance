@@ -19,42 +19,42 @@ export const Potters = ({ refresh }) => {
     ).then();
   }, [refresh]);
 
-  if (isLoading) {
-    return <SpinnerWithText text="ophalen potters" />;
-  }
-
-  function renderItem(item, prefix) {
-    return (
-      item && (
-        <Grid item xs={12} container spacing={1} alignItems={"center"}>
-          <Grid item xs={2}>
-            <Typography variant={"h4"}>{prefix}</Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography>
-              {item.currency} {Number(item.amount).toFixed(2)}
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography>{item.name}</Typography>
-          </Grid>
+  const renderItem = (item, prefix) =>
+    item && (
+      <Grid item xs={12} container alignItems={"center"}>
+        <Grid item xs={2}>
+          <Typography variant={"h4"}>{prefix}</Typography>
         </Grid>
-      )
+        <Grid item xs={4}>
+          <Typography>
+            {item.currency} {Number(item.amount).toFixed(2)}
+          </Typography>
+        </Grid>
+        <Grid item xs={6}>
+          <Typography>{item.name}</Typography>
+        </Grid>
+      </Grid>
     );
-  }
 
   const renderTop3 = (items, title, prefixes) =>
-    Array.isArray(items) && items.length > 0 && (
-      <Grid container item xs={12} sm={6} spacing={1}>
-        <Typography variant={"h6"}>{title}</Typography>
+    Array.isArray(items) &&
+    items.length > 0 && (
+      <Grid container item xs={12} sm={6}>
+        <Grid item>
+          <Typography variant={"h6"}>{title}</Typography>
+        </Grid>
         {renderItem(items[0], prefixes[0])}
         {renderItem(items[1], prefixes[1])}
         {renderItem(items[2], prefixes[2])}
       </Grid>
     );
 
+  if (isLoading) {
+    return <SpinnerWithText text="ophalen potters" />;
+  }
+
   return (
-    <Grid container spacing={1}>
+    <Grid item container spacing={2}>
       {renderTop3(toppers, "Toppers (van het seizoen)", ["🥇", "🥈", "🥉"])}
       {renderTop3(floppers, "Floppers (van het seizoen)", ["🐷", "🐗", "🐖"])}
     </Grid>

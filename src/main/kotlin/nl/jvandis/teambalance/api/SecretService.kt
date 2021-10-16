@@ -9,7 +9,7 @@ const val SECRET_HEADER = "X-Secret"
 
 @Service
 class SecretService(
-    @Value("\${app.bank.secret-value}") private val validSecretValue: String
+    @Value("\${app.secret.secret-value}") private val validSecretValue: String
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 

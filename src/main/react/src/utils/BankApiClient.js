@@ -8,9 +8,9 @@ const getBalance = () => {
     .then((data) => data.balance || "€ XX,XX");
 };
 
-const getTransactions = () => {
+const getTransactions = (limit = 20, offset= 0) => {
   return bankClient
-    .call("bank/transactions?limit=20")
+    .call(`bank/transactions?limit=${limit}&offset=${offset}`)
     .then((data) => internalize(data.transactions) || []);
 };
 

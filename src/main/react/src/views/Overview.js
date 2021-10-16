@@ -3,7 +3,7 @@ import Balance from "../components/Balance";
 import Topup from "../components/Topup";
 import Potters from "../components/Potters";
 import PageItem from "../components/PageItem";
-import { Button, Card, CardHeader } from "@material-ui/core";
+import {Button, Card, createStyles, makeStyles} from "@material-ui/core";
 import Transactions from "../components/Transactions";
 import React, { useState } from "react";
 import Events from "../components/events/Events";
@@ -14,8 +14,20 @@ import Hidden from "@material-ui/core/Hidden";
 import Typography from "@material-ui/core/Typography";
 import { EventsType } from "../components/events/utils";
 
+
+const useStyles = makeStyles(() =>
+    createStyles({
+      transactions: {
+        padding: "16px",
+      },
+    })
+);
+
+
 const Overview = ({ refresh }) => {
   const [goTo, setGoTo] = useState(undefined);
+
+  const classes = useStyles();
 
   if (goTo !== undefined) {
     return <Redirect to={goTo} />;
@@ -143,11 +155,26 @@ const Overview = ({ refresh }) => {
             </Grid>
           </PageItem>
           <Grid item xs={12}>
-            <Card>
-              <CardHeader title="Transacties" />
-            </Card>
-            <Card>
-              <Transactions refresh={refresh} />
+            <Card className={classes.transactions}>
+              <Grid container item spacing={3}>
+                <Grid container item xs={12} justify={"space-between"}>
+                  <Grid item>
+                    <Typography variant="h5">Transacties</Typography>
+                  </Grid>
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => setGoTo("/transactions")}
+                    >
+                      Meer
+                    </Button>
+                  </Grid>
+                </Grid>
+                <Grid item xs={12}>
+                  <Transactions refresh={refresh} />
+                </Grid>
+              </Grid>
             </Card>
           </Grid>
           <Grid item container spacing={2}>

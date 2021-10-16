@@ -19,6 +19,7 @@ import Typography from "@material-ui/core/Typography";
 const Admin = lazy(() => import("./views/Admin.js"));
 const Login = lazy(() => import("./views/Login.js"));
 const Overview = lazy(() => import("./views/Overview.js"));
+const Transaction = lazy(() => import( "./views/TransactionsPage"));
 
 const App = () => {
   const [topBarShouldRefresh, setTopBarShouldRefresh] = useState(false);
@@ -82,6 +83,11 @@ const App = () => {
                   eventsType={EventsType.MATCH}
                   component={EventsPage}
                   refresh={shouldRefresh}
+                />
+                <PrivateRoute
+                    path="/transactions"
+                    component={Transaction}
+                    refresh={shouldRefresh}
                 />
                 <PrivateRoute
                   path="/misc-events"

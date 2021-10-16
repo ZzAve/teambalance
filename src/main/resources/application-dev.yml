@@ -1,6 +1,7 @@
 app:
   bank:
-    saveSessionToFile: true
+    bunq:
+      saveSessionToFile: true
 
 spring:
   jpa:

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.context.annotation.Lazy
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.stereotype.Service
 import java.time.Duration
 import java.time.ZoneId
@@ -25,12 +26,27 @@ data class CacheConfig(
     val maximumSize: Long
 )
 
-@ConstructorBinding
-@ConfigurationProperties("app.bank.cache")
 data class BankCacheConfig(
     val balance: CacheConfig,
     val transactions: CacheConfig
 )
+
+data class BankBunqConfig(
+    val apiKey: String,
+    val saveSessionToFile: Boolean = false
+)
+
+
+@ConstructorBinding
+@ConfigurationProperties("app.bank")
+data class BankConfig(
+    val bunq: BankBunqConfig,
+    val cache: BankCacheConfig,
+    val bankAccountId: Int,
+    val transactionLimit: Int,
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) val dateTimeLimit: ZonedDateTime
+)
+
 
 /**
  * BankService resolves bankrelated questions
@@ -42,21 +58,18 @@ data class BankCacheConfig(
 class BankService(
     @Lazy private val bunqRepository: BunqRepository,
     private val bankAccountAliasRepository: BankAccountAliasRepository,
-    bankCacheConfig: BankCacheConfig,
-    @Value("\${app.bank.bank-account-id}") private val bankAccountId: Int,
-    @Value("\${app.bank.transaction-limit}") private val transactionLimit: Int
-
+    private val bankConfig: BankConfig
 ) {
     private val balanceCache: AsyncLoadingCache<Int, String> =
-        setupCache(bankCacheConfig.balance) { accountId: Int -> updateBalance(accountId) }
+        setupCache(bankConfig.cache.balance) { accountId: Int -> updateBalance(accountId) }
 
     private val transactionsCache: AsyncLoadingCache<Int, Transactions> =
-        setupCache(bankCacheConfig.transactions) { accountId: Int -> updateTransactions(accountId) }
+        setupCache(bankConfig.cache.transactions) { accountId: Int -> updateTransactions(accountId) }
 
-    fun getBalance(): String = balanceCache[bankAccountId].get()
+    fun getBalance(): String = balanceCache[bankConfig.bankAccountId].get()
 
-    fun getTransactions(limit: Int = transactionLimit, offset: Int = 0): Transactions =
-        transactionsCache[bankAccountId].get()
+    fun getTransactions(limit: Int = bankConfig.transactionLimit, offset: Int = 0): Transactions =
+        transactionsCache[bankConfig.bankAccountId].get()
             .filter(limit, offset)
 
     private fun updateBalance(accountId: Int): String {
@@ -68,14 +81,19 @@ class BankService(
             }
     }
 
+    //TODO: Fetch all transactions up to datelimit
     private fun updateTransactions(accountId: Int): Transactions {
-        return bunqRepository.getAllPayment(accountId, transactionLimit).let {
+        return bunqRepository.getAllPayment(accountId, bankConfig.transactionLimit).let {
             val aliases = getAllAliases()
+            val transactions = it.map { payment -> payment.toDomain(aliases) }
+                .filter { t -> t.date > bankConfig.dateTimeLimit }
+
             Transactions(
-                transactions = it.map { payment -> payment.toDomain(aliases) },
-                limit = it.size
+                transactions = transactions,
+                limit = transactions.size
             )
-        }.also {
+        }
+            .also {
             bunqRepository.updateContext()
         }
     }
@@ -102,7 +120,7 @@ class BankService(
 
     private fun Transactions.filter(limit: Int, offset: Int): Transactions {
         val allowedUpperLimit = min(transactions.size, offset + limit)
-        val allowedLowerLimit = min(transactions.size - 1, offset)
+        val allowedLowerLimit = min(transactions.size, offset)
         val filteredTransactions = transactions.subList(allowedLowerLimit, allowedUpperLimit)
         return Transactions(
             transactions = filteredTransactions,

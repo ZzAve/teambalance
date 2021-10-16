@@ -40,12 +40,14 @@ class BankController(
     @GetMapping("/transactions")
     fun getTransactions(
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?,
-        @RequestParam(value = "limit", defaultValue = "10") @Max(50) @Min(1) limit: Int
+        @RequestParam(value = "limit", defaultValue = "10") @Max(50) @Min(1) limit: Int,
+        @RequestParam(value = "offset", defaultValue = "0") @Max(1000) @Min(0) offset: Int
     ): TransactionsResponse {
         secretService.ensureSecret(secret)
 
-        return bankService.getTransactions(limit, 0).let {
-            TransactionsResponse(transactions = it.transactions.toResponse())
+        return bankService.getTransactions(limit, offset).let {
+            val transactionResponses = it.transactions.toResponse()
+            TransactionsResponse(transactions = transactionResponses)
         }
     }
 

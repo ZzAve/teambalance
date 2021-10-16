@@ -2,7 +2,6 @@ package nl.jvandis.teambalance.api.bank
 
 import com.bunq.sdk.context.ApiEnvironmentType
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
@@ -10,13 +9,15 @@ import org.springframework.context.annotation.Lazy
 @Lazy
 @Configuration
 class BunqConfiguration(
-    @Value("\${app.bank.api-key}") private val apiKey: String,
-    @Value("\${app.bank.saveSessionToFile:false}") private val saveSessionToFile: Boolean
+    private val bankConfig: BankConfig
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Bean
     fun bunqLib(): BunqRepository {
+        val apiKey = bankConfig.bunq.apiKey
+        val saveSessionToFile = bankConfig.bunq.saveSessionToFile
+
         log.info("Using api-key '${apiKey.substring(0, 5)}******${apiKey.substring(apiKey.length - 5)}'")
         return try {
             BunqRepository(ApiEnvironmentType.PRODUCTION, apiKey, saveSessionToFile)
