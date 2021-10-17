@@ -14,9 +14,9 @@ const getTransactions = (limit = 20, offset= 0) => {
     .then((data) => internalize(data.transactions) || []);
 };
 
-const getPotters = () => {
+const getPotters = (limit = 3) => {
   return bankClient
-      .call("bank/potters")
+      .call(`bank/potters?limit=${limit}`)
       .then((data) => data || {toppers:[], floppers:[]});
 
 };

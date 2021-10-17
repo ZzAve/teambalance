@@ -155,9 +155,8 @@ const Overview = ({ refresh }) => {
             </Grid>
           </PageItem>
           <Grid item xs={12}>
-            <Card className={classes.transactions}>
-              <Grid container item spacing={3}>
-                <Grid container item xs={12} justify={"space-between"}>
+            <Card>
+                <Grid container item xs={12} justify={"space-between"} className={classes.transactions}>
                   <Grid item>
                     <Typography variant="h5">Transacties</Typography>
                   </Grid>
@@ -170,10 +169,9 @@ const Overview = ({ refresh }) => {
                       Meer
                     </Button>
                   </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                  <Transactions refresh={refresh} />
-                </Grid>
+              </Grid>
+              <Grid item xs={12}>
+                <Transactions refresh={refresh} />
               </Grid>
             </Card>
           </Grid>

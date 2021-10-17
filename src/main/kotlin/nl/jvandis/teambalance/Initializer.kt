@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 import kotlin.random.Random
 
 @Configuration
-@Profile("never ") // don't use class unless 'never' profile is activated
+@Profile("dev") // don't use class unless 'never' profile is activated
 class Initializer(
     private val userRepository: UserRepository,
     private val eventRepository: EventRepository,
@@ -36,10 +36,12 @@ class Initializer(
         return InitializingBean {
             userRepository.saveAll(
                 listOf(
-                    User("Julius", Role.DIAGONAL /*bankAccountAliases = listOf("Julius","Henk")*/),
+                    User("Julius", Role.DIAGONAL),
                     User("Maurice", Role.COACH),
                     User("Bocaj", Role.MID),
-                    User("Joep", Role.PASSER)
+                    User("Joep", Role.PASSER),
+                    User("Roger", Role.PASSER),
+                    User("Pardoes", Role.COACH),
                 )
             )
 
@@ -96,7 +98,9 @@ class Initializer(
             bankAccountAliasRepository.saveAll(
                 listOf(
                     BankAccountAlias("J. van Dis", users.first { it.name == "Julius" }),
-                    BankAccountAlias("J. Post", users.first { it.name == "Bocaj" })
+                    BankAccountAlias("J. Post", users.first { it.name == "Bocaj" }),
+                    BankAccountAlias("Hr E. Fens", users.first { it.name == "Martijn" }),
+                    BankAccountAlias("M.A. Haga", users.first { it.name == "Joep" })
                 )
             )
 

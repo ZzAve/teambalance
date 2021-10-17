@@ -5,14 +5,14 @@ import { withLoading } from "../utils/util";
 import Typography from "@material-ui/core/Typography";
 import { Grid } from "@material-ui/core";
 
-export const Potters = ({ refresh }) => {
+export const Potters = ({ refresh, limit = 3 }) => {
   const [toppers, setToppers] = useState([]);
   const [floppers, setFloppers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     withLoading(setIsLoading, () =>
-      bankApiClient.getPotters().then((x) => {
+      bankApiClient.getPotters(limit).then((x) => {
         setFloppers(x.floppers);
         setToppers(x.toppers);
       })
@@ -21,9 +21,9 @@ export const Potters = ({ refresh }) => {
 
   const renderItem = (item, prefix) =>
     item && (
-      <Grid item xs={12} container alignItems={"center"}>
+      <Grid item xs={12} container  alignItems={"center"}>
         <Grid item xs={2}>
-          <Typography variant={"h4"}>{prefix}</Typography>
+          <Typography  align={"center"} variant={"h4"}>{prefix}</Typography>
         </Grid>
         <Grid item xs={4}>
           <Typography>
@@ -36,16 +36,16 @@ export const Potters = ({ refresh }) => {
       </Grid>
     );
 
-  const renderTop3 = (items, title, prefixes) =>
+  const renderItems = (items, title, prefixes) =>
     Array.isArray(items) &&
     items.length > 0 && (
       <Grid container item xs={12} sm={6}>
         <Grid item>
           <Typography variant={"h6"}>{title}</Typography>
         </Grid>
-        {renderItem(items[0], prefixes[0])}
-        {renderItem(items[1], prefixes[1])}
-        {renderItem(items[2], prefixes[2])}
+          {items.map((item,i) =>
+              (renderItem(item, prefixes[i] || prefixes[prefixes.length-1] || i + 1 ))
+          )}
       </Grid>
     );
 
@@ -55,8 +55,8 @@ export const Potters = ({ refresh }) => {
 
   return (
     <Grid item container spacing={2}>
-      {renderTop3(toppers, "Toppers (van het seizoen)", ["🥇", "🥈", "🥉"])}
-      {renderTop3(floppers, "Floppers (van het seizoen)", ["🐷", "🐗", "🐖"])}
+      {renderItems(toppers, "Toppers (van het seizoen)", ["🥇", "🥈", "🥉", ""])}
+      {renderItems(floppers, "Floppers (van het seizoen)", ["🐷", "🐗", "🐖"])}
     </Grid>
   );
 };

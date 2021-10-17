@@ -12,12 +12,10 @@ import {
 import { PrivateRoute } from "../components/PrivateRoute";
 import Loading from "./Loading";
 import { ViewType } from "../utils/util";
-import { Button } from "@material-ui/core";
+import { Button, createStyles, makeStyles } from "@material-ui/core";
 import Hidden from "@material-ui/core/Hidden";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import EventDetails from "../components/events/EventDetails";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItem from "@material-ui/core/ListItem";
 import List from "@material-ui/core/List";
 import AddIcon from "@material-ui/icons/Add";
 import { EventsType } from "../components/events/utils";
@@ -54,9 +52,25 @@ const getText = (eventsType, name) => {
   return texts[name][typpe] || name;
 };
 
+const useStyles = makeStyles((theme) =>
+    createStyles({
+      menu: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        width:"100%",
+
+        '& > a': {
+            textDecoration: "none"
+        }
+      },
+    })
+);
+
 const Admin = ({ refresh }) => {
   const [goBack, triggerGoBack] = useState(false);
 
+  const classes = useStyles();
   if (goBack) {
     return <Redirect to="/" />;
   }
@@ -78,32 +92,27 @@ const Admin = ({ refresh }) => {
       </PageItem>
 
       <Router>
-        <PageItem title="TOC" md={6}>
-          <List component="nav" aria-label="main mailbox folders">
-            <Link to="/admin">
-              <ListItem button>
-                <ListItemText primary="Admin" />
-              </ListItem>
-            </Link>
+        <Grid item xs={12}>
 
+          <List component="nav" aria-label="Admin menu" className={classes.menu}>
             <Link to="/admin/trainings">
-              <ListItem button>
-                <ListItemText primary="Trainingen" />
-              </ListItem>
+              <Button variant="outlined" color="primary">
+                Trainingen
+              </Button>
             </Link>
 
             <Link to="/admin/matches">
-              <ListItem button>
-                <ListItemText primary="Wedstrijden" />
-              </ListItem>
+              <Button variant="outlined" color="primary">
+                Wedstrijden
+              </Button>
             </Link>
             <Link to="/admin/misc-events">
-              <ListItem button>
-                <ListItemText primary="Overige events" />
-              </ListItem>
+              <Button variant="outlined" color="primary">
+                Overige events
+              </Button>
             </Link>
           </List>
-        </PageItem>
+        </Grid>
 
         <Switch>
           <PrivateRoute
@@ -262,14 +271,9 @@ const NewEvent = ({ eventsType, location }) => {
 
 const HiAdmin = ({}) => {
   return (
-    <PageItem title="Hi admin">
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Typography variant="body1"> Je bent een admin</Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <img src="https://media.giphy.com/media/Ufc2geerZac4U/giphy.gif" />
-        </Grid>
+    <PageItem>
+      <Grid container spacing={2} justify="center">
+        <img src="https://media.giphy.com/media/Ufc2geerZac4U/giphy.gif" />
       </Grid>
     </PageItem>
   );

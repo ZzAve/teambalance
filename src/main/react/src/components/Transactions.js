@@ -14,6 +14,8 @@ import {
   makeStyles,
   TableFooter,
   TablePagination,
+  useMediaQuery,
+  useTheme,
 } from "@material-ui/core";
 
 const useStyles = makeStyles(() =>
@@ -25,8 +27,11 @@ const useStyles = makeStyles(() =>
       color: "red",
     },
     hidden: {
-      display: "none"
-    }
+      display: "none",
+    },
+    full: {
+      width: "100%",
+    },
   })
 );
 
@@ -37,6 +42,7 @@ export const Transactions = ({ refresh, withPagination = false, initialRowsPerPa
   const [rowsPerPage, setRowsPerPage] = useState(initialRowsPerPage);
 
   const classes = useStyles();
+  const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
 
   useEffect(() => {
     withLoading(setIsLoading, () =>
@@ -61,11 +67,10 @@ export const Transactions = ({ refresh, withPagination = false, initialRowsPerPa
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label="simple table">
+      <Table className={classes.full} aria-label="betalingen en inleg voor de teampot">
         <TableHead>
           <TableRow>
             <TableCell>Datum</TableCell>
-            <TableCell>Tijd</TableCell>
             <TableCell>Wie</TableCell>
             <TableCell align="right">Bedrag</TableCell>
           </TableRow>
@@ -74,9 +79,9 @@ export const Transactions = ({ refresh, withPagination = false, initialRowsPerPa
           {transactions.map((row) => (
             <TableRow key={row.id}>
               <TableCell component="th" scope="row">
-                {formattedDate(row.date, { year: "numeric", weekday: "short" })}
+                {formattedDate(row.date, { year: "numeric", weekday: "short" })}&nbsp;
+                {formattedTime(row.date)}
               </TableCell>
-              <TableCell>{formattedTime(row.date)}</TableCell>
               <TableCell>{row.counterParty}</TableCell>
               <TableCell className={classes[row.type]} align="right">
                 {row.amount}
@@ -88,7 +93,7 @@ export const Transactions = ({ refresh, withPagination = false, initialRowsPerPa
         <TableFooter className={withPagination ? '': classes.hidden}>
           <TableRow>
             <TablePagination
-              rowsPerPageOptions={[10, 20, 50]}
+              rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
               // colSpan={3}
               count={transactions.length === rowsPerPage ? -1 : page*rowsPerPage + transactions.length}
               rowsPerPage={rowsPerPage}

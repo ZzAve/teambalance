@@ -36,7 +36,6 @@ const EventsPage = ({ eventsType, refresh }) => {
   return (
     <Grid item container spacing={2}>
       <Grid container item xs={12}>
-        <PageItem title="Terug naar het overzicht">
           <Button
             variant="contained"
             color="primary"
@@ -45,7 +44,6 @@ const EventsPage = ({ eventsType, refresh }) => {
             <ArrowBackIcon />
             <Hidden xsDown>Terug </Hidden>
           </Button>
-        </PageItem>
       </Grid>
       <Grid container item xs={12}>
         <PageItem title={getText(eventsType, "coming_events")}>
