@@ -5,7 +5,7 @@ import { withLoading } from "../utils/util";
 import Typography from "@material-ui/core/Typography";
 import { Grid } from "@material-ui/core";
 
-export const Potters = ({ refresh, limit = 3 }) => {
+export const Potters = ({ refresh, limit = 3, showFloppers = true }) => {
   const [toppers, setToppers] = useState([]);
   const [floppers, setFloppers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,7 +56,7 @@ export const Potters = ({ refresh, limit = 3 }) => {
   return (
     <Grid item container spacing={2}>
       {renderItems(toppers, "Toppers (van het seizoen)", ["🥇", "🥈", "🥉", ""])}
-      {renderItems(floppers, "Floppers (van het seizoen)", ["🐷", "🐗", "🐖"])}
+      {showFloppers && renderItems(floppers, "Floppers (van het seizoen)", ["🐷", "🐗", "🐖"])}
     </Grid>
   );
 };

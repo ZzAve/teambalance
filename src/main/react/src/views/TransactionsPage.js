@@ -52,7 +52,7 @@ const TransactionsPage = ({ refresh }) => {
       </Grid>
       <Grid container item xs={12}>
         <PageItem title="Potters">
-          <Potters refresh={refresh} limit={10} />
+          <Potters refresh={refresh} limit={10}  showFloppers={false}/>
         </PageItem>
       </Grid>
     </Grid>
