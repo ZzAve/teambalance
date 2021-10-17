@@ -10,7 +10,15 @@ import TableBody from "@material-ui/core/TableBody";
 import React, { useState } from "react";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { Button, createStyles, makeStyles } from "@material-ui/core";
+import {
+    Button,
+    createStyles,
+    makeStyles,
+    TableFooter,
+    TablePagination,
+    useMediaQuery,
+    useTheme
+} from "@material-ui/core";
 import { Redirect } from "react-router-dom";
 import Attendees from "../Attendees";
 import { EventsType } from "./utils";
@@ -33,8 +41,21 @@ const EventsTable = ({
   updateTrigger,
 }) => {
   const [goTo, setGoTo] = useState(undefined);
+  const [page, setPage] = useState(0); // get from url?
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const classes = useStyles();
+  const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
+
+    const handleChangePage = (event, page) => {
+        console.log(`onPageChange was called for page ${page}`, event);
+        setPage(page);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
   const handleClickEditEvent = (id) => {
     if (eventsType === EventsType.TRAINING) {
@@ -74,7 +95,7 @@ const EventsTable = ({
   // TODO expand table for Match events (maybe split impl?)
   const getTableBodyTraining = () => (
     <>
-      {events.map((row) => {
+      {events.slice(page*rowsPerPage,(page+1)*rowsPerPage).map((row) => {
         return (
           <TableRow key={row.id}>
             <TableCell component="th" scope="row">
@@ -214,16 +235,52 @@ const EventsTable = ({
             <>
               <TableHead>{getTableHeadTraining()}</TableHead>
               <TableBody>{getTableBodyTraining()}</TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
+                    count={events.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onChangePage={handleChangePage}
+                    onChangeRowsPerPage={handleChangeRowsPerPage}
+                  />
+                </TableRow>
+              </TableFooter>
             </>
           ) : eventsType === EventsType.MATCH ? (
             <>
               <TableHead>{getTableHeadMatch()}</TableHead>
               <TableBody>{getTableBodyMatch()}</TableBody>
+                <TableFooter>
+                    <TableRow>
+                        <TablePagination
+                            rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
+                            count={events.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onChangePage={handleChangePage}
+                            onChangeRowsPerPage={handleChangeRowsPerPage}
+                        />
+                    </TableRow>
+                </TableFooter>
             </>
           ) : eventsType === EventsType.MISC ? (
             <>
               <TableHead>{getTableHeadOther()}</TableHead>
               <TableBody>{getTableBodyOther()}</TableBody>
+                <TableFooter>
+                    <TableRow>
+                        <TablePagination
+                            rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
+                            count={events.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onChangePage={handleChangePage}
+                            onChangeRowsPerPage={handleChangeRowsPerPage}
+                        />
+                    </TableRow>
+                </TableFooter>
             </>
           ) : (
             "🤷‍♂️"
