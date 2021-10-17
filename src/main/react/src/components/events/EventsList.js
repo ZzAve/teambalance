@@ -1,23 +1,48 @@
 import Grid from "@material-ui/core/Grid";
-import React from "react";
+import React, { useState } from "react";
 import Typography from "@material-ui/core/Typography";
 import Attendees from "../Attendees";
 import { formattedDate, formattedTime } from "../../utils/util";
 import { EventsType, HomeAway } from "./utils";
+import { TablePagination, useMediaQuery, useTheme } from "@material-ui/core";
 
-const EventsList = ({ eventsType, events, updateTrigger }) => (
-  <Grid container spacing={5}>
-    {events.map((it) => (
-      <Grid key={it.id} item xs={12}>
-        <EventListItem
-          eventsType={eventsType}
-          event={it}
-          onUpdate={updateTrigger}
-        />
-      </Grid>
-    ))}
-  </Grid>
-);
+const EventsList = ({ eventsType, events, updateTrigger }) => {
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
+
+  const handleChangePage = (event, page) => {
+    console.log(`onPageChange was called for page ${page}`, event);
+    setPage(page);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+  return (
+    <Grid container spacing={5}>
+      {events.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map((it) => (
+        <Grid key={it.id} item xs={12}>
+          <EventListItem
+            eventsType={eventsType}
+            event={it}
+            onUpdate={updateTrigger}
+          />
+        </Grid>
+      ))}
+      <TablePagination
+        rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
+        count={events.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+      />
+    </Grid>
+  );
+};
 
 function formattedHomeVsAway(event) {
   return (

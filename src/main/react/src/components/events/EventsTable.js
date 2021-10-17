@@ -99,9 +99,7 @@ const EventsTable = ({
         return (
           <TableRow key={row.id}>
             <TableCell component="th" scope="row">
-              {formattedDate(new Date(row.startTime))}
-            </TableCell>
-            <TableCell align="right">
+              {formattedDate(new Date(row.startTime))}&nbsp;
               {formattedTime(new Date(row.startTime))}
             </TableCell>
             <TableCell align="right">{row.location}</TableCell>
@@ -129,9 +127,7 @@ const EventsTable = ({
         return (
           <TableRow key={row.id}>
             <TableCell component="th" scope="row">
-              {formattedDate(new Date(row.startTime))}
-            </TableCell>
-            <TableCell align="right">
+              {formattedDate(new Date(row.startTime))}&nbsp;
               {formattedTime(new Date(row.startTime))}
             </TableCell>
             <TableCell align="right">{row.opponent}</TableCell>
@@ -162,9 +158,7 @@ const EventsTable = ({
         return (
           <TableRow key={row.id}>
             <TableCell component="th" scope="row">
-              {formattedDate(new Date(row.startTime))}
-            </TableCell>
-            <TableCell align="right">
+              {formattedDate(new Date(row.startTime))}&nbsp;
               {formattedTime(new Date(row.startTime))}
             </TableCell>
             <TableCell align="right">{row.title}</TableCell>
@@ -195,7 +189,6 @@ const EventsTable = ({
   const getTableHeadTraining = () => (
     <TableRow>
       <TableCell>Datum</TableCell>
-      <TableCell align="right">Tijd</TableCell>
       <TableCell align="right">Location</TableCell>
       <TableCell align="right">Opmerking</TableCell>
       <TableCell align="center">Deelnemers</TableCell>
@@ -206,7 +199,6 @@ const EventsTable = ({
   const getTableHeadMatch = () => (
     <TableRow>
       <TableCell>Datum</TableCell>
-      <TableCell align="right">Tijd</TableCell>
       <TableCell align="right">Tegenstander</TableCell>
       <TableCell align="right">Location</TableCell>
       <TableCell align="right">Opmerking</TableCell>
@@ -218,7 +210,6 @@ const EventsTable = ({
   const getTableHeadOther = () => (
     <TableRow>
       <TableCell>Datum</TableCell>
-      <TableCell align="right">Tijd</TableCell>
       <TableCell align="right">Titel</TableCell>
       <TableCell align="right">Location</TableCell>
       <TableCell align="right">Opmerking</TableCell>
@@ -235,56 +226,35 @@ const EventsTable = ({
             <>
               <TableHead>{getTableHeadTraining()}</TableHead>
               <TableBody>{getTableBodyTraining()}</TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TablePagination
-                    rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
-                    count={events.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onChangePage={handleChangePage}
-                    onChangeRowsPerPage={handleChangeRowsPerPage}
-                  />
-                </TableRow>
-              </TableFooter>
+
             </>
           ) : eventsType === EventsType.MATCH ? (
             <>
               <TableHead>{getTableHeadMatch()}</TableHead>
               <TableBody>{getTableBodyMatch()}</TableBody>
-                <TableFooter>
-                    <TableRow>
-                        <TablePagination
-                            rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
-                            count={events.length}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onChangePage={handleChangePage}
-                            onChangeRowsPerPage={handleChangeRowsPerPage}
-                        />
-                    </TableRow>
-                </TableFooter>
+
             </>
           ) : eventsType === EventsType.MISC ? (
             <>
               <TableHead>{getTableHeadOther()}</TableHead>
               <TableBody>{getTableBodyOther()}</TableBody>
-                <TableFooter>
-                    <TableRow>
-                        <TablePagination
-                            rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
-                            count={events.length}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onChangePage={handleChangePage}
-                            onChangeRowsPerPage={handleChangeRowsPerPage}
-                        />
-                    </TableRow>
-                </TableFooter>
+
             </>
           ) : (
             "🤷‍♂️"
           )}
+            <TableFooter>
+                <TableRow>
+                    <TablePagination
+                        rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
+                        count={events.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onChangePage={handleChangePage}
+                        onChangeRowsPerPage={handleChangeRowsPerPage}
+                    />
+                </TableRow>
+            </TableFooter>
         </Table>
       </TableContainer>
     </Grid>
