@@ -52,7 +52,7 @@ const getText = (eventsType, name) => {
   return texts[name][typpe] || name;
 };
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles(() =>
     createStyles({
       menu: {
         display: "flex",
@@ -274,7 +274,7 @@ const HiAdmin = ({}) => {
   return (
     <PageItem>
       <Grid container spacing={2} justify="center">
-        <img src="https://media.giphy.com/media/Ufc2geerZac4U/giphy.gif" />
+        <img alt="Walt from Breaking Bad telling you who's admin" src="https://media.giphy.com/media/Ufc2geerZac4U/giphy.gif" />
       </Grid>
     </PageItem>
   );
