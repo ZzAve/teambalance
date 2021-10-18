@@ -31,6 +31,7 @@ const Events = ({
   eventsType = EventsType.OTHER,
   refresh,
   view,
+  withPagination,
   allowChanges = false,
   limit = 1,
 }) => {
@@ -78,6 +79,7 @@ const Events = ({
             eventsType={eventsType}
             events={events}
             updateTrigger={updateEvents}
+            withPagination={withPagination}
           />
         </Grid>
       </Grid>
@@ -90,6 +92,7 @@ const Events = ({
           events={events}
           updateTrigger={updateEvents}
           allowChanges={allowChanges}
+          withPagination={withPagination}
         />
       </Grid>
     );

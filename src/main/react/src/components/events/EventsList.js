@@ -4,26 +4,20 @@ import Typography from "@material-ui/core/Typography";
 import Attendees from "../Attendees";
 import { formattedDate, formattedTime } from "../../utils/util";
 import { EventsType, HomeAway } from "./utils";
-import { TablePagination, useMediaQuery, useTheme } from "@material-ui/core";
+import { Pagination } from "@material-ui/lab";
 
-const EventsList = ({ eventsType, events, updateTrigger }) => {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+const EventsList = ({ eventsType, events, updateTrigger, withPagination }) => {
+  const [page, setPage] = useState(1);
 
-  const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
+  const rowsPerPage = 10;
 
   const handleChangePage = (event, page) => {
     console.log(`onPageChange was called for page ${page}`, event);
     setPage(page);
   };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
   return (
     <Grid container spacing={5}>
-      {events.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map((it) => (
+      {events.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((it) => (
         <Grid key={it.id} item xs={12}>
           <EventListItem
             eventsType={eventsType}
@@ -32,14 +26,13 @@ const EventsList = ({ eventsType, events, updateTrigger }) => {
           />
         </Grid>
       ))}
-      <TablePagination
-        rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
-        count={events.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onChangePage={handleChangePage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
-      />
+      {withPagination && (
+        <Pagination
+          count={Math.ceil(events.length / rowsPerPage)}
+          page={page}
+          onChange={handleChangePage}
+        />
+      )}
     </Grid>
   );
 };

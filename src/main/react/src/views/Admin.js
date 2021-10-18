@@ -223,6 +223,7 @@ const EventsOverview = ({ eventsType, refresh }) => {
             view={ViewType.Table}
             allowChanges={true}
             limit={50}
+            withPagination={true}
           />
         </Grid>
       </Grid>

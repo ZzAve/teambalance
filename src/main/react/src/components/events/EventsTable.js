@@ -39,6 +39,7 @@ const EventsTable = ({
   events,
   allowChanges = false,
   updateTrigger,
+  withPagination,
 }) => {
   const [goTo, setGoTo] = useState(undefined);
   const [page, setPage] = useState(0); // get from url?
@@ -47,15 +48,15 @@ const EventsTable = ({
   const classes = useStyles();
   const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
 
-    const handleChangePage = (event, page) => {
-        console.log(`onPageChange was called for page ${page}`, event);
-        setPage(page);
-    };
+  const handleChangePage = (event, page) => {
+    console.log(`onPageChange was called for page ${page}`, event);
+    setPage(page);
+  };
 
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const handleClickEditEvent = (id) => {
     if (eventsType === EventsType.TRAINING) {
@@ -95,7 +96,7 @@ const EventsTable = ({
   // TODO expand table for Match events (maybe split impl?)
   const getTableBodyTraining = () => (
     <>
-      {events.slice(page*rowsPerPage,(page+1)*rowsPerPage).map((row) => {
+      {events.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map((row) => {
         return (
           <TableRow key={row.id}>
             <TableCell component="th" scope="row">
@@ -226,35 +227,34 @@ const EventsTable = ({
             <>
               <TableHead>{getTableHeadTraining()}</TableHead>
               <TableBody>{getTableBodyTraining()}</TableBody>
-
             </>
           ) : eventsType === EventsType.MATCH ? (
             <>
               <TableHead>{getTableHeadMatch()}</TableHead>
               <TableBody>{getTableBodyMatch()}</TableBody>
-
             </>
           ) : eventsType === EventsType.MISC ? (
             <>
               <TableHead>{getTableHeadOther()}</TableHead>
               <TableBody>{getTableBodyOther()}</TableBody>
-
             </>
           ) : (
             "🤷‍♂️"
           )}
+          {withPagination && (
             <TableFooter>
-                <TableRow>
-                    <TablePagination
-                        rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
-                        count={events.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onChangePage={handleChangePage}
-                        onChangeRowsPerPage={handleChangeRowsPerPage}
-                    />
-                </TableRow>
+              <TableRow>
+                <TablePagination
+                  rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
+                  count={events.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onChangePage={handleChangePage}
+                  onChangeRowsPerPage={handleChangeRowsPerPage}
+                />
+              </TableRow>
             </TableFooter>
+          )}
         </Table>
       </TableContainer>
     </Grid>

@@ -76,6 +76,7 @@ const EventsPage = ({ eventsType, refresh }) => {
                 refresh={refresh}
                 view={showList ? ViewType.List : ViewType.Table}
                 limit={50}
+                withPagination={true}
               />
             </Grid>
           </Grid>

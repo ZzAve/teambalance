@@ -19,9 +19,9 @@ export const Potters = ({ refresh, limit = 3, showFloppers = true }) => {
     ).then();
   }, [refresh]);
 
-  const renderItem = (item, prefix) =>
+  const renderItem = (item, prefix, index) =>
     item && (
-      <Grid item xs={12} container  alignItems={"center"}>
+      <Grid item xs={12} container  alignItems={"center"} key={index}>
         <Grid item xs={2}>
           <Typography  align={"center"} variant={"h4"}>{prefix}</Typography>
         </Grid>
@@ -44,7 +44,7 @@ export const Potters = ({ refresh, limit = 3, showFloppers = true }) => {
           <Typography variant={"h6"}>{title}</Typography>
         </Grid>
           {items.map((item,i) =>
-              (renderItem(item, prefixes[i] || prefixes[prefixes.length-1] || i + 1 ))
+              (renderItem(item, prefixes[i] || prefixes[prefixes.length-1] || i + 1 , i))
           )}
       </Grid>
     );

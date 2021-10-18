@@ -29,11 +29,12 @@ const Login = ({ location, handleRefresh }) => {
           setIsLoading(false);
           setIsAuthenticated(isAuth);
         })
-        .finally(() => {
+        .catch(() => {
           setInput(authenticationManager.get() || "");
         });
-      
+
     });
+
   }, []);
 
   useEffect(() => {

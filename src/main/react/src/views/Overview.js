@@ -50,6 +50,7 @@ const Overview = ({ refresh }) => {
                   refresh={refresh}
                   view={ViewType.List}
                   limit={2}
+                  withPagination={false}
                 />
               </Grid>
               <Grid
@@ -83,6 +84,7 @@ const Overview = ({ refresh }) => {
                   refresh={refresh}
                   view={ViewType.List}
                   limit={2}
+                  withPagination={false}
                 />
               </Grid>
               <Grid
@@ -114,6 +116,7 @@ const Overview = ({ refresh }) => {
                   refresh={refresh}
                   view={ViewType.List}
                   limit={2}
+                  withPagination={false}
                 />
               </Grid>
               <Grid
