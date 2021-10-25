@@ -5,6 +5,8 @@ import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.attendees.Availability
 import nl.jvandis.teambalance.api.bank.BankAccountAlias
 import nl.jvandis.teambalance.api.bank.BankAccountAliasRepository
+import nl.jvandis.teambalance.api.bank.BankAccountTransactionExclusionRepository
+import nl.jvandis.teambalance.api.bank.TransactionExclusion
 import nl.jvandis.teambalance.api.event.EventRepository
 import nl.jvandis.teambalance.api.training.Training
 import nl.jvandis.teambalance.api.users.Role
@@ -24,7 +26,8 @@ class Initializer(
     private val userRepository: UserRepository,
     private val eventRepository: EventRepository,
     private val attendeeRepository: AttendeeRepository,
-    private val bankAccountAliasRepository: BankAccountAliasRepository
+    private val bankAccountAliasRepository: BankAccountAliasRepository,
+    private val bankAccountTransactionExclusionRepository: BankAccountTransactionExclusionRepository
 
 ) {
 
@@ -107,6 +110,10 @@ class Initializer(
             log.info("After alias injection")
             val aliases = bankAccountAliasRepository.findAll()
             log.info("All aliases: ", aliases)
+
+            bankAccountTransactionExclusionRepository.saveAll(listOf(
+                TransactionExclusion(counterParty = "CCV*BUITEN IN DE KUIL")
+            ))
         }
     }
 }

@@ -5,6 +5,7 @@ import com.bunq.sdk.model.generated.endpoint.Payment
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import nl.jvandis.teambalance.api.users.User
+import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.context.annotation.Lazy
@@ -55,8 +56,11 @@ data class BankConfig(
 class BankService(
     @Lazy private val bunqRepository: BunqRepository,
     private val bankAccountAliasRepository: BankAccountAliasRepository,
+    private val transactionExclusionRepository: BankAccountTransactionExclusionRepository,
     private val bankConfig: BankConfig
 ) {
+    private val log = LoggerFactory.getLogger(BankService::class.java);
+
     private val balanceCache: AsyncLoadingCache<Int, String> =
         setupCache(bankConfig.cache.balance) { accountId: Int -> updateBalance(accountId) }
 
@@ -82,7 +86,10 @@ class BankService(
     private fun updateTransactions(accountId: Int): Transactions {
         return bunqRepository.getAllPayment(accountId, bankConfig.transactionLimit).let {
             val aliases = getAllAliases()
-            val transactions = it.map { payment -> payment.toDomain(aliases) }
+            val exclusions = getAllTransactionExclusions()
+            val transactions = it
+                .filter { p -> !p.shouldBeExcluded(exclusions) }
+                .map { payment -> payment.toDomain(aliases) }
                 .filter { t -> t.date > bankConfig.dateTimeLimit }
 
             Transactions(
@@ -95,15 +102,25 @@ class BankService(
             }
     }
 
-    private fun Payment.toDomain(aliases: Map<String, User>) = Transaction(
-        id = id,
-        type = toTransactionType(),
-        currency = amount.parseCurrency(),
-        amount = amount.value,
-        user = counterpartyAlias.displayName.getAlias(aliases),
-        counterParty = counterpartyAlias.displayName,
-        date = created.toZonedDateTime()
-    )
+    private fun Payment.shouldBeExcluded(exclusions: List<TransactionExclusion>) = exclusions.any { e ->
+        (e.transactionId == null || id == e.transactionId) &&
+                (e.date == null || created.toZonedDateTime().toLocalDate() == e.date) &&
+                (e.description == null || description == e.description) &&
+                (e.counterParty == null || counterpartyAlias.displayName == e.counterParty)
+    }
+
+    private fun Payment.toDomain(aliases: Map<String, User>): Transaction {
+
+        return Transaction(
+            id = id,
+            type = toTransactionType(),
+            currency = amount.parseCurrency(),
+            amount = amount.value,
+            user = counterpartyAlias.displayName.getAlias(aliases),
+            counterParty = counterpartyAlias.displayName,
+            date = created.toZonedDateTime()
+        )
+    }
 
     private fun Payment.toTransactionType() =
         if (amount.value.startsWith("-")) TransactionType.CREDIT else TransactionType.DEBIT
@@ -139,4 +156,7 @@ class BankService(
     private fun getAllAliases() = bankAccountAliasRepository
         .findAll()
         .associate { it.alias to it.user }
+
+    private fun getAllTransactionExclusions() = transactionExclusionRepository
+        .findAll()
 }
