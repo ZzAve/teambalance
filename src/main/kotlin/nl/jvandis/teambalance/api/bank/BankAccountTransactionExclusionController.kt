@@ -5,7 +5,6 @@ import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.SECRET_HEADER
 import nl.jvandis.teambalance.api.SecretService
-import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.repository.findByIdOrNull
@@ -89,7 +88,7 @@ class BankAccountTransactionExclusionController(
             transactionId = transactionId,
             counterParty = counterParty,
             description = description
-        );
+        )
     }
 }
 

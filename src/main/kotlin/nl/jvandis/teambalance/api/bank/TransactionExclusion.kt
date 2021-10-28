@@ -10,7 +10,6 @@ import javax.persistence.Id
 import javax.persistence.Table
 import javax.persistence.TemporalType
 
-
 data class TransactionExclusions(
     val transactionExclusions: List<TransactionExclusion>
 )
@@ -25,9 +24,9 @@ data class TransactionExclusion(
     @Column(nullable = true) val counterParty: String?,
     @Column(nullable = true) val description: String?,
 
-    ) {
+) {
 
-    constructor(date: LocalDate? = null, transactionId: Int? = null, counterParty: String? = null,description: String? = null) : this(
+    constructor(date: LocalDate? = null, transactionId: Int? = null, counterParty: String? = null, description: String? = null) : this(
         0,
         date,
         transactionId,

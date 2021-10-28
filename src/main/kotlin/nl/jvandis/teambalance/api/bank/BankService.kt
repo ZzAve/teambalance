@@ -59,7 +59,7 @@ class BankService(
     private val transactionExclusionRepository: BankAccountTransactionExclusionRepository,
     private val bankConfig: BankConfig
 ) {
-    private val log = LoggerFactory.getLogger(BankService::class.java);
+    private val log = LoggerFactory.getLogger(BankService::class.java)
 
     private val balanceCache: AsyncLoadingCache<Int, String> =
         setupCache(bankConfig.cache.balance) { accountId: Int -> updateBalance(accountId) }
@@ -104,9 +104,9 @@ class BankService(
 
     private fun Payment.shouldBeExcluded(exclusions: List<TransactionExclusion>) = exclusions.any { e ->
         (e.transactionId == null || id == e.transactionId) &&
-                (e.date == null || created.toZonedDateTime().toLocalDate() == e.date) &&
-                (e.description == null || description == e.description) &&
-                (e.counterParty == null || counterpartyAlias.displayName == e.counterParty)
+            (e.date == null || created.toZonedDateTime().toLocalDate() == e.date) &&
+            (e.description == null || description == e.description) &&
+            (e.counterParty == null || counterpartyAlias.displayName == e.counterParty)
     }
 
     private fun Payment.toDomain(aliases: Map<String, User>): Transaction {
