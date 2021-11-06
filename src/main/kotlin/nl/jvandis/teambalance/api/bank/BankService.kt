@@ -1,6 +1,6 @@
 package nl.jvandis.teambalance.api.bank
 
-import com.bunq.sdk.model.generated.`object`.Amount
+import com.bunq.sdk.model.generated.`object`.Amount // ktlint-disable import-ordering
 import com.bunq.sdk.model.generated.endpoint.Payment
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
