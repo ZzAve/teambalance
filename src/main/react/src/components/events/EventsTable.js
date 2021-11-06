@@ -49,7 +49,6 @@ const EventsTable = ({
   const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
 
   const handleChangePage = (event, page) => {
-    console.log(`onPageChange was called for page ${page}`, event);
     setPage(page);
   };
 

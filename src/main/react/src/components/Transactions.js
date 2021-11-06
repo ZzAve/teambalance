@@ -51,7 +51,6 @@ export const Transactions = ({ refresh, withPagination = false, initialRowsPerPa
   }, [refresh, page, rowsPerPage]);
 
   const handleChangePage = (event, page) => {
-    console.log(`onPageChange was called for page ${page}`, event);
     setPage(page);
   };
 
@@ -94,12 +93,10 @@ export const Transactions = ({ refresh, withPagination = false, initialRowsPerPa
           <TableRow>
             <TablePagination
               rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
-              // colSpan={3}
               count={transactions.length === rowsPerPage ? -1 : page*rowsPerPage + transactions.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onChangePage={handleChangePage}
-              // onPageChange={handleChangePage}
               onChangeRowsPerPage={handleChangeRowsPerPage}
             />
           </TableRow>

@@ -12,7 +12,6 @@ const EventsList = ({ eventsType, events, updateTrigger, withPagination }) => {
   const rowsPerPage = 10;
 
   const handleChangePage = (event, page) => {
-    console.log(`onPageChange was called for page ${page}`, event);
     setPage(page);
   };
   return (
