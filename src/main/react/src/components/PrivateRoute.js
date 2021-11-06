@@ -17,6 +17,7 @@ export const PrivateRoute = ({ component: Component, ...rest }) => (
             pathname: "/authenticate",
             state: { from: props.location },
           }}
+          push={false}
         />
       )
     }

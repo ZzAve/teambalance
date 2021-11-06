@@ -13,6 +13,7 @@ import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import Hidden from "@material-ui/core/Hidden";
 import Typography from "@material-ui/core/Typography";
 import { EventsType } from "../components/events/utils";
+import PageTitle from "../components/PageTitle";
 
 
 const useStyles = makeStyles(() =>
@@ -30,11 +31,12 @@ const Overview = ({ refresh }) => {
   const classes = useStyles();
 
   if (goTo !== undefined) {
-    return <Redirect to={goTo} />;
+    return <Redirect to={goTo} push={true}/>;
   }
 
   return (
     <>
+      <PageTitle title="Team Balance" withSuffix={false}/>
       <Grid item xs={12} md={6}>
         <Grid container spacing={2}>
           <PageItem title="Aanstaande trainingen">

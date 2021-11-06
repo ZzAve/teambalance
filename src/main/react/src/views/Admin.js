@@ -53,18 +53,18 @@ const getText = (eventsType, name) => {
 };
 
 const useStyles = makeStyles(() =>
-    createStyles({
-      menu: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        width:"100%",
+  createStyles({
+    menu: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      width: "100%",
 
-        '& > a': {
-            textDecoration: "none"
-        }
+      "& > a": {
+        textDecoration: "none",
       },
-    })
+    },
+  })
 );
 
 const Admin = ({ refresh }) => {
@@ -72,7 +72,7 @@ const Admin = ({ refresh }) => {
 
   const classes = useStyles();
   if (goBack) {
-    return <Redirect to="/" />;
+    return <Redirect to="/" push={true} />;
   }
 
   return (
@@ -196,11 +196,12 @@ const EventsOverview = ({ eventsType, refresh }) => {
 
   if (goTo !== undefined) {
     console.log(`Navigating to: ${goTo}`);
-    return <Redirect to={goTo} />;
+    return <Redirect to={goTo} push={true} />;
   }
 
+  const title = getText(eventsType, "event_type_name");
   return (
-    <PageItem title={getText(eventsType, "event_type_name")}>
+    <PageItem title={title} pageTitle={title}>
       <Grid item container spacing={5}>
         <Grid item xs={12}>
           <Button
@@ -231,7 +232,7 @@ const EventsOverview = ({ eventsType, refresh }) => {
   );
 };
 
-const ChangeEvent = ({ computedMatch, eventsType, ...rest }) => {
+const ChangeEvent = ({ computedMatch, eventsType, pageTitle, ...rest }) => {
   const id = +((computedMatch || {}).params || {}).id;
   if (id === undefined || isNaN(id)) {
     return (
@@ -246,12 +247,14 @@ const ChangeEvent = ({ computedMatch, eventsType, ...rest }) => {
               ? "/admin/misc-events"
               : "/admin",
         }}
+        push={true}
       />
     );
   }
 
+  const title = getText(eventsType, "edit_event_pageitem_label");
   return (
-    <PageItem title={getText(eventsType, "edit_event_pageitem_label")}>
+    <PageItem pageTitle={title} title={title}>
       <EventDetails
         eventsType={eventsType}
         location={location}
@@ -263,8 +266,9 @@ const ChangeEvent = ({ computedMatch, eventsType, ...rest }) => {
 };
 
 const NewEvent = ({ eventsType, location }) => {
+  const title = getText(eventsType, "new_event_pageitem_label");
   return (
-    <PageItem title={getText(eventsType, "new_event_pageitem_label")}>
+    <PageItem pageTitle={title} title={title}>
       <EventDetails eventsType={eventsType} location={location} />
     </PageItem>
   );
@@ -272,9 +276,12 @@ const NewEvent = ({ eventsType, location }) => {
 
 const HiAdmin = ({}) => {
   return (
-    <PageItem>
+    <PageItem pageTitle="Admin">
       <Grid container spacing={2} justify="center">
-        <img alt="Walt from Breaking Bad telling you who's admin" src="https://media.giphy.com/media/Ufc2geerZac4U/giphy.gif" />
+        <img
+          alt="Walt from Breaking Bad telling you who's admin"
+          src="https://media.giphy.com/media/Ufc2geerZac4U/giphy.gif"
+        />
       </Grid>
     </PageItem>
   );

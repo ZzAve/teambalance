@@ -30,9 +30,10 @@ const EventsPage = ({ eventsType, refresh }) => {
   const [showList, setShowList] = useState(true);
 
   if (goTo !== undefined) {
-    return <Redirect to={goTo} />;
+    return <Redirect to={goTo} push={true}/>;
   }
 
+  const title = getText(eventsType, "coming_events");
   return (
     <Grid item container spacing={2}>
       <Grid container item xs={12}>
@@ -46,7 +47,7 @@ const EventsPage = ({ eventsType, refresh }) => {
           </Button>
       </Grid>
       <Grid container item xs={12}>
-        <PageItem title={getText(eventsType, "coming_events")}>
+        <PageItem pageTitle={title} title={title}>
           <Grid container spacing={4}>
             <Grid
               component="label"

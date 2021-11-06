@@ -66,7 +66,7 @@ const Login = ({ location, handleRefresh }) => {
   if (isAuthenticated) {
     const { from } = location.state || { from: { pathname: "/" } };
     handleRefresh();
-    return <Redirect to={from} />;
+    return <Redirect to={from} push={false} />;
   }
 
   if (isLoading) {

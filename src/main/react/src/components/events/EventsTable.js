@@ -184,7 +184,7 @@ const EventsTable = ({
 
   if (goTo !== undefined) {
     console.log(`Navigating to: ${goTo}`);
-    return <Redirect to={goTo} />;
+    return <Redirect to={goTo} push={true} />;
   }
 
   const getTableHeadTraining = () => (
