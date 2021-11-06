@@ -1,2 +1,2 @@
-import "@babel/polyfill";
-import "regenerator-runtime/runtime.js";
+import "core-js/stable";
+import "regenerator-runtime/runtime";

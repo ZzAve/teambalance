@@ -11,13 +11,13 @@ import React, { useState } from "react";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {
-    Button,
-    createStyles,
-    makeStyles,
-    TableFooter,
-    TablePagination,
-    useMediaQuery,
-    useTheme
+  Button,
+  createStyles,
+  makeStyles,
+  TableFooter,
+  TablePagination,
+  useMediaQuery,
+  useTheme,
 } from "@material-ui/core";
 import { Redirect } from "react-router-dom";
 import Attendees from "../Attendees";

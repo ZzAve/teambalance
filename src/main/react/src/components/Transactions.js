@@ -35,7 +35,11 @@ const useStyles = makeStyles(() =>
   })
 );
 
-export const Transactions = ({ refresh, withPagination = false, initialRowsPerPage = 10 }) => {
+export const Transactions = ({
+  refresh,
+  withPagination = false,
+  initialRowsPerPage = 10,
+}) => {
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(0); // get from url?
@@ -46,7 +50,9 @@ export const Transactions = ({ refresh, withPagination = false, initialRowsPerPa
 
   useEffect(() => {
     withLoading(setIsLoading, () =>
-      bankApiClient.getTransactions(rowsPerPage, page * rowsPerPage).then(setTransactions)
+      bankApiClient
+        .getTransactions(rowsPerPage, page * rowsPerPage)
+        .then(setTransactions)
     ).then();
   }, [refresh, page, rowsPerPage]);
 
@@ -59,14 +65,16 @@ export const Transactions = ({ refresh, withPagination = false, initialRowsPerPa
     setPage(0);
   };
 
-
   if (isLoading) {
     return <SpinnerWithText text="ophalen transacties" />;
   }
 
   return (
     <TableContainer component={Paper}>
-      <Table className={classes.full} aria-label="betalingen en inleg voor de teampot">
+      <Table
+        className={classes.full}
+        aria-label="betalingen en inleg voor de teampot"
+      >
         <TableHead>
           <TableRow>
             <TableCell>Datum</TableCell>
@@ -78,7 +86,8 @@ export const Transactions = ({ refresh, withPagination = false, initialRowsPerPa
           {transactions.map((row) => (
             <TableRow key={row.id}>
               <TableCell component="th" scope="row">
-                {formattedDate(row.date, { year: "numeric", weekday: "short" })}&nbsp;
+                {formattedDate(row.date, { year: "numeric", weekday: "short" })}
+                &nbsp;
                 {formattedTime(row.date)}
               </TableCell>
               <TableCell>{row.counterParty}</TableCell>
@@ -87,13 +96,16 @@ export const Transactions = ({ refresh, withPagination = false, initialRowsPerPa
               </TableCell>
             </TableRow>
           ))}
-
         </TableBody>
-        <TableFooter className={withPagination ? '': classes.hidden}>
+        <TableFooter className={withPagination ? "" : classes.hidden}>
           <TableRow>
             <TablePagination
               rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
-              count={transactions.length === rowsPerPage ? -1 : page*rowsPerPage + transactions.length}
+              count={
+                transactions.length === rowsPerPage
+                  ? -1
+                  : page * rowsPerPage + transactions.length
+              }
               rowsPerPage={rowsPerPage}
               page={page}
               onChangePage={handleChangePage}

@@ -8,7 +8,7 @@ const getBalance = () => {
     .then((data) => data.balance || "€ XX,XX");
 };
 
-const getTransactions = (limit = 20, offset= 0) => {
+const getTransactions = (limit = 20, offset = 0) => {
   return bankClient
     .call(`bank/transactions?limit=${limit}&offset=${offset}`)
     .then((data) => internalize(data.transactions) || []);
@@ -16,9 +16,8 @@ const getTransactions = (limit = 20, offset= 0) => {
 
 const getPotters = (limit = 3) => {
   return bankClient
-      .call(`bank/potters?limit=${limit}`)
-      .then((data) => data || {toppers:[], floppers:[]});
-
+    .call(`bank/potters?limit=${limit}`)
+    .then((data) => data || { toppers: [], floppers: [] });
 };
 
 const internalize = (transactions) => {

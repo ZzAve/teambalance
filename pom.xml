@@ -15,6 +15,8 @@
     <description>Personal project to monitor team expenses on beer and brown fruit</description>
 
     <properties>
+        <skip.npm-ci>false</skip.npm-ci>
+
         <java.version>11</java.version>
         <kotlin.version>1.5.31</kotlin.version>
         <!-- installed node/npm version: lts/carbon -->
@@ -268,7 +270,9 @@
                         <phase>generate-resources</phase>
                         <configuration>
                             <arguments>ci</arguments>
+                            <skip>${skip.npm-ci}</skip>
                         </configuration>
+
                     </execution>
                     <execution>
                         <id>npm build</id>
