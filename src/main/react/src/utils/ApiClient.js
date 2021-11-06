@@ -1,7 +1,7 @@
 import { fetchWithTimeout } from "./fetchWithTimeout";
 import { delay } from "./util";
 import { authenticationManager } from "./AuthenticationManager";
-import {InvalidSecretException, TimeoutError} from "./Exceptions";
+import { InvalidSecretException, TimeoutError } from "./Exceptions";
 
 const DEFAULT_TIMEOUT = 5000; //ms
 const DEFAULT_MIN_DELAY = 400; //ms
@@ -26,7 +26,7 @@ const _throwIfNotOk = (path, res) => {
     }
 
     if (res.status === 504) {
-      throw new TimeoutError("Respnse timed out")
+      throw new TimeoutError("Response timed out");
     }
 
     throw Error(

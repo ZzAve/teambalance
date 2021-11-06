@@ -3,7 +3,7 @@ import Balance from "../components/Balance";
 import Topup from "../components/Topup";
 import Potters from "../components/Potters";
 import PageItem from "../components/PageItem";
-import {Button, Card, createStyles, makeStyles} from "@material-ui/core";
+import { Button, Card, createStyles, makeStyles } from "@material-ui/core";
 import Transactions from "../components/Transactions";
 import React, { useState } from "react";
 import Events from "../components/events/Events";
@@ -15,15 +15,13 @@ import Typography from "@material-ui/core/Typography";
 import { EventsType } from "../components/events/utils";
 import PageTitle from "../components/PageTitle";
 
-
 const useStyles = makeStyles(() =>
-    createStyles({
-      transactions: {
-        padding: "16px",
-      },
-    })
+  createStyles({
+    transactions: {
+      padding: "16px",
+    },
+  })
 );
-
 
 const Overview = ({ refresh }) => {
   const [goTo, setGoTo] = useState(undefined);
@@ -31,12 +29,12 @@ const Overview = ({ refresh }) => {
   const classes = useStyles();
 
   if (goTo !== undefined) {
-    return <Redirect to={goTo} push={true}/>;
+    return <Redirect to={goTo} push={true} />;
   }
 
   return (
     <>
-      <PageTitle title="Team Balance" withSuffix={false}/>
+      <PageTitle title="Team Balance" withSuffix={false} />
       <Grid item xs={12} md={6}>
         <Grid container spacing={2}>
           <PageItem title="Aanstaande trainingen">
@@ -152,7 +150,9 @@ const Overview = ({ refresh }) => {
                 <Topup />
               </Grid>
               <Grid item xs={12}>
-                <Typography>Wie spekt de pot het meeste en verdient een pluim?</Typography>
+                <Typography>
+                  Wie spekt de pot het meeste en verdient een pluim?
+                </Typography>
               </Grid>
               <Grid item xs={12}>
                 <Potters refresh={refresh} />
@@ -161,19 +161,25 @@ const Overview = ({ refresh }) => {
           </PageItem>
           <Grid item xs={12}>
             <Card>
-                <Grid container item xs={12} justify={"space-between"} className={classes.transactions}>
-                  <Grid item>
-                    <Typography variant="h5">Transacties</Typography>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => setGoTo("/transactions")}
-                    >
-                      Meer
-                    </Button>
-                  </Grid>
+              <Grid
+                container
+                item
+                xs={12}
+                justify={"space-between"}
+                className={classes.transactions}
+              >
+                <Grid item>
+                  <Typography variant="h5">Transacties</Typography>
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setGoTo("/transactions")}
+                  >
+                    Meer
+                  </Button>
+                </Grid>
               </Grid>
               <Grid item xs={12}>
                 <Transactions refresh={refresh} />

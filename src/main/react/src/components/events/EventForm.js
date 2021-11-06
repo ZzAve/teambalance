@@ -192,7 +192,7 @@ export const EventForm = ({
       },
     };
 
-    return <Redirect to={from} push={true}/>;
+    return <Redirect to={from} push={true} />;
   }
 
   if (isLoading) {

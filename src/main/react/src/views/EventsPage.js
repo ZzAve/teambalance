@@ -30,21 +30,21 @@ const EventsPage = ({ eventsType, refresh }) => {
   const [showList, setShowList] = useState(true);
 
   if (goTo !== undefined) {
-    return <Redirect to={goTo} push={true}/>;
+    return <Redirect to={goTo} push={true} />;
   }
 
   const title = getText(eventsType, "coming_events");
   return (
     <Grid item container spacing={2}>
       <Grid container item xs={12}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setGoTo("/")}
-          >
-            <ArrowBackIcon />
-            <Hidden xsDown>Terug </Hidden>
-          </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setGoTo("/")}
+        >
+          <ArrowBackIcon />
+          <Hidden xsDown>Terug </Hidden>
+        </Button>
       </Grid>
       <Grid container item xs={12}>
         <PageItem pageTitle={title} title={title}>

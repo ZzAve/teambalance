@@ -53,12 +53,12 @@ const getSecret = () => _secret;
 const isAuthenticated = () => _authenticated;
 const checkAuthentication = () => _authenticationCheck;
 
-const _doAuthenticate = (passphrase) =>{
+const _doAuthenticate = (passphrase) => {
   setSecret(passphrase);
   return authenticationApiClient.authenticate(passphrase).then((result) => {
     console.log(`Successful authentication ${result.message}`);
   });
-}
+};
 
 const authenticate = (passphrase) => {
   let isAuthenticated = recursiveAuth(passphrase);
