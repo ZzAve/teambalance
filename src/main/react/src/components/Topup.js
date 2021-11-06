@@ -6,13 +6,13 @@ import Typography from "@material-ui/core/Typography";
 const bunqMeUrl = "https://bunq.me/tovoheren5";
 
 const Topup = () => {
-    const createTopUpLink = (price) => () => {
-      let url = bunqMeUrl;
-      if (!!price) {
-        url += `/${price}/Meer%20Muntjes%20Meer%20Beter`;
-      }
-      window.open(url, "_blank");
-    };
+  const createTopUpLink = (price) => () => {
+    let url = bunqMeUrl;
+    if (!!price) {
+      url += `/${price}/Meer%20Muntjes%20Meer%20Beter`;
+    }
+    window.open(url, "_blank");
+  };
 
   function getButton(clickPrice, content) {
     return (

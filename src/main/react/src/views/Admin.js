@@ -93,8 +93,11 @@ const Admin = ({ refresh }) => {
 
       <Router>
         <Grid item xs={12}>
-
-          <List component="nav" aria-label="Admin menu" className={classes.menu}>
+          <List
+            component="nav"
+            aria-label="Admin menu"
+            className={classes.menu}
+          >
             <Link to="/admin/trainings">
               <Button variant="outlined" color="primary">
                 Trainingen

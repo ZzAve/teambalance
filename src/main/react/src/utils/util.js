@@ -29,10 +29,16 @@ const timeOptions = {
   timeZone: "Europe/Amsterdam",
 };
 export const formattedDate = (dateTime, dateOptionsOverrides = {}) =>
-  new Intl.DateTimeFormat("nl-NL", {...dateOptions, ...dateOptionsOverrides}).format(dateTime);
+  new Intl.DateTimeFormat("nl-NL", {
+    ...dateOptions,
+    ...dateOptionsOverrides,
+  }).format(dateTime);
 
 export const formattedTime = (dateTime, timeOptionsOverrides = {}) =>
-  new Intl.DateTimeFormat("nl-NL", {...timeOptions, timeOptionsOverrides}).format(dateTime);
+  new Intl.DateTimeFormat("nl-NL", {
+    ...timeOptions,
+    timeOptionsOverrides,
+  }).format(dateTime);
 
 export const ViewType = {
   List: "list",

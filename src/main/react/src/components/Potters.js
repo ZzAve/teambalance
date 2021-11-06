@@ -21,9 +21,11 @@ export const Potters = ({ refresh, limit = 3, showFloppers = true }) => {
 
   const renderItem = (item, prefix, index) =>
     item && (
-      <Grid item xs={12} container  alignItems={"center"} key={index}>
+      <Grid item xs={12} container alignItems={"center"} key={index}>
         <Grid item xs={2}>
-          <Typography  align={"center"} variant={"h4"}>{prefix}</Typography>
+          <Typography align={"center"} variant={"h4"}>
+            {prefix}
+          </Typography>
         </Grid>
         <Grid item xs={4}>
           <Typography>
@@ -43,9 +45,13 @@ export const Potters = ({ refresh, limit = 3, showFloppers = true }) => {
         <Grid item>
           <Typography variant={"h6"}>{title}</Typography>
         </Grid>
-          {items.map((item,i) =>
-              (renderItem(item, prefixes[i] || prefixes[prefixes.length-1] || i + 1 , i))
-          )}
+        {items.map((item, i) =>
+          renderItem(
+            item,
+            prefixes[i] || prefixes[prefixes.length - 1] || i + 1,
+            i
+          )
+        )}
       </Grid>
     );
 
@@ -55,8 +61,14 @@ export const Potters = ({ refresh, limit = 3, showFloppers = true }) => {
 
   return (
     <Grid item container spacing={2}>
-      {renderItems(toppers, "Toppers (van het seizoen)", ["🥇", "🥈", "🥉", ""])}
-      {showFloppers && renderItems(floppers, "Floppers (van het seizoen)", ["🐷", "🐗", "🐖"])}
+      {renderItems(toppers, "Toppers (van het seizoen)", [
+        "🥇",
+        "🥈",
+        "🥉",
+        "",
+      ])}
+      {showFloppers &&
+        renderItems(floppers, "Floppers (van het seizoen)", ["🐷", "🐗", "🐖"])}
     </Grid>
   );
 };
