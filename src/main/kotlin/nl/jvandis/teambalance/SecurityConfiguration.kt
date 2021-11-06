@@ -24,6 +24,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             .headers().frameOptions().sameOrigin().and()
             .csrf().disable()
             .authorizeRequests()
+            //Permit public API calls
             .antMatchers("/api/bank/**").permitAll()
             .antMatchers("/api/authentication/**").permitAll()
             .antMatchers("/api/users/**").permitAll()
@@ -31,10 +32,10 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             .antMatchers("/api/attendees/**").permitAll()
             .antMatchers("/api/matches/**").permitAll()
             .antMatchers("/api/miscellaneous-events/**").permitAll()
-            .antMatchers("/login").permitAll()
-            .antMatchers("/_ah/**").permitAll()
+            // Require auth on internal pages
             .antMatchers("/internal/**").fullyAuthenticated()
             .antMatchers("/webjars/**").fullyAuthenticated()
+            // Be lean on resource files
             .antMatchers("/**.html").permitAll()
             .antMatchers("/**.js").permitAll()
             .antMatchers("/**.css").permitAll()
@@ -42,8 +43,18 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             .antMatchers("/**.png").permitAll()
             .antMatchers("/**.jpg").permitAll()
             .antMatchers("/manifest.json").permitAll()
+            // Permit frontend paths
+            .antMatchers("/_ah/**").permitAll() // check this one!
+            .antMatchers("/login").permitAll()
+            .antMatchers("/logout").permitAll()
+            .antMatchers("/images/**").permitAll()
+            .antMatchers("/admin/**").permitAll()
+            .antMatchers("/matches/**").permitAll()
+            .antMatchers("/misc-events/**").permitAll()
+            .antMatchers("/trainings/**").permitAll()
+            .antMatchers("/transactions/**").permitAll()
             .antMatchers("/").permitAll()
-            .anyRequest().authenticated()
+            .anyRequest().authenticated() // default is authenticated
             .and()
             .formLogin()
             .and()
