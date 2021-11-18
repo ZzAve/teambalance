@@ -110,7 +110,6 @@ class Initializer(
         val trainings = eventRepository.findAll().filterIsInstance<Training>()
         log.info("ALl trainings: ", trainings)
 
-
         trainings.forEach { t ->
             attendeeRepository.saveAll(
                 users.map { user ->
@@ -160,7 +159,6 @@ class Initializer(
         val matches = eventRepository.findAll().filterIsInstance<Match>()
         log.info("ALl Match: ", matches)
 
-
         matches.forEach { t ->
             attendeeRepository.saveAll(
                 users.map { user ->
@@ -175,6 +173,4 @@ class Initializer(
 
         log.info("After attendee additions", attendeeRepository.findAll())
     }
-
-
 }
