@@ -78,10 +78,10 @@ class MiscellaneousEventController(
             limit = limit,
             since = since,
             includeAttendees = includeAttendees
-        ).toResponse()
+        ).toResponse(includeInactiveUsers)
     }
 
-    private fun Pair<Page<MiscellaneousEvent>, Map<Long, List<Attendee>>>.toResponse(): MiscellaneousEventsResponse {
+    private fun Pair<Page<MiscellaneousEvent>, Map<Long, List<Attendee>>>.toResponse(includeInactiveUsers: Boolean): MiscellaneousEventsResponse {
         val eventPage = first
         val attendees = second
 
@@ -91,7 +91,9 @@ class MiscellaneousEventController(
             page = eventPage.number + 1,
             size = min(eventPage.size, eventPage.content.size),
             events = eventPage.content.map { t ->
-                val relevantAttendees = attendees[t.id] ?: emptyList()
+                val relevantAttendees = attendees[t.id]
+                    ?.filter { a -> a.user.isActive || includeInactiveUsers }
+                    ?: emptyList()
                 t.externalizeWithAttendees(relevantAttendees)
             }
         )
@@ -101,6 +103,7 @@ class MiscellaneousEventController(
     fun getEvent(
         @PathVariable("event-id") eventId: Long,
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
+        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): MiscellaneousEventResponse {
         log.debug("Get miscellaneous event $eventId")
@@ -108,7 +111,10 @@ class MiscellaneousEventController(
 
         val event = eventRepository.findByIdOrNull(eventId) ?: throw InvalidMiscellaneousEventException(eventId)
         val attendees =
-            if (!includeAttendees) emptyList() else attendeeRepository.findAllByEventIdIn(listOf(eventId))
+            if (!includeAttendees) emptyList()
+            else attendeeRepository
+                .findAllByEventIdIn(listOf(eventId))
+                .filter { a -> a.user.isActive || includeInactiveUsers }
 
         return event.externalizeWithAttendees(attendees)
     }

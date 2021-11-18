@@ -103,7 +103,7 @@ const EventDetails = ({ eventsType, location, id }) => {
 
   const fetchUsers = async () => {
     try {
-      const data = await usersApiClient.getUsers();
+      const data = await usersApiClient.getActiveUsers();
       setUsers(data.users || []); //.first(d => d.id === id) || {});
     } catch (e) {
       setMessage({

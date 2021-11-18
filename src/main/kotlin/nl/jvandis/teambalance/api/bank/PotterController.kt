@@ -34,15 +34,16 @@ class PotterController(
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?,
         @RequestParam(value = "limit", defaultValue = "3") @Max(200) @Min(1) limit: Int,
         @RequestParam(value = "sort", defaultValue = "desc") sort: Sort,
-        @RequestParam(value = "since", defaultValue = "2021-08-01T00:00:00+02:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) sinceInput: ZonedDateTime
-    ): PottersResponse {
+        @RequestParam(value = "since", defaultValue = "2021-08-01T00:00:00+02:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) sinceInput: ZonedDateTime,
+        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
+        ): PottersResponse {
         secretService.ensureSecret(secret)
 
         val sinceLowerLimit = ZonedDateTime.of(2021, 7, 31, 23, 59, 59, 0, ZoneId.of("Europe/Paris"))
         if (sinceInput < sinceLowerLimit) {
             throw IllegalArgumentException("Since input argument is before lower limit of $sinceLowerLimit. Input was $sinceInput")
         }
-        return potterService.getPotters(sinceInput).toPottersResponse(limit)
+        return potterService.getPotters(sinceInput,includeInactiveUsers).toPottersResponse(limit)
     }
 
     private fun Potters.toPottersResponse(limit: Int) = PottersResponse(

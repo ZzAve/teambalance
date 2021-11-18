@@ -78,10 +78,10 @@ class TrainingController(
             limit = limit,
             since = since,
             includeAttendees = includeAttendees
-        ).toResponse()
+        ).toResponse(includeInactiveUsers)
     }
 
-    private fun Pair<Page<Training>, Map<Long, List<Attendee>>>.toResponse(): TrainingsResponse {
+    private fun Pair<Page<Training>, Map<Long, List<Attendee>>>.toResponse(includeInactiveUsers: Boolean): TrainingsResponse {
         val trainingsPage = first
         val attendees = second
 
@@ -91,7 +91,9 @@ class TrainingController(
             page = trainingsPage.number + 1,
             size = min(trainingsPage.size, trainingsPage.content.size),
             trainings = trainingsPage.content.map { t ->
-                val relevantAttendees = attendees[t.id] ?: emptyList()
+                val relevantAttendees = attendees[t.id]
+                    ?.filter { a -> a.user.isActive || includeInactiveUsers }
+                    ?: emptyList()
                 t.externalizeWithAttendees(relevantAttendees)
             }
         )
@@ -101,6 +103,7 @@ class TrainingController(
     fun getTraining(
         @PathVariable("training-id") trainingId: Long,
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
+        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ): TrainingResponse {
@@ -109,7 +112,10 @@ class TrainingController(
 
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
         val attendees =
-            if (!includeAttendees) emptyList() else attendeeRepository.findAllByEventIdIn(listOf(trainingId))
+            if (!includeAttendees) emptyList()
+            else attendeeRepository
+                .findAllByEventIdIn(listOf(trainingId))
+                .filter { a -> a.user.isActive || includeInactiveUsers }
 
         return training.externalizeWithAttendees(attendees)
     }

@@ -69,10 +69,10 @@ class MatchController(
             limit = limit,
             since = since,
             includeAttendees = includeAttendees
-        ).toResponse()
+        ).toResponse(includeInactiveUsers)
     }
 
-    private fun Pair<Page<Match>, Map<Long, List<Attendee>>>.toResponse(): MatchesResponse {
+    private fun Pair<Page<Match>, Map<Long, List<Attendee>>>.toResponse(includeInactiveUsers: Boolean): MatchesResponse {
         val matchesPage = first
         val attendees = second
         return MatchesResponse(
@@ -81,7 +81,9 @@ class MatchController(
             page = matchesPage.number + 1,
             size = min(matchesPage.size, matchesPage.content.size),
             matches = matchesPage.content.map { t ->
-                val relevantAttendees = attendees[t.id] ?: emptyList()
+                val relevantAttendees = attendees[t.id]
+                    ?.filter { a -> a.user.isActive || includeInactiveUsers }
+                    ?: emptyList()
                 t.externaliseWithAttendees(relevantAttendees)
             }
         )
@@ -91,6 +93,7 @@ class MatchController(
     fun getMatch(
         @PathVariable("match-id") matchId: Long,
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
+        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ): MatchResponse {
@@ -99,7 +102,10 @@ class MatchController(
 
         val match = matchRepository.findByIdOrNull(matchId) ?: throw InvalidMatchException(matchId)
         val attendees =
-            if (!includeAttendees) emptyList() else attendeeRepository.findAllByEventIdIn(listOf(matchId))
+            if (!includeAttendees) emptyList()
+            else attendeeRepository
+                .findAllByEventIdIn(listOf(matchId))
+                .filter { a -> a.user.isActive || includeInactiveUsers }
 
         return match.externaliseWithAttendees(attendees)
     }
