@@ -12,6 +12,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -73,6 +74,7 @@ class UserController(
         userRepository.save(user)
     }
 
+    @PreAuthorize("hasRole('admin')")
     @PutMapping("/{id}")
     fun updateUser(
         @PathVariable(value = "id") userId: Long,
@@ -85,20 +87,28 @@ class UserController(
 
         return userRepository
             .findByIdOrNull(userId)
-            ?.let {
-                val x = it.copy(
-                    name = potentialUserUpdate.name ?: it.name,
-                    role = potentialUserUpdate.role ?: it.role
-                )
-
-                try {
-                    userRepository.save(x)
-                } catch (e: DataIntegrityViolationException) {
-                    throw DataConstraintViolationException("Could not update user $userId to $potentialUserUpdate, name already in use")
-                }
-            } ?: throw InvalidUserException(userId)
+            ?.updateUser(potentialUserUpdate, userId)
+            ?: throw InvalidUserException(userId)
     }
 
+    private fun User.updateUser(
+        potentialUserUpdate: PotentialUserUpdate,
+        userId: Long
+    ): User {
+        val updatedUser = copy(
+            name = potentialUserUpdate.name ?: name,
+            role = potentialUserUpdate.role ?: role,
+            isActive = potentialUserUpdate.isActive ?: isActive
+        )
+
+        return try {
+            userRepository.save(updatedUser)
+        } catch (e: DataIntegrityViolationException) {
+            throw DataConstraintViolationException("Could not update user $userId to $potentialUserUpdate, name already in use")
+        }
+    }
+
+    @PreAuthorize("hasRole('admin')")
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun updateUser(
@@ -128,10 +138,6 @@ data class PotentialUser(
 
 data class PotentialUserUpdate(
     val name: String?,
-    val role: Role?
-) {
-
-//    fun internalize() = User(name, role)
-
-//    fun internalize(id: Long) =  User(id = id, name = name, role = role)
-}
+    val role: Role?,
+    val isActive: Boolean?
+)
