@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -117,6 +118,17 @@ class GlobalExceptionHandler {
                 Error(
                     status = HttpStatus.BAD_REQUEST,
                     reason = e.message ?: "Forbidden"
+                )
+            )
+
+    @ExceptionHandler(AccessDeniedException::class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    fun handleAccessDeniedException(e: AccessDeniedException) =
+        ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(
+                Error(
+                    status = HttpStatus.FORBIDDEN,
+                    reason = "Access to resource is denied."
                 )
             )
 
