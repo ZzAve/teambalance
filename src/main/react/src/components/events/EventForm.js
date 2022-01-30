@@ -9,7 +9,7 @@ import {
   TimePicker,
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import nlLocale from "date-fns/locale/nl";
+import { nl } from "date-fns/locale";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -200,7 +200,7 @@ export const EventForm = ({
   }
 
   return (
-    <MuiPickersUtilsProvider utils={DateFnsUtils} locale={nlLocale}>
+    <MuiPickersUtilsProvider utils={DateFnsUtils}  locale={nl}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <TextField
