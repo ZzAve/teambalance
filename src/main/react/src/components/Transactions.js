@@ -108,8 +108,8 @@ export const Transactions = ({
               }
               rowsPerPage={rowsPerPage}
               page={page}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </TableRow>
         </TableFooter>

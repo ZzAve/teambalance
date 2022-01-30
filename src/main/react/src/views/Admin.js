@@ -287,7 +287,7 @@ const NewEvent = ({ eventsType, location }) => {
 const HiAdmin = ({}) => {
   return (
     <PageItem pageTitle="Admin">
-      <Grid container spacing={2} justify="center">
+      <Grid container spacing={2} justifyContent="center">
         <img
           alt="Walt from Breaking Bad telling you who's admin"
           src="https://media.giphy.com/media/Ufc2geerZac4U/giphy.gif"

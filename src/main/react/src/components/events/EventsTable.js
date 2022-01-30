@@ -248,8 +248,8 @@ const EventsTable = ({
                   count={events.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
-                  onChangePage={handleChangePage}
-                  onChangeRowsPerPage={handleChangeRowsPerPage}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
                 />
               </TableRow>
             </TableFooter>
