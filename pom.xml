@@ -33,7 +33,7 @@
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
         <postgresql.version>42.3.1</postgresql.version>
         <spring-cloud-gcp-dependencies.version>3.0.0</spring-cloud-gcp-dependencies.version>
-        <springfox-swagger.version>3.0.0</springfox-swagger.version>
+        <springdoc-openapi.version>1.6.5</springdoc-openapi.version>
     </properties>
 
     <dependencyManagement>
@@ -63,6 +63,10 @@
                     <artifactId>spring-boot-starter-tomcat</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <dependency>
@@ -111,9 +115,14 @@
 
         <!-- Swagger -->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-            <version>${springfox-swagger.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc-openapi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-kotlin</artifactId>
+            <version>${springdoc-openapi.version}</version>
         </dependency>
 
 
@@ -344,7 +353,9 @@
                                 </java>
                             </target>
                         </configuration>
-                        <goals><goal>run</goal></goals>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>
                     <execution>
                         <id>ktlint-format</id>
@@ -357,7 +368,9 @@
                                 </java>
                             </target>
                         </configuration>
-                        <goals><goal>run</goal></goals>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>
                 </executions>
                 <dependencies>
@@ -372,6 +385,20 @@
     </build>
 
 
+    <profiles>
+        <profile>
+            <id>develop</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-devtools</artifactId>
+                    <optional>true</optional>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+        </profile>
+    </profiles>
     <repositories>
         <repository>
             <id>maven-central</id>

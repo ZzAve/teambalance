@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.bank
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
+import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.SECRET_HEADER
@@ -23,7 +24,8 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@Api(tags = ["aliases"])
+@Admin
+@Tag(name = "aliases")
 @RequestMapping(path = ["/api/aliases"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class BankAccountAliasController(
     private val bankAccountAliasRepository: BankAccountAliasRepository,
@@ -52,7 +54,9 @@ class BankAccountAliasController(
         log.debug("getUser $bankAccountAliasId")
         secretService.ensureSecret(secret)
 
-        return bankAccountAliasRepository.findByIdOrNull(bankAccountAliasId) ?: throw InvalidUserException(bankAccountAliasId)
+        return bankAccountAliasRepository.findByIdOrNull(bankAccountAliasId) ?: throw InvalidUserException(
+            bankAccountAliasId
+        )
     }
 
     @ResponseStatus(HttpStatus.CREATED)

@@ -1,6 +1,6 @@
 package nl.jvandis.teambalance.api.training
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidTrainingException
@@ -34,7 +34,7 @@ import java.time.LocalDateTime
 import kotlin.math.min
 
 @RestController
-@Api(tags = ["trainings"])
+@Tag(name = "trainings")
 @RequestMapping(path = ["/api/trainings"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class TrainingController(
     private val eventRepository: TrainingRepository,

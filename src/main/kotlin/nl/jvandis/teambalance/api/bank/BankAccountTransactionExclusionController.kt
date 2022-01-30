@@ -1,6 +1,6 @@
 package nl.jvandis.teambalance.api.bank
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.SECRET_HEADER
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 
 @RestController
-@Api(tags = ["transaction-exclusions"])
+@Tag(name = "transaction-exclusions")
 @RequestMapping(path = ["/api/transaction-exclusions"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class BankAccountTransactionExclusionController(
     private val transactionExclusionRepository: BankAccountTransactionExclusionRepository,

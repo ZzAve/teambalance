@@ -1,6 +1,6 @@
 package nl.jvandis.teambalance.api.match
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMatchException
@@ -36,7 +36,7 @@ import javax.validation.Valid
 import kotlin.math.min
 
 @RestController
-@Api(tags = ["matches"])
+@Tag(name = "matches")
 @RequestMapping(path = ["/api/matches"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class MatchController(
     private val matchRepository: MatchRepository,

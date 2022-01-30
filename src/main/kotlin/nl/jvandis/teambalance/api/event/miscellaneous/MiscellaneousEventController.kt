@@ -1,6 +1,6 @@
 package nl.jvandis.teambalance.api.event.miscellaneous
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMiscellaneousEventException
@@ -34,7 +34,7 @@ import java.time.LocalDateTime
 import kotlin.math.min
 
 @RestController
-@Api(tags = ["miscellaneous-events"])
+@Tag(name = "miscellaneous-events")
 @RequestMapping(path = ["/api/miscellaneous-events"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class MiscellaneousEventController(
     private val eventRepository: MiscellaneousEventRepository,

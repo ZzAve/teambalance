@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.users
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
+import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.SECRET_HEADER
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@Api(tags = ["users"])
+@Tag(name = "users")
 @RequestMapping(path = ["/api/users"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class UserController(
     private val userRepository: UserRepository,
@@ -74,6 +75,7 @@ class UserController(
         userRepository.save(user)
     }
 
+    @Admin
     @PreAuthorize("hasRole('admin')")
     @PutMapping("/{id}")
     fun updateUser(
