@@ -1,11 +1,22 @@
 {
   "short_name": "TeamBalance",
   "name": "Fancy pants teampot voor heren 5",
+  "description": "For sv Tovo '67 HS5, this is the place too keep attendance of beer consumption, and events like trainings or matches",
   "icons": [
     {
       "src": "images/favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "sizes": "16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "images/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "images/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
     },
     {
       "src": "images/logo192.png",
@@ -20,6 +31,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#3f51b5",
   "background_color": "#ffffff"
 }
