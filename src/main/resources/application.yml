@@ -1,4 +1,6 @@
 app:
+  title: Team balance
+  version: '@project.version@'
   secret:
     secret-value: ${sm://API_SECRET}
   bank:
@@ -22,6 +24,8 @@ app:
 server:
   forward-headers-strategy: NATIVE
 spring:
+  application:
+    name: "Fancy pants teampot for Tovo heren 5"
   cloud:
     gcp:
       project-id: ${sm://GCP_PROJECT_ID}
