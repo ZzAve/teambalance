@@ -16,7 +16,7 @@
     "use-persisted-state": "0.3.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.12",
+    "@babel/core": "7.16.12",
     "@babel/plugin-proposal-class-properties": "7.16.0",
     "@babel/preset-env": "7.16.0",
     "@babel/preset-react": "7.16.0",
@@ -42,7 +42,7 @@
     "style-loader": "3.3.1",
     "webpack": "5.62.1",
     "webpack-cli": "4.9.1",
-    "webpack-dev-server": "3.11.2"
+    "webpack-dev-server": "4.7.3"
   },
   "scripts": {
     "start": "webpack serve --mode development --host 0.0.0.0",
