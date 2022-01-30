@@ -7,9 +7,11 @@ import {
   BrowserRouter as Router,
   Link,
   Redirect,
+  Route,
   Switch,
+  useParams,
 } from "react-router-dom";
-import { PrivateRoute } from "../components/PrivateRoute";
+import { RequireAuth } from "../components/RequireAuth";
 import Loading from "./Loading";
 import { ViewType } from "../utils/util";
 import { Button, createStyles, makeStyles } from "@material-ui/core";
@@ -118,64 +120,67 @@ const Admin = ({ refresh }) => {
         </Grid>
 
         <Switch>
-          <PrivateRoute
-            path="/admin/trainings"
-            eventsType={EventsType.TRAINING}
-            component={EventsOverview}
-            refresh={refresh}
-          />
-          <PrivateRoute
-            path="/admin/matches"
-            eventsType={EventsType.MATCH}
-            component={EventsOverview}
-            refresh={refresh}
-          />
-          <PrivateRoute
-            path="/admin/misc-events"
-            eventsType={EventsType.MISC}
-            component={EventsOverview}
-            refresh={refresh}
-          />
-          <PrivateRoute
-            path="/admin/new-training"
-            eventsType={EventsType.TRAINING}
-            component={NewEvent}
-            refresh={refresh}
-          />
-          <PrivateRoute
-            path="/admin/new-match"
-            eventsType={EventsType.MATCH}
-            component={NewEvent}
-            refresh={refresh}
-          />
-          <PrivateRoute
-            path="/admin/new-misc-event"
-            eventsType={EventsType.MISC}
-            component={NewEvent}
-            refresh={refresh}
-          />
-          <PrivateRoute
-            path="/admin/edit-training/:id"
-            eventsType={EventsType.TRAINING}
-            component={ChangeEvent}
-            refresh={refresh}
-          />
-          <PrivateRoute
-            path="/admin/edit-match/:id"
-            eventsType={EventsType.MATCH}
-            component={ChangeEvent}
-            view={ViewType.Table}
-            refresh={refresh}
-          />
-          <PrivateRoute
-            path="/admin/edit-misc-event/:id"
-            eventsType={EventsType.MISC}
-            component={ChangeEvent}
-            refresh={refresh}
-          />
+          <Route path="/admin/trainings">
+            <RequireAuth>
+              <EventsOverview
+                eventsType={EventsType.TRAINING}
+                refresh={refresh}
+              />
+            </RequireAuth>
+          </Route>
+          <Route path="/admin/matches">
+            <RequireAuth>
+              <EventsOverview eventsType={EventsType.MATCH} refresh={refresh} />
+            </RequireAuth>
+          </Route>
+          <Route path="/admin/misc-events">
+            <RequireAuth>
+              <EventsOverview eventsType={EventsType.MISC} refresh={refresh} />
+            </RequireAuth>
+          </Route>
 
-          <PrivateRoute path="/admin/loading" component={Loading} />
-          <PrivateRoute path="/" component={HiAdmin} />
+          <Route path="/admin/new-training">
+            <RequireAuth>
+              <NewEvent eventsType={EventsType.TRAINING} refresh={refresh} />
+            </RequireAuth>
+          </Route>
+          <Route path="/admin/new-match">
+            <RequireAuth>
+              <NewEvent eventsType={EventsType.MATCH} refresh={refresh} />
+            </RequireAuth>
+          </Route>
+          <Route path="/admin/new-misc-event">
+            <RequireAuth>
+              <NewEvent eventsType={EventsType.MISC} refresh={refresh} />
+            </RequireAuth>
+          </Route>
+
+          <Route path="/admin/edit-training/:id">
+            <RequireAuth>
+              <ChangeEvent eventsType={EventsType.TRAINING} refresh={refresh} />
+            </RequireAuth>
+          </Route>
+          <Route path="/admin/edit-match/:id">
+            <RequireAuth>
+              <ChangeEvent eventsType={EventsType.MATCH} refresh={refresh} />
+            </RequireAuth>
+          </Route>
+          <Route path="/admin/edit-misc-event/:id">
+            <RequireAuth>
+              <ChangeEvent eventsType={EventsType.MISC} refresh={refresh} />
+            </RequireAuth>
+          </Route>
+
+          <Route path="/admin/loading">
+            <RequireAuth>
+              <Loading />
+            </RequireAuth>
+          </Route>
+          <Route path="/">
+            <RequireAuth>
+              <HiAdmin />
+            </RequireAuth>
+          </Route>
         </Switch>
       </Router>
     </>
@@ -235,8 +240,10 @@ const EventsOverview = ({ eventsType, refresh }) => {
   );
 };
 
-const ChangeEvent = ({ computedMatch, eventsType, pageTitle, ...rest }) => {
-  const id = +((computedMatch || {}).params || {}).id;
+const ChangeEvent = ({ computedMatch, eventsType, ...rest }) => {
+  let { id } = useParams();
+  // const id = +((computedMatch || {}).params || {}).id;
+  console.log("ChangeEvent: ", rest, computedMatch, eventsType);
   if (id === undefined || isNaN(id)) {
     return (
       <Redirect
@@ -261,7 +268,7 @@ const ChangeEvent = ({ computedMatch, eventsType, pageTitle, ...rest }) => {
       <EventDetails
         eventsType={eventsType}
         location={location}
-        id={computedMatch.params.id}
+        id={id}
         showAttendees={true}
       />
     </PageItem>

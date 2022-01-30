@@ -7,13 +7,14 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import { withLoading } from "../utils/util";
 import Loading from "./Loading";
-import { Redirect } from "react-router-dom";
+import {Redirect, useLocation} from "react-router-dom";
 import { authenticationManager } from "../utils/AuthenticationManager";
 
-const Login = ({ location, handleRefresh }) => {
+const Login = ({ handleRefresh }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(undefined);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation()
 
   useEffect(() => {
     //On startup , try with current value in authenticationManager
@@ -47,11 +48,11 @@ const Login = ({ location, handleRefresh }) => {
     withLoading(setIsLoading, () =>
       authenticationManager.authenticate(passphrase)
     )
-      .catch((e) => {
-        console.error("Login did not work", e);
-      })
       .then((_) => {
         setIsAuthenticated(true);
+      })
+      .catch((e) => {
+        console.error("Login did not work", e);
       });
 
   const handleLogin = async (e) => {

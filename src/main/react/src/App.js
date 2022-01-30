@@ -2,10 +2,9 @@
 
 import React, { lazy, Suspense, useState } from "react";
 import "./App.css";
-import { BrowserRouter as Router, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Loading from "./views/Loading";
-import { PrivateRoute } from "./components/PrivateRoute";
-import { PublicRoute } from "./components/PublicRoute";
+import { RequireAuth } from "./components/RequireAuth";
 import TopBar from "./components/TopBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Container from "@material-ui/core/Container";
@@ -62,45 +61,58 @@ const App = () => {
           <Router>
             <Suspense fallback={<Loading />}>
               <Switch>
-                <PublicRoute
-                  path="/authenticate"
-                  component={Login}
-                  handleRefresh={refreshTopBar}
-                />
-                <PrivateRoute
+                <Route path="/authenticate">
+                  <Login handleRefresh={refreshTopBar} />
+                </Route>
+                <Route
                   path="/admin"
-                  component={Admin}
-                  refresh={shouldRefresh}
+                  render={() => (
+                    <RequireAuth>
+                      <Admin refresh={shouldRefresh} />
+                    </RequireAuth>
+                  )}
                 />
-                <PrivateRoute
-                  path="/trainings"
-                  eventsType={EventsType.TRAINING}
-                  component={EventsPage}
-                  refresh={shouldRefresh}
-                />
-                <PrivateRoute
-                  path="/matches"
-                  eventsType={EventsType.MATCH}
-                  component={EventsPage}
-                  refresh={shouldRefresh}
-                />
-                <PrivateRoute
-                  path="/transactions"
-                  component={Transaction}
-                  refresh={shouldRefresh}
-                />
-                <PrivateRoute
-                  path="/misc-events"
-                  eventsType={EventsType.MISC}
-                  component={EventsPage}
-                  refresh={shouldRefresh}
-                />
-                <PrivateRoute path="/loading" component={Loading} />
-                <PrivateRoute
-                  path="/"
-                  component={Overview}
-                  refresh={shouldRefresh}
-                />
+                <Route path="/trainings">
+                  <RequireAuth>
+                    <EventsPage
+                      eventsType={EventsType.TRAINING}
+                      refresh={shouldRefresh}
+                    />
+                  </RequireAuth>
+                </Route>
+                <Route path="/matches">
+                  <RequireAuth>
+                    <EventsPage
+                      eventsType={EventsType.MATCH}
+                      refresh={shouldRefresh}
+                    />
+                  </RequireAuth>
+                </Route>
+                <Route path="/transactions">
+                  <RequireAuth>
+                    <Transaction refresh={shouldRefresh} />
+                  </RequireAuth>
+                </Route>
+                <Route path="/misc-events">
+                  <RequireAuth>
+                    <EventsPage
+                      eventsType={EventsType.MISC}
+                      refresh={shouldRefresh}
+                    />
+                  </RequireAuth>
+                </Route>
+
+                <Route path="/loading">
+                  <RequireAuth>
+                    <Loading />
+                  </RequireAuth>
+                </Route>
+
+                <Route path="/">
+                  <RequireAuth>
+                    <Overview refresh={shouldRefresh} />
+                  </RequireAuth>
+                </Route>
               </Switch>
             </Suspense>
           </Router>
