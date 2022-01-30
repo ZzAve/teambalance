@@ -337,7 +337,7 @@ export const EventForm = ({
           container
           spacing={5}
           alignItems="flex-end"
-          justify="flex-end"
+          justifyContent="flex-end"
         >
           <Grid item>
             <FormControlLabel

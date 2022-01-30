@@ -56,8 +56,7 @@ const Overview = ({ refresh }) => {
               <Grid
                 container
                 item
-                justify-content="flex-end"
-                justify="flex-end"
+                justifyContent="flex-end"
               >
                 <Grid item>
                   <Button
@@ -90,8 +89,7 @@ const Overview = ({ refresh }) => {
               <Grid
                 container
                 item
-                justify-content="flex-end"
-                justify="flex-end"
+                justifyContent="flex-end"
               >
                 <Grid item>
                   <Button
@@ -122,8 +120,7 @@ const Overview = ({ refresh }) => {
               <Grid
                 container
                 item
-                justify-content="flex-end"
-                justify="flex-end"
+                justifyContent="flex-end"
               >
                 <Grid item>
                   <Button
@@ -165,7 +162,7 @@ const Overview = ({ refresh }) => {
                 container
                 item
                 xs={12}
-                justify={"space-between"}
+                justifyContent="space-between"
                 className={classes.transactions}
               >
                 <Grid item>

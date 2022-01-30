@@ -55,7 +55,7 @@ const EventsPage = ({ eventsType, refresh }) => {
               container
               alignItems="center"
               spacing={1}
-              justify="flex-end"
+              justifyContent="flex-end"
             >
               <Grid item>
                 <Typography variant="body1"> Table </Typography>
