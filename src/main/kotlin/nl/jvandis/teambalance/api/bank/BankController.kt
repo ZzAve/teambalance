@@ -1,6 +1,6 @@
 package nl.jvandis.teambalance.api.bank
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.SECRET_HEADER
 import nl.jvandis.teambalance.api.SecretService
@@ -20,7 +20,7 @@ import javax.validation.constraints.Min
 
 @RestController
 @Validated
-@Api(value = "Bank", tags = ["bank"])
+@Tag(name = "bank")
 @RequestMapping(path = ["/api/bank"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class BankController(
     private val bankService: BankService,

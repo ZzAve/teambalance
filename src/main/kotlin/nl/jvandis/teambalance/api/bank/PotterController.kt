@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.bank
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.tags.Tags
 import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.SECRET_HEADER
 import nl.jvandis.teambalance.api.SecretService
@@ -22,7 +23,7 @@ import javax.validation.constraints.Min
 
 @RestController
 @Validated
-@Api(value = "Aliases", tags = ["aliases", "bank"])
+@Tags(value = [Tag(name = "aliases"), Tag(name = "bank")])
 @RequestMapping(path = ["/api/bank"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class PotterController(
     private val potterService: PotterService,

@@ -1,6 +1,6 @@
 package nl.jvandis.teambalance.api.attendees
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.InvalidAttendeeException
@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@Api(tags = ["attendees"])
+@Tag(name = "attendees")
 @RequestMapping(path = ["/api/attendees"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class AttendeeController(
     private val attendeeRepository: AttendeeRepository,
