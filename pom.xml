@@ -184,6 +184,7 @@
                     <compilerPlugins>
                         <plugin>spring</plugin>
                         <plugin>jpa</plugin>
+                        <plugin>all-open</plugin>
                     </compilerPlugins>
                     <jvmTarget>11</jvmTarget>
                 </configuration>
