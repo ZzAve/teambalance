@@ -7,14 +7,25 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import { withLoading } from "../utils/util";
 import Loading from "./Loading";
-import {Redirect, useLocation} from "react-router-dom";
+import { Redirect, useLocation } from "react-router-dom";
 import { authenticationManager } from "../utils/AuthenticationManager";
+import { createStyles, makeStyles } from "@material-ui/core";
+
+const useStyles = makeStyles(() =>
+  createStyles({
+    hidden: {
+      display: "none",
+    },
+  })
+);
 
 const Login = ({ handleRefresh }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(undefined);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const location = useLocation()
+  const location = useLocation();
+
+  const classes = useStyles();
 
   useEffect(() => {
     //On startup , try with current value in authenticationManager
@@ -82,6 +93,12 @@ const Login = ({ handleRefresh }) => {
                 <Typography>omdat we niet graag onze namen delen</Typography>
               </Grid>
               <Grid item>
+                <TextField
+                  className={classes.hidden}
+                  type="text"
+                  autoComplete="username"
+                  value="tovoheren5"
+                />
                 <TextField
                   id="secret"
                   type="password"
