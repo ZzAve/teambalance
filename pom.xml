@@ -11,7 +11,7 @@
     <groupId>nl.jvandis</groupId>
     <artifactId>teambalance</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>teambalance</name>
+    <name>Team balance</name>
     <description>Personal project to monitor team expenses on beer and brown fruit</description>
 
     <properties>

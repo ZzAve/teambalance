@@ -2,7 +2,7 @@
             ▒▒▒▒▒▒▒▒
         ▒▒▒▒░░░░░░░░▒▒▒
        ▒▒░▒░░░      ░░░▒                    Title: ${app.title}
-       ▒░▒░░░░░░░░░░░░░▒                    Description: ${spring.application.name}
+       ▒░▒░░░░░░░░░░░░░▒                    Description: ${app.description}
   ░▒▒░ ▒▒ ░░░▒▒▒░░░░▒▒▒░▒                   Active profiles: ${spring.profiles.active}
   ▒░░░▒▒▒▒░░░▒+▒░░░░▒+▒░░       ▒▒▒▒▒▒      App version: ${app.version}
   ▒░░▒▒▒▒░░░░░░░░░░░░░░░░      ▓▒▒▒▒░▒▒     Spring version: ${spring-boot.version}

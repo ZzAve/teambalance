@@ -41,7 +41,7 @@ const Overview = ({ refresh }) => {
             <Grid item container spacing={4}>
               <Grid item xs={12}>
                 <Typography>
-                  Wanneer kan Chris zijn waarde weer laten zien?
+                  Wanneer mogen we onszelf weer een beetje beter maken?
                 </Typography>
               </Grid>
               <Grid item xs={12}>

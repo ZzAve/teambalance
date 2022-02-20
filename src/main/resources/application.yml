@@ -2,7 +2,8 @@ management.endpoints.web:
   base-path: /internal/actuator
 
 app:
-  title: Team balance
+  title: '@project.name@'
+  description: "Fancy pants teampot for Tovo heren 5"
   version: '@project.version@'
   secret:
     secret-value: ${sm://API_SECRET}
@@ -27,8 +28,6 @@ app:
 server:
   forward-headers-strategy: NATIVE
 spring:
-  application:
-    name: "Fancy pants teampot for Tovo heren 5"
   cloud:
     gcp:
       project-id: ${sm://GCP_PROJECT_ID}
