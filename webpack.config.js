@@ -23,7 +23,7 @@ module.exports = {
     path.join(__dirname, "src/main/react/polyfill.js")
   ],
   output: {
-    path: path.resolve(__dirname, "src/main/webapp/"),
+    path: path.join(process.cwd(), 'target/classes/static'),
     filename: "[name].bundle.js",
     chunkFilename: "[name].bundle.js",
     publicPath: "/"

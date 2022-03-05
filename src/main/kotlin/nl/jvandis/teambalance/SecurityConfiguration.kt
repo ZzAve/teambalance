@@ -24,14 +24,8 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             .headers().frameOptions().sameOrigin().and()
             .csrf().disable()
             .authorizeRequests()
-            //Permit public API calls
-            .antMatchers("/api/bank/**").permitAll()
-            .antMatchers("/api/authentication/**").permitAll()
-            .antMatchers("/api/users/**").permitAll()
-            .antMatchers("/api/trainings/**").permitAll()
-            .antMatchers("/api/attendees/**").permitAll()
-            .antMatchers("/api/matches/**").permitAll()
-            .antMatchers("/api/miscellaneous-events/**").permitAll()
+            // Permit public API calls
+            .antMatchers("/api/**").permitAll()
             // Require auth on internal pages
             .antMatchers("/internal/**").fullyAuthenticated()
             .antMatchers("/webjars/**").fullyAuthenticated()
@@ -45,15 +39,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             .antMatchers("/manifest.json").permitAll()
             // Permit frontend paths
             .antMatchers("/_ah/**").permitAll() // check this one!
-            .antMatchers("/login").permitAll()
-            .antMatchers("/logout").permitAll()
-            .antMatchers("/images/**").permitAll()
-            .antMatchers("/admin/**").permitAll()
-            .antMatchers("/matches/**").permitAll()
-            .antMatchers("/misc-events/**").permitAll()
-            .antMatchers("/trainings/**").permitAll()
-            .antMatchers("/transactions/**").permitAll()
-            .antMatchers("/").permitAll()
+            .antMatchers("/**").permitAll()
             .anyRequest().authenticated() // default is authenticated
             .and()
             .formLogin()

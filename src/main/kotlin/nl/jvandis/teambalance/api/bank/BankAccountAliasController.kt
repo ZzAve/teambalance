@@ -13,6 +13,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -36,6 +37,7 @@ class BankAccountAliasController(
     private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
+    @PreAuthorize("hasRole('admin')")
     fun getAliases(
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): BankAccountAliases {
@@ -47,6 +49,7 @@ class BankAccountAliasController(
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('admin')")
     fun getUser(
         @PathVariable(value = "id") bankAccountAliasId: Long,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
@@ -61,6 +64,7 @@ class BankAccountAliasController(
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
+    @PreAuthorize("hasRole('admin')")
     fun postUser(
         @RequestBody potentialBankAccountAlias: PotentialBankAccountAlias,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
@@ -74,6 +78,7 @@ class BankAccountAliasController(
 
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('admin')")
     fun updateUser(
         @PathVariable(value = "id") bankAccountAliasId: Long,
         @RequestHeader(value = SECRET_HEADER, required = false) secret: String?

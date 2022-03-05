@@ -2,6 +2,7 @@ package nl.jvandis.teambalance
 
 import nl.jvandis.teambalance.api.bank.StringToEnumConverter
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 import org.springframework.format.FormatterRegistry
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
@@ -17,16 +18,16 @@ class WebConfig : WebMvcConfigurer {
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
         registry.addResourceHandler("/**")
-            .addResourceLocations("/")
+            .addResourceLocations("classpath:/static/")
             .resourceChain(true)
             .addResolver(object : PathResourceResolver() {
                 @Throws(IOException::class)
                 override fun getResource(resourcePath: String, location: Resource): Resource {
                     val requestedResource = location.createRelative(resourcePath)
-                    return if (requestedResource.exists() && requestedResource.isReadable())
+                    return if (requestedResource.exists() && requestedResource.isReadable)
                         requestedResource
                     else
-                        getResource("/index.html", location);
+                        ClassPathResource("/static/index.html")
                 }
             })
     }
