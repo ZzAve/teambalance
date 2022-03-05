@@ -66,10 +66,15 @@ const updateMatch = ({
   );
 };
 
+const deleteMatch = (id, deleteAttendees = true) => {
+    return matchesClient.call(`matches/${id}?delete-attendees=${deleteAttendees}`, { method: "DELETE" });
+};
+
 export const matchesApiClient = {
   ...matchesClient,
   getMatches,
   getMatch,
   createMatch,
   updateMatch,
+  deleteMatch
 };

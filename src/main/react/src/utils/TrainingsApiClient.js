@@ -47,10 +47,15 @@ const updateTraining = ({ id, location, comment, startTime }) => {
   );
 };
 
+const deleteTraining = (id, deleteAttendees = true) => {
+  return trainingsClient.call(`trainings/${id}?delete-attendees=${deleteAttendees}`, { method: "DELETE" });
+};
+
 export const trainingsApiClient = {
   ...trainingsClient,
   getTrainings,
   getTraining,
   createTraining,
   updateTraining,
+  deleteTraining
 };

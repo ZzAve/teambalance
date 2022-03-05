@@ -6,7 +6,7 @@ import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { eventsApiClient } from "../../utils/MiscEventsApiClient";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
 import { ViewType, withLoading } from "../../utils/util";
-import EventsList from "./EventsList";
+import { EventsList } from "./EventsList";
 import EventsTable from "./EventsTable";
 import { EventsType } from "./utils";
 

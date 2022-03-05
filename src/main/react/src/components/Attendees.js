@@ -84,12 +84,7 @@ const additionalButtonColor = (state) => additionalColorMap[state] || "default";
 /**
  * Function Attendees component
  */
-const Attendees = ({
-  attendees,
-  onUpdate,
-  size = "medium",
-  showSummary = false,
-}) => {
+const Attendees = ({attendees, onUpdate, readOnly = false, size = "medium", showSummary = false,}) => {
   const [selectedAttendee, setSelectedAttendee] = useState(null);
   const [errorMessage, setErrorMessage] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
@@ -150,6 +145,7 @@ const Attendees = ({
           <Attendee
             size={size}
             attendee={it}
+            disabled={readOnly}
             onSelection={handleAttendeeClick}
           />
         </Grid>
@@ -200,10 +196,11 @@ const Attendees = ({
   );
 };
 
-export const Attendee = ({ size, attendee, onSelection }) => {
+export const Attendee = ({ size, attendee, onSelection, disabled = false }) => {
   return (
     <AttendeeStyledButton
       size={size}
+      disabled={disabled}
       variant="contained"
       color={buttonColor(attendee.state)}
       additional-color={additionalButtonColor(attendee.state)}

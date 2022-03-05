@@ -6,7 +6,7 @@ import { formattedDate, formattedTime } from "../../utils/util";
 import { EventsType, HomeAway } from "./utils";
 import { Pagination } from "@material-ui/lab";
 
-const EventsList = ({ eventsType, events, updateTrigger, withPagination }) => {
+export const EventsList = ({ eventsType, events, updateTrigger, withPagination }) => {
   const [page, setPage] = useState(1);
 
   const rowsPerPage = 10;
@@ -53,7 +53,7 @@ function formattedHomeVsAway(event) {
  * - event overview showing all attendees
  * - event showing attendance of a single attendee with availability to change
  */
-const EventListItem = ({ eventsType, event, onUpdate }) => {
+export const EventListItem = ({ eventsType, event, onUpdate, allowUpdating = true }) => {
   const startDateTime = new Date(event.startTime);
   const titleVariant = !event.title ? "body1" : "h6";
   const dateTimeVariant = !!event.title ? "body1" : "h6";
@@ -70,7 +70,6 @@ const EventListItem = ({ eventsType, event, onUpdate }) => {
         <Typography variant={dateTimeVariant}>
           📅 {formattedDate(startDateTime)}
         </Typography>
-        {!!event.title ? "" : ""}
         <Typography variant="body1">
           ⏰ {formattedTime(startDateTime)}
         </Typography>
@@ -94,6 +93,7 @@ const EventListItem = ({ eventsType, event, onUpdate }) => {
         <Attendees
           attendees={event.attendees}
           onUpdate={onUpdate}
+          readOnly={!allowUpdating}
           showSummary={[EventsType.TRAINING, EventsType.MATCH].includes(
             eventsType
           )}
@@ -103,4 +103,3 @@ const EventListItem = ({ eventsType, event, onUpdate }) => {
   );
 };
 
-export default EventsList;
