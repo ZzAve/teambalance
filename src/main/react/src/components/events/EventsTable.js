@@ -1,6 +1,5 @@
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
-import { formattedDate, formattedTime } from "../../utils/util";
 import Grid from "@material-ui/core/Grid";
 import TableContainer from "@material-ui/core/TableContainer";
 import Paper from "@material-ui/core/Paper";
@@ -21,15 +20,26 @@ import {
 } from "@material-ui/core";
 import { Redirect } from "react-router-dom";
 import Attendees from "../Attendees";
+import { formattedDate, formattedTime, withLoading } from "../../utils/util";
 import { EventsType } from "./utils";
+import AlertDialog from "../Alert";
+import { EventListItem } from "./EventsList";
+import { SpinnerWithText } from "../SpinnerWithText";
+import { trainingsApiClient } from "../../utils/TrainingsApiClient";
+import { eventsApiClient } from "../../utils/MiscEventsApiClient";
+import { matchesApiClient } from "../../utils/MatchesApiClient";
 
 const useStyles = makeStyles(() =>
   createStyles({
     root: {
-      minWidth: "960px",
+      minWidth: "480px",
     },
     attendees: {
       width: "20%",
+    },
+    changes: {
+      width: "10%",
+      minWidth: "100px",
     },
   })
 );
@@ -44,12 +54,14 @@ const EventsTable = ({
   const [goTo, setGoTo] = useState(undefined);
   const [page, setPage] = useState(0); // get from url?
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [deleteAlertOpen, setDeleteAlertOpen] = React.useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const classes = useStyles();
   const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
 
-  const handleChangePage = (event, page) => {
-    setPage(page);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -69,6 +81,37 @@ const EventsTable = ({
     }
   };
 
+  const handleDeleteClick = () => {
+    setDeleteAlertOpen(true);
+  };
+
+  const handleDelete = (shouldDelete, eventId) => {
+    console.warn(
+      "Called handle delete with should delete and eventId",
+      shouldDelete,
+      eventId
+    );
+    setDeleteAlertOpen(false);
+    if (shouldDelete) {
+      withLoading(setIsLoading, () => {
+        if (eventsType === EventsType.TRAINING) {
+          return trainingsApiClient.deleteTraining(eventId);
+        } else if (eventsType === EventsType.MATCH) {
+          return matchesApiClient.deleteMatch(eventId);
+        } else if (eventsType === EventsType.MISC) {
+          return eventsApiClient.deleteEvent(eventId);
+        } else {
+          console.error(`Could not delete event for type ${eventsType}`);
+        }
+      }).then(() => {
+        console.log(`Deleted event ${eventId}`);
+        withLoading(setIsLoading, () => updateTrigger()).then();
+      });
+    } else {
+      console.log("Should not delete");
+    }
+  };
+
   const getUpdateIcons = ({ id }) => (
     <Grid container spacing={1}>
       <Grid item xs>
@@ -84,7 +127,7 @@ const EventsTable = ({
         <Button
           variant="contained"
           color="secondary"
-          onClick={() => alert("verwijderen. binnenkort echt")}
+          onClick={handleDeleteClick}
         >
           <DeleteIcon />
         </Button>
@@ -92,92 +135,92 @@ const EventsTable = ({
     </Grid>
   );
 
-  // TODO expand table for Match events (maybe split impl?)
-  const getTableBodyTraining = () => (
-    <>
-      {events.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map((row) => {
-        return (
-          <TableRow key={row.id}>
-            <TableCell component="th" scope="row">
-              {formattedDate(new Date(row.startTime))}&nbsp;
-              {formattedTime(new Date(row.startTime))}
-            </TableCell>
-            <TableCell align="right">{row.location}</TableCell>
-            <TableCell align="right">{row.comment}</TableCell>
-            <TableCell className={classes.attendees}>
-              <Attendees
-                size="small"
-                attendees={row.attendees}
-                onUpdate={updateTrigger}
-                showSummary={false}
-              />
-            </TableCell>
-            <TableCell hidden={!allowChanges} align="right">
-              {allowChanges ? getUpdateIcons(row) : <> </>}
-            </TableCell>
-          </TableRow>
-        );
-      })}
-    </>
+  const getHeaderTitleCell = () => (
+    <TableCell align="right">
+      {EventsType.MATCH ? "Tegenstander" : "Titel"}
+    </TableCell>
   );
 
-  const getTableBodyMatch = () => (
-    <>
-      {events.map((row) => {
-        return (
-          <TableRow key={row.id}>
-            <TableCell component="th" scope="row">
-              {formattedDate(new Date(row.startTime))}&nbsp;
-              {formattedTime(new Date(row.startTime))}
-            </TableCell>
-            <TableCell align="right">{row.opponent}</TableCell>
-            <TableCell align="right">
-              {row.location} ({row.homeAway === "HOME" ? "THUIS" : "UIT"})
-            </TableCell>
-            <TableCell align="right">{row.comment}</TableCell>
-            <TableCell className={classes.attendees}>
-              <Attendees
-                attendees={row.attendees}
-                onUpdate={updateTrigger}
-                size="small"
-                showSummary={false}
-              />
-            </TableCell>
-            <TableCell hidden={!allowChanges} align="right">
-              {allowChanges ? getUpdateIcons(row) : <> </>}
-            </TableCell>
-          </TableRow>
-        );
-      })}
-    </>
+  const getTableHead = () => (
+    <TableRow>
+      <TableCell>Datum</TableCell>
+      {eventsType !== EventsType.TRAINING ? getHeaderTitleCell() : <></>}
+      <TableCell align="right">Locatie</TableCell>
+      <TableCell align="right">Opmerking</TableCell>
+      <TableCell align="center">Deelnemers</TableCell>
+      {allowChanges ? <TableCell align="right">Aanpassen</TableCell> : <></>}
+    </TableRow>
   );
 
-  const getTableBodyOther = () => (
+  const getBodyTitleCell = (row) => (
+    <TableCell align="right">
+      {EventsType.MATCH ? row.opponent : row.title}
+    </TableCell>
+  );
+
+  const getBodyLocationCell = (row) => {
+    let locationAddendum = "";
+    if (EventsType.MATCH) {
+      locationAddendum = row.homeAway === "HOME" ? "THUIS" : "UIT";
+    }
+
+    return row.location + locationAddendum;
+  };
+
+  const getAlertDialog = (row) => {
+    const eventListItem = (
+      <EventListItem
+        event={row}
+        eventsType={eventsType}
+        onUpdate={() => false}
+        allowUpdating={false}
+      />
+    );
+
+    return (
+      <AlertDialog
+        open={deleteAlertOpen}
+        onResult={(result) => handleDelete(result, row.id)}
+        title={`Weet je zeker dat je ${eventsType.toLowerCase()} met id #${
+          row.id
+        } wil verwijderen?`}
+        body={eventListItem}
+      />
+    );
+  };
+  const getTableBodyRow = (row) => (
+    <TableRow key={row.id}>
+      <TableCell component="th" scope="row">
+        {formattedDate(new Date(row.startTime))}&nbsp;
+        {formattedTime(new Date(row.startTime))}
+      </TableCell>
+      {eventsType !== EventsType.TRAINING ? getBodyTitleCell(row) : <></>}
+      <TableCell align="right">{getBodyLocationCell(row)}</TableCell>
+      <TableCell align="right">{row.comment}</TableCell>
+      <TableCell className={classes.attendees}>
+        <Attendees
+          size="small"
+          attendees={row.attendees}
+          onUpdate={updateTrigger}
+          showSummary={false}
+        />
+      </TableCell>
+      {allowChanges ? (
+        <TableCell className={classes.changes} align="right">
+          {getUpdateIcons(row)}
+          {getAlertDialog(row)}
+        </TableCell>
+      ) : (
+        <></>
+      )}
+    </TableRow>
+  );
+
+  const getTableBody = () => (
     <>
-      {events.map((row) => {
-        return (
-          <TableRow key={row.id}>
-            <TableCell component="th" scope="row">
-              {formattedDate(new Date(row.startTime))}&nbsp;
-              {formattedTime(new Date(row.startTime))}
-            </TableCell>
-            <TableCell align="right">{row.title}</TableCell>
-            <TableCell align="right">{row.location}</TableCell>
-            <TableCell align="right">{row.comment}</TableCell>
-            <TableCell className={classes.attendees}>
-              <Attendees
-                size="small"
-                attendees={row.attendees}
-                onUpdate={updateTrigger}
-                showSummary={false}
-              />
-            </TableCell>
-            <TableCell hidden={!allowChanges} align="right">
-              {allowChanges ? getUpdateIcons(row) : <> </>}
-            </TableCell>
-          </TableRow>
-        );
-      })}
+      {events
+        .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+        .map((row) => getTableBodyRow(row))}
     </>
   );
 
@@ -186,60 +229,16 @@ const EventsTable = ({
     return <Redirect to={goTo} push={true} />;
   }
 
-  const getTableHeadTraining = () => (
-    <TableRow>
-      <TableCell>Datum</TableCell>
-      <TableCell align="right">Location</TableCell>
-      <TableCell align="right">Opmerking</TableCell>
-      <TableCell align="center">Deelnemers</TableCell>
-      {allowChanges ? <TableCell align="right">Aanpassen</TableCell> : <></>}
-    </TableRow>
-  );
-
-  const getTableHeadMatch = () => (
-    <TableRow>
-      <TableCell>Datum</TableCell>
-      <TableCell align="right">Tegenstander</TableCell>
-      <TableCell align="right">Location</TableCell>
-      <TableCell align="right">Opmerking</TableCell>
-      <TableCell align="center">Deelnemers</TableCell>
-      {allowChanges ? <TableCell align="right">Aanpassen</TableCell> : <></>}
-    </TableRow>
-  );
-
-  const getTableHeadOther = () => (
-    <TableRow>
-      <TableCell>Datum</TableCell>
-      <TableCell align="right">Titel</TableCell>
-      <TableCell align="right">Location</TableCell>
-      <TableCell align="right">Opmerking</TableCell>
-      <TableCell align="center">Deelnemers</TableCell>
-      {allowChanges ? <TableCell align="right">Aanpassen</TableCell> : <></>}
-    </TableRow>
-  );
+  if (isLoading) {
+    return <SpinnerWithText text={"Laden"} />;
+  }
 
   return (
     <Grid container item xs={12}>
       <TableContainer component={Paper}>
         <Table aria-label="simple table" size="medium" className={classes.root}>
-          {eventsType === EventsType.TRAINING ? (
-            <>
-              <TableHead>{getTableHeadTraining()}</TableHead>
-              <TableBody>{getTableBodyTraining()}</TableBody>
-            </>
-          ) : eventsType === EventsType.MATCH ? (
-            <>
-              <TableHead>{getTableHeadMatch()}</TableHead>
-              <TableBody>{getTableBodyMatch()}</TableBody>
-            </>
-          ) : eventsType === EventsType.MISC ? (
-            <>
-              <TableHead>{getTableHeadOther()}</TableHead>
-              <TableBody>{getTableBodyOther()}</TableBody>
-            </>
-          ) : (
-            "🤷‍♂️"
-          )}
+          <TableHead>{getTableHead()}</TableHead>
+          <TableBody>{getTableBody()}</TableBody>
           {withPagination && (
             <TableFooter>
               <TableRow>
@@ -259,5 +258,4 @@ const EventsTable = ({
     </Grid>
   );
 };
-
 export default EventsTable;
