@@ -4,17 +4,19 @@ import { BankApiClient as bankApiClient } from "../utils/BankApiClient";
 import { withLoading } from "../utils/util";
 import Typography from "@material-ui/core/Typography";
 import { Grid } from "@material-ui/core";
+import Switch from "@material-ui/core/Switch";
 
 export const Potters = ({ refresh, limit = 3, showFloppers = true }) => {
-  const [toppers, setToppers] = useState([]);
-  const [floppers, setFloppers] = useState([]);
+  const [toppers, setToppers] = useState({});
+  const [floppers, setFloppers] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showSeason, setShowSeason] = useState(true);
 
   useEffect(() => {
     withLoading(setIsLoading, () =>
       bankApiClient.getPotters(limit).then((x) => {
-        setFloppers(x.floppers);
-        setToppers(x.toppers);
+        setFloppers({season:x.floppers, month:x.subPeriod?.floppers});
+        setToppers({season:x.toppers, month:x.subPeriod?.toppers});
       })
     ).then();
   }, [refresh]);
@@ -59,16 +61,39 @@ export const Potters = ({ refresh, limit = 3, showFloppers = true }) => {
     return <SpinnerWithText text="ophalen potters" />;
   }
 
-  return (
+    const setShowSeasonToggle = checked => setShowSeason(checked);
+
+    return (
     <Grid item container spacing={2}>
-      {renderItems(toppers, "Toppers (van het seizoen)", [
+        <Grid
+            component="label"
+            item
+            container
+            alignItems="center"
+            spacing={1}
+            justifyContent="flex-end"
+        >
+            <Grid item>
+                <Typography variant="body1"> Month (last 30 days) </Typography>
+            </Grid>
+            <Grid item > <Switch
+                checked={showSeason}
+                onChange={(x) => setShowSeasonToggle(x.target.checked)}
+                name="monthVsSeason"
+            /></Grid>
+            <Grid item>
+                <Typography variant="body1"> Season </Typography>
+            </Grid>
+        </Grid>
+
+      {renderItems(showSeason ? toppers.season : toppers.month, "Toppers (van het seizoen)", [
         "🥇",
         "🥈",
         "🥉",
         "",
       ])}
       {showFloppers &&
-        renderItems(floppers, "Floppers (van het seizoen)", ["🐷", "🐗", "🐖"])}
+        renderItems(showSeason ? floppers.season : floppers.month, "Floppers (van het seizoen)", ["🐷", "🐗", "🐖"])}
     </Grid>
   );
 };

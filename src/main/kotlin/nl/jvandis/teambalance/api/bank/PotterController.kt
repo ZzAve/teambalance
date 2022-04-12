@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.time.ZoneId
+import java.time.Duration
 import java.time.ZonedDateTime
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
@@ -27,7 +27,8 @@ import javax.validation.constraints.Min
 @RequestMapping(path = ["/api/bank"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class PotterController(
     private val potterService: PotterService,
-    private val secretService: SecretService
+    private val secretService: SecretService,
+    private val bankConfig: BankConfig
 ) {
 
     @GetMapping("/potters")
@@ -40,20 +41,29 @@ class PotterController(
     ): PottersResponse {
         secretService.ensureSecret(secret)
 
-        val sinceLowerLimit = ZonedDateTime.of(2021, 7, 31, 23, 59, 59, 0, ZoneId.of("Europe/Paris"))
-        if (sinceInput < sinceLowerLimit) {
-            throw IllegalArgumentException("Since input argument is before lower limit of $sinceLowerLimit. Input was $sinceInput")
+        if (sinceInput < bankConfig.dateTimeLimit) {
+            throw IllegalArgumentException("Since input argument is before lower limit of ${bankConfig.dateTimeLimit}. Input was $sinceInput")
         }
-        return potterService.getPotters(sinceInput, includeInactiveUsers).toPottersResponse(limit)
+        val pottersFullPeriod = potterService.getPotters(sinceInput, includeInactiveUsers)
+        val now = ZonedDateTime.now()
+        val pottersLastMonthResponse: PottersResponse? = when {
+            Duration.between(sinceInput, now) > Duration.ofDays(30) ->
+                potterService.getPotters(now.minusDays(30), includeInactiveUsers)
+                    .toPottersResponse(limit)
+            else -> null
+        }
+        return pottersFullPeriod.toPottersResponse(limit, pottersLastMonthResponse)
     }
 
-    private fun Potters.toPottersResponse(limit: Int) = PottersResponse(
-        toppers = potters.map { it.toPotterResponse(currency) }.sortedByDescending { it.amount }.take(limit),
-        floppers = potters.map { it.toPotterResponse(currency) }.sortedBy { it.amount }.take(limit),
-        amountOfConsideredTransactions = amountOfTransactions,
-        from = from,
-        until = until
-    )
+    private fun Potters.toPottersResponse(limit: Int, pottersLastMonthResponse: PottersResponse? = null) =
+        PottersResponse(
+            toppers = this.potters.map { it.toPotterResponse(currency) }.sortedByDescending { it.amount }.take(limit),
+            floppers = this.potters.map { it.toPotterResponse(currency) }.sortedBy { it.amount }.take(limit),
+            amountOfConsideredTransactions = amountOfTransactions,
+            from = from,
+            until = until,
+            subPeriod = pottersLastMonthResponse
+        )
 
     private fun Potter.toPotterResponse(currency: String): PotterResponse {
         val cumulativeAmount = transactions.fold(0.0) { acc, cur -> acc + cur.amount.toDouble() }

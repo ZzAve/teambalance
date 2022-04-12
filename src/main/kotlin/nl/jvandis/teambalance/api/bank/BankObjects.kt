@@ -58,6 +58,7 @@ data class PottersResponse(
     val amountOfConsideredTransactions: Int,
     val from: ZonedDateTime,
     val until: ZonedDateTime,
+    val subPeriod: PottersResponse?
 )
 
 data class PotterResponse(
