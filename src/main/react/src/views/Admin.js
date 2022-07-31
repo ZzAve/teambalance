@@ -120,67 +120,76 @@ const Admin = ({ refresh }) => {
         </Grid>
 
         <Switch>
-          <Route path="/admin/trainings">
+          <Route path="/admin/trainings" render={() => (
+
             <RequireAuth>
               <EventsOverview
                 eventsType={EventsType.TRAINING}
                 refresh={refresh}
               />
             </RequireAuth>
-          </Route>
-          <Route path="/admin/matches">
+          )}/>
+          <Route path="/admin/matches" render={() => (
+
             <RequireAuth>
               <EventsOverview eventsType={EventsType.MATCH} refresh={refresh} />
             </RequireAuth>
-          </Route>
-          <Route path="/admin/misc-events">
+          )}/>
+          <Route path="/admin/misc-events" render={() => (
+
             <RequireAuth>
               <EventsOverview eventsType={EventsType.MISC} refresh={refresh} />
             </RequireAuth>
-          </Route>
+          )}/>
 
-          <Route path="/admin/new-training">
+          <Route path="/admin/new-training" render={() => (
             <RequireAuth>
               <NewEvent eventsType={EventsType.TRAINING} refresh={refresh} />
             </RequireAuth>
-          </Route>
-          <Route path="/admin/new-match">
+          )}/>
+          <Route path="/admin/new-match" render={() => (
+
             <RequireAuth>
               <NewEvent eventsType={EventsType.MATCH} refresh={refresh} />
             </RequireAuth>
-          </Route>
-          <Route path="/admin/new-misc-event">
+          )}/>
+          <Route path="/admin/new-misc-event" render={() => (
+
             <RequireAuth>
               <NewEvent eventsType={EventsType.MISC} refresh={refresh} />
             </RequireAuth>
-          </Route>
+          )}/>
 
-          <Route path="/admin/edit-training/:id">
+          <Route path="/admin/edit-training/:id" render={() => (
             <RequireAuth>
               <ChangeEvent eventsType={EventsType.TRAINING} refresh={refresh} />
             </RequireAuth>
-          </Route>
-          <Route path="/admin/edit-match/:id">
+          )}/>
+          <Route path="/admin/edit-match/:id" render={() => (
+
             <RequireAuth>
               <ChangeEvent eventsType={EventsType.MATCH} refresh={refresh} />
             </RequireAuth>
-          </Route>
-          <Route path="/admin/edit-misc-event/:id">
+          )}/>
+          <Route path="/admin/edit-misc-event/:id" render={() => (
+
             <RequireAuth>
               <ChangeEvent eventsType={EventsType.MISC} refresh={refresh} />
             </RequireAuth>
-          </Route>
+          )}/>
 
-          <Route path="/admin/loading">
+          <Route path="/admin/loading" render={() => (
+
             <RequireAuth>
               <Loading />
             </RequireAuth>
-          </Route>
-          <Route path="/">
+          )}/>
+          <Route path="/" render={() => (
+
             <RequireAuth>
               <HiAdmin />
             </RequireAuth>
-          </Route>
+          )}/>
         </Switch>
       </Router>
     </>

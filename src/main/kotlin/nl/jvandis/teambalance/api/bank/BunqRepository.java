@@ -5,12 +5,9 @@ import com.bunq.sdk.context.ApiEnvironmentType;
 import com.bunq.sdk.context.BunqContext;
 import com.bunq.sdk.exception.BunqException;
 import com.bunq.sdk.exception.ForbiddenException;
+import com.bunq.sdk.http.BunqHeader;
 import com.bunq.sdk.http.Pagination;
-import com.bunq.sdk.model.generated.endpoint.MonetaryAccountBank;
-import com.bunq.sdk.model.generated.endpoint.Payment;
-import com.bunq.sdk.model.generated.endpoint.RequestInquiry;
-import com.bunq.sdk.model.generated.endpoint.User;
-import com.bunq.sdk.model.generated.endpoint.SandboxUserPerson;
+import com.bunq.sdk.model.generated.endpoint.*;
 import com.bunq.sdk.model.generated.object.Amount;
 import com.bunq.sdk.model.generated.object.Pointer;
 import com.google.gson.Gson;
@@ -33,6 +30,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -263,13 +261,21 @@ public class BunqRepository {
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
-                .url("https://public-api.sandbox.bunq.com/v1/sandbox-user")
-                .post(RequestBody.create(null, new byte[0]))
-                .addHeader("x-bunq-client-request-id", "1234")
-                .addHeader("cache-control", "no-cache")
-                .addHeader("x-bunq-geolocation", "0 0 0 0 NL")
-                .addHeader("x-bunq-language", "en_US")
-                .addHeader("x-bunq-region", "en_US")
+                .url(
+                        "https://" +
+                                ApiEnvironmentType.SANDBOX.getBaseUri() +
+                                "/" +
+                                ApiEnvironmentType.SANDBOX.getApiVersion() +
+                                "/sandbox-user-person"
+                )
+                .post(RequestBody.create(null, new byte[INDEX_FIRST]))
+                .addHeader(BunqHeader.CLIENT_REQUEST_ID.getHeaderName(), UUID.randomUUID().toString())
+                .addHeader(
+                        BunqHeader.CACHE_CONTROL.getHeaderName(), BunqHeader.CACHE_CONTROL.getDefaultValue()
+                )
+                .addHeader(BunqHeader.GEOLOCATION.getHeaderName(), BunqHeader.GEOLOCATION.getDefaultValue())
+                .addHeader(BunqHeader.LANGUAGE.getHeaderName(), BunqHeader.LANGUAGE.getDefaultValue())
+                .addHeader(BunqHeader.REGION.getHeaderName(), BunqHeader.REGION.getDefaultValue())
                 .build();
 
         try {

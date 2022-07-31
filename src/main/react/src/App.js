@@ -2,7 +2,6 @@
 
 import React, { lazy, Suspense, useState } from "react";
 import "./App.css";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Loading from "./views/Loading";
 import { RequireAuth } from "./components/RequireAuth";
 import TopBar from "./components/TopBar";
@@ -14,6 +13,7 @@ import { EventsType } from "./components/events/utils";
 import { Alert } from "@material-ui/lab";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import Typography from "@material-ui/core/Typography";
+import {Route, BrowserRouter as Router, Switch} from "react-router-dom";
 
 const Admin = lazy(() => import("./views/Admin.js"));
 const Login = lazy(() => import("./views/Login.js"));
@@ -72,47 +72,44 @@ const App = () => {
                     </RequireAuth>
                   )}
                 />
-                <Route path="/trainings">
+                <Route path="/trainings" render={() => (
                   <RequireAuth>
                     <EventsPage
                       eventsType={EventsType.TRAINING}
                       refresh={shouldRefresh}
                     />
                   </RequireAuth>
-                </Route>
-                <Route path="/matches">
+                )}/>
+                <Route path="/matches" render={() => (
                   <RequireAuth>
                     <EventsPage
                       eventsType={EventsType.MATCH}
                       refresh={shouldRefresh}
                     />
                   </RequireAuth>
-                </Route>
-                <Route path="/transactions">
+                )}/>
+                <Route path="/transactions" render={() => (
                   <RequireAuth>
                     <Transaction refresh={shouldRefresh} />
                   </RequireAuth>
-                </Route>
-                <Route path="/misc-events">
+                )}/>
+                <Route path="/misc-events" render={() => (
                   <RequireAuth>
                     <EventsPage
                       eventsType={EventsType.MISC}
                       refresh={shouldRefresh}
                     />
                   </RequireAuth>
+                )}/>
+
+                <Route path="/loading" component={Loading}>
                 </Route>
 
-                <Route path="/loading">
-                  <RequireAuth>
-                    <Loading />
-                  </RequireAuth>
-                </Route>
-
-                <Route path="/">
+                <Route path="/" render={() => (
                   <RequireAuth>
                     <Overview refresh={shouldRefresh} />
                   </RequireAuth>
-                </Route>
+                )}/>
               </Switch>
             </Suspense>
           </Router>

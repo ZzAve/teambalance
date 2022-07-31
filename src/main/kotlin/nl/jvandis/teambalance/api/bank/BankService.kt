@@ -47,10 +47,10 @@ data class BankConfig(
 )
 
 /**
- * BankService resolves bankrelated questions
+ * BankService resolves bank related questions
  *
  * Its main function is to retrieve information from the BunqRepository and make it available in domain objects.
- * Makes use of a BunqReposity to connect to the bunqAPI
+ * Makes use of a BunqRepository to connect to the bunqAPI
  */
 @Service
 class BankService(
