@@ -18,7 +18,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@material-ui/core";
-import { Redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Attendees from "../Attendees";
 import { formattedDate, formattedTime, withLoading } from "../../utils/util";
 import { EventsType } from "./utils";
@@ -51,12 +51,11 @@ const EventsTable = ({
   updateTrigger,
   withPagination,
 }) => {
-  const [goTo, setGoTo] = useState(undefined);
   const [page, setPage] = useState(0); // get from url?
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [deleteAlertOpen, setDeleteAlertOpen] = React.useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const navigate = useNavigate();
   const classes = useStyles();
   const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
 
@@ -71,11 +70,11 @@ const EventsTable = ({
 
   const handleClickEditEvent = (id) => {
     if (eventsType === EventsType.TRAINING) {
-      setGoTo(`/admin/edit-training/${id}`);
+      navigate(`/admin/edit-training/${id}`);
     } else if (eventsType === EventsType.MATCH) {
-      setGoTo(`/admin/edit-match/${id}`);
+      navigate(`/admin/edit-match/${id}`);
     } else if (eventsType === EventsType.MISC) {
-      setGoTo(`/admin/edit-misc-event/${id}`);
+      navigate(`/admin/edit-misc-event/${id}`);
     } else {
       console.error(`Could not edit event for type ${eventsType}`);
     }
@@ -223,12 +222,7 @@ const EventsTable = ({
         .map((row) => getTableBodyRow(row))}
     </>
   );
-
-  if (goTo !== undefined) {
-    console.log(`Navigating to: ${goTo}`);
-    return <Redirect to={goTo} push={true} />;
-  }
-
+  
   if (isLoading) {
     return <SpinnerWithText text={"Laden"} />;
   }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { withLoading } from "../../utils/util";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { SpinnerWithText } from "../SpinnerWithText";
 import {
   DatePicker,
@@ -192,7 +192,7 @@ export const EventForm = ({
       },
     };
 
-    return <Redirect to={from} push={true} />;
+    return <Navigate to={from.pathname} />;
   }
 
   if (isLoading) {

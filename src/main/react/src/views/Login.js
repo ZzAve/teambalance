@@ -7,7 +7,7 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import { withLoading } from "../utils/util";
 import Loading from "./Loading";
-import { Redirect, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { authenticationManager } from "../utils/AuthenticationManager";
 import { createStyles, makeStyles } from "@material-ui/core";
 
@@ -76,7 +76,7 @@ const Login = ({ handleRefresh }) => {
   if (isAuthenticated) {
     const { from } = location.state || { from: { pathname: "/" } };
     handleRefresh();
-    return <Redirect to={from} push={false} />;
+    return <Navigate to={from} replace />;
   }
 
   if (isLoading) {

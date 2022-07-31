@@ -2,7 +2,7 @@ import Grid from "@material-ui/core/Grid";
 import PageItem from "../components/PageItem";
 import { Button, Card, createStyles, makeStyles } from "@material-ui/core";
 import React, { useState } from "react";
-import { Redirect } from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import Hidden from "@material-ui/core/Hidden";
 import Transactions from "../components/Transactions";
@@ -19,11 +19,11 @@ const useStyles = makeStyles(() =>
 );
 
 const TransactionsPage = ({ refresh }) => {
-  const [goTo, setGoTo] = useState(undefined);
-
+  const navigate = useNavigate();
   const classes = useStyles();
-  if (goTo !== undefined) {
-    return <Redirect to={goTo} push={true} />;
+
+  const navigateBack = () => {
+    navigate("../");
   }
 
   return (
@@ -34,7 +34,7 @@ const TransactionsPage = ({ refresh }) => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => setGoTo("/")}
+            onClick={navigateBack}
           >
             <ArrowBackIcon />
             <Hidden xsDown>Terug </Hidden>
