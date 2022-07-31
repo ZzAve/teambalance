@@ -200,7 +200,7 @@ export const EventForm = ({
   }
 
   return (
-    <MuiPickersUtilsProvider utils={DateFnsUtils}  locale={nl}>
+    <MuiPickersUtilsProvider utils={DateFnsUtils} locale={nl}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <TextField

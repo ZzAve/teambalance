@@ -67,7 +67,10 @@ const updateMatch = ({
 };
 
 const deleteMatch = (id, deleteAttendees = true) => {
-    return matchesClient.call(`matches/${id}?delete-attendees=${deleteAttendees}`, { method: "DELETE" });
+  return matchesClient.call(
+    `matches/${id}?delete-attendees=${deleteAttendees}`,
+    { method: "DELETE" }
+  );
 };
 
 export const matchesApiClient = {
@@ -76,5 +79,5 @@ export const matchesApiClient = {
   getMatch,
   createMatch,
   updateMatch,
-  deleteMatch
+  deleteMatch,
 };
