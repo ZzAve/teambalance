@@ -8,7 +8,7 @@ import Transactions from "../components/Transactions";
 import React, { useState } from "react";
 import Events from "../components/events/Events";
 import { ViewType } from "../utils/util";
-import { Navigate } from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import Hidden from "@material-ui/core/Hidden";
 import Typography from "@material-ui/core/Typography";
@@ -24,13 +24,8 @@ const useStyles = makeStyles(() =>
 );
 
 const Overview = ({ refresh }) => {
-  const [goTo, setGoTo] = useState(undefined);
   const classes = useStyles();
-
-  if (goTo !== undefined) {
-    console.warn("navigating to ", goTo)
-    return <Navigate to={goTo} />
-  }
+  const navigate = useNavigate();
 
   return (
     <>
@@ -62,7 +57,7 @@ const Overview = ({ refresh }) => {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => setGoTo("/trainings")}
+                    onClick={() => navigate("trainings")}
                   >
                     Meer
                   </Button>
@@ -95,7 +90,7 @@ const Overview = ({ refresh }) => {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => setGoTo("/matches")}
+                    onClick={() => navigate("matches")}
                   >
                     Meer
                   </Button>
@@ -126,7 +121,7 @@ const Overview = ({ refresh }) => {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => setGoTo("/misc-events")}
+                    onClick={() => navigate("misc-events")}
                   >
                     Meer
                   </Button>
@@ -172,7 +167,7 @@ const Overview = ({ refresh }) => {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => setGoTo("/transactions")}
+                    onClick={() => navigate("transactions")}
                   >
                     Meer
                   </Button>
@@ -188,7 +183,7 @@ const Overview = ({ refresh }) => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => setGoTo("/admin")}
+                onClick={() => navigate("admin")}
               >
                 <Hidden xsDown>Admin dingen </Hidden>
                 <ArrowForwardIcon spacing={5} />

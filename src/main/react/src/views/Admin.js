@@ -8,7 +8,7 @@ import {
   Link,
   Navigate,
   Route,
-  Routes,
+  Routes, useNavigate,
   useParams,
 } from "react-router-dom";
 import { RequireAuth } from "../components/RequireAuth";
@@ -70,11 +70,11 @@ const useStyles = makeStyles(() =>
 );
 
 const Admin = ({ refresh }) => {
-  const [goBack, triggerGoBack] = useState(false);
   const classes = useStyles();
+  const navigate = useNavigate()
 
-  if (goBack) {
-    return <Navigate to={goBack} />;
+  const navigateBack = () => {
+    navigate("../")
   }
 
   return (
@@ -86,7 +86,7 @@ const Admin = ({ refresh }) => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => triggerGoBack(true)}
+          onClick={navigateBack}
         >
           <ArrowBackIcon spacing={5} />
           <Hidden xsDown> Terug naar de veiligheid</Hidden>
@@ -221,24 +221,19 @@ const Admin = ({ refresh }) => {
 };
 
 const EventsOverview = ({ eventsType, refresh }) => {
-  const [goTo, setGoTo] = useState(undefined);
+  const navigate = useNavigate();
 
   const handleClickEditEvent = () => {
     if (eventsType === EventsType.TRAINING) {
-      setGoTo("/admin/new-training");
+      navigate("/admin/new-training");
     } else if (eventsType === EventsType.MATCH) {
-      setGoTo("/admin/new-match");
+      navigate("/admin/new-match");
     } else if (eventsType === EventsType.MISC) {
-      setGoTo("/admin/new-misc-event");
+      navigate("/admin/new-misc-event");
     } else {
       console.error(`Could not create new event for type ${eventsType}`);
     }
   };
-
-  if (goTo !== undefined) {
-    console.log(`Navigating to: ${goTo}`);
-    return <Navigate to={goTo} />;
-  }
 
   const title = getText(eventsType, "event_type_name");
   return (
