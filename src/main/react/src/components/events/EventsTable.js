@@ -18,7 +18,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@material-ui/core";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import Attendees from "../Attendees";
 import { formattedDate, formattedTime, withLoading } from "../../utils/util";
 import { EventsType } from "./utils";
@@ -226,7 +226,7 @@ const EventsTable = ({
 
   if (goTo !== undefined) {
     console.log(`Navigating to: ${goTo}`);
-    return <Redirect to={goTo} push={true} />;
+    return <Navigate to={goTo} />;
   }
 
   if (isLoading) {

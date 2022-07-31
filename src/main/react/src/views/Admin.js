@@ -6,9 +6,9 @@ import Typography from "@material-ui/core/Typography";
 import {
   BrowserRouter as Router,
   Link,
-  Redirect,
+  Navigate,
   Route,
-  Switch,
+  Routes,
   useParams,
 } from "react-router-dom";
 import { RequireAuth } from "../components/RequireAuth";
@@ -71,10 +71,10 @@ const useStyles = makeStyles(() =>
 
 const Admin = ({ refresh }) => {
   const [goBack, triggerGoBack] = useState(false);
-
   const classes = useStyles();
+
   if (goBack) {
-    return <Redirect to="/" push={true} />;
+    return <Navigate to={goBack} />;
   }
 
   return (
@@ -93,105 +93,129 @@ const Admin = ({ refresh }) => {
         </Button>
       </PageItem>
 
-      <Router>
-        <Grid item xs={12}>
-          <List
-            component="nav"
-            aria-label="Admin menu"
-            className={classes.menu}
-          >
-            <Link to="/admin/trainings">
-              <Button variant="outlined" color="primary">
-                Trainingen
-              </Button>
-            </Link>
+      <Grid item xs={12}>
+        <List
+          component="nav"
+          aria-label="Admin menu"
+          className={classes.menu}
+        >
+          <Link to="trainings">
+            <Button variant="outlined" color="primary">
+              Trainingen
+            </Button>
+          </Link>
 
-            <Link to="/admin/matches">
-              <Button variant="outlined" color="primary">
-                Wedstrijden
-              </Button>
-            </Link>
-            <Link to="/admin/misc-events">
-              <Button variant="outlined" color="primary">
-                Overige events
-              </Button>
-            </Link>
-          </List>
-        </Grid>
+          <Link to="matches">
+            <Button variant="outlined" color="primary">
+              Wedstrijden
+            </Button>
+          </Link>
+          <Link to="misc-events">
+            <Button variant="outlined" color="primary">
+              Overige events
+            </Button>
+          </Link>
+        </List>
+      </Grid>
 
-        <Switch>
-          <Route path="/admin/trainings" render={() => (
+        <Routes>
+          <Route
+            path="trainings"
+            element={
+              <RequireAuth>
+                <EventsOverview
+                  eventsType={EventsType.TRAINING}
+                  refresh={refresh}
+                />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="matches"
+            element={
+              <RequireAuth>
+                <EventsOverview
+                  eventsType={EventsType.MATCH}
+                  refresh={refresh}
+                />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="misc-events"
+            element={
+              <RequireAuth>
+                <EventsOverview
+                  eventsType={EventsType.MISC}
+                  refresh={refresh}
+                />
+              </RequireAuth>
+            }
+          />
 
-            <RequireAuth>
-              <EventsOverview
-                eventsType={EventsType.TRAINING}
-                refresh={refresh}
-              />
-            </RequireAuth>
-          )}/>
-          <Route path="/admin/matches" render={() => (
+          <Route
+            path="new-training"
+            element={
+              <RequireAuth>
+                <NewEvent eventsType={EventsType.TRAINING} refresh={refresh} />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="new-match"
+            element={
+              <RequireAuth>
+                <NewEvent eventsType={EventsType.MATCH} refresh={refresh} />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="new-misc-event"
+            element={
+              <RequireAuth>
+                <NewEvent eventsType={EventsType.MISC} refresh={refresh} />
+              </RequireAuth>
+            }
+          />
 
-            <RequireAuth>
-              <EventsOverview eventsType={EventsType.MATCH} refresh={refresh} />
-            </RequireAuth>
-          )}/>
-          <Route path="/admin/misc-events" render={() => (
+          <Route
+            path="edit-training/:id"
+            element={
+              <RequireAuth>
+                <ChangeEvent
+                  eventsType={EventsType.TRAINING}
+                  refresh={refresh}
+                />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="edit-match/:id"
+            element={
+              <RequireAuth>
+                <ChangeEvent eventsType={EventsType.MATCH} refresh={refresh} />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="edit-misc-event/:id"
+            element={
+              <RequireAuth>
+                <ChangeEvent eventsType={EventsType.MISC} refresh={refresh} />
+              </RequireAuth>
+            }
+          />
 
-            <RequireAuth>
-              <EventsOverview eventsType={EventsType.MISC} refresh={refresh} />
-            </RequireAuth>
-          )}/>
-
-          <Route path="/admin/new-training" render={() => (
-            <RequireAuth>
-              <NewEvent eventsType={EventsType.TRAINING} refresh={refresh} />
-            </RequireAuth>
-          )}/>
-          <Route path="/admin/new-match" render={() => (
-
-            <RequireAuth>
-              <NewEvent eventsType={EventsType.MATCH} refresh={refresh} />
-            </RequireAuth>
-          )}/>
-          <Route path="/admin/new-misc-event" render={() => (
-
-            <RequireAuth>
-              <NewEvent eventsType={EventsType.MISC} refresh={refresh} />
-            </RequireAuth>
-          )}/>
-
-          <Route path="/admin/edit-training/:id" render={() => (
-            <RequireAuth>
-              <ChangeEvent eventsType={EventsType.TRAINING} refresh={refresh} />
-            </RequireAuth>
-          )}/>
-          <Route path="/admin/edit-match/:id" render={() => (
-
-            <RequireAuth>
-              <ChangeEvent eventsType={EventsType.MATCH} refresh={refresh} />
-            </RequireAuth>
-          )}/>
-          <Route path="/admin/edit-misc-event/:id" render={() => (
-
-            <RequireAuth>
-              <ChangeEvent eventsType={EventsType.MISC} refresh={refresh} />
-            </RequireAuth>
-          )}/>
-
-          <Route path="/admin/loading" render={() => (
-
-            <RequireAuth>
-              <Loading />
-            </RequireAuth>
-          )}/>
-          <Route path="/" render={() => (
-
-            <RequireAuth>
-              <HiAdmin />
-            </RequireAuth>
-          )}/>
-        </Switch>
-      </Router>
+          <Route path="loading" element={<Loading />} />
+          <Route
+            path="/"
+            element={
+              <RequireAuth>
+                <HiAdmin />
+              </RequireAuth>
+            }
+          />
+        </Routes>
     </>
   );
 };
@@ -213,7 +237,7 @@ const EventsOverview = ({ eventsType, refresh }) => {
 
   if (goTo !== undefined) {
     console.log(`Navigating to: ${goTo}`);
-    return <Redirect to={goTo} push={true} />;
+    return <Navigate to={goTo} />;
   }
 
   const title = getText(eventsType, "event_type_name");
@@ -250,25 +274,21 @@ const EventsOverview = ({ eventsType, refresh }) => {
 };
 
 const ChangeEvent = ({ computedMatch, eventsType, ...rest }) => {
+  const navigate = useNavigate();
   let { id } = useParams();
   // const id = +((computedMatch || {}).params || {}).id;
   console.log("ChangeEvent: ", rest, computedMatch, eventsType);
   if (id === undefined || isNaN(id)) {
-    return (
-      <Redirect
-        to={{
-          pathname:
-            eventsType === EventsType.TRAINING
-              ? "/admin/trainings"
-              : eventsType === EventsType.MATCH
-              ? "/admin/matches"
-              : eventsType === EventsType.MISC
-              ? "/admin/misc-events"
-              : "/admin",
-        }}
-        push={true}
-      />
-    );
+    let target =
+      eventsType === EventsType.TRAINING
+        ? "/admin/trainings"
+        : eventsType === EventsType.MATCH
+        ? "/admin/matches"
+        : eventsType === EventsType.MISC
+        ? "/admin/misc-events"
+        : "/admin";
+
+    return <Navigate to={target} />;
   }
 
   const title = getText(eventsType, "edit_event_pageitem_label");

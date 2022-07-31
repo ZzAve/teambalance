@@ -8,7 +8,7 @@ import Transactions from "../components/Transactions";
 import React, { useState } from "react";
 import Events from "../components/events/Events";
 import { ViewType } from "../utils/util";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import Hidden from "@material-ui/core/Hidden";
 import Typography from "@material-ui/core/Typography";
@@ -25,11 +25,11 @@ const useStyles = makeStyles(() =>
 
 const Overview = ({ refresh }) => {
   const [goTo, setGoTo] = useState(undefined);
-
   const classes = useStyles();
 
   if (goTo !== undefined) {
-    return <Redirect to={goTo} push={true} />;
+    console.warn("navigating to ", goTo)
+    return <Navigate to={goTo} />
   }
 
   return (

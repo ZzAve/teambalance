@@ -2,7 +2,7 @@ import Grid from "@material-ui/core/Grid";
 import PageItem from "../components/PageItem";
 import { Button, Card, createStyles, makeStyles } from "@material-ui/core";
 import React, { useState } from "react";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import Hidden from "@material-ui/core/Hidden";
 import Transactions from "../components/Transactions";
@@ -23,7 +23,7 @@ const TransactionsPage = ({ refresh }) => {
 
   const classes = useStyles();
   if (goTo !== undefined) {
-    return <Redirect to={goTo} push={true} />;
+    return <Navigate to={goTo} />;
   }
 
   return (

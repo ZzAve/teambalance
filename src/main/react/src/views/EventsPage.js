@@ -4,7 +4,7 @@ import { Button } from "@material-ui/core";
 import React, { useState } from "react";
 import Events from "../components/events/Events";
 import { ViewType } from "../utils/util";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import Hidden from "@material-ui/core/Hidden";
 import Switch from "@material-ui/core/Switch";
@@ -30,7 +30,7 @@ const EventsPage = ({ eventsType, refresh }) => {
   const [showList, setShowList] = useState(true);
 
   if (goTo !== undefined) {
-    return <Redirect to={goTo} push={true} />;
+    return <Navigate to={goTo} />;
   }
 
   const title = getText(eventsType, "coming_events");
