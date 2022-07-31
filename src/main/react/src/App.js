@@ -44,20 +44,20 @@ const App = () => {
         <TopBar handleRefresh={handleRefresh} refresh={topBarShouldRefresh} />
         <Grid container spacing={2} alignItems="flex-start">
           <Grid item xs={12} />
-          <Grid item xs={12}>
-            <Alert severity="warning">
-              <AlertTitle>COVID-19</AlertTitle>
-              <Typography>
-                Ook rondom volleybal hangt veel onzekerheid wat betreft COVID-19
-                🦠. Dat heeft wat invloed op de betrouwbaarheid van de data die
-                hier getoond wordt.
-              </Typography>
-              <Typography>
-                Check in met het team als je iets niet zeker weet. Blijf gezond
-                👨‍⚕️!
-              </Typography>
-            </Alert>
-          </Grid>
+          {/*<Grid item xs={12}>*/}
+          {/*  <Alert severity="warning">*/}
+          {/*    <AlertTitle>COVID-19</AlertTitle>*/}
+          {/*    <Typography>*/}
+          {/*      Ook rondom volleybal hangt veel onzekerheid wat betreft COVID-19*/}
+          {/*      🦠. Dat heeft wat invloed op de betrouwbaarheid van de data die*/}
+          {/*      hier getoond wordt.*/}
+          {/*    </Typography>*/}
+          {/*    <Typography>*/}
+          {/*      Check in met het team als je iets niet zeker weet. Blijf gezond*/}
+          {/*      👨‍⚕️!*/}
+          {/*    </Typography>*/}
+          {/*  </Alert>*/}
+          {/*</Grid>*/}
           <Router>
             <Suspense fallback={<Loading />}>
               <Routes>
