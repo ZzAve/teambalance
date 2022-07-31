@@ -12,7 +12,7 @@ app:
       api-key: ${sm://BUNQ_APIKEY}
     bank-account-id: ${sm://BUNQ_BANK_ACCOUNT_ID}
     transaction-limit: 200 # up this when pagination is built (max is 200 from bunq)
-    datetime-limit: 2021-08-01T00:00:00+02:00
+    datetime-limit: 2022-08-01T00:00:00+02:00
     cache:
       balance:
         enabled: true

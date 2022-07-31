@@ -50,7 +50,7 @@ class MatchController(
     fun getMatches(
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
-        @RequestParam(value = "since", defaultValue = "2020-09-01T00:00")
+        @RequestParam(value = "since", defaultValue = "2022-08-01T00:00")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: LocalDateTime,
         @RequestParam(value = "limit", defaultValue = "10") limit: Int,
         @RequestParam(value = "page", defaultValue = "1") page: Int,
