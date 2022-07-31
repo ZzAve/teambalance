@@ -6,5 +6,5 @@ const getActiveUsers = () => usersClient.call(`users`);
 
 export const usersApiClient = {
   ...usersClient,
-  getActiveUsers
+  getActiveUsers,
 };

@@ -84,7 +84,13 @@ const additionalButtonColor = (state) => additionalColorMap[state] || "default";
 /**
  * Function Attendees component
  */
-const Attendees = ({attendees, onUpdate, readOnly = false, size = "medium", showSummary = false,}) => {
+const Attendees = ({
+  attendees,
+  onUpdate,
+  readOnly = false,
+  size = "medium",
+  showSummary = false,
+}) => {
   const [selectedAttendee, setSelectedAttendee] = useState(null);
   const [errorMessage, setErrorMessage] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);

@@ -6,7 +6,12 @@ import { formattedDate, formattedTime } from "../../utils/util";
 import { EventsType, HomeAway } from "./utils";
 import { Pagination } from "@material-ui/lab";
 
-export const EventsList = ({ eventsType, events, updateTrigger, withPagination }) => {
+export const EventsList = ({
+  eventsType,
+  events,
+  updateTrigger,
+  withPagination,
+}) => {
   const [page, setPage] = useState(1);
 
   const rowsPerPage = 10;
@@ -53,7 +58,12 @@ function formattedHomeVsAway(event) {
  * - event overview showing all attendees
  * - event showing attendance of a single attendee with availability to change
  */
-export const EventListItem = ({ eventsType, event, onUpdate, allowUpdating = true }) => {
+export const EventListItem = ({
+  eventsType,
+  event,
+  onUpdate,
+  allowUpdating = true,
+}) => {
   const startDateTime = new Date(event.startTime);
   const titleVariant = !event.title ? "body1" : "h6";
   const dateTimeVariant = !!event.title ? "body1" : "h6";
@@ -102,4 +112,3 @@ export const EventListItem = ({ eventsType, event, onUpdate, allowUpdating = tru
     </Grid>
   );
 };
-

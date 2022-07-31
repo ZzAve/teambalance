@@ -50,9 +50,11 @@ const updateEvent = ({ id, location, title, comment, startTime }) => {
 };
 
 const deleteEvent = (id, deleteAttendees = true) => {
-    return eventsClient.call(`miscellaneous-events/${id}?delete-attendees=${deleteAttendees}`, { method: "DELETE" });
+  return eventsClient.call(
+    `miscellaneous-events/${id}?delete-attendees=${deleteAttendees}`,
+    { method: "DELETE" }
+  );
 };
-
 
 export const eventsApiClient = {
   ...eventsClient,
@@ -60,5 +62,5 @@ export const eventsApiClient = {
   getEvent,
   createEvent,
   updateEvent,
-  deleteEvent
+  deleteEvent,
 };

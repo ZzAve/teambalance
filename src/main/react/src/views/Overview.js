@@ -53,11 +53,7 @@ const Overview = ({ refresh }) => {
                   withPagination={false}
                 />
               </Grid>
-              <Grid
-                container
-                item
-                justifyContent="flex-end"
-              >
+              <Grid container item justifyContent="flex-end">
                 <Grid item>
                   <Button
                     variant="contained"
@@ -86,11 +82,7 @@ const Overview = ({ refresh }) => {
                   withPagination={false}
                 />
               </Grid>
-              <Grid
-                container
-                item
-                justifyContent="flex-end"
-              >
+              <Grid container item justifyContent="flex-end">
                 <Grid item>
                   <Button
                     variant="contained"
@@ -117,11 +109,7 @@ const Overview = ({ refresh }) => {
                   withPagination={false}
                 />
               </Grid>
-              <Grid
-                container
-                item
-                justifyContent="flex-end"
-              >
+              <Grid container item justifyContent="flex-end">
                 <Grid item>
                   <Button
                     variant="contained"

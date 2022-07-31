@@ -15,8 +15,8 @@ export const Potters = ({ refresh, limit = 3, showFloppers = true }) => {
   useEffect(() => {
     withLoading(setIsLoading, () =>
       bankApiClient.getPotters(limit).then((x) => {
-        setFloppers({season:x.floppers, month:x.subPeriod?.floppers});
-        setToppers({season:x.toppers, month:x.subPeriod?.toppers});
+        setFloppers({ season: x.floppers, month: x.subPeriod?.floppers });
+        setToppers({ season: x.toppers, month: x.subPeriod?.toppers });
       })
     ).then();
   }, [refresh]);
@@ -61,39 +61,45 @@ export const Potters = ({ refresh, limit = 3, showFloppers = true }) => {
     return <SpinnerWithText text="ophalen potters" />;
   }
 
-    const setShowSeasonToggle = checked => setShowSeason(checked);
+  const setShowSeasonToggle = (checked) => setShowSeason(checked);
 
-    return (
+  return (
     <Grid item container spacing={2}>
-        <Grid
-            component="label"
-            item
-            container
-            alignItems="center"
-            spacing={1}
-            justifyContent="flex-end"
-        >
-            <Grid item>
-                <Typography variant="body1"> Month (last 30 days) </Typography>
-            </Grid>
-            <Grid item > <Switch
-                checked={showSeason}
-                onChange={(x) => setShowSeasonToggle(x.target.checked)}
-                name="monthVsSeason"
-            /></Grid>
-            <Grid item>
-                <Typography variant="body1"> Season </Typography>
-            </Grid>
+      <Grid
+        component="label"
+        item
+        container
+        alignItems="center"
+        spacing={1}
+        justifyContent="flex-end"
+      >
+        <Grid item>
+          <Typography variant="body1"> Month (last 30 days) </Typography>
         </Grid>
+        <Grid item>
+          {" "}
+          <Switch
+            checked={showSeason}
+            onChange={(x) => setShowSeasonToggle(x.target.checked)}
+            name="monthVsSeason"
+          />
+        </Grid>
+        <Grid item>
+          <Typography variant="body1"> Season </Typography>
+        </Grid>
+      </Grid>
 
-      {renderItems(showSeason ? toppers.season : toppers.month, "Toppers (van het seizoen)", [
-        "🥇",
-        "🥈",
-        "🥉",
-        "",
-      ])}
+      {renderItems(
+        showSeason ? toppers.season : toppers.month,
+        "Toppers (van het seizoen)",
+        ["🥇", "🥈", "🥉", ""]
+      )}
       {showFloppers &&
-        renderItems(showSeason ? floppers.season : floppers.month, "Floppers (van het seizoen)", ["🐷", "🐗", "🐖"])}
+        renderItems(
+          showSeason ? floppers.season : floppers.month,
+          "Floppers (van het seizoen)",
+          ["🐷", "🐗", "🐖"]
+        )}
     </Grid>
   );
 };
