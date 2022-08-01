@@ -316,7 +316,11 @@
                     </to>
                     <container>
                         <mainClass>nl.jvandis.teambalance.ApplicationKt</mainClass>
+                        <ports>
+                            <port>8080</port>
+                        </ports>
                     </container>
+
                 </configuration>
             </plugin>
 
