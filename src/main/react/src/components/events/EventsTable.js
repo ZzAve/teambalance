@@ -171,7 +171,7 @@ const EventsTable = ({
       locationAddendum = row.homeAway === "HOME" ? "THUIS" : "UIT";
     }
 
-    return row.location + locationAddendum;
+    return row.location + " (" + locationAddendum + ")";
   };
 
   const getAlertDialog = (row) => {

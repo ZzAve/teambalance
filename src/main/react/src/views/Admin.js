@@ -21,6 +21,7 @@ import EventDetails from "../components/events/EventDetails";
 import List from "@material-ui/core/List";
 import AddIcon from "@material-ui/icons/Add";
 import { EventsType } from "../components/events/utils";
+import CheckBox from "@material-ui/core/Checkbox";
 
 const texts = {
   event_type_name: {
@@ -221,6 +222,7 @@ const Admin = ({ refresh }) => {
 };
 
 const EventsOverview = ({ eventsType, refresh }) => {
+  const [includeHistory, setIncludeHistory ] = useState(false)
   const navigate = useNavigate();
 
   const handleClickEditEvent = () => {
@@ -239,7 +241,7 @@ const EventsOverview = ({ eventsType, refresh }) => {
   return (
     <PageItem title={title} pageTitle={title}>
       <Grid item container spacing={5}>
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <Button
             variant="contained"
             color="primary"
@@ -253,11 +255,34 @@ const EventsOverview = ({ eventsType, refresh }) => {
             </Hidden>
           </Button>
         </Grid>
+        <Grid
+            component="label"
+            item
+            container
+            alignItems="center"
+            spacing={0}
+            justifyContent="flex-end"
+            xs={6}
+        >
+          <Grid item>
+            <CheckBox
+                checked={includeHistory}
+                onChange={(x) => setIncludeHistory(x.target.checked)}
+                name="Show history"
+                size="small"
+            ></CheckBox>
+          </Grid>
+          <Grid item>
+            <Typography variant="body1">Oude events</Typography>
+          </Grid>
+        </Grid>
+
         <Grid item xs={12}>
           <Events
             eventsType={eventsType}
             refresh={refresh}
             view={ViewType.Table}
+            includeHistory={includeHistory}
             allowChanges={true}
             limit={50}
             withPagination={true}
