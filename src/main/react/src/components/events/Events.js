@@ -22,6 +22,9 @@ const texts = {
   },
 };
 
+// 1st of August, 02:00 (UTC, or 0:00 in GMT +2)
+const startOfSeason = new Date(2022, 7, 1, 2);
+
 const getText = (eventsType, name) => {
   const typpe = EventsType[eventsType] || EventsType.OTHER;
   return texts[name][typpe] || name;
@@ -31,6 +34,7 @@ const Events = ({
   eventsType = EventsType.OTHER,
   refresh,
   view,
+  includeHistory,
   withPagination,
   allowChanges = false,
   limit = 1,
@@ -41,26 +45,21 @@ const Events = ({
   useEffect(() => {
     console.debug(`[Events ${eventsType}] refresh: ${refresh}`);
     withLoading(setIsLoading, updateEvents).then();
-  }, [refresh, eventsType]);
+  }, [refresh, eventsType, includeHistory]);
 
   const updateEvents = async () => {
+    const startTime = includeHistory ? startOfSeason : nowMinus6Hours;
     if (eventsType === EventsType.TRAINING) {
       const data = await trainingsApiClient.getTrainings(
-        nowMinus6Hours.toJSON(),
+        startTime.toJSON(),
         limit
       );
       await setEvents(data || []);
     } else if (eventsType === EventsType.MATCH) {
-      const data = await matchesApiClient.getMatches(
-        nowMinus6Hours.toJSON(),
-        limit
-      );
+      const data = await matchesApiClient.getMatches(startTime.toJSON(), limit);
       await setEvents(data || []);
     } else if (eventsType === EventsType.MISC) {
-      const data = await eventsApiClient.getEvents(
-        nowMinus6Hours.toJSON(),
-        limit
-      );
+      const data = await eventsApiClient.getEvents(startTime.toJSON(), limit);
       await setEvents(data || []);
     } else {
       console.warn("NO SUPPORT FOR OTHER EVENTS yet(?)");

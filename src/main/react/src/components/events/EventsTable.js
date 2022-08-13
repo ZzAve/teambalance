@@ -151,19 +151,30 @@ const EventsTable = ({
     </TableRow>
   );
 
-  const getBodyTitleCell = (row) => (
-    <TableCell align="right">
-      {EventsType.MATCH ? row.opponent : row.title}
-    </TableCell>
-  );
+  const getBodyTitleCell = (row, eventsType) => {
+    if (EventsType.TRAINING === eventsType) {
+      return <></>;
+    }
 
-  const getBodyLocationCell = (row) => {
+    let value = "";
+    if (EventsType.MATCH === eventsType) {
+      value = row.opponent;
+    } else if (
+      EventsType.MISC === eventsType ||
+      EventsType.OTHER === eventsType
+    ) {
+      value = row.title;
+    }
+    return <TableCell align="right">{value}</TableCell>;
+  };
+
+  const getBodyLocationCell = (row, eventsType) => {
     let locationAddendum = "";
-    if (EventsType.MATCH) {
+    if (EventsType.MATCH === eventsType) {
       locationAddendum = row.homeAway === "HOME" ? "THUIS" : "UIT";
     }
 
-    return row.location + locationAddendum;
+    return row.location + " (" + locationAddendum + ")";
   };
 
   const getAlertDialog = (row) => {
@@ -193,8 +204,10 @@ const EventsTable = ({
         {formattedDate(new Date(row.startTime))}&nbsp;
         {formattedTime(new Date(row.startTime))}
       </TableCell>
-      {eventsType !== EventsType.TRAINING ? getBodyTitleCell(row) : <></>}
-      <TableCell align="right">{getBodyLocationCell(row)}</TableCell>
+      {getBodyTitleCell(row, eventsType)}
+      <TableCell align="right">
+        {getBodyLocationCell(row, eventsType)}
+      </TableCell>
       <TableCell align="right">{row.comment}</TableCell>
       <TableCell className={classes.attendees}>
         <Attendees
@@ -222,7 +235,7 @@ const EventsTable = ({
         .map((row) => getTableBodyRow(row))}
     </>
   );
-  
+
   if (isLoading) {
     return <SpinnerWithText text={"Laden"} />;
   }

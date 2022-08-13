@@ -6,8 +6,6 @@ import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.InvalidAttendeeException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
-import nl.jvandis.teambalance.api.SECRET_HEADER
-import nl.jvandis.teambalance.api.SecretService
 import nl.jvandis.teambalance.api.event.EventRepository
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -38,7 +35,6 @@ class AttendeeController(
     private val attendeeRepository: AttendeeRepository,
     private val eventRepository: EventRepository,
     private val userRepository: UserRepository,
-    private val secretService: SecretService
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -46,10 +42,8 @@ class AttendeeController(
     fun getAttendees(
         @RequestParam(value = "event-ids", defaultValue = "") eventIds: List<Long>,
         @RequestParam(value = "user-ids", defaultValue = "") userIds: List<Long>,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): AttendeesResponse {
         log.debug("Get attendees (filter eventIds: $eventIds,userIds: $userIds")
-        secretService.ensureSecret(secret)
 
         val attendees = when {
             eventIds.isEmpty() && userIds.isEmpty() -> attendeeRepository.findAll()
@@ -70,10 +64,8 @@ class AttendeeController(
     @GetMapping("/{id}")
     fun getAttendee(
         @PathVariable(value = "id") attendeeId: Long,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): AttendeeResponse {
         log.debug("Get attendees $attendeeId")
-        secretService.ensureSecret(secret)
 
         val attendee = attendeeRepository.findByIdOrNull(attendeeId) ?: throw InvalidAttendeeException(attendeeId)
 
@@ -84,10 +76,8 @@ class AttendeeController(
     @PostMapping
     fun addAttendee(
         @RequestBody potentialAttendee: PotentialAttendee,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): AttendeeResponse {
         log.debug("Adding attendee: $potentialAttendee")
-        secretService.ensureSecret(secret)
 
         val user = userRepository.findByIdOrNull(potentialAttendee.userId)
             ?: throw InvalidUserException(potentialAttendee.userId)
@@ -112,9 +102,7 @@ class AttendeeController(
     fun updateAttendee(
         @PathVariable("id") attendeeId: Long,
         @RequestBody attendeeStateUpdate: AttendeeStateUpdate,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): AttendeeResponse {
-        secretService.ensureSecret(secret)
 
         val attendee = attendeeRepository.findByIdOrNull(attendeeId)
             ?: throw InvalidAttendeeException(attendeeId)
@@ -130,10 +118,8 @@ class AttendeeController(
     @DeleteMapping("/{id}")
     fun deleteAttendee(
         @PathVariable("id") id: Long,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ) {
         log.debug("Deleting attendee x")
-        secretService.ensureSecret(secret)
 
         attendeeRepository.deleteById(id)
     }
@@ -143,10 +129,8 @@ class AttendeeController(
     fun deleteAttendeeByUserIdAndEventId(
         @RequestParam("user-id") userId: Long,
         @RequestParam("event-id") eventId: Long,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ) {
         log.debug("Deleting user $userId from training $eventId")
-        secretService.ensureSecret(secret)
 
         attendeeRepository.findByUserIdAndEventId(userId, eventId)
             .firstOrNull()

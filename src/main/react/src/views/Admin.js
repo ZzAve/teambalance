@@ -8,7 +8,8 @@ import {
   Link,
   Navigate,
   Route,
-  Routes, useNavigate,
+  Routes,
+  useNavigate,
   useParams,
 } from "react-router-dom";
 import { RequireAuth } from "../components/RequireAuth";
@@ -21,6 +22,7 @@ import EventDetails from "../components/events/EventDetails";
 import List from "@material-ui/core/List";
 import AddIcon from "@material-ui/icons/Add";
 import { EventsType } from "../components/events/utils";
+import CheckBox from "@material-ui/core/Checkbox";
 
 const texts = {
   event_type_name: {
@@ -71,11 +73,11 @@ const useStyles = makeStyles(() =>
 
 const Admin = ({ refresh }) => {
   const classes = useStyles();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const navigateBack = () => {
-    navigate("../")
-  }
+    navigate("../");
+  };
 
   return (
     <>
@@ -83,22 +85,14 @@ const Admin = ({ refresh }) => {
         <Typography variant="h6">
           Je begeeft je nu op de 'admin' pagina's. Pas op voor de lactacyd{" "}
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={navigateBack}
-        >
+        <Button variant="contained" color="primary" onClick={navigateBack}>
           <ArrowBackIcon spacing={5} />
           <Hidden xsDown> Terug naar de veiligheid</Hidden>
         </Button>
       </PageItem>
 
       <Grid item xs={12}>
-        <List
-          component="nav"
-          aria-label="Admin menu"
-          className={classes.menu}
-        >
+        <List component="nav" aria-label="Admin menu" className={classes.menu}>
           <Link to="trainings">
             <Button variant="outlined" color="primary">
               Trainingen
@@ -118,109 +112,101 @@ const Admin = ({ refresh }) => {
         </List>
       </Grid>
 
-        <Routes>
-          <Route
-            path="trainings"
-            element={
-              <RequireAuth>
-                <EventsOverview
-                  eventsType={EventsType.TRAINING}
-                  refresh={refresh}
-                />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="matches"
-            element={
-              <RequireAuth>
-                <EventsOverview
-                  eventsType={EventsType.MATCH}
-                  refresh={refresh}
-                />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="misc-events"
-            element={
-              <RequireAuth>
-                <EventsOverview
-                  eventsType={EventsType.MISC}
-                  refresh={refresh}
-                />
-              </RequireAuth>
-            }
-          />
+      <Routes>
+        <Route
+          path="trainings"
+          element={
+            <RequireAuth>
+              <EventsOverview
+                eventsType={EventsType.TRAINING}
+                refresh={refresh}
+              />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="matches"
+          element={
+            <RequireAuth>
+              <EventsOverview eventsType={EventsType.MATCH} refresh={refresh} />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="misc-events"
+          element={
+            <RequireAuth>
+              <EventsOverview eventsType={EventsType.MISC} refresh={refresh} />
+            </RequireAuth>
+          }
+        />
 
-          <Route
-            path="new-training"
-            element={
-              <RequireAuth>
-                <NewEvent eventsType={EventsType.TRAINING} refresh={refresh} />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="new-match"
-            element={
-              <RequireAuth>
-                <NewEvent eventsType={EventsType.MATCH} refresh={refresh} />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="new-misc-event"
-            element={
-              <RequireAuth>
-                <NewEvent eventsType={EventsType.MISC} refresh={refresh} />
-              </RequireAuth>
-            }
-          />
+        <Route
+          path="new-training"
+          element={
+            <RequireAuth>
+              <NewEvent eventsType={EventsType.TRAINING} refresh={refresh} />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="new-match"
+          element={
+            <RequireAuth>
+              <NewEvent eventsType={EventsType.MATCH} refresh={refresh} />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="new-misc-event"
+          element={
+            <RequireAuth>
+              <NewEvent eventsType={EventsType.MISC} refresh={refresh} />
+            </RequireAuth>
+          }
+        />
 
-          <Route
-            path="edit-training/:id"
-            element={
-              <RequireAuth>
-                <ChangeEvent
-                  eventsType={EventsType.TRAINING}
-                  refresh={refresh}
-                />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="edit-match/:id"
-            element={
-              <RequireAuth>
-                <ChangeEvent eventsType={EventsType.MATCH} refresh={refresh} />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="edit-misc-event/:id"
-            element={
-              <RequireAuth>
-                <ChangeEvent eventsType={EventsType.MISC} refresh={refresh} />
-              </RequireAuth>
-            }
-          />
+        <Route
+          path="edit-training/:id"
+          element={
+            <RequireAuth>
+              <ChangeEvent eventsType={EventsType.TRAINING} refresh={refresh} />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="edit-match/:id"
+          element={
+            <RequireAuth>
+              <ChangeEvent eventsType={EventsType.MATCH} refresh={refresh} />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="edit-misc-event/:id"
+          element={
+            <RequireAuth>
+              <ChangeEvent eventsType={EventsType.MISC} refresh={refresh} />
+            </RequireAuth>
+          }
+        />
 
-          <Route path="loading" element={<Loading />} />
-          <Route
-            path="/"
-            element={
-              <RequireAuth>
-                <HiAdmin />
-              </RequireAuth>
-            }
-          />
-        </Routes>
+        <Route path="loading" element={<Loading />} />
+        <Route
+          path="/"
+          element={
+            <RequireAuth>
+              <HiAdmin />
+            </RequireAuth>
+          }
+        />
+      </Routes>
     </>
   );
 };
 
 const EventsOverview = ({ eventsType, refresh }) => {
+  const [includeHistory, setIncludeHistory] = useState(false);
   const navigate = useNavigate();
 
   const handleClickEditEvent = () => {
@@ -239,7 +225,7 @@ const EventsOverview = ({ eventsType, refresh }) => {
   return (
     <PageItem title={title} pageTitle={title}>
       <Grid item container spacing={5}>
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <Button
             variant="contained"
             color="primary"
@@ -253,11 +239,34 @@ const EventsOverview = ({ eventsType, refresh }) => {
             </Hidden>
           </Button>
         </Grid>
+        <Grid
+          component="label"
+          item
+          container
+          alignItems="center"
+          spacing={0}
+          justifyContent="flex-end"
+          xs={6}
+        >
+          <Grid item>
+            <CheckBox
+              checked={includeHistory}
+              onChange={(x) => setIncludeHistory(x.target.checked)}
+              name="Show history"
+              size="small"
+            ></CheckBox>
+          </Grid>
+          <Grid item>
+            <Typography variant="body1">Oude events</Typography>
+          </Grid>
+        </Grid>
+
         <Grid item xs={12}>
           <Events
             eventsType={eventsType}
             refresh={refresh}
             view={ViewType.Table}
+            includeHistory={includeHistory}
             allowChanges={true}
             limit={50}
             withPagination={true}

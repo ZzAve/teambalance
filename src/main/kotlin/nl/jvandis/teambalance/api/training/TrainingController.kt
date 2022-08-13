@@ -5,8 +5,6 @@ import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
-import nl.jvandis.teambalance.api.SECRET_HEADER
-import nl.jvandis.teambalance.api.SecretService
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -40,7 +37,6 @@ class TrainingController(
     private val eventRepository: TrainingRepository,
     private val userRepository: UserRepository,
     private val attendeeRepository: AttendeeRepository,
-    private val secretService: SecretService
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -54,11 +50,8 @@ class TrainingController(
         ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: LocalDateTime,
         @RequestParam(value = "limit", defaultValue = "10") limit: Int,
         @RequestParam(value = "page", defaultValue = "1") page: Int,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): TrainingsResponse {
         log.debug("GetAllTrainings")
-        secretService.ensureSecret(secret)
-
         // In case of testing performance again :)
         // measureTiming(50) {
         //     getEventsAndAttendees(
@@ -104,12 +97,9 @@ class TrainingController(
         @PathVariable("training-id") trainingId: Long,
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ): TrainingResponse {
         log.debug("Get training $trainingId")
-        secretService.ensureSecret(secret)
-
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
         val attendees =
             if (!includeAttendees) emptyList()
@@ -124,11 +114,8 @@ class TrainingController(
     @PostMapping
     fun createTraining(
         @RequestBody potentialEvent: PotentialTraining,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
     ): TrainingResponse {
         log.debug("postTraining $potentialEvent")
-        secretService.ensureSecret(secret)
-
         val allUsers = userRepository.findAll()
 
         val requestedUsersToAdd = allUsers.filter {
@@ -157,12 +144,9 @@ class TrainingController(
         @PathVariable(value = "training-id") trainingId: Long,
         @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,
         @RequestBody user: UserAddRequest,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ): List<Attendee> {
         log.debug("Adding: $user (or all: $addAll) to training $trainingId")
-        secretService.ensureSecret(secret)
-
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
         val users = if (addAll) {
             userRepository.findAll()
@@ -182,11 +166,7 @@ class TrainingController(
     fun updateTraining(
         @PathVariable(value = "training-id") trainingId: Long,
         @RequestBody updateTrainingRequest: UpdateTrainingRequest,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
-
     ): TrainingResponse {
-        secretService.ensureSecret(secret)
-
         return eventRepository
             .findByIdOrNull(trainingId)
             ?.let {
@@ -202,12 +182,9 @@ class TrainingController(
     fun deleteTraining(
         @PathVariable(value = "training-id") trainingId: Long,
         @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean,
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?
 
     ) {
         log.debug("Deleting training: $trainingId")
-        secretService.ensureSecret(secret)
-
         if (deleteAttendees) {
             attendeeRepository.findAllByEventIdIn(listOf(trainingId))
                 .let { attendeeRepository.deleteAll(it) }

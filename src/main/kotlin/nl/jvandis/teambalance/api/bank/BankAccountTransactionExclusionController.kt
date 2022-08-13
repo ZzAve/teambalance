@@ -3,8 +3,8 @@ package nl.jvandis.teambalance.api.bank
 import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidUserException
-import nl.jvandis.teambalance.api.SECRET_HEADER
-import nl.jvandis.teambalance.api.SecretService
+import nl.jvandis.teambalance.filters.SECRET_HEADER
+import nl.jvandis.teambalance.filters.SecretService
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.repository.findByIdOrNull

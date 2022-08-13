@@ -36,6 +36,8 @@
     "eslint-plugin-react": "7.30.1",
     "eslint-plugin-react-hooks": "4.6.0",
     "html-webpack-plugin": "5.5.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
     "prettier": "2.7.1",
     "react-helmet": "6.1.0",
     "regenerator-runtime": "0.13.9",
@@ -44,12 +46,12 @@
     "webpack-cli": "4.10.0",
     "webpack-dev-server": "4.9.2"
   },
-
   "scripts": {
     "start": "webpack serve --mode development --host 0.0.0.0",
     "build": "webpack --mode production ./src/main/react",
     "lint": "prettier --check './src/main/react/**/*.js' ",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -64,6 +66,19 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "lint-staged": {
+    "src/main/react/**/*.{js,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "src/main/react/*.{scss,css}": [
+      "stylelint --fix",
+      "prettier --write"
+    ],
+    "*.{yml,json,md,html}": [
+      "prettier --write"
     ]
   }
 }

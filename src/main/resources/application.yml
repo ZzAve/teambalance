@@ -5,6 +5,7 @@ app:
   title: '@project.name@'
   description: "Fancy pants teampot for Tovo heren 5"
   version: '@project.version@'
+  datetime-limit: ${app.bank.datetime-limit}
   secret:
     secret-value: ${sm://API_SECRET}
   bank:

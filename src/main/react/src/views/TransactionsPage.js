@@ -2,7 +2,7 @@ import Grid from "@material-ui/core/Grid";
 import PageItem from "../components/PageItem";
 import { Button, Card, createStyles, makeStyles } from "@material-ui/core";
 import React, { useState } from "react";
-import {Navigate, useNavigate} from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import Hidden from "@material-ui/core/Hidden";
 import Transactions from "../components/Transactions";
@@ -24,18 +24,14 @@ const TransactionsPage = ({ refresh }) => {
 
   const navigateBack = () => {
     navigate("../");
-  }
+  };
 
   return (
     <>
       <PageTitle title="Transacties" />
       <Grid item container spacing={2}>
         <Grid container item xs={12}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={navigateBack}
-          >
+          <Button variant="contained" color="primary" onClick={navigateBack}>
             <ArrowBackIcon />
             <Hidden xsDown>Terug </Hidden>
           </Button>
