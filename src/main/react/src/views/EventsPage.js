@@ -46,7 +46,7 @@ const EventsPage = ({ eventsType, refresh }) => {
       </Grid>
       <Grid container item xs={12}>
         <PageItem pageTitle={title} title={title}>
-          <Grid container spacing={1} >
+          <Grid container spacing={1}>
             <Grid
               component="label"
               item
@@ -54,7 +54,8 @@ const EventsPage = ({ eventsType, refresh }) => {
               alignItems="center"
               spacing={0}
               justifyContent="flex-end"
-              xs={6} sm={12}
+              xs={6}
+              sm={12}
             >
               <Grid item>
                 <Typography variant="body1"> Table </Typography>
@@ -72,20 +73,21 @@ const EventsPage = ({ eventsType, refresh }) => {
             </Grid>
 
             <Grid
-                component="label"
-                item
-                container
-                alignItems="center"
-                spacing={0}
-                justifyContent="flex-end"
-                xs={6} sm={12}
+              component="label"
+              item
+              container
+              alignItems="center"
+              spacing={0}
+              justifyContent="flex-end"
+              xs={6}
+              sm={12}
             >
               <Grid item>
                 <CheckBox
-                    checked={includeHistory}
-                    onChange={(x) => setIncludeHistory(x.target.checked)}
-                    name="Show history"
-                    size="small"
+                  checked={includeHistory}
+                  onChange={(x) => setIncludeHistory(x.target.checked)}
+                  name="Show history"
+                  size="small"
                 ></CheckBox>
               </Grid>
               <Grid item>

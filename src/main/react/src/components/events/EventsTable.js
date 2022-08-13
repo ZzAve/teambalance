@@ -152,22 +152,25 @@ const EventsTable = ({
   );
 
   const getBodyTitleCell = (row, eventsType) => {
-    if (EventsType.TRAINING === eventsType){
-      return <></>
+    if (EventsType.TRAINING === eventsType) {
+      return <></>;
     }
 
-    let value =''
-    if (EventsType.MATCH === eventsType){
-      value = row.opponent
-    } else if (EventsType.MISC === eventsType || EventsType.OTHER === eventsType){
-      value = row.title
+    let value = "";
+    if (EventsType.MATCH === eventsType) {
+      value = row.opponent;
+    } else if (
+      EventsType.MISC === eventsType ||
+      EventsType.OTHER === eventsType
+    ) {
+      value = row.title;
     }
     return <TableCell align="right">{value}</TableCell>;
   };
 
   const getBodyLocationCell = (row, eventsType) => {
     let locationAddendum = "";
-    if (EventsType.MATCH === eventsType ) {
+    if (EventsType.MATCH === eventsType) {
       locationAddendum = row.homeAway === "HOME" ? "THUIS" : "UIT";
     }
 
@@ -202,7 +205,9 @@ const EventsTable = ({
         {formattedTime(new Date(row.startTime))}
       </TableCell>
       {getBodyTitleCell(row, eventsType)}
-      <TableCell align="right">{getBodyLocationCell(row, eventsType)}</TableCell>
+      <TableCell align="right">
+        {getBodyLocationCell(row, eventsType)}
+      </TableCell>
       <TableCell align="right">{row.comment}</TableCell>
       <TableCell className={classes.attendees}>
         <Attendees
@@ -230,7 +235,7 @@ const EventsTable = ({
         .map((row) => getTableBodyRow(row))}
     </>
   );
-  
+
   if (isLoading) {
     return <SpinnerWithText text={"Laden"} />;
   }

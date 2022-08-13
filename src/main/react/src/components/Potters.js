@@ -91,13 +91,13 @@ export const Potters = ({ refresh, limit = 3, showFloppers = true }) => {
 
       {renderItems(
         showSeason ? toppers.season : toppers.month,
-        `Toppers (van ${ showSeason ? 'het seizoen' : 'de maand'})`,
+        `Toppers (van ${showSeason ? "het seizoen" : "de maand"})`,
         ["🥇", "🥈", "🥉", ""]
       )}
       {showFloppers &&
         renderItems(
           showSeason ? floppers.season : floppers.month,
-          `Floppers (van ${ showSeason ? 'het seizoen' : 'de maand'})`,
+          `Floppers (van ${showSeason ? "het seizoen" : "de maand"})`,
           ["🐷", "🐗", "🐖"]
         )}
     </Grid>
