@@ -3,8 +3,7 @@ package nl.jvandis.teambalance.api.bank
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.tags.Tags
 import nl.jvandis.teambalance.api.Error
-import nl.jvandis.teambalance.api.SECRET_HEADER
-import nl.jvandis.teambalance.api.SecretService
+import nl.jvandis.teambalance.filters.InvalidDateTimeException
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -27,22 +25,19 @@ import javax.validation.constraints.Min
 @RequestMapping(path = ["/api/bank"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class PotterController(
     private val potterService: PotterService,
-    private val secretService: SecretService,
     private val bankConfig: BankConfig
 ) {
 
     @GetMapping("/potters")
     fun getPotters(
-        @RequestHeader(value = SECRET_HEADER, required = false) secret: String?,
         @RequestParam(value = "limit", defaultValue = "3") @Max(200) @Min(1) limit: Int,
         @RequestParam(value = "sort", defaultValue = "desc") sort: Sort,
         @RequestParam(value = "since", defaultValue = "2021-08-01T00:00:00+02:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) sinceInput: ZonedDateTime,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
     ): PottersResponse {
-        secretService.ensureSecret(secret)
 
         if (sinceInput < bankConfig.dateTimeLimit) {
-            throw IllegalArgumentException("Since input argument is before lower limit of ${bankConfig.dateTimeLimit}. Input was $sinceInput")
+            throw InvalidDateTimeException("Since input argument is before lower limit of ${bankConfig.dateTimeLimit}. Input was $sinceInput")
         }
         val pottersFullPeriod = potterService.getPotters(sinceInput, includeInactiveUsers)
         val now = ZonedDateTime.now()

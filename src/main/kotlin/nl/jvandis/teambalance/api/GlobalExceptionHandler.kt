@@ -1,5 +1,6 @@
 package nl.jvandis.teambalance.api
 
+import nl.jvandis.teambalance.filters.InvalidDateTimeException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -24,6 +25,17 @@ class GlobalExceptionHandler {
                 Error(
                     status = HttpStatus.FORBIDDEN,
                     reason = e.message ?: "Forbidden"
+                )
+            )
+
+    @ExceptionHandler(InvalidDateTimeException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleDateTimeExceptions(e: InvalidDateTimeException) =
+        ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(
+                Error(
+                    status = HttpStatus.BAD_REQUEST,
+                    reason = e.message ?: "Bad request"
                 )
             )
 
@@ -135,7 +147,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(Throwable::class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     fun handleUnhandledExceptions(t: Throwable): ResponseEntity<Error> {
-        log.error("Unhandled exception occured: ${t.message}", t)
+        log.error("Unhandled exception occurred: ${t.message}", t)
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(

@@ -1,8 +1,14 @@
 package nl.jvandis.teambalance
 
+import io.swagger.v3.oas.models.Components
+import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.info.Info
+import io.swagger.v3.oas.models.security.SecurityRequirement
+import io.swagger.v3.oas.models.security.SecurityScheme
 import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.Public
 import org.springdoc.core.GroupedOpenApi
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.lang.reflect.Method
@@ -39,6 +45,23 @@ import java.lang.reflect.Method
  */
 @Configuration
 class SpringdocConf {
+
+    @Bean
+    fun customOpenAPI(@Value("\${app.version}") appVersion: String): OpenAPI? {
+        return OpenAPI()
+            .components(
+                Components().addSecuritySchemes(
+                    "basicScheme",
+                    SecurityScheme().type(SecurityScheme.Type.APIKEY).`in`(SecurityScheme.In.HEADER).name("X-Secret")
+                )
+            )
+            .security(listOf(SecurityRequirement().addList("basicScheme")))
+            .info(
+                Info()
+                    .title("Teambalance API")
+                    .version(appVersion)
+            )
+    }
 
     @Bean
     fun publicApi(): GroupedOpenApi? {

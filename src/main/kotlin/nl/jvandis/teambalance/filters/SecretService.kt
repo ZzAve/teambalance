@@ -1,11 +1,10 @@
-package nl.jvandis.teambalance.api
+package nl.jvandis.teambalance.filters
 
+import nl.jvandis.teambalance.api.InvalidSecretException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.util.Base64
-
-const val SECRET_HEADER = "X-Secret"
 
 @Service
 class SecretService(
