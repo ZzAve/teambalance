@@ -10,10 +10,7 @@ import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import EventsPage from "./views/EventsPage";
 import { EventsType } from "./components/events/utils";
-import { Alert } from "@material-ui/lab";
-import AlertTitle from "@material-ui/lab/AlertTitle";
-import Typography from "@material-ui/core/Typography";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 const Admin = lazy(() => import("./views/Admin.js"));
 const Login = lazy(() => import("./views/Login.js"));
@@ -40,7 +37,7 @@ const App = () => {
   return (
     <>
       <CssBaseline />
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <TopBar handleRefresh={handleRefresh} refresh={topBarShouldRefresh} />
         <Grid container spacing={2} alignItems="flex-start">
           <Grid item xs={12} />

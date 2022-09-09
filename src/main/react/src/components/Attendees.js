@@ -62,7 +62,7 @@ const formatUnicorn = (unicorn) => {
   };
 };
 
-const AttendeeStyledButton = withStyles({
+export const AttendeeStyledButton = withStyles({
   root: {
     "&:hover": {
       background: styledBy("additional-color", {
@@ -233,7 +233,7 @@ const AttendeeRefinement = ({
       attendeesApiClient.updateAttendee(attendee.id, availability)
     )
       .then(onSuccess)
-      .catch(() => {
+      .catch((e) => {
         console.error(
           `Nope, not successful. Could not update ${attendee.user.name} (${attendee.id}) availability to ${availability}`,
           e

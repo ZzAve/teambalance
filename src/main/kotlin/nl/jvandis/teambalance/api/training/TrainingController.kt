@@ -8,6 +8,7 @@ import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
+import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.api.users.UserRepository
 import nl.jvandis.teambalance.api.users.toAttendee
 import org.slf4j.LoggerFactory
@@ -175,6 +176,34 @@ class TrainingController(
             }
             ?.externalizeWithAttendees(emptyList())
             ?: throw InvalidTrainingException(trainingId)
+    }
+
+    @PutMapping("/{training-id}/trainer")
+    fun updateTrainer(
+        @PathVariable(value = "training-id") trainingId: Long,
+        @RequestBody updateTrainerRequest: UpdateTrainerRequest,
+    ): TrainingResponse {
+        return eventRepository
+            .findByIdOrNull(trainingId)
+            ?.let {
+                val potentialTrainer = getPotentialTrainer(updateTrainerRequest)
+                val updatedTraining = it.copy(
+                    trainer = potentialTrainer
+                )
+                eventRepository.save(updatedTraining)
+            }
+            ?.externalizeWithAttendees(emptyList())
+            ?: throw InvalidTrainingException(trainingId)
+    }
+
+    private fun getPotentialTrainer(updateTrainerRequest: UpdateTrainerRequest): User? {
+        return when (updateTrainerRequest.userId) {
+            null -> null
+            else ->
+                userRepository
+                    .findByIdOrNull(updateTrainerRequest.userId)
+                    ?: throw InvalidUserException(updateTrainerRequest.userId)
+        }
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

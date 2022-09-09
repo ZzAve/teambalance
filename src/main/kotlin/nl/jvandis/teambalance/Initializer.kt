@@ -66,7 +66,7 @@ class Initializer(
 
             log.info("After alias injection")
             val aliases = bankAccountAliasRepository.findAll()
-            log.info("All aliases: ", aliases)
+            log.info("All aliases: {}", aliases)
 
             bankAccountTransactionExclusionRepository.saveAll(
                 listOf(
@@ -88,7 +88,8 @@ class Initializer(
             Training(
                 startTime = LocalDateTime.now().plusDays(10),
                 location = "adsfadf,asdf",
-                comment = ""
+                comment = "",
+                trainer = users.first()
             )
         )
         eventRepository.save(
@@ -108,7 +109,7 @@ class Initializer(
 
         log.info("After training injection")
         val trainings = eventRepository.findAll().filterIsInstance<Training>()
-        log.info("ALl trainings: ", trainings)
+        log.info("ALl trainings: {} ", trainings)
 
         trainings.forEach { t ->
             attendeeRepository.saveAll(

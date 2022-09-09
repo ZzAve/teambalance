@@ -5,6 +5,8 @@ import Attendees from "../Attendees";
 import { formattedDate, formattedTime } from "../../utils/util";
 import { EventsType, HomeAway } from "./utils";
 import { Pagination } from "@material-ui/lab";
+import { SelectUser } from "./SelectUser";
+import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 
 export const EventsList = ({
   eventsType,
@@ -41,17 +43,15 @@ export const EventsList = ({
   );
 };
 
-function formattedHomeVsAway(event) {
-  return (
-    <>
-      {event.homeAway === HomeAway.HOME
-        ? "THUIS"
-        : event.homeAway === HomeAway.AWAY
-        ? "UIT"
-        : ""}
-    </>
-  );
-}
+const formattedHomeVsAway = (event) => (
+  <>
+    {event.homeAway === HomeAway.HOME
+      ? "THUIS"
+      : event.homeAway === HomeAway.AWAY
+      ? "UIT"
+      : ""}
+  </>
+);
 
 /**
  * Event has 2 states
@@ -67,6 +67,18 @@ export const EventListItem = ({
   const startDateTime = new Date(event.startTime);
   const titleVariant = !event.title ? "body1" : "h6";
   const dateTimeVariant = !!event.title ? "body1" : "h6";
+
+  const handleTrainerSelection = async (userId) => {
+    await trainingsApiClient
+      .updateTrainer({ id: event.id, trainerUserId: userId })
+      .then((e) => {
+        console.debug("Trainer updated. Training:", e);
+        onUpdate();
+      })
+      .catch((e) => {
+        console.error("Updating trainer failed!", e);
+      });
+  };
   return (
     <Grid container spacing={1}>
       <Grid item xs={12}>
@@ -95,6 +107,16 @@ export const EventListItem = ({
           <Typography variant="body1">
             📝 <em>{event.comment}</em>
           </Typography>
+        ) : (
+          ""
+        )}
+        {eventsType === EventsType.TRAINING ? (
+          <SelectUser
+            label="Trainer"
+            attendees={event.attendees}
+            initialUser={event.trainer}
+            selectedUserCallback={handleTrainerSelection}
+          ></SelectUser>
         ) : (
           ""
         )}
