@@ -36,7 +36,7 @@ import kotlin.math.min
 class TrainingController(
     private val eventRepository: TrainingRepository,
     private val userRepository: UserRepository,
-    private val attendeeRepository: AttendeeRepository,
+    private val attendeeRepository: AttendeeRepository
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -47,9 +47,11 @@ class TrainingController(
         @RequestParam(
             value = "since",
             defaultValue = "2022-08-01T00:00"
-        ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: LocalDateTime,
+        )
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        since: LocalDateTime,
         @RequestParam(value = "limit", defaultValue = "10") limit: Int,
-        @RequestParam(value = "page", defaultValue = "1") page: Int,
+        @RequestParam(value = "page", defaultValue = "1") page: Int
     ): TrainingsResponse {
         log.debug("GetAllTrainings")
         // In case of testing performance again :)
@@ -96,16 +98,19 @@ class TrainingController(
     fun getTraining(
         @PathVariable("training-id") trainingId: Long,
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
-        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
+        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
 
     ): TrainingResponse {
         log.debug("Get training $trainingId")
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
         val attendees =
-            if (!includeAttendees) emptyList()
-            else attendeeRepository
-                .findAllByEventIdIn(listOf(trainingId))
-                .filter { a -> a.user.isActive || includeInactiveUsers }
+            if (!includeAttendees) {
+                emptyList()
+            } else {
+                attendeeRepository
+                    .findAllByEventIdIn(listOf(trainingId))
+                    .filter { a -> a.user.isActive || includeInactiveUsers }
+            }
 
         return training.externalizeWithAttendees(attendees)
     }
@@ -113,7 +118,7 @@ class TrainingController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun createTraining(
-        @RequestBody potentialEvent: PotentialTraining,
+        @RequestBody potentialEvent: PotentialTraining
     ): TrainingResponse {
         log.debug("postTraining $potentialEvent")
         val allUsers = userRepository.findAll()
@@ -143,7 +148,7 @@ class TrainingController(
     fun addAttendee(
         @PathVariable(value = "training-id") trainingId: Long,
         @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,
-        @RequestBody user: UserAddRequest,
+        @RequestBody user: UserAddRequest
 
     ): List<Attendee> {
         log.debug("Adding: $user (or all: $addAll) to training $trainingId")
@@ -165,7 +170,7 @@ class TrainingController(
     @PutMapping("/{training-id}")
     fun updateTraining(
         @PathVariable(value = "training-id") trainingId: Long,
-        @RequestBody updateTrainingRequest: UpdateTrainingRequest,
+        @RequestBody updateTrainingRequest: UpdateTrainingRequest
     ): TrainingResponse {
         return eventRepository
             .findByIdOrNull(trainingId)
@@ -181,7 +186,7 @@ class TrainingController(
     @DeleteMapping("/{training-id}")
     fun deleteTraining(
         @PathVariable(value = "training-id") trainingId: Long,
-        @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean,
+        @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean
 
     ) {
         log.debug("Deleting training: $trainingId")

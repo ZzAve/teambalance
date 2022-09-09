@@ -17,11 +17,18 @@ data class Match(
     override val location: String,
     override val comment: String? = null,
     @Column(nullable = false) val opponent: String,
-    @Column(nullable = false) @Enumerated(EnumType.STRING) val homeAway: Place
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    val homeAway: Place
 ) : Event(id, startTime, location, comment) {
     constructor(startTime: LocalDateTime, location: String, comment: String?) :
         this(
-            0, startTime, location, comment, "opponent",
+            0,
+            startTime,
+            location,
+            comment,
+            "opponent",
             Place.HOME
         )
 

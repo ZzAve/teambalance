@@ -24,10 +24,11 @@ class WebConfig : WebMvcConfigurer {
                 @Throws(IOException::class)
                 override fun getResource(resourcePath: String, location: Resource): Resource {
                     val requestedResource = location.createRelative(resourcePath)
-                    return if (requestedResource.exists() && requestedResource.isReadable)
+                    return if (requestedResource.exists() && requestedResource.isReadable) {
                         requestedResource
-                    else
+                    } else {
                         ClassPathResource("/static/index.html")
+                    }
                 }
             })
     }

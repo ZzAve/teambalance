@@ -17,12 +17,17 @@ data class TransactionExclusions(
 @Entity
 @Table
 data class TransactionExclusion(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,
+
     @Temporal(TemporalType.DATE)
-    @Column(nullable = true) val date: LocalDate?,
+    @Column(nullable = true)
+    val date: LocalDate?,
+
     @Column(nullable = true) val transactionId: Int?,
     @Column(nullable = true) val counterParty: String?,
-    @Column(nullable = true) val description: String?,
+    @Column(nullable = true) val description: String?
 
 ) {
 

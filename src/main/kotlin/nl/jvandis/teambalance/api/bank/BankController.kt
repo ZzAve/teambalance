@@ -26,17 +26,21 @@ class BankController(
 
     @GetMapping("/balance")
     fun getBalance(): BalanceResponse {
-
         return bankService.getBalance().toResponse()
     }
 
     @GetMapping("/transactions")
     fun getTransactions(
+        @RequestParam(value = "limit", defaultValue = "10")
+        @Max(50)
+        @Min(1)
+        limit: Int,
 
-        @RequestParam(value = "limit", defaultValue = "10") @Max(50) @Min(1) limit: Int,
-        @RequestParam(value = "offset", defaultValue = "0") @Max(1000) @Min(0) offset: Int
+        @RequestParam(value = "offset", defaultValue = "0")
+        @Max(1000)
+        @Min(0)
+        offset: Int
     ): TransactionsResponse {
-
         return bankService.getTransactions(limit, offset).let {
             val transactionResponses = it.transactions.toResponse()
             TransactionsResponse(transactions = transactionResponses)

@@ -27,14 +27,14 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "users")
 @RequestMapping(path = ["/api/users"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class UserController(
-    private val userRepository: UserRepository,
+    private val userRepository: UserRepository
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
     fun getUsers(
-        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
+        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
 
     ): Users {
         log.debug("getUsers")
@@ -48,7 +48,7 @@ class UserController(
 
     @GetMapping("/{id}")
     fun getUser(
-        @PathVariable(value = "id") userId: Long,
+        @PathVariable(value = "id") userId: Long
     ): User {
         log.debug("getUser $userId")
 
@@ -58,7 +58,7 @@ class UserController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun postUser(
-        @RequestBody potentialUser: PotentialUser,
+        @RequestBody potentialUser: PotentialUser
     ) {
         log.debug("postUser $potentialUser")
 
@@ -71,7 +71,7 @@ class UserController(
     @PutMapping("/{id}")
     fun updateUser(
         @PathVariable(value = "id") userId: Long,
-        @RequestBody potentialUserUpdate: PotentialUserUpdate,
+        @RequestBody potentialUserUpdate: PotentialUserUpdate
 
     ): User {
         log.debug("updatingUser: $potentialUserUpdate")
@@ -103,7 +103,7 @@ class UserController(
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun updateUser(
-        @PathVariable(value = "id") userId: Long,
+        @PathVariable(value = "id") userId: Long
     ) {
         log.debug("deletingUser: $userId")
 

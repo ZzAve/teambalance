@@ -27,7 +27,6 @@ class SecretFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-
         try {
             request.getHeader(SECRET_HEADER)
                 .let { secretService.ensureSecret(it) }

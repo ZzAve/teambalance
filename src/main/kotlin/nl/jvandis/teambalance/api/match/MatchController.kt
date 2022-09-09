@@ -38,7 +38,7 @@ import kotlin.math.min
 class MatchController(
     private val matchRepository: MatchRepository,
     private val userRepository: UserRepository,
-    private val attendeeRepository: AttendeeRepository,
+    private val attendeeRepository: AttendeeRepository
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -47,9 +47,10 @@ class MatchController(
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
         @RequestParam(value = "since", defaultValue = "2022-08-01T00:00")
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: LocalDateTime,
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        since: LocalDateTime,
         @RequestParam(value = "limit", defaultValue = "10") limit: Int,
-        @RequestParam(value = "page", defaultValue = "1") page: Int,
+        @RequestParam(value = "page", defaultValue = "1") page: Int
     ): MatchesResponse {
         log.debug("GetAllMatches")
 
@@ -87,17 +88,20 @@ class MatchController(
     fun getMatch(
         @PathVariable("match-id") matchId: Long,
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
-        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
+        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
 
     ): MatchResponse {
         log.debug("Get match $matchId")
 
         val match = matchRepository.findByIdOrNull(matchId) ?: throw InvalidMatchException(matchId)
         val attendees =
-            if (!includeAttendees) emptyList()
-            else attendeeRepository
-                .findAllByEventIdIn(listOf(matchId))
-                .filter { a -> a.user.isActive || includeInactiveUsers }
+            if (!includeAttendees) {
+                emptyList()
+            } else {
+                attendeeRepository
+                    .findAllByEventIdIn(listOf(matchId))
+                    .filter { a -> a.user.isActive || includeInactiveUsers }
+            }
 
         return match.externaliseWithAttendees(attendees)
     }
@@ -105,7 +109,8 @@ class MatchController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun createMatch(
-        @RequestBody @Valid potentialEvent: PotentialMatch,
+        @RequestBody @Valid
+        potentialEvent: PotentialMatch
     ): MatchResponse {
         log.debug("postMatch $potentialEvent")
 
@@ -136,7 +141,7 @@ class MatchController(
     fun addAttendee(
         @PathVariable(value = "match-id") matchId: Long,
         @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,
-        @RequestBody user: UserAddRequest,
+        @RequestBody user: UserAddRequest
 
     ): List<Attendee> {
         log.debug("Adding: $user (or all: $addAll) to match $matchId")
@@ -159,10 +164,9 @@ class MatchController(
     @PutMapping("/{match-id}")
     fun updateMatch(
         @PathVariable(value = "match-id") matchId: Long,
-        @RequestBody updateMatchRequest: UpdateMatchRequest,
+        @RequestBody updateMatchRequest: UpdateMatchRequest
 
     ): MatchResponse {
-
         return matchRepository
             .findByIdOrNull(matchId)
             ?.let {
@@ -177,7 +181,7 @@ class MatchController(
     @DeleteMapping("/{match-id}")
     fun deleteMatch(
         @PathVariable(value = "match-id") matchId: Long,
-        @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean,
+        @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean
 
     ) {
         log.debug("Deleting match: $matchId")

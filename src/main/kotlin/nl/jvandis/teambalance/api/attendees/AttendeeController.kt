@@ -34,14 +34,14 @@ import org.springframework.web.bind.annotation.RestController
 class AttendeeController(
     private val attendeeRepository: AttendeeRepository,
     private val eventRepository: EventRepository,
-    private val userRepository: UserRepository,
+    private val userRepository: UserRepository
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
     fun getAttendees(
         @RequestParam(value = "event-ids", defaultValue = "") eventIds: List<Long>,
-        @RequestParam(value = "user-ids", defaultValue = "") userIds: List<Long>,
+        @RequestParam(value = "user-ids", defaultValue = "") userIds: List<Long>
     ): AttendeesResponse {
         log.debug("Get attendees (filter eventIds: $eventIds,userIds: $userIds")
 
@@ -63,7 +63,7 @@ class AttendeeController(
 
     @GetMapping("/{id}")
     fun getAttendee(
-        @PathVariable(value = "id") attendeeId: Long,
+        @PathVariable(value = "id") attendeeId: Long
     ): AttendeeResponse {
         log.debug("Get attendees $attendeeId")
 
@@ -75,7 +75,7 @@ class AttendeeController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun addAttendee(
-        @RequestBody potentialAttendee: PotentialAttendee,
+        @RequestBody potentialAttendee: PotentialAttendee
     ): AttendeeResponse {
         log.debug("Adding attendee: $potentialAttendee")
 
@@ -101,9 +101,8 @@ class AttendeeController(
     @PutMapping("{id}")
     fun updateAttendee(
         @PathVariable("id") attendeeId: Long,
-        @RequestBody attendeeStateUpdate: AttendeeStateUpdate,
+        @RequestBody attendeeStateUpdate: AttendeeStateUpdate
     ): AttendeeResponse {
-
         val attendee = attendeeRepository.findByIdOrNull(attendeeId)
             ?: throw InvalidAttendeeException(attendeeId)
 
@@ -117,7 +116,7 @@ class AttendeeController(
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun deleteAttendee(
-        @PathVariable("id") id: Long,
+        @PathVariable("id") id: Long
     ) {
         log.debug("Deleting attendee x")
 
@@ -128,7 +127,7 @@ class AttendeeController(
     @DeleteMapping()
     fun deleteAttendeeByUserIdAndEventId(
         @RequestParam("user-id") userId: Long,
-        @RequestParam("event-id") eventId: Long,
+        @RequestParam("event-id") eventId: Long
     ) {
         log.debug("Deleting user $userId from training $eventId")
 

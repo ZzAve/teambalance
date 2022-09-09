@@ -36,7 +36,6 @@ class Initializer(
 
     @Bean
     fun initializeDatabase(): InitializingBean? {
-
         return InitializingBean {
             userRepository.saveAll(
                 listOf(
@@ -45,7 +44,7 @@ class Initializer(
                     User("Bocaj", Role.MID),
                     User("Joep", Role.PASSER),
                     User("Roger", Role.PASSER),
-                    User("Pardoes", Role.COACH),
+                    User("Pardoes", Role.COACH)
                 )
             )
 

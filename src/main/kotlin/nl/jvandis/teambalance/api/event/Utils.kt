@@ -23,7 +23,9 @@ fun <T : Event> getEventsAndAttendees(
         val matchIds = events.content.map { it.id }
         attendeeRepository.findAllByEventIdIn(matchIds)
             .groupBy { it.event.id }
-    } else emptyMap()
+    } else {
+        emptyMap()
+    }
 
     return Pair(events, attendees)
 }

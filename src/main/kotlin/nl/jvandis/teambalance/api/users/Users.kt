@@ -14,9 +14,16 @@ data class Users(
 
 @Entity(name = "Uzer")
 data class User(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,
+
     @Column(nullable = false, unique = true) val name: String,
-    @Enumerated(EnumType.STRING) @Column(nullable = false) val role: Role,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    val role: Role,
+
     @Column(nullable = false) val isActive: Boolean = true,
     @Column(nullable = false) val showForTrainings: Boolean = true,
     @Column(nullable = false) val showForMatches: Boolean = true

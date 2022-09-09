@@ -12,8 +12,7 @@ class PotterService(
     private val userRepository: UserRepository
 ) {
 
-    fun getPotters(since: ZonedDateTime, includeInactiveUsers: Boolean,): Potters {
-
+    fun getPotters(since: ZonedDateTime, includeInactiveUsers: Boolean): Potters {
         val relevantTransactions = getRelevantTransactions(since)
         val groupedTransactions: Map<User, List<Transaction>> = relevantTransactions
             .groupBy { x -> x.user!! }
