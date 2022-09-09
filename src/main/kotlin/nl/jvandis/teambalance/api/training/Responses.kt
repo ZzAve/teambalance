@@ -1,10 +1,15 @@
 package nl.jvandis.teambalance.api.training
 
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
+import nl.jvandis.teambalance.api.users.User
 import java.time.LocalDateTime
 
 data class UserAddRequest(
     val userId: Long
+)
+
+data class UpdateTrainerRequest(
+    val userId: Long?
 )
 
 data class UpdateTrainingRequest(
@@ -39,5 +44,6 @@ data class TrainingResponse(
     val startTime: LocalDateTime,
     val location: String,
     val comment: String?,
-    val attendees: List<AttendeeResponse>
+    val attendees: List<AttendeeResponse>,
+    val trainer: User?
 )

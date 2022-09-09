@@ -47,6 +47,16 @@ const updateTraining = ({ id, location, comment, startTime }) => {
   );
 };
 
+const updateTrainer = ({ id, trainerUserId }) => {
+  return trainingsClient.callWithBody(
+    `trainings/${id}/trainer`,
+    {
+      userId: trainerUserId,
+    },
+    { method: "PUT" }
+  );
+};
+
 const deleteTraining = (id, deleteAttendees = true) => {
   return trainingsClient.call(
     `trainings/${id}?delete-attendees=${deleteAttendees}`,
@@ -60,5 +70,6 @@ export const trainingsApiClient = {
   getTraining,
   createTraining,
   updateTraining,
+  updateTrainer,
   deleteTraining,
 };

@@ -10,6 +10,7 @@ export const ControlType = {
   CHECKBOX: "CHECKBOX",
   SWITCH: "SWITCH",
 };
+
 export const EventUsers = ({
   event,
   users,
@@ -32,15 +33,15 @@ export const EventUsers = ({
     setSingleUserCheck(selectedUserMap);
     setUserSelection(selectedUserMap);
     setAllUsersCheckBox(attendeeUserIds.length === users.length);
-  }, [users, event]);
+  }, [users, event, setUserSelection]);
 
   useEffect(() => {
-    let hasUncheckedUsers = Object.values(singleUserCheck).some(
+    const hasUncheckedUsers = Object.values(singleUserCheck).some(
       (it) => it === false
     );
     setAllUsersCheckBox(!hasUncheckedUsers);
     setUserSelection(singleUserCheck);
-  }, [singleUserCheck]);
+  }, [singleUserCheck, setUserSelection]);
 
   const setAllUsersCheckedStateTo = async (isChecked) => {
     console.log(`Setting  all users to ${isChecked}`);
