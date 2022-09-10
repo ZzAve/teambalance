@@ -53,7 +53,7 @@ const EventsTable = ({
 }) => {
   const [page, setPage] = useState(0); // get from url?
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [deleteAlertOpen, setDeleteAlertOpen] = React.useState(false);
+  const [deleteAlertOpen, setDeleteAlertOpen] = React.useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const classes = useStyles();
@@ -80,18 +80,14 @@ const EventsTable = ({
     }
   };
 
-  const handleDeleteClick = () => {
-    setDeleteAlertOpen(true);
+  const handleDeleteClick = (eventId) => {
+    setDeleteAlertOpen(eventId);
   };
 
   const handleDelete = (shouldDelete, eventId) => {
-    console.warn(
-      "Called handle delete with should delete and eventId",
-      shouldDelete,
-      eventId
-    );
-    setDeleteAlertOpen(false);
+    setDeleteAlertOpen(undefined);
     if (shouldDelete) {
+      console.warn("Deleting event #", eventId);
       withLoading(setIsLoading, () => {
         if (eventsType === EventsType.TRAINING) {
           return trainingsApiClient.deleteTraining(eventId);
@@ -107,7 +103,7 @@ const EventsTable = ({
         withLoading(setIsLoading, () => updateTrigger()).then();
       });
     } else {
-      console.log("Should not delete");
+      console.log("Should not delete evente #", eventId);
     }
   };
 
@@ -126,7 +122,7 @@ const EventsTable = ({
         <Button
           variant="contained"
           color="secondary"
-          onClick={handleDeleteClick}
+          onClick={() => handleDeleteClick(id)}
         >
           <DeleteIcon />
         </Button>
@@ -189,7 +185,6 @@ const EventsTable = ({
 
     return (
       <AlertDialog
-        open={deleteAlertOpen}
         onResult={(result) => handleDelete(result, row.id)}
         title={`Weet je zeker dat je ${eventsType.toLowerCase()} met id #${
           row.id
@@ -220,7 +215,6 @@ const EventsTable = ({
       {allowChanges ? (
         <TableCell className={classes.changes} align="right">
           {getUpdateIcons(row)}
-          {getAlertDialog(row)}
         </TableCell>
       ) : (
         <></>
@@ -242,6 +236,7 @@ const EventsTable = ({
 
   return (
     <Grid container item xs={12}>
+      {deleteAlertOpen ? getAlertDialog(events.find(e => e.id ===deleteAlertOpen)): ""}
       <TableContainer component={Paper}>
         <Table aria-label="simple table" size="medium" className={classes.root}>
           <TableHead>{getTableHead()}</TableHead>
