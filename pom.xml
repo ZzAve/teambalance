@@ -18,7 +18,7 @@
         <skip.npm-ci>false</skip.npm-ci>
 
         <java.version>11</java.version>
-        <kotlin.version>1.6.10</kotlin.version>
+        <kotlin.version>1.7.20</kotlin.version>
         <!-- installed node/npm version: lts/carbon -->
         <node.version>v16.13.2</node.version>
         <npm.version>8.1.2</npm.version>
