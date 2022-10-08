@@ -129,7 +129,7 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = e.message ?: "Forbidden"
+                    reason = e.message
                 )
             )
 
