@@ -19,7 +19,7 @@ abstract class Event(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     open val id: Long = 0,
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     @Temporal(TemporalType.TIMESTAMP)
     open val startTime: LocalDateTime,
 

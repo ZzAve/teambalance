@@ -1,1 +1,2 @@
-lint-staged
+# Lint staged files
+./node_modules/.bin/lint-staged
