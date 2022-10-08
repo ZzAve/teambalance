@@ -15,7 +15,9 @@ data class Training(
     override val startTime: LocalDateTime,
     override val location: String,
     override val comment: String? = null,
-    @ManyToOne @JoinColumn(name = "USER_ID") val trainer: User? = null
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    val trainer: User? = null
 ) : Event(id, startTime, location, comment) {
     constructor(startTime: LocalDateTime, location: String, comment: String? = null, trainer: User? = null) :
         this(id = 0, startTime = startTime, location = location, comment = comment, trainer = trainer)
@@ -23,7 +25,7 @@ data class Training(
     fun createUpdatedTraining(updateTrainingRequestBody: UpdateTrainingRequest) = copy(
         startTime = updateTrainingRequestBody.startTime ?: startTime,
         comment = updateTrainingRequestBody.comment ?: comment,
-        location = updateTrainingRequestBody.location ?: location,
+        location = updateTrainingRequestBody.location ?: location
 
     )
 

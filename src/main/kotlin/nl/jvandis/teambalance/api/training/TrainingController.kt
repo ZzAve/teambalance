@@ -186,7 +186,7 @@ class TrainingController(
     @PutMapping("/{training-id}/trainer")
     fun updateTrainer(
         @PathVariable(value = "training-id") trainingId: Long,
-        @RequestBody updateTrainerRequest: UpdateTrainerRequest,
+        @RequestBody updateTrainerRequest: UpdateTrainerRequest
     ): TrainingResponse {
         return eventRepository
             .findByIdOrNull(trainingId)
