@@ -1,7 +1,5 @@
 package nl.jvandis.teambalance.filters
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.servlet.HandlerExceptionResolver
@@ -37,9 +35,5 @@ class SecretFilter(
         } catch (e: Exception) {
             handlerExceptionResolver.resolveException(request, response, null, e)
         }
-    }
-
-    companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(javaClass)
     }
 }
