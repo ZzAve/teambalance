@@ -25,7 +25,7 @@
 
         <appengine-maven-plugin.version>2.4.1</appengine-maven-plugin.version>
         <bunq-sdk.version>1.19.11.48</bunq-sdk.version>
-        <caffeine.version>3.0.5</caffeine.version>
+        <caffeine.version>v3.1.1</caffeine.version>
         <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
         <ktlint.version>0.47.1</ktlint.version>
         <maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
