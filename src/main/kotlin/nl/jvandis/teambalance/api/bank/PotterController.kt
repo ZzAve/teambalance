@@ -30,12 +30,18 @@ class PotterController(
 
     @GetMapping("/potters")
     fun getPotters(
-        @RequestParam(value = "limit", defaultValue = "3") @Max(200) @Min(1) limit: Int,
+        @RequestParam(value = "limit", defaultValue = "3")
+        @Max(200)
+        @Min(1)
+        limit: Int,
+
         @RequestParam(value = "sort", defaultValue = "desc") sort: Sort,
-        @RequestParam(value = "since", defaultValue = "2022-08-01T00:00:00+02:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) sinceInput: ZonedDateTime,
+        @RequestParam(value = "since", defaultValue = "2022-08-01T00:00:00+02:00")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        sinceInput: ZonedDateTime,
+
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
     ): PottersResponse {
-
         if (sinceInput < bankConfig.dateTimeLimit) {
             throw InvalidDateTimeException("Since input argument is before lower limit of ${bankConfig.dateTimeLimit}. Input was $sinceInput")
         }

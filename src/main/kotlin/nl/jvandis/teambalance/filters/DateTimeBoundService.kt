@@ -10,7 +10,9 @@ class InvalidDateTimeException(msg: String) : RuntimeException(msg)
 
 @Service
 class DateTimeBoundService(
-    @Value("\${app.datetime-limit}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) private val dateTimeLimit: ZonedDateTime
+    @Value("\${app.datetime-limit}")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private val dateTimeLimit: ZonedDateTime
 ) {
 
     fun ensureDateTimeLimit(since: LocalDateTime) {

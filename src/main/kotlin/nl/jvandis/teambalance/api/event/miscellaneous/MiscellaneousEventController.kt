@@ -36,7 +36,7 @@ import kotlin.math.min
 class MiscellaneousEventController(
     private val eventRepository: MiscellaneousEventRepository,
     private val userRepository: UserRepository,
-    private val attendeeRepository: AttendeeRepository,
+    private val attendeeRepository: AttendeeRepository
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -47,9 +47,11 @@ class MiscellaneousEventController(
         @RequestParam(
             value = "since",
             defaultValue = "2022-08-01T00:00"
-        ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: LocalDateTime,
+        )
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        since: LocalDateTime,
         @RequestParam(value = "limit", defaultValue = "10") limit: Int,
-        @RequestParam(value = "page", defaultValue = "1") page: Int,
+        @RequestParam(value = "page", defaultValue = "1") page: Int
     ): MiscellaneousEventsResponse {
         log.debug("GetAllMiscellaneousEvents")
 
@@ -97,16 +99,19 @@ class MiscellaneousEventController(
     fun getEvent(
         @PathVariable("event-id") eventId: Long,
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
-        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
+        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
     ): MiscellaneousEventResponse {
         log.debug("Get miscellaneous event $eventId")
 
         val event = eventRepository.findByIdOrNull(eventId) ?: throw InvalidMiscellaneousEventException(eventId)
         val attendees =
-            if (!includeAttendees) emptyList()
-            else attendeeRepository
-                .findAllByEventIdIn(listOf(eventId))
-                .filter { a -> a.user.isActive || includeInactiveUsers }
+            if (!includeAttendees) {
+                emptyList()
+            } else {
+                attendeeRepository
+                    .findAllByEventIdIn(listOf(eventId))
+                    .filter { a -> a.user.isActive || includeInactiveUsers }
+            }
 
         return event.externalizeWithAttendees(attendees)
     }
@@ -114,7 +119,7 @@ class MiscellaneousEventController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun createMiscellaneousEvent(
-        @RequestBody potentialEvent: PotentialMiscellaneousEvent,
+        @RequestBody potentialEvent: PotentialMiscellaneousEvent
     ): MiscellaneousEventResponse {
         log.debug("postEvent $potentialEvent")
 
@@ -145,7 +150,7 @@ class MiscellaneousEventController(
     fun addAttendee(
         @PathVariable(value = "event-id") eventId: Long,
         @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,
-        @RequestBody user: UserAddRequest,
+        @RequestBody user: UserAddRequest
 
     ): List<Attendee> {
         log.debug("Adding: $user (or all: $addAll) to event $eventId")
@@ -168,10 +173,9 @@ class MiscellaneousEventController(
     @PutMapping("/{event-id}")
     fun updateEvent(
         @PathVariable(value = "event-id") eventId: Long,
-        @RequestBody updateEventRequest: UpdateMiscellaneousEventRequest,
+        @RequestBody updateEventRequest: UpdateMiscellaneousEventRequest
 
     ): MiscellaneousEventResponse {
-
         return eventRepository
             .findByIdOrNull(eventId)
             ?.let {
@@ -186,7 +190,7 @@ class MiscellaneousEventController(
     @DeleteMapping("/{event-id}")
     fun deleteEvent(
         @PathVariable(value = "event-id") eventId: Long,
-        @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean,
+        @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean
 
     ) {
         log.debug("Deleting event: $eventId")

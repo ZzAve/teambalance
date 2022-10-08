@@ -16,7 +16,8 @@ import javax.persistence.TemporalType
     strategy = InheritanceType.JOINED
 )
 abstract class Event(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     open val id: Long = 0,
 
     @Column(nullable = false, unique = false)

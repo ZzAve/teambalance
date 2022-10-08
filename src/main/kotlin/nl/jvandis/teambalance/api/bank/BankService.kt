@@ -110,7 +110,6 @@ class BankService(
     }
 
     private fun Payment.toDomain(aliases: Map<String, User>): Transaction {
-
         return Transaction(
             id = id,
             type = toTransactionType(),

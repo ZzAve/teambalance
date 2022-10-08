@@ -21,10 +21,21 @@ import javax.persistence.UniqueConstraint
 @Entity
 @Table(uniqueConstraints = arrayOf(UniqueConstraint(columnNames = arrayOf("USER_ID", "EVENT_ID"))))
 data class Attendee(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
-    @ManyToOne @JoinColumn(name = "USER_ID") val user: User,
-    @Enumerated(EnumType.STRING) @Column(nullable = false) val availability: Availability,
-    @ManyToOne @JoinColumn(name = "EVENT_ID") val event: Event
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,
+
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    val user: User,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    val availability: Availability,
+
+    @ManyToOne
+    @JoinColumn(name = "EVENT_ID")
+    val event: Event
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(Attendee::class.java)

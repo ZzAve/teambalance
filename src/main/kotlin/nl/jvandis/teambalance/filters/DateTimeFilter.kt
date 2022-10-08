@@ -23,9 +23,7 @@ class DateTimeFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-
         try {
-
             request.getParameter("since")
                 ?.let { eventService.ensureDateTimeLimit(LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME)) }
 

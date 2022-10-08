@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping(path = ["/api/aliases"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class BankAccountAliasController(
     private val bankAccountAliasRepository: BankAccountAliasRepository,
-    private val userRepository: UserRepository,
+    private val userRepository: UserRepository
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -44,7 +44,7 @@ class BankAccountAliasController(
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('admin')")
     fun getUser(
-        @PathVariable(value = "id") bankAccountAliasId: Long,
+        @PathVariable(value = "id") bankAccountAliasId: Long
     ): BankAccountAlias {
         log.debug("getUser $bankAccountAliasId")
 
@@ -57,7 +57,7 @@ class BankAccountAliasController(
     @PostMapping
     @PreAuthorize("hasRole('admin')")
     fun postUser(
-        @RequestBody potentialBankAccountAlias: PotentialBankAccountAlias,
+        @RequestBody potentialBankAccountAlias: PotentialBankAccountAlias
     ) {
         log.debug("postBankAccountAlias $potentialBankAccountAlias")
 
@@ -69,7 +69,7 @@ class BankAccountAliasController(
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('admin')")
     fun updateUser(
-        @PathVariable(value = "id") bankAccountAliasId: Long,
+        @PathVariable(value = "id") bankAccountAliasId: Long
 
     ) {
         log.debug("deleting bankAccountAlias: $bankAccountAliasId")
