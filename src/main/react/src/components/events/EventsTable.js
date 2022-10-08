@@ -236,7 +236,9 @@ const EventsTable = ({
 
   return (
     <Grid container item xs={12}>
-      {deleteAlertOpen ? getAlertDialog(events.find(e => e.id ===deleteAlertOpen)): ""}
+      {deleteAlertOpen
+        ? getAlertDialog(events.find((e) => e.id === deleteAlertOpen))
+        : ""}
       <TableContainer component={Paper}>
         <Table aria-label="simple table" size="medium" className={classes.root}>
           <TableHead>{getTableHead()}</TableHead>

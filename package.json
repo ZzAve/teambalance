@@ -49,7 +49,8 @@
   "scripts": {
     "start": "webpack serve --mode development --host 0.0.0.0",
     "build": "webpack --mode production ./src/main/react",
-    "lint": "prettier --check './src/main/react/**/*.js' ",
+    "lint": "prettier --check './src/main/react/**/*.js'",
+    "lint:fix": "prettier --write './src/main/react/**/*.js' --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install"
   },
