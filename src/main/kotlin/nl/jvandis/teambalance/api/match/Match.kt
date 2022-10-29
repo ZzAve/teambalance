@@ -4,6 +4,7 @@ import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.event.Event
 import nl.jvandis.teambalance.api.event.Place
+import org.hibernate.Hibernate
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -20,7 +21,9 @@ data class Match(
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    val homeAway: Place
+    val homeAway: Place,
+    @Column(nullable=true)
+    val coach: String? = null
 ) : Event(id, startTime, location, comment) {
     constructor(startTime: LocalDateTime, location: String, comment: String?) :
         this(
@@ -47,7 +50,8 @@ data class Match(
         location = updateMatchRequestBody.location ?: location,
         opponent = updateMatchRequestBody.opponent ?: opponent,
         homeAway = updateMatchRequestBody.homeAway ?: homeAway,
-        comment = updateMatchRequestBody.comment ?: comment
+        comment = updateMatchRequestBody.comment ?: comment,
+        coach = updateMatchRequestBody.coach ?: coach
     )
 
     fun externaliseWithAttendees(attendees: List<Attendee>): MatchResponse {
@@ -62,6 +66,7 @@ data class Match(
         startTime = startTime,
         opponent = opponent,
         homeAway = homeAway,
+        coach = coach,
         attendees = attendeesResponse
     )
 }

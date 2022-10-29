@@ -7,6 +7,8 @@ import { EventsType, HomeAway } from "./utils";
 import { Pagination } from "@material-ui/lab";
 import { SelectUser } from "./SelectUser";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
+import { EditableTextField } from "./EditableTextField";
+import { matchesApiClient } from "../../utils/MatchesApiClient";
 
 export const EventsList = ({
   eventsType,
@@ -79,6 +81,19 @@ export const EventListItem = ({
         console.error("Updating trainer failed!", e);
       });
   };
+
+  const handleCoachSelection = async (coach) => {
+    await matchesApiClient
+      .updateCoach({ id: event.id, coach: coach })
+      .then((e) => {
+        console.debug("Coach updated. Coach:", e);
+        onUpdate();
+      })
+      .catch((e) => {
+        //TODO: give feedback to user
+        console.error("Updating coach failed!", e);
+      });
+  };
   return (
     <Grid container spacing={1}>
       <Grid item xs={12}>
@@ -107,6 +122,16 @@ export const EventListItem = ({
           <Typography variant="body1">
             📝 <em>{event.comment}</em>
           </Typography>
+        ) : (
+          ""
+        )}
+        {eventsType === EventsType.MATCH ? (
+          <EditableTextField
+            label="👮‍"
+            attendees={[]}
+            initialText={event?.coach}
+            updatedTextValueCallback={handleCoachSelection}
+          ></EditableTextField>
         ) : (
           ""
         )}

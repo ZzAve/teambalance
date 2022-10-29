@@ -66,6 +66,17 @@ const updateMatch = ({
   );
 };
 
+const updateCoach = ({ id, coach }) => {
+  debugger;
+  return matchesClient.callWithBody(
+    `matches/${id}`,
+    {
+      coach: coach,
+    },
+    { method: "PUT" }
+  );
+};
+
 const deleteMatch = (id, deleteAttendees = true) => {
   return matchesClient.call(
     `matches/${id}?delete-attendees=${deleteAttendees}`,
@@ -79,5 +90,6 @@ export const matchesApiClient = {
   getMatch,
   createMatch,
   updateMatch,
+  updateCoach,
   deleteMatch,
 };

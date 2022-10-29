@@ -9,7 +9,8 @@ data class UpdateMatchRequest(
     val location: String?,
     val opponent: String?,
     val homeAway: Place?,
-    val comment: String?
+    val comment: String?,
+    val coach: String?
 )
 
 data class PotentialMatch(
@@ -44,5 +45,6 @@ data class MatchResponse(
     val comment: String?,
     val attendees: List<AttendeeResponse>,
     val opponent: String,
-    val homeAway: Place
+    val homeAway: Place,
+    val coach: String?
 )

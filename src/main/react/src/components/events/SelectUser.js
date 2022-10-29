@@ -44,11 +44,9 @@ export const SelectUser = ({
 
       {isChanging ? (
         <FormControl fullWidth>
-          <InputLabel id="user-select">{label}</InputLabel>
           <Select
             labelId="user-select"
             value={selectedUser}
-            label={label}
             onChange={handleUserSelection}
           >
             <MenuItem key={noUser} value={noUser}>
