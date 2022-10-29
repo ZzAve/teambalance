@@ -11,3 +11,5 @@ src/main/webapp
 .env
 
 /cloud_sql_proxy
+
+.jpb
