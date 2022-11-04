@@ -34,7 +34,7 @@ const Events = ({
   eventsType = EventsType.OTHER,
   refresh,
   view,
-  includeHistory,
+  includeHistory = false,
   withPagination,
   allowChanges = false,
   limit = 1,

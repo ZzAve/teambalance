@@ -14,7 +14,8 @@ const Texts = [
 const Loading = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [text, setText] = useState("Inloggen ...");
-  const [lastDelayedExecution, setLastDelayedExecution] = useState(-1);
+  const [lastDelayedExecution, setLastDelayedExecution] =
+    useState<NodeJS.Timeout>(setTimeout(() => {}));
 
   // Unmount cancellation effect
   useEffect(() => {
@@ -24,9 +25,9 @@ const Loading = () => {
   }, [lastDelayedExecution]);
 
   useEffect(() => {
-    if (!!isUpdating) return;
+    if (isUpdating) return;
 
-    const updateTextHandle = updateText();
+    const updateTextHandle: NodeJS.Timeout = updateText();
     setLastDelayedExecution(updateTextHandle);
     setIsUpdating(true);
   }, [isUpdating]);

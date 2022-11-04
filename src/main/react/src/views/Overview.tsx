@@ -23,7 +23,7 @@ const useStyles = makeStyles(() =>
   })
 );
 
-const Overview = ({ refresh }) => {
+const Overview = (props: { refresh:boolean }) => {
   const classes = useStyles();
   const navigate = useNavigate();
 
@@ -32,7 +32,10 @@ const Overview = ({ refresh }) => {
       <PageTitle title="Team Balance" withSuffix={false} />
       <Grid item xs={12} md={6}>
         <Grid container spacing={2}>
-          <PageItem title="Aanstaande trainingen">
+          <PageItem
+            pageTitle="Aanstaande trainingen"
+            title="Aanstaande trainingen"
+          >
             <Grid item container spacing={4}>
               <Grid item xs={12}>
                 <Typography>
@@ -42,7 +45,7 @@ const Overview = ({ refresh }) => {
               <Grid item xs={12}>
                 <Events
                   eventsType={EventsType.TRAINING}
-                  refresh={refresh}
+                  refresh={props.refresh}
                   view={ViewType.List}
                   limit={2}
                   withPagination={false}
@@ -61,7 +64,7 @@ const Overview = ({ refresh }) => {
               </Grid>
             </Grid>
           </PageItem>
-          <PageItem title="Aanstaande wedstrijden">
+          <PageItem title="Aanstaande wedstrijden" pageTitle="Aanstaande wedstrijden">
             <Grid item container spacing={4}>
               <Grid item xs={12}>
                 <Typography>
@@ -71,7 +74,7 @@ const Overview = ({ refresh }) => {
               <Grid item xs={12}>
                 <Events
                   eventsType={EventsType.MATCH}
-                  refresh={refresh}
+                  refresh={props.refresh}
                   view={ViewType.List}
                   limit={2}
                   withPagination={false}
@@ -90,7 +93,7 @@ const Overview = ({ refresh }) => {
               </Grid>
             </Grid>
           </PageItem>
-          <PageItem title="Aanstaande andere evenementen en uitjes">
+          <PageItem title="Aanstaande andere evenementen en uitjes" pageTitle="Aanstaande andere evenementen en uitjes">
             <Grid item container spacing={4}>
               <Grid item xs={12}>
                 <Typography>Wanneer moeten we iets anders doen?</Typography>
@@ -98,7 +101,7 @@ const Overview = ({ refresh }) => {
               <Grid item xs={12}>
                 <Events
                   eventsType={EventsType.MISC}
-                  refresh={refresh}
+                  refresh={props.refresh}
                   view={ViewType.List}
                   limit={2}
                   withPagination={false}
@@ -121,10 +124,10 @@ const Overview = ({ refresh }) => {
       </Grid>
       <Grid item xs={12} md={6}>
         <Grid container spacing={2}>
-          <PageItem title="De bierstand">
+          <PageItem title="De bierstand" pageTitle="De bierstand">
             <Grid item container spacing={3} xs={12}>
               <Grid item xs={12}>
-                <Balance refresh={refresh} />
+                <Balance refresh={props.refresh} />
               </Grid>
               <Grid item xs={12}>
                 <Topup />
@@ -135,7 +138,7 @@ const Overview = ({ refresh }) => {
                 </Typography>
               </Grid>
               <Grid item xs={12}>
-                <Potters refresh={refresh} />
+                <Potters refresh={props.refresh} />
               </Grid>
             </Grid>
           </PageItem>
@@ -162,12 +165,12 @@ const Overview = ({ refresh }) => {
                 </Grid>
               </Grid>
               <Grid item xs={12}>
-                <Transactions refresh={refresh} />
+                <Transactions refresh={props.refresh} />
               </Grid>
             </Card>
           </Grid>
           <Grid item container spacing={2}>
-            <PageItem title="Admin snuff">
+            <PageItem title="Admin snuff" pageTitle="Admin snuff">
               <Button
                 variant="contained"
                 color="primary"

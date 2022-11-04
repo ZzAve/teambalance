@@ -1,5 +1,3 @@
-// src/App.js
-
 import React, { lazy, Suspense, useState } from "react";
 import "./App.css";
 import Loading from "./views/Loading";
@@ -13,22 +11,22 @@ import { EventsType } from "./components/events/utils";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
 
-const Admin = lazy(() => import("./views/Admin.js"));
-const Login = lazy(() => import("./views/Login.js"));
-const Overview = lazy(() => import("./views/Overview.js"));
+const Admin = lazy(() => import("./views/Admin"));
+const Login = lazy(() => import("./views/Login"));
+const Overview = lazy(() => import("./views/Overview"));
 const Transaction = lazy(() => import("./views/TransactionsPage"));
 
 const App = () => {
   const [topBarShouldRefresh, setTopBarShouldRefresh] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
 
-  const handleRefresh = (_) => {
+  const handleRefresh = () => {
     setTimeout(() => {
       setShouldRefresh(!shouldRefresh);
     });
   };
 
-  const refreshTopBar = (_) => {
+  const refreshTopBar = () => {
     setTimeout(() => {
       setTopBarShouldRefresh(!topBarShouldRefresh);
     });

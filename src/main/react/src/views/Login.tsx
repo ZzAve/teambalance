@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {ChangeEventHandler, FormEvent, useEffect, useState} from "react";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
@@ -19,8 +19,9 @@ const useStyles = makeStyles(() =>
   })
 );
 
-const Login = ({ handleRefresh }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(undefined);
+type LocationState = { from: { pathname: string } };
+const Login = (opts: { handleRefresh: () => void }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
@@ -55,7 +56,7 @@ const Login = ({ handleRefresh }) => {
       `);
   }, [input]);
 
-  const authenticate = (passphrase) =>
+  const authenticate = (passphrase: string) =>
     withLoading(setIsLoading, () =>
       authenticationManager.authenticate(passphrase)
     )
@@ -66,16 +67,18 @@ const Login = ({ handleRefresh }) => {
         console.error("Login did not work", e);
       });
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     await authenticate(input);
   };
 
-  const handleInput = (e) => setInput(e.target.value);
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value);
 
   if (isAuthenticated) {
-    const { from } = location.state || { from: { pathname: "/" } };
-    handleRefresh();
+    const { from } = (location.state as LocationState) || {
+      from: { pathname: "/" },
+    };
+    opts.handleRefresh();
     return <Navigate to={from} replace />;
   }
 
@@ -83,10 +86,11 @@ const Login = ({ handleRefresh }) => {
     return <Loading />;
   }
 
-  return (
+
+    return (
     <Grid item xs={12}>
       <Grid container spacing={2}>
-        <PageItem title="Login">
+        <PageItem title="Login" pageTitle="Login">
           <form onSubmit={handleLogin}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
@@ -127,7 +131,7 @@ const Login = ({ handleRefresh }) => {
  * @param number
  * @returns {string}
  */
-const randomChars = (number) => {
+const randomChars = (number: number) => {
   let char = () => Math.floor(Math.random() * 36).toString(36);
   let outStr = "";
   while (outStr.length < number) {
