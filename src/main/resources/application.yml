@@ -2,9 +2,9 @@ management.endpoints.web:
   base-path: /internal/actuator
 
 app:
-  title: '@project.name@'
+  title: "@project.name@"
   description: "Fancy pants teampot for Tovo heren 5"
-  version: '@project.version@'
+  version: "@project.version@"
   datetime-limit: ${app.bank.datetime-limit}
   secret:
     secret-value: ${sm://API_SECRET}
@@ -50,7 +50,7 @@ spring:
     password: override-me
     url: override-me
     hikari:
-      maximum-pool-size: 2
+      maximum-pool-size: 1
 
   jackson:
     serialization:
