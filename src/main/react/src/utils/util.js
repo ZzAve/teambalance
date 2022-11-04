@@ -45,3 +45,8 @@ export const ViewType = {
   Table: "table",
 };
 Object.freeze(ViewType);
+
+export const toBase64 = (text) => {
+  const buf = Buffer.from(text, "utf-8");
+  return buf.toString("base64");
+};

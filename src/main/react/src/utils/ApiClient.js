@@ -1,5 +1,5 @@
 import { fetchWithTimeout } from "./fetchWithTimeout";
-import { delay } from "./util";
+import { delay, toBase64 } from "./util";
 import { authenticationManager } from "./AuthenticationManager";
 import { InvalidSecretException, TimeoutError } from "./Exceptions";
 
@@ -11,7 +11,7 @@ const _mergeFetchOptions = (options, secret) => ({
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    "X-Secret": btoa(secret),
+    "X-Secret": toBase64(secret),
     ...options.headers,
   },
 });

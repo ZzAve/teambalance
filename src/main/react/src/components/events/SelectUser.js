@@ -11,6 +11,7 @@ import LockIcon from "@material-ui/icons/Lock";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
 import Typography from "@material-ui/core/Typography";
 import { Attendee } from "../Attendees";
+import { AlertLevel, useAlerts } from "../../hooks/alertsHook";
 
 const noUser = "";
 export const SelectUser = ({
@@ -23,20 +24,39 @@ export const SelectUser = ({
   const [selectedUser, setSelectedUser] = useState(
     (attendees.find((a) => a.user.id === initialUser?.id) || noUser)?.user?.id
   );
+  const { addAlert } = useAlerts();
 
-  const handleUserSelection = (event) => {
+  const handleUserSelection = async (event) => {
     const newUser = event.target.value;
-    console.log("User selected:", newUser);
+    const previousUser = selectedUser;
+    console.log("New user selected:", newUser, "was", previousUser);
+
     setSelectedUser(newUser);
-    selectedUserCallback(newUser === noUser ? undefined : newUser);
-    setIsChanging(false);
+    const success = await selectedUserCallback(
+      newUser === noUser ? undefined : newUser
+    );
+
+    if (!success) {
+      //update failed, revert update
+      setSelectedUser(previousUser);
+      addAlert({
+        message: `Kon ${label} '${
+          attendees.find((it) => it.user.id === newUser)?.name
+        }' niet selecteren voor`,
+        level: AlertLevel.ERROR,
+      });
+      console.warn(
+        `Could not update user to ${newUser} for event ${event}, reverting to ${previousUser}`
+      );
+    }
+
+    setIsChanging(!success);
   };
 
   const toggleLock = () => {
     setIsChanging(!isChanging);
   };
 
-  console.log("Initial user:", initialUser, "vs selectedUser:", selectedUser);
   const attendee = attendees.find((it) => it.user.id === selectedUser);
   return (
     <Box display="flex" alignItems="center">
@@ -44,11 +64,9 @@ export const SelectUser = ({
 
       {isChanging ? (
         <FormControl fullWidth>
-          <InputLabel id="user-select">{label}</InputLabel>
           <Select
             labelId="user-select"
             value={selectedUser}
-            label={label}
             onChange={handleUserSelection}
           >
             <MenuItem key={noUser} value={noUser}>

@@ -4,13 +4,12 @@ import React, { useEffect, useState } from "react";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { withLoading } from "../../utils/util";
 import { usersApiClient } from "../../utils/UsersApiClient";
-import { Alert } from "@material-ui/lab";
-import { EventUsers } from "./EventUsers";
 import Typography from "@material-ui/core/Typography";
 import { EventForm } from "./EventForm";
 import { EventsType } from "./utils";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
 import { eventsApiClient } from "../../utils/MiscEventsApiClient";
+import { AlertLevel, useAlerts } from "../../hooks/alertsHook";
 
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
@@ -39,7 +38,7 @@ const EventDetails = ({ eventsType, location, id }) => {
   const [event, setEvent] = useState({});
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState(undefined);
+  const { addAlert } = useAlerts();
 
   useEffect(() => {
     console.debug(`[EventDetails ${eventsType}] loaded`);
@@ -61,9 +60,9 @@ const EventDetails = ({ eventsType, location, id }) => {
           setEvent(data || {});
         } catch (e) {
           console.log(e);
-          setMessage({
+          addAlert({
             message: `Er ging iets mis met het ophalen van data voor training ${id} `,
-            level: Message.ERROR,
+            level: AlertLevel.ERROR,
           });
         }
       } else if (eventsType === EventsType.MATCH) {
@@ -72,9 +71,9 @@ const EventDetails = ({ eventsType, location, id }) => {
           setEvent(data || {});
         } catch (e) {
           console.log(e);
-          setMessage({
+          addAlert({
             message: `Er ging iets mis met het ophalen van data voor wedstrijd ${id} `,
-            level: Message.ERROR,
+            level: AlertLevel.ERROR,
           });
         }
       } else if (eventsType === EventsType.MISC) {
@@ -83,9 +82,9 @@ const EventDetails = ({ eventsType, location, id }) => {
           setEvent(data || {});
         } catch (e) {
           console.log(e);
-          setMessage({
+          addAlert({
             message: `Er ging iets mis met het ophalen van data voor overig event ${id} `,
-            level: Message.ERROR,
+            level: AlertLevel.ERROR,
           });
         }
       } else {
@@ -93,9 +92,9 @@ const EventDetails = ({ eventsType, location, id }) => {
           `Event details for EventType ${eventsType} are not supported`
         );
         setEvent({});
-        setMessage({
+        addAlert({
           message: `Dit type event word niet ondersteund. Are you a wizard 🧙‍♂️? ( event ${id} )`,
-          level: Message.ERROR,
+          level: AlertLevel.ERROR,
         });
       }
     }
@@ -106,9 +105,9 @@ const EventDetails = ({ eventsType, location, id }) => {
       const data = await usersApiClient.getActiveUsers();
       setUsers(data.users || []); //.first(d => d.id === id) || {});
     } catch (e) {
-      setMessage({
+      addAlert({
         message: `Er ging iets mis met het ophalen van de gebruikers`,
-        level: Message.ERROR,
+        level: AlertLevel.ERROR,
       });
     }
   };
@@ -119,11 +118,6 @@ const EventDetails = ({ eventsType, location, id }) => {
 
   return (
     <Grid container spacing={2}>
-      {!!message && (
-        <Grid item xs={12}>
-          <Alert severity={message.level}>{message.message}</Alert>
-        </Grid>
-      )}
       <Grid item xs={12}>
         <Typography variant="h6">
           {getText(eventsType, "event_details_header")}
@@ -133,7 +127,6 @@ const EventDetails = ({ eventsType, location, id }) => {
           location={location}
           event={event}
           users={users}
-          setMessage={setMessage}
         />
       </Grid>
     </Grid>
@@ -141,10 +134,3 @@ const EventDetails = ({ eventsType, location, id }) => {
 };
 
 export default EventDetails;
-
-export const Message = {
-  SUCCESS: "success",
-  INFO: "info",
-  WARN: "warning",
-  ERROR: "error",
-};

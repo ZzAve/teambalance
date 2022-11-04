@@ -20,7 +20,9 @@ data class Match(
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    val homeAway: Place
+    val homeAway: Place,
+    @Column(nullable = true)
+    val coach: String? = null
 ) : Event(id, startTime, location, comment) {
     constructor(startTime: LocalDateTime, location: String, comment: String?) :
         this(
@@ -47,7 +49,8 @@ data class Match(
         location = updateMatchRequestBody.location ?: location,
         opponent = updateMatchRequestBody.opponent ?: opponent,
         homeAway = updateMatchRequestBody.homeAway ?: homeAway,
-        comment = updateMatchRequestBody.comment ?: comment
+        comment = updateMatchRequestBody.comment ?: comment,
+        coach = updateMatchRequestBody.coach ?: coach
     )
 
     fun externaliseWithAttendees(attendees: List<Attendee>): MatchResponse {
@@ -62,6 +65,7 @@ data class Match(
         startTime = startTime,
         opponent = opponent,
         homeAway = homeAway,
+        coach = coach,
         attendees = attendeesResponse
     )
 }

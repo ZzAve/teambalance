@@ -137,9 +137,11 @@ const Attendees = ({
       detail = `SPEL: ${sv}, P/L: ${pl}, MID: ${mid}, DIA: ${dia}, TL: ${tl}, `;
     }
 
+    // TODO: Coach detail is temporarily disabled, enable when team has coach again
+    const coachDetail = <></>; //<>COACH: {coach > 0 ? " ✅" : " ❌"}</>;
     return (
       <em>
-        Σ {allPlayers}, {detail} COACH: {coach > 0 ? " ✅" : " ❌"}
+        Σ {allPlayers} {detail} {coachDetail}
       </em>
     );
   };
