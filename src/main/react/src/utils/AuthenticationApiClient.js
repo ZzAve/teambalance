@@ -1,4 +1,5 @@
 import { ApiClient } from "./ApiClient";
+import { toBase64 } from "./util";
 
 const authenticationClient = ApiClient("auth");
 
@@ -7,7 +8,7 @@ const authenticate = (password) => {
     `authentication`,
     {
       method: "GET",
-      headers: { "X-Secret": btoa(password) },
+      headers: { "X-Secret": toBase64(password) },
     },
     authenticationClient.defaultTimeout,
     1000

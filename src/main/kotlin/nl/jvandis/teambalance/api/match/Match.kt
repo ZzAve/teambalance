@@ -4,7 +4,6 @@ import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.event.Event
 import nl.jvandis.teambalance.api.event.Place
-import org.hibernate.Hibernate
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -22,7 +21,7 @@ data class Match(
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     val homeAway: Place,
-    @Column(nullable=true)
+    @Column(nullable = true)
     val coach: String? = null
 ) : Event(id, startTime, location, comment) {
     constructor(startTime: LocalDateTime, location: String, comment: String?) :

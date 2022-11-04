@@ -67,7 +67,6 @@ const updateMatch = ({
 };
 
 const updateCoach = ({ id, coach }) => {
-  debugger;
   return matchesClient.callWithBody(
     `matches/${id}`,
     {

@@ -2,24 +2,19 @@ import Grid from "@material-ui/core/Grid";
 import React, { useEffect, useState } from "react";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
-import { Message } from "./EventDetails";
 import { attendeesApiClient } from "../../utils/AttendeesApiClient";
 import Checkbox from "@material-ui/core/Checkbox";
+import { AlertLevel, useAlerts } from "../../hooks/alertsHook";
 
 export const ControlType = {
   CHECKBOX: "CHECKBOX",
   SWITCH: "SWITCH",
 };
 
-export const EventUsers = ({
-  event,
-  users,
-  controlType,
-  setMessage,
-  setUserSelection,
-}) => {
+export const EventUsers = ({ event, users, controlType, setUserSelection }) => {
   const [singleUserCheck, setSingleUserCheck] = useState([]);
   const [allUsersCheckBox, setAllUsersCheckBox] = useState(false);
+  const { addAlert } = useAlerts();
 
   useEffect(() => {
     let attendeeUserIds = (event.attendees || []).map((it) => it.user.id);
@@ -88,15 +83,15 @@ export const EventUsers = ({
           });
         }
 
-        setMessage({
+        addAlert({
           message: `💪 Geüpdate `,
-          level: Message.SUCCESS,
+          level: AlertLevel.SUCCESS,
         });
       } catch (e) {
         console.error(e);
-        setMessage({
+        addAlert({
           message: `Er ging iets mis met het updaten van de speler. `,
-          level: Message.ERROR,
+          level: AlertLevel.ERROR,
         });
 
         //Revert state

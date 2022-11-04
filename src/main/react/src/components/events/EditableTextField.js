@@ -15,16 +15,18 @@ export const EditableTextField = ({
   const [isChanging, setIsChanging] = useState(false);
   const [textValue, setTextValue] = useState(initialText || noUser);
 
-  const toggleEdit = (event) => {
+  const toggleEdit = async (event) => {
     event.preventDefault();
     if (isChanging) {
-      updatedTextValueCallback(textValue);
+      setTextValue(textValue.trim());
+      const success = await updatedTextValueCallback(textValue.trim());
+      setIsChanging(!success);
     } else {
       setTimeout(() => {
         inputRef?.focus();
       }, 10);
+      setIsChanging(true);
     }
-    setIsChanging(!isChanging);
   };
 
   return (

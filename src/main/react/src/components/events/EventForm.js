@@ -15,7 +15,6 @@ import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import CheckBox from "@material-ui/core/Checkbox";
 import Button from "@material-ui/core/Button";
-import { Message } from "./EventDetails";
 import { EventsType, HomeAway } from "./utils";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
 import RadioGroup from "@material-ui/core/RadioGroup";
@@ -23,6 +22,7 @@ import Radio from "@material-ui/core/Radio";
 import { eventsApiClient } from "../../utils/MiscEventsApiClient";
 import Typography from "@material-ui/core/Typography";
 import { ControlType, EventUsers } from "./EventUsers";
+import { AlertLevel, useAlerts } from "../../hooks/alertsHook";
 
 const texts = {
   send_event: {
@@ -87,13 +87,8 @@ async function updateEvent(
   }
 }
 
-export const EventForm = ({
-  eventsType,
-  location = {},
-  users,
-  event,
-  setMessage,
-}) => {
+export const EventForm = ({ eventsType, location = {}, users, event }) => {
+  const { addAlert } = useAlerts();
   const getInitialSelectedDate = (event) => {
     return () => {
       if (!!event.startTime) {
@@ -158,15 +153,15 @@ export const EventForm = ({
     let successfulSave = await withLoading(setIsLoading, async () => {
       try {
         await save();
-        setMessage({
+        addAlert({
           message: `${isCreateEvent() ? "Creatie" : "Update"} successvol`,
-          level: Message.SUCCESS,
+          level: AlertLevel.SUCCESS,
         });
         return true;
       } catch (e) {
-        setMessage({
+        addAlert({
           message: `Er ging iets fout: ${e}`,
-          level: Message.ERROR,
+          level: AlertLevel.ERROR,
         });
         return false;
       }
@@ -327,7 +322,6 @@ export const EventForm = ({
             controlType={
               isCreateEvent() ? ControlType.CHECKBOX : ControlType.SWITCH
             }
-            setMessage={setMessage}
             setUserSelection={setUserSelection}
           />
         </Grid>

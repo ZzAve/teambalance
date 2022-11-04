@@ -9,6 +9,7 @@ import { SelectUser } from "./SelectUser";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { EditableTextField } from "./EditableTextField";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
+import { AlertLevel, useAlerts } from "../../hooks/alertsHook";
 
 export const EventsList = ({
   eventsType,
@@ -69,31 +70,43 @@ export const EventListItem = ({
   const startDateTime = new Date(event.startTime);
   const titleVariant = !event.title ? "body1" : "h6";
   const dateTimeVariant = !!event.title ? "body1" : "h6";
-
+  const { addAlert } = useAlerts();
   const handleTrainerSelection = async (userId) => {
-    await trainingsApiClient
+    return await trainingsApiClient
       .updateTrainer({ id: event.id, trainerUserId: userId })
       .then((e) => {
         console.debug("Trainer updated. Training:", e);
         onUpdate();
+        return true;
       })
       .catch((e) => {
         console.error("Updating trainer failed!", e);
+        return false;
       });
   };
 
   const handleCoachSelection = async (coach) => {
-    await matchesApiClient
+    return await matchesApiClient
       .updateCoach({ id: event.id, coach: coach })
       .then((e) => {
-        console.debug("Coach updated. Coach:", e);
+        console.debug("Coach update ", coach, " for event", event, ":", e);
+        addAlert({
+          message: `'${coach}' is de coach voor de wedstrijd tegen ${event.opponent}`,
+          level: AlertLevel.INFO,
+        });
         onUpdate();
+        return true;
       })
       .catch((e) => {
-        //TODO: give feedback to user
-        console.error("Updating coach failed!", e);
+        addAlert({
+          message: `'${coach}' mag de wedstrijd tegen ${event.opponent} niet coachen blijkbaar 🤷. Error ${e.message}`,
+          level: AlertLevel.ERROR,
+        });
+        console.error(`Updating coach for event ${event} failed!`, e);
+        return false;
       });
   };
+
   return (
     <Grid container spacing={1}>
       <Grid item xs={12}>
