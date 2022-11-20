@@ -33,7 +33,7 @@
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
         <postgresql.version>42.3.7</postgresql.version>
         <spring-cloud-gcp-dependencies.version>3.3.0</spring-cloud-gcp-dependencies.version>
-        <springdoc-openapi.version>1.6.9</springdoc-openapi.version>
+        <springdoc-openapi.version>1.6.13</springdoc-openapi.version>
     </properties>
 
     <dependencyManagement>
