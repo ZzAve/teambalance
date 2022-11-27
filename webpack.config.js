@@ -21,7 +21,7 @@ module.exports = {
   mode: "production",
   entry: [
     path.join(__dirname, "src/main/react/index.tsx"),
-    path.join(__dirname, "src/main/react/polyfill.js"),
+    path.join(__dirname, "src/main/react/polyfill.ts"),
   ],
   output: {
     path: path.join(process.cwd(), "target/classes/static"),

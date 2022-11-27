@@ -1,18 +1,16 @@
 import Grid from "@material-ui/core/Grid";
 import Balance from "../components/Balance";
-import Topup from "../components/Topup";
+import TopUp from "../components/TopUp";
 import Potters from "../components/Potters";
 import PageItem from "../components/PageItem";
 import { Button, Card, createStyles, makeStyles } from "@material-ui/core";
 import Transactions from "../components/Transactions";
-import React, { useState } from "react";
+import React from "react";
 import Events from "../components/events/Events";
-import { ViewType } from "../utils/util";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import Hidden from "@material-ui/core/Hidden";
 import Typography from "@material-ui/core/Typography";
-import { EventsType } from "../components/events/utils";
 import PageTitle from "../components/PageTitle";
 
 const useStyles = makeStyles(() =>
@@ -44,9 +42,9 @@ const Overview = (props: { refresh:boolean }) => {
               </Grid>
               <Grid item xs={12}>
                 <Events
-                  eventsType={EventsType.TRAINING}
+                  eventType="TRAINING"
                   refresh={props.refresh}
-                  view={ViewType.List}
+                  view="list"
                   limit={2}
                   withPagination={false}
                 />
@@ -73,9 +71,9 @@ const Overview = (props: { refresh:boolean }) => {
               </Grid>
               <Grid item xs={12}>
                 <Events
-                  eventsType={EventsType.MATCH}
+                  eventType="MATCH"
                   refresh={props.refresh}
-                  view={ViewType.List}
+                  view="list"
                   limit={2}
                   withPagination={false}
                 />
@@ -100,9 +98,9 @@ const Overview = (props: { refresh:boolean }) => {
               </Grid>
               <Grid item xs={12}>
                 <Events
-                  eventsType={EventsType.MISC}
+                  eventType="MISC"
                   refresh={props.refresh}
-                  view={ViewType.List}
+                  view="list"
                   limit={2}
                   withPagination={false}
                 />
@@ -130,7 +128,7 @@ const Overview = (props: { refresh:boolean }) => {
                 <Balance refresh={props.refresh} />
               </Grid>
               <Grid item xs={12}>
-                <Topup />
+                <TopUp />
               </Grid>
               <Grid item xs={12}>
                 <Typography>

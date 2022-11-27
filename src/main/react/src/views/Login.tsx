@@ -1,4 +1,4 @@
-import React, {ChangeEventHandler, FormEvent, useEffect, useState} from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
@@ -10,6 +10,7 @@ import Loading from "./Loading";
 import { Navigate, useLocation } from "react-router-dom";
 import { authenticationManager } from "../utils/AuthenticationManager";
 import { createStyles, makeStyles } from "@material-ui/core";
+import { LocationState } from "../components/utils";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -19,7 +20,6 @@ const useStyles = makeStyles(() =>
   })
 );
 
-type LocationState = { from: { pathname: string } };
 const Login = (opts: { handleRefresh: () => void }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [input, setInput] = useState("");

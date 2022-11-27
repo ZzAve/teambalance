@@ -7,7 +7,6 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import EventsPage from "./views/EventsPage";
-import { EventsType } from "./components/events/utils";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
 
@@ -75,7 +74,7 @@ const App = () => {
                     element={
                       <RequireAuth>
                         <EventsPage
-                          eventsType={EventsType.TRAINING}
+                          eventType="TRAINING"
                           refresh={shouldRefresh}
                         />
                       </RequireAuth>
@@ -86,7 +85,7 @@ const App = () => {
                     element={
                       <RequireAuth>
                         <EventsPage
-                          eventsType={EventsType.MATCH}
+                          eventType="MATCH"
                           refresh={shouldRefresh}
                         />
                       </RequireAuth>
@@ -105,7 +104,7 @@ const App = () => {
                     element={
                       <RequireAuth>
                         <EventsPage
-                          eventsType={EventsType.MISC}
+                          eventType="MISC"
                           refresh={shouldRefresh}
                         />
                       </RequireAuth>

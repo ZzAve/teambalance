@@ -32,7 +32,7 @@ data class MiscellaneousEvent(
     private fun externalize(attendeesResponse: List<AttendeeResponse>) = MiscellaneousEventResponse(
         id = id,
         comment = comment,
-        title = title,
+        title = title ?: "Overig event",
         location = location,
         startTime = startTime,
         attendees = attendeesResponse

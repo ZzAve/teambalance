@@ -40,7 +40,7 @@ data class MiscellaneousEventsResponse(
 data class MiscellaneousEventResponse(
     val id: Long,
     val startTime: LocalDateTime,
-    val title: String?,
+    val title: String,
     val location: String,
     val comment: String?,
     val attendees: List<AttendeeResponse>
