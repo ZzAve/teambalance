@@ -30,10 +30,7 @@ const Overview = (props: { refresh:boolean }) => {
       <PageTitle title="Team Balance" withSuffix={false} />
       <Grid item xs={12} md={6}>
         <Grid container spacing={2}>
-          <PageItem
-            pageTitle="Aanstaande trainingen"
-            title="Aanstaande trainingen"
-          >
+          <PageItem title="Aanstaande trainingen">
             <Grid item container spacing={4}>
               <Grid item xs={12}>
                 <Typography>
@@ -62,7 +59,7 @@ const Overview = (props: { refresh:boolean }) => {
               </Grid>
             </Grid>
           </PageItem>
-          <PageItem title="Aanstaande wedstrijden" pageTitle="Aanstaande wedstrijden">
+          <PageItem title="Aanstaande wedstrijden">
             <Grid item container spacing={4}>
               <Grid item xs={12}>
                 <Typography>
@@ -91,7 +88,7 @@ const Overview = (props: { refresh:boolean }) => {
               </Grid>
             </Grid>
           </PageItem>
-          <PageItem title="Aanstaande andere evenementen en uitjes" pageTitle="Aanstaande andere evenementen en uitjes">
+          <PageItem title="Aanstaande andere evenementen en uitjes">
             <Grid item container spacing={4}>
               <Grid item xs={12}>
                 <Typography>Wanneer moeten we iets anders doen?</Typography>
@@ -122,7 +119,7 @@ const Overview = (props: { refresh:boolean }) => {
       </Grid>
       <Grid item xs={12} md={6}>
         <Grid container spacing={2}>
-          <PageItem title="De bierstand" pageTitle="De bierstand">
+          <PageItem title="De bierstand">
             <Grid item container spacing={3} xs={12}>
               <Grid item xs={12}>
                 <Balance refresh={props.refresh} />
@@ -168,7 +165,7 @@ const Overview = (props: { refresh:boolean }) => {
             </Card>
           </Grid>
           <Grid item container spacing={2}>
-            <PageItem title="Admin snuff" pageTitle="Admin snuff">
+            <PageItem title="Admin snuff">
               <Button
                 variant="contained"
                 color="primary"

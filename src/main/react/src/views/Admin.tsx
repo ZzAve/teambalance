@@ -322,7 +322,7 @@ const NewEvent = (props:{ eventType: EventType, location?: object }) => {
 
 const HiAdmin = ({}) => {
   return (
-    <PageItem pageTitle="Admin" title="">
+    <PageItem pageTitle="Admin" title="Admin">
       <Grid container spacing={2} justifyContent="center">
         <img
           alt="Walt from Breaking Bad telling you who's admin"
