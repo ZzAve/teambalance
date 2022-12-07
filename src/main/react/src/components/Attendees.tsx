@@ -130,9 +130,9 @@ const Attendees = (props: {
 
   const getAttendeesSummary = (attendees:AttendeeType[]) => {
       const allPresent = attendees.filter((x) => x.state === "PRESENT");
-      const nonPlayerRoles: Role[] = ["TRAINER", "COACH", "OTHER"];
+      const excludedPlayerRoles: Role[] = ["TRAINER", "COACH"];
       const coach = allPresent.filter((x) =>
-        nonPlayerRoles.includes(x.user.role)
+        excludedPlayerRoles.includes(x.user.role)
       ).length;
       const allPlayers = allPresent.length - coach;
 
