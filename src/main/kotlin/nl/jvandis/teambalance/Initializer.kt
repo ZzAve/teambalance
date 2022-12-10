@@ -22,7 +22,7 @@ import java.time.LocalDateTime
 import kotlin.random.Random
 
 @Configuration
-@Profile("dev") // don't use class unless 'dev' profile is activated
+@Profile("dev", "local") // don't use class unless 'dev' profile is activated
 class Initializer(
     private val userRepository: UserRepository,
     private val eventRepository: EventRepository,

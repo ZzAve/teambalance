@@ -20,6 +20,7 @@ import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -63,12 +64,14 @@ public class BunqRepository {
      */
     private static final String POINTER_TYPE_EMAIL = "EMAIL";
     private static final String CURRENCY_EUR = "EUR";
-    private static final String DEVICE_SERVER_DESCRIPTION = "bunq Tinker java";
+    private static final String DEVICE_SERVER_DESCRIPTION = "Teambalance SANDBOX app";
 
     /**
      * The index of the fist item in an array.
      */
     private static final int INDEX_FIRST = 0;
+
+    private static final String MONETARY_ACCOUNT_STATUS_ACTIVE = "ACTIVE";
 
     /**
      * Http constants.
@@ -94,36 +97,93 @@ public class BunqRepository {
      */
 
     private static final Duration acquireMaxWaitDuration = Duration.ofSeconds(5);
+    private final int accountId;
 
-    private ApiEnvironmentType environmentType;
+    private final ApiEnvironmentType environmentType;
 
     private final String apiKey;
     private final Boolean saveSessionToFile;
 
-    private User user;
+    private final User user;
 
-    private static Logger log = LoggerFactory.getLogger(BunqRepository.class);
+    private static final Logger log = LoggerFactory.getLogger(BunqRepository.class);
+    private static final Semaphore semaphore = new Semaphore(1);
 
     public BunqRepository(ApiEnvironmentType environmentType,
-                          String apiKey,
+                          @Nullable String apiKey,
+                          @Nullable Integer accountId,
                           Boolean saveSessionToFile) throws UnknownHostException {
         log.info("Starting BunqRepository");
+        assert (ApiEnvironmentType.PRODUCTION != environmentType) || (apiKey != null && accountId != null);
+
         this.environmentType = environmentType;
         this.apiKey = apiKey;
         this.saveSessionToFile = saveSessionToFile;
 
         this.setupContext();
-        this.setupCurrentUser();
+        this.user = User.get().getValue();
         this.requestSpendingMoneyIfNeeded();
+
+        if (environmentType == ApiEnvironmentType.PRODUCTION) {
+            this.accountId = this.validateAccountId(accountId);
+        } else {
+            this.accountId = this.getAccountId();
+        }
     }
 
-    private static Semaphore semaphore = new Semaphore(1);
-
-    public MonetaryAccountBank getMonetaryAccountBank(int id) {
-        return withSemaphore(() -> MonetaryAccountBank.get(id).getValue());
+    public BunqRepository(BankBunqConfig config) throws UnknownHostException {
+        this(
+                toApiEnvironmentType(config.getEnvironment()),
+                config.getApiKey(),
+                config.getBankAccountId(),
+                config.getSaveSessionToFile()
+        );
     }
 
-    public List<Payment> getAllPayment(int accountId, int count) {
+    private int getAccountId() {
+        return withSemaphore(() -> {
+            Pagination pagination = new Pagination();
+            pagination.setCount(100);
+
+            List<MonetaryAccountBank> allAccount = MonetaryAccountBank.list(pagination.getUrlParamsCountOnly()).getValue();
+
+            return allAccount.stream()
+                    .findFirst().orElseThrow(() -> {
+                        throw new IllegalStateException("There are no active accounts enabled for the current user / session");
+                    }).getId();
+        });
+    }
+
+    private int validateAccountId(Integer accountId) {
+        return withSemaphore(() -> {
+            Pagination pagination = new Pagination();
+            pagination.setCount(100);
+
+            List<MonetaryAccountBank> allAccount = MonetaryAccountBank.list(pagination.getUrlParamsCountOnly()).getValue();
+
+            return allAccount.stream()
+                    .filter(monetaryAccountBank -> accountId.equals(monetaryAccountBank.getId()))
+                    .findFirst().orElseThrow(() -> {
+                        final String error = String.format("There is no account with id %s present " +
+                                "and/or enabled for access with the current API key ", accountId);
+                        log.error(error);
+                        throw new IllegalStateException(error);
+                    }).getId();
+        });
+    }
+
+    private static ApiEnvironmentType toApiEnvironmentType(BunqEnvironment environment) {
+        return switch (environment) {
+            case PRODUCTION -> ApiEnvironmentType.PRODUCTION;
+            case SANDBOX -> ApiEnvironmentType.SANDBOX;
+        };
+    }
+
+    public MonetaryAccountBank getMonetaryAccountBank() {
+        return withSemaphore(() -> MonetaryAccountBank.get(accountId).getValue());
+    }
+
+    public List<Payment> getAllPayments(int count) {
         return withSemaphore(() -> {
             Pagination pagination = new Pagination();
             pagination.setCount(count);
@@ -134,11 +194,12 @@ public class BunqRepository {
 
         });
     }
+
     public void updateContext() {
         safeSave(BunqContext.getApiContext());
     }
 
-    private <T> T withSemaphore(Supplier<T> action){
+    private <T> T withSemaphore(Supplier<T> action) {
         boolean permit = false;
         try {
             permit = semaphore.tryAcquire(acquireMaxWaitDuration.getSeconds(), TimeUnit.SECONDS);
@@ -249,13 +310,6 @@ public class BunqRepository {
         }
     }
 
-    /**
-     *
-     */
-    private void setupCurrentUser() {
-        this.user = User.get().getValue();
-    }
-
 
     private SandboxUserPerson generateNewSandboxUser() {
         OkHttpClient client = new OkHttpClient();
@@ -279,15 +333,16 @@ public class BunqRepository {
                 .build();
 
         try {
-            Response response = client.newCall(request).execute();
-            if (response.code() == HTTP_STATUS_OK) {
-                String responseString = response.body().string();
-                JsonObject jsonObject = new Gson().fromJson(responseString, JsonObject.class);
-                JsonObject apiKEy = jsonObject.getAsJsonArray(FIELD_RESPONSE).get(INDEX_FIRST).getAsJsonObject().get(FIELD_API_KEY).getAsJsonObject();
+            try (Response response = client.newCall(request).execute()) {
+                if (response.code() == HTTP_STATUS_OK) {
+                    String responseString = response.body().string();
+                    JsonObject jsonObject = new Gson().fromJson(responseString, JsonObject.class);
+                    JsonObject apiKEy = jsonObject.getAsJsonArray(FIELD_RESPONSE).get(INDEX_FIRST).getAsJsonObject().get(FIELD_API_KEY).getAsJsonObject();
 
-                return SandboxUserPerson.fromJsonReader(new JsonReader(new StringReader(apiKEy.toString())));
-            } else {
-                throw new BunqException(String.format(ERROR_COULD_NOT_GENERATE_NEW_API_KEY, response.body().string()));
+                    return SandboxUserPerson.fromJsonReader(new JsonReader(new StringReader(apiKEy.toString())));
+                } else {
+                    throw new BunqException(String.format(ERROR_COULD_NOT_GENERATE_NEW_API_KEY, response.body().string()));
+                }
             }
         } catch (IOException e) {
             throw new BunqException(e.getMessage());
@@ -306,7 +361,7 @@ public class BunqRepository {
             try {
                 Thread.sleep(REQUEST_SPENDING_MONEY_WAIT_TIME_MILLISECONDS);
             } catch (InterruptedException exception) {
-                System.out.println(exception.getMessage());
+                log.warn(exception.getMessage());
             }
         }
     }

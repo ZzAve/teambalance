@@ -11,7 +11,8 @@ app:
   bank:
     bunq:
       api-key: ${sm://BUNQ_APIKEY}
-    bank-account-id: ${sm://BUNQ_BANK_ACCOUNT_ID}
+      bank-account-id: ${sm://BUNQ_BANK_ACCOUNT_ID}
+      environment: PRODUCTION
     transaction-limit: 200 # up this when pagination is built (max is 200 from bunq)
     datetime-limit: 2022-08-01T00:00:00+02:00
     cache:
@@ -29,6 +30,8 @@ app:
 server:
   forward-headers-strategy: NATIVE
 spring:
+  devtools:
+    add-properties: false
   cloud:
     gcp:
       project-id: ${sm://GCP_PROJECT_ID}

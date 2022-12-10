@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.bank
 
-import com.bunq.sdk.context.ApiEnvironmentType
+import nl.jvandis.teambalance.api.bank.BunqEnvironment.PRODUCTION
+import nl.jvandis.teambalance.api.bank.BunqEnvironment.SANDBOX
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,15 +16,62 @@ class BunqConfiguration(
 
     @Bean
     fun bunqLib(): BunqRepository {
-        val apiKey = bankConfig.bunq.apiKey
-        val saveSessionToFile = bankConfig.bunq.saveSessionToFile
-
-        log.info("Using api-key '${apiKey.substring(0, 5)}******${apiKey.substring(apiKey.length - 5)}'")
-        return try {
-            BunqRepository(ApiEnvironmentType.PRODUCTION, apiKey, saveSessionToFile)
-        } catch (t: Throwable) {
-            log.error("Could not create BunqRepo:", t)
-            BunqRepository(ApiEnvironmentType.SANDBOX, "test", saveSessionToFile)
+        return when (bankConfig.bunq.environment) {
+            PRODUCTION -> initializeProductionSetup(bankConfig.bunq)
+            SANDBOX -> initializeSandboxSetup(bankConfig.bunq)
         }
+    }
+
+    private fun initializeProductionSetup(bunqConfig: BankBunqConfig): BunqRepository {
+        ensure(bunqConfig.environment == PRODUCTION) { "Bunq environment was not set to PRODUCTION" }
+        ensure(bunqConfig.apiKey != null) { "No apikey was set for Bunq" }
+        ensure(bunqConfig.bankAccountId != null) { "No bankAccountId was set for Bunq" }
+        val obfuscatedApiKey = "${bunqConfig.apiKey?.take(5)}******"
+        log.info("Setting up connection with bunq PRODUCTION using api-key '$obfuscatedApiKey'")
+
+        return try {
+            BunqRepository(bunqConfig)
+        } catch (t: Throwable) {
+            throw IllegalStateException(
+                "Could not create bunqRepository for production setup (apiKey: $obfuscatedApiKey, accountId: ${bunqConfig.bankAccountId})",
+                t
+            )
+        }
+    }
+
+    private fun initializeSandboxSetup(bunqConfig: BankBunqConfig): BunqRepository {
+        ensure(bunqConfig.environment == SANDBOX) {
+            "Bunq environment was not set to PRODUCTION"
+        }
+        ensure(bunqConfig.apiKey.isNullOrEmpty()) {
+            "An apikey was set for Bunq while trying to setup SANDBOX environment. " +
+                    "This is not allowed, for your protection"
+        }
+        ensure(bunqConfig.bankAccountId == null || bunqConfig.bankAccountId == -1) {
+            "A bankAccountId was set while trying to setup SANDBOX environment. " +
+                    "This is not allowed, for your protection"
+        }
+        log.info("Setting up connection with bunq SANDBOX")
+
+        return try {
+            BunqRepository(bunqConfig)
+        } catch (t: Throwable) {
+            throw IllegalStateException("Could not create bunqRepository for sandbox setup", t)
+
+        }
+    }
+}
+
+inline fun ensure(value: Boolean) {
+    ensure(value) { "Assertion failed" }
+}
+
+/**
+ * Throws an [AssertionError] calculated by [lazyMessage] if the [value] is false
+ */
+inline fun ensure(value: Boolean, lazyMessage: () -> Any) {
+    if (!value) {
+        val message = lazyMessage()
+        throw AssertionError(message)
     }
 }

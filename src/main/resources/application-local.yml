@@ -1,0 +1,41 @@
+app:
+  bank:
+    bunq:
+      api-key: ""
+      bank-account-id: -1
+      environment: SANDBOX
+      saveSessionToFile: true
+    transaction-limit: 200 # up this when pagination is built (max is 200 from bunq)
+    datetime-limit: 2022-08-01T00:00:00+02:00
+    cache:
+      balance:
+        enabled: true
+        expire-after-write: 60s
+        refresh-after-write: 30s
+        maximum-size: 1
+      transactions:
+        enabled: true
+        expire-after-write: 60s
+        refresh-after-write: 30s
+        maximum-size: 1
+
+spring:
+  cloud:
+    gcp.core.enabled: false
+  datasource:
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:54321/teambalance
+  devtools:
+    add-properties: true
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  security:
+    user:
+      password: admin
+      name: admin
+      roles:
+        - admin
+        - user
