@@ -6,45 +6,14 @@ import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import nl.jvandis.teambalance.api.users.User
 import org.slf4j.LoggerFactory
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.context.annotation.Lazy
-import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.stereotype.Service
-import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.min
 
 private val FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS").withZone(ZoneId.of("UTC"))
-
-data class CacheConfig(
-    val enabled: Boolean = true,
-    val expireAfterWrite: Duration,
-    val refreshAfterWrite: Duration?,
-    val maximumSize: Long
-)
-
-data class BankCacheConfig(
-    val balance: CacheConfig,
-    val transactions: CacheConfig
-)
-
-data class BankBunqConfig(
-    val apiKey: String,
-    val saveSessionToFile: Boolean = false
-)
-
-@ConstructorBinding
-@ConfigurationProperties("app.bank")
-data class BankConfig(
-    val bunq: BankBunqConfig,
-    val cache: BankCacheConfig,
-    val bankAccountId: Int,
-    val transactionLimit: Int,
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) val dateTimeLimit: ZonedDateTime
-)
 
 /**
  * BankService resolves bank related questions
@@ -61,20 +30,20 @@ class BankService(
 ) {
     private val log = LoggerFactory.getLogger(BankService::class.java)
 
-    private val balanceCache: AsyncLoadingCache<Int, String> =
-        setupCache(bankConfig.cache.balance) { accountId: Int -> updateBalance(accountId) }
+    private val balanceCache: AsyncLoadingCache<String, String> =
+        setupCache(bankConfig.cache.balance) { _: String -> updateBalance() }
 
-    private val transactionsCache: AsyncLoadingCache<Int, Transactions> =
-        setupCache(bankConfig.cache.transactions) { accountId: Int -> updateTransactions(accountId) }
+    private val transactionsCache: AsyncLoadingCache<String, Transactions> =
+        setupCache(bankConfig.cache.transactions) { _: String -> updateTransactions() }
 
-    fun getBalance(): String = balanceCache[bankConfig.bankAccountId].get()
+    fun getBalance(): String = balanceCache["teambalance-bank-account"].get()
 
     fun getTransactions(limit: Int = bankConfig.transactionLimit, offset: Int = 0): Transactions =
-        transactionsCache[bankConfig.bankAccountId].get()
+        transactionsCache["teambalance-bank-account"].get()
             .filter(limit, offset)
 
-    private fun updateBalance(accountId: Int): String {
-        return bunqRepository.getMonetaryAccountBank(accountId).balance
+    private fun updateBalance(): String {
+        return bunqRepository.getMonetaryAccountBank().balance
             .let {
                 "${it.parseCurrency()} ${it.value}"
             }.also {
@@ -83,31 +52,32 @@ class BankService(
     }
 
     // TODO: Fetch all transactions up to datelimit
-    private fun updateTransactions(accountId: Int): Transactions {
-        return bunqRepository.getAllPayment(accountId, bankConfig.transactionLimit).let {
-            val aliases = getAllAliases()
-            val exclusions = getAllTransactionExclusions()
-            val transactions = it
-                .filter { p -> !p.shouldBeExcluded(exclusions) }
-                .map { payment -> payment.toDomain(aliases) }
-                .filter { t -> t.date > bankConfig.dateTimeLimit }
+    private fun updateTransactions(): Transactions =
+        bunqRepository.getAllPayments(bankConfig.transactionLimit)
+            .let {
+                val aliases = getAllAliases()
+                val exclusions = getAllTransactionExclusions()
+                val transactions = it
+                    .filter { p -> !p.shouldBeExcluded(exclusions) }
+                    .map { payment -> payment.toDomain(aliases) }
+                    .filter { t -> t.date > bankConfig.dateTimeLimit }
 
-            Transactions(
-                transactions = transactions,
-                limit = transactions.size
-            )
-        }
+                Transactions(
+                    transactions = transactions,
+                    limit = transactions.size
+                )
+            }
             .also {
                 bunqRepository.updateContext()
             }
-    }
 
-    private fun Payment.shouldBeExcluded(exclusions: List<TransactionExclusion>) = exclusions.any { e ->
-        (e.transactionId == null || id == e.transactionId) &&
-            (e.date == null || created.toZonedDateTime().toLocalDate() == e.date) &&
-            (e.description == null || description == e.description) &&
-            (e.counterParty == null || counterpartyAlias.displayName == e.counterParty)
-    }
+    private fun Payment.shouldBeExcluded(exclusions: List<TransactionExclusion>) =
+        exclusions.any { e ->
+            (e.transactionId == null || id == e.transactionId) &&
+                (e.date == null || created.toZonedDateTime().toLocalDate() == e.date) &&
+                (e.description == null || description == e.description) &&
+                (e.counterParty == null || counterpartyAlias.displayName == e.counterParty)
+        }
 
     private fun Payment.toDomain(aliases: Map<String, User>): Transaction {
         return Transaction(
