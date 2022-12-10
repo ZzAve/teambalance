@@ -6,51 +6,14 @@ import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import nl.jvandis.teambalance.api.users.User
 import org.slf4j.LoggerFactory
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.context.annotation.Lazy
-import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.stereotype.Service
-import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.min
 
 private val FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS").withZone(ZoneId.of("UTC"))
-
-data class CacheConfig(
-    val enabled: Boolean = true,
-    val expireAfterWrite: Duration,
-    val refreshAfterWrite: Duration?,
-    val maximumSize: Long
-)
-
-data class BankCacheConfig(
-    val balance: CacheConfig,
-    val transactions: CacheConfig
-)
-
-data class BankBunqConfig(
-    val apiKey: String?,
-    val bankAccountId: Int?,
-    val environment: BunqEnvironment,
-    val saveSessionToFile: Boolean = false
-)
-
-enum class BunqEnvironment {
-    PRODUCTION,
-    SANDBOX
-}
-
-@ConstructorBinding
-@ConfigurationProperties("app.bank")
-data class BankConfig(
-    val bunq: BankBunqConfig,
-    val cache: BankCacheConfig,
-    val transactionLimit: Int,
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) val dateTimeLimit: ZonedDateTime
-)
 
 /**
  * BankService resolves bank related questions
