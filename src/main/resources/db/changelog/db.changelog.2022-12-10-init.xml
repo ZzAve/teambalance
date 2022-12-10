@@ -1,0 +1,162 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="juliusvandis (generated)" id="1670705690730-1">
+        <createTable tableName="attendee">
+            <column autoIncrement="true" name="id" startWith="49" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="attendee_pkey"/>
+            </column>
+            <column name="availability" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_id" type="BIGINT"/>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-2">
+        <createTable tableName="bank_account_alias">
+            <column autoIncrement="true" name="id" startWith="5" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="bank_account_alias_pkey"/>
+            </column>
+            <column name="alias" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-3">
+        <createTable tableName="event">
+            <column autoIncrement="true" name="id" startWith="9" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="event_pkey"/>
+            </column>
+            <column name="comment" type="VARCHAR(255)"/>
+            <column name="location" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-4">
+        <createTable tableName="transaction_exclusion">
+            <column autoIncrement="true" name="id" startWith="2" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="transaction_exclusion_pkey"/>
+            </column>
+            <column name="counter_party" type="VARCHAR(255)"/>
+            <column name="date" type="date"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="transaction_id" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-5">
+        <createTable tableName="uzer">
+            <column autoIncrement="true" name="id" startWith="7" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="uzer_pkey"/>
+            </column>
+            <column name="is_active" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="show_for_matches" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="show_for_trainings" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-6">
+        <addUniqueConstraint columnNames="user_id, event_id" constraintName="ukclxhgkcqa2mw2q2va1eapy323"
+                             tableName="attendee"/>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-7">
+        <addUniqueConstraint columnNames="alias" constraintName="ukg3fy61cn327ghq9cx9l6dqu64"
+                             tableName="bank_account_alias"/>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-8">
+        <addUniqueConstraint columnNames="name" constraintName="uk_28we3f6y80y1yxygp1i950t96" tableName="uzer"/>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-9">
+        <createTable tableName="match">
+            <column name="coach" type="VARCHAR(255)"/>
+            <column name="home_away" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="opponent" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="match_pkey"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-10">
+        <createTable tableName="miscellaneous_event">
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="miscellaneous_event_pkey"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-11">
+        <createTable tableName="training">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="training_pkey"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-12">
+        <addForeignKeyConstraint baseColumnNames="id" baseTableName="miscellaneous_event"
+                                 constraintName="fk2piu8ig87rkniq86i2fyhibk5" deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="event" validate="true"/>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-13">
+        <addForeignKeyConstraint baseColumnNames="id" baseTableName="training"
+                                 constraintName="fkdmqigaqf7txs1i6c98yv6avm"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="event" validate="true"/>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-14">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="bank_account_alias"
+                                 constraintName="fkjvfps1drlufcl026d0kvvva4v" deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="uzer"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-15">
+        <addForeignKeyConstraint baseColumnNames="id" baseTableName="match" constraintName="fkkg9ttbfvavr43q0g2jvurs0lw"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="event" validate="true"/>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-16">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="attendee"
+                                 constraintName="fknk7ciip46rwm29t1f3j0hh56p"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="uzer" validate="true"/>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-17">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="training"
+                                 constraintName="fkoxo2yj28rv8sx5ceh5sedttrs"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="uzer" validate="true"/>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1670705690730-18">
+        <addForeignKeyConstraint baseColumnNames="event_id" baseTableName="attendee"
+                                 constraintName="fktlojoyim69p3784m18rsocl33" deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="event" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

@@ -25,13 +25,17 @@ spring:
   datasource:
     username: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:54321/teambalance
+    url: jdbc:postgresql://localhost:54321/postgres
   devtools:
     add-properties: true
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     show-sql: true
+  liquibase:
+    change-log: "classpath:db/changelog/db.changelog-master.xml"
+    enabled: true
+
   security:
     user:
       password: admin
