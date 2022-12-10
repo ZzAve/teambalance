@@ -45,11 +45,11 @@ class BunqConfiguration(
         }
         ensure(bunqConfig.apiKey.isNullOrEmpty()) {
             "An apikey was set for Bunq while trying to setup SANDBOX environment. " +
-                    "This is not allowed, for your protection"
+                "This is not allowed, for your protection"
         }
         ensure(bunqConfig.bankAccountId == null || bunqConfig.bankAccountId == -1) {
             "A bankAccountId was set while trying to setup SANDBOX environment. " +
-                    "This is not allowed, for your protection"
+                "This is not allowed, for your protection"
         }
         log.info("Setting up connection with bunq SANDBOX")
 
@@ -57,7 +57,6 @@ class BunqConfiguration(
             BunqRepository(bunqConfig)
         } catch (t: Throwable) {
             throw IllegalStateException("Could not create bunqRepository for sandbox setup", t)
-
         }
     }
 }
