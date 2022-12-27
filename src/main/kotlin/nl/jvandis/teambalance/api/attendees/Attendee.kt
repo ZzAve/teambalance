@@ -59,13 +59,6 @@ data class Attendee(
         availability = availability,
         event = event
     )
-
-    fun externalize() = AttendeeResponse(
-        id = id,
-        eventId = event.id,
-        state = availability,
-        user = user
-    )
 }
 
 enum class Availability {

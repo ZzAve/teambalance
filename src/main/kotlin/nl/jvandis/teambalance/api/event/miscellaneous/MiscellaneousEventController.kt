@@ -90,7 +90,7 @@ class MiscellaneousEventController(
                 val relevantAttendees = attendees[t.id]
                     ?.filter { a -> a.user.isActive || includeInactiveUsers }
                     ?: emptyList()
-                t.externalizeWithAttendees(relevantAttendees)
+                t.expose(relevantAttendees)
             }
         )
     }
@@ -113,7 +113,7 @@ class MiscellaneousEventController(
                     .filter { a -> a.user.isActive || includeInactiveUsers }
             }
 
-        return event.externalizeWithAttendees(attendees)
+        return event.expose(attendees)
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -142,7 +142,7 @@ class MiscellaneousEventController(
         val savedEvent = eventRepository.save(event)
         val savedAttendees = attendeeRepository.saveAll(attendees).toList()
 
-        return savedEvent.externalizeWithAttendees(savedAttendees)
+        return savedEvent.expose(savedAttendees)
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -182,7 +182,7 @@ class MiscellaneousEventController(
                 val updatedEvent = it.createUpdatedEvent(updateEventRequest)
                 eventRepository.save(updatedEvent)
             }
-            ?.externalizeWithAttendees(emptyList())
+            ?.expose(emptyList())
             ?: throw InvalidMiscellaneousEventException(eventId)
     }
 

@@ -2,6 +2,7 @@ package nl.jvandis.teambalance.api.match
 
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
+import nl.jvandis.teambalance.api.attendees.expose
 import nl.jvandis.teambalance.api.event.Event
 import nl.jvandis.teambalance.api.event.Place
 import java.time.LocalDateTime
@@ -54,7 +55,7 @@ data class Match(
     )
 
     fun externaliseWithAttendees(attendees: List<Attendee>): MatchResponse {
-        val attendeesResponse = attendees.map { a -> a.externalize() }
+        val attendeesResponse = attendees.map { a -> a.expose() }
         return externalise(attendeesResponse)
     }
 

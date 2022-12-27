@@ -10,4 +10,5 @@
                     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
 >
     <include file="db.changelog.2022-12-10-init.xml" relativeToChangelogFile="true"/>
+    <include file="db.changelog.2022-12-27-add-jersey-number-to-uzer.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

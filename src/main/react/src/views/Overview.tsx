@@ -165,15 +165,29 @@ const Overview = (props: { refresh:boolean }) => {
             </Card>
           </Grid>
           <Grid item container spacing={2}>
-            <PageItem title="Admin snuff">
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => navigate("admin")}
-              >
-                <Hidden xsDown>Admin dingen </Hidden>
-                <ArrowForwardIcon spacing={5} />
-              </Button>
+            <PageItem title="☣️ Danger zone">
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => navigate("admin")}
+                  >
+                    <Hidden xsDown>Admin dingen </Hidden>
+                    <ArrowForwardIcon spacing={5} />
+                  </Button>
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => navigate("users")}
+                  >
+                    <Hidden xsDown>Teamleden </Hidden>
+                    <ArrowForwardIcon spacing={5} />
+                  </Button>
+                </Grid>{" "}
+              </Grid>
             </PageItem>
           </Grid>
         </Grid>

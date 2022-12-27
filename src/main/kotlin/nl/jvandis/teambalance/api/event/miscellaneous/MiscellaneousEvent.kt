@@ -1,7 +1,5 @@
 package nl.jvandis.teambalance.api.event.miscellaneous
 
-import nl.jvandis.teambalance.api.attendees.Attendee
-import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.event.Event
 import java.time.LocalDateTime
 import javax.persistence.Entity
@@ -15,26 +13,18 @@ data class MiscellaneousEvent(
     val title: String? = null
 ) : Event(id, startTime, location, comment) {
     constructor(startTime: LocalDateTime, location: String, comment: String?, title: String?) :
-        this(id = 0, startTime = startTime, location = location, comment = comment, title = title)
+        this(
+            id = 0,
+            startTime = startTime,
+            location = location,
+            comment = comment,
+            title = title
+        )
 
     fun createUpdatedEvent(updateEventRequest: UpdateMiscellaneousEventRequest) = copy(
         startTime = updateEventRequest.startTime ?: startTime,
         comment = updateEventRequest.comment ?: comment,
         location = updateEventRequest.location ?: location,
         title = updateEventRequest.title ?: title
-    )
-
-    fun externalizeWithAttendees(attendees: List<Attendee>): MiscellaneousEventResponse {
-        val attendeesResponse = attendees.map { a -> a.externalize() }
-        return externalize(attendeesResponse)
-    }
-
-    private fun externalize(attendeesResponse: List<AttendeeResponse>) = MiscellaneousEventResponse(
-        id = id,
-        comment = comment,
-        title = title ?: "Overig event",
-        location = location,
-        startTime = startTime,
-        attendees = attendeesResponse
     )
 }
