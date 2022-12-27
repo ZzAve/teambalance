@@ -54,11 +54,13 @@ spring:
     url: override-me
     hikari:
       maximum-pool-size: 1
-
   jackson:
     serialization:
       write_dates_as_timestamps: false
       WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS: false
+  liquibase:
+    change-log: "classpath:db/changelog/db.changelog-master.xml"
+    enabled: true
 
 springdoc:
   model-and-view-allowed: true
