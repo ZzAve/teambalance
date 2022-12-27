@@ -5,14 +5,11 @@ management:
     web:
       base-path: /_ah
 
-spring.jpa.hibernate.ddl-auto: validate
-
 spring:
   datasource:
     username: ${sm://DB_USERNAME}
     password: ${sm://DB_PASSWORD}
     url: ${sm://DB_URL}
-
 #spring:
 #  datasource:
 #    url: ${CLOUD_INSTANCE_CONNECTION_NAME}

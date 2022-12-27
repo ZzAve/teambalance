@@ -5,13 +5,10 @@ app:
 
 spring:
   jpa:
-    hibernate:
-      ddl-auto: create
     show-sql: true
   datasource:
     username: ${sm://DB_USERNAME_DEV}
     password: ${sm://DB_PASSWORD_DEV}
     url: ${sm://DB_URL_DEV}
-
   devtools:
     add-properties: true

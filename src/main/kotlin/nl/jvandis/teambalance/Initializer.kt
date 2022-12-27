@@ -16,13 +16,12 @@ import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
 import java.time.LocalDateTime
 import kotlin.random.Random
 
-@Configuration
-@Profile("dev", "local") // don't use class unless 'dev' profile is activated
+// Enable me if you want to populate the database on application startup
+// @Configuration
+// @Profile("dev", "local") // don't use class unless 'dev' profile is activated
 class Initializer(
     private val userRepository: UserRepository,
     private val eventRepository: EventRepository,

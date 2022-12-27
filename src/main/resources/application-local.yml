@@ -25,13 +25,12 @@ spring:
   datasource:
     username: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:54321/teambalance
+    url: jdbc:postgresql://localhost:54321/postgres
   devtools:
     add-properties: true
   jpa:
-    hibernate:
-      ddl-auto: create
     show-sql: true
+
   security:
     user:
       password: admin
