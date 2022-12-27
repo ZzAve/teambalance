@@ -25,6 +25,7 @@ data class User(
     val role: Role,
 
     @Column(nullable = false) val isActive: Boolean = true,
+    @Column(nullable = true) val jerseyNumber: Int? = null,
     @Column(nullable = false) val showForTrainings: Boolean = true,
     @Column(nullable = false) val showForMatches: Boolean = true
 ) {

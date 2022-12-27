@@ -111,8 +111,8 @@ const EventDetails = (props: { eventType: EventType; id?: number }) => {
 
   const fetchUsers = async () => {
     try {
-      const data = (await usersApiClient.getActiveUsers())as UsersResponse;
-      setUsers(data.users || []); //.first(d => d.id === id) || {});
+      const data = (await usersApiClient.getActiveUsers());
+      setUsers(data || []);
     } catch (e) {
       addAlert({
         message: `Er ging iets mis met het ophalen van de gebruikers`,

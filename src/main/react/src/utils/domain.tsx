@@ -34,6 +34,7 @@ export interface User {
   name: string;
   role: Role;
   isActive: boolean;
+  jerseyNumber?: number;
 }
 
 export type Availability = "PRESENT" | "ABSENT" | "UNCERTAIN" | "NOT_RESPONDED";
@@ -46,6 +47,15 @@ export type Role =
   | "PASSER"
   | "OTHER";
 
+export const roleMapper: Record<Role, string> = {
+  COACH: "Coach",
+  DIAGONAL: "Dia",
+  MID: "Midden",
+  OTHER: "Trainingslid/vrije vogel",
+  PASSER: "Passer/loper",
+  SETTER: "Set-upper",
+  TRAINER: "Trainer",
+};
 export type Place = "HOME" | "AWAY";
 
 export type TransactionType = "DEBIT" | "CREDIT";
@@ -61,8 +71,7 @@ export interface Transaction {
 export interface Potters {
   toppers: Potter[];
   floppers: Potter[];
-  subPeriod?: Potters
-
+  subPeriod?: Potters;
 }
 
 export interface Potter {

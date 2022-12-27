@@ -1,6 +1,8 @@
 package nl.jvandis.teambalance.api.event.miscellaneous
 
+import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
+import nl.jvandis.teambalance.api.attendees.expose
 import java.time.LocalDateTime
 
 data class UserAddRequest(
@@ -44,4 +46,14 @@ data class MiscellaneousEventResponse(
     val location: String,
     val comment: String?,
     val attendees: List<AttendeeResponse>
+)
+
+fun MiscellaneousEvent.toResponse(attendees: List<Attendee>) = expose(attendees)
+fun MiscellaneousEvent.expose(attendees: List<Attendee>) = MiscellaneousEventResponse(
+    id = id,
+    comment = comment,
+    title = title ?: "Overig event",
+    location = location,
+    startTime = startTime,
+    attendees = attendees.map(Attendee::expose)
 )

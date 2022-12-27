@@ -8,6 +8,7 @@ import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.event.EventRepository
 import nl.jvandis.teambalance.api.users.UserRepository
+import nl.jvandis.teambalance.api.users.expose
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.repository.findByIdOrNull
@@ -143,7 +144,7 @@ class AttendeeController(
         AttendeeResponse(
             id = id,
             eventId = event.id,
-            user = user,
+            user = user.expose(),
             state = availability
         )
 

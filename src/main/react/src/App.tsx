@@ -14,6 +14,7 @@ const Admin = lazy(() => import("./views/Admin"));
 const Login = lazy(() => import("./views/Login"));
 const Overview = lazy(() => import("./views/Overview"));
 const Transaction = lazy(() => import("./views/TransactionsPage"));
+const Users = lazy(() => import("./views/UsersPage"));
 
 const App = () => {
   const [topBarShouldRefresh, setTopBarShouldRefresh] = useState(false);
@@ -92,14 +93,6 @@ const App = () => {
                     }
                   />
                   <Route
-                    path="transactions"
-                    element={
-                      <RequireAuth>
-                        <Transaction refresh={shouldRefresh} />
-                      </RequireAuth>
-                    }
-                  />
-                  <Route
                     path="misc-events"
                     element={
                       <RequireAuth>
@@ -110,6 +103,23 @@ const App = () => {
                       </RequireAuth>
                     }
                   />
+                  <Route
+                    path="transactions"
+                    element={
+                      <RequireAuth>
+                        <Transaction refresh={shouldRefresh} />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="users"
+                    element={
+                      <RequireAuth>
+                        <Users refresh={shouldRefresh} />
+                      </RequireAuth>
+                    }
+                  />
+
 
                   <Route path="loading" element={<Loading />}></Route>
 

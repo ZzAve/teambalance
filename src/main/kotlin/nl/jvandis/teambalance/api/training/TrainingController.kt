@@ -113,7 +113,7 @@ class TrainingController(
                     .filter { a -> a.user.isActive || includeInactiveUsers }
             }
 
-        return training.externalizeWithAttendees(attendees)
+        return training.expose(attendees)
     }
 
     @ResponseStatus(HttpStatus.CREATED)

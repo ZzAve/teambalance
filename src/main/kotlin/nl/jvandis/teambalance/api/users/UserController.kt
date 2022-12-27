@@ -35,24 +35,23 @@ class UserController(
     @GetMapping
     fun getUsers(
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
-
-    ): Users {
+    ): ExternalUsers {
         log.debug("getUsers")
 
         return Users(
             users = userRepository.findAll(Sort.by("name"))
                 .filter { includeInactiveUsers || it.isActive }
                 .filterNotNull()
-        )
+        ).expose()
     }
 
     @GetMapping("/{id}")
     fun getUser(
         @PathVariable(value = "id") userId: Long
-    ): User {
+    ): ExternalUser {
         log.debug("getUser $userId")
 
-        return userRepository.findByIdOrNull(userId) ?: throw InvalidUserException(userId)
+        return userRepository.findByIdOrNull(userId)?.expose() ?: throw InvalidUserException(userId)
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -73,12 +72,13 @@ class UserController(
         @PathVariable(value = "id") userId: Long,
         @RequestBody potentialUserUpdate: PotentialUserUpdate
 
-    ): User {
+    ): ExternalUser {
         log.debug("updatingUser: $potentialUserUpdate")
 
         return userRepository
             .findByIdOrNull(userId)
             ?.updateUser(potentialUserUpdate, userId)
+            ?.expose()
             ?: throw InvalidUserException(userId)
     }
 
@@ -89,7 +89,8 @@ class UserController(
         val updatedUser = copy(
             name = potentialUserUpdate.name ?: name,
             role = potentialUserUpdate.role ?: role,
-            isActive = potentialUserUpdate.isActive ?: isActive
+            isActive = potentialUserUpdate.isActive ?: isActive,
+            jerseyNumber = potentialUserUpdate.jerseyNumber ?: jerseyNumber
         )
 
         return try {
@@ -128,5 +129,6 @@ data class PotentialUser(
 data class PotentialUserUpdate(
     val name: String?,
     val role: Role?,
-    val isActive: Boolean?
+    val isActive: Boolean?,
+    val jerseyNumber: Int?
 )

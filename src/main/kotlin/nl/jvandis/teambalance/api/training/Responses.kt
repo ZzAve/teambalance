@@ -1,6 +1,8 @@
 package nl.jvandis.teambalance.api.training
 
+import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
+import nl.jvandis.teambalance.api.attendees.expose
 import nl.jvandis.teambalance.api.users.User
 import java.time.LocalDateTime
 
@@ -46,4 +48,15 @@ data class TrainingResponse(
     val comment: String?,
     val attendees: List<AttendeeResponse>,
     val trainer: User?
+)
+
+fun Training.toResponse(attendees: List<Attendee>) = expose(attendees)
+fun Training.externalizeWithAttendees(attendees: List<Attendee>) = expose(attendees)
+fun Training.expose(attendees: List<Attendee>) = TrainingResponse(
+    id = id,
+    comment = comment,
+    location = location,
+    startTime = startTime,
+    attendees = attendees.map(Attendee::expose),
+    trainer = trainer
 )

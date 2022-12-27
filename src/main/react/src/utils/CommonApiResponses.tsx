@@ -1,4 +1,4 @@
-import { Attendee, Availability, Role } from "./domain";
+import { Attendee, Availability, Role, User } from "./domain";
 
 export interface AttendeeResponse {
   id: number;
@@ -15,8 +15,6 @@ export interface UserResponse {
     name: string;
     role: Role;
     isActive: boolean;
-    showForTrainings: boolean;
-    showForMatches: boolean;
 }
 
 export const internalizeAttendees: (value: AttendeeResponse) => Attendee = (
@@ -25,5 +23,9 @@ export const internalizeAttendees: (value: AttendeeResponse) => Attendee = (
   id: value.id,
   eventId: value.eventId,
   state: value.state,
-  user: value.user,
+  user: internalizeUser(value.user),
+});
+
+export const internalizeUser: (value: UserResponse) => User = (value) => ({
+  ...value,
 });
