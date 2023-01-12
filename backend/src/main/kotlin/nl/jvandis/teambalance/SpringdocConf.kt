@@ -47,7 +47,7 @@ import java.lang.reflect.Method
 class SpringdocConf {
 
     @Bean
-    fun customOpenAPI(@Value("\${app.version}") appVersion: String): OpenAPI? {
+    fun customOpenAPI(@Value("\${app.version}") appVersion: String): OpenAPI {
         return OpenAPI()
             .components(
                 Components().addSecuritySchemes(
