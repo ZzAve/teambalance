@@ -83,7 +83,7 @@
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{scss,css}": [
+    "src/main/react/**/*.{scss,css}": [
       "stylelint --fix",
       "prettier --write"
     ],
