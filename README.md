@@ -217,3 +217,12 @@ As with most projects, it's hardly ever considered finished.
 ### Won't have:
 
 - Integration with CMS systems for customisation purposes
+
+
+## ❤️‍🩹 Troubleshooting
+### Let Intellij understand the shaded artifact from [shadowed-bung-sdk](shadowed-bung-sdk/pom.xml).
+
+Unfortunately, Intellij doesn't understand shaded artifacts ([read up on it here](https://youtrack.jetbrains.com/issue/IDEA-126596))
+
+> A better workaround seems to be: Right-click on shade-bug-repackaged -> pom.xml in the project view in IntelliJ,
+> choose "Maven" -> "Ignore Projects". Then do a "Maven" -> "Reimport" on the top-level pom.xml.

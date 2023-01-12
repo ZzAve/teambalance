@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Application [DEV]" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="dev" />
-    <module name="teambalance" />
+    <module name="app" />
     <option name="PROGRAM_PARAMETERS" value="-P develop" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="nl.jvandis.teambalance.Application" />
     <extension name="net.ashald.envfile">
