@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Admin
-@PreAuthorize("hasRole('admin')")
+@PreAuthorize("hasRole('admin')") // TODO: make me pretty in https://github.com/ZzAve/teambalance/issues/200
 @Tag(name = "aliases")
 @RequestMapping(path = ["/api/aliases"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class BankAccountAliasController(
@@ -33,7 +33,9 @@ class BankAccountAliasController(
 
     private val log = LoggerFactory.getLogger(javaClass)
 
+    // TODO: make me pretty in https://github.com/ZzAve/teambalance/issues/200
 //    @PreAuthorize("hasRole('admin')")
+//    @PreAuthorize("permitAll()") // to make it public
     @GetMapping
     fun getAliases(): BankAccountAliases {
         log.debug("getAliases")
@@ -42,7 +44,7 @@ class BankAccountAliasController(
         return BankAccountAliases(bankAccountAliases = bankAccountAliasRepository.findAll())
     }
 
-//    @PreAuthorize("hasRole('admin')")
+    //    @PreAuthorize("hasRole('admin')")
     @GetMapping("/{id}")
     fun getUser(
         @PathVariable(value = "id") bankAccountAliasId: Long
@@ -54,7 +56,7 @@ class BankAccountAliasController(
         )
     }
 
-//    @PreAuthorize("hasRole('admin')")
+    //    @PreAuthorize("hasRole('admin')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun postUser(
@@ -66,7 +68,7 @@ class BankAccountAliasController(
         bankAccountAliasRepository.save(bankAccountAlias)
     }
 
-//    @PreAuthorize("hasRole('admin')")
+    //    @PreAuthorize("hasRole('admin')")
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun updateUser(
