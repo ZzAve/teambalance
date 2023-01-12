@@ -2,7 +2,7 @@
 *.iml
 
 target
-/*.conf
+bunq-*.conf
 
 node
 node_modules

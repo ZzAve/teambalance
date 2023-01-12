@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>nl.jvandis</groupId>
+        <artifactId>teambalance</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <groupId>nl.jvandis.teambalance</groupId>
+    <name>Team balance - app</name>
+    <description>Fullstack app combining a spring boot backend with a Single Page app frontend</description>
+    <artifactId>app</artifactId>
+
+    <properties>
+        <jib-maven-plugin.version>3.3.1</jib-maven-plugin.version>
+        <maven-dependency-plugin.version>3.4.0</maven-dependency-plugin.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>nl.jvandis.teambalance</groupId>
+            <artifactId>frontend</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>nl.jvandis.teambalance</groupId>
+            <artifactId>backend</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+
+
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <args>
+                        <arg>-Xjsr305=strict</arg>
+                    </args>
+                    <compilerPlugins>
+                        <plugin>spring</plugin>
+                        <plugin>jpa</plugin>
+                    </compilerPlugins>
+                    <jvmTarget>11</jvmTarget>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-allopen</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-noarg</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <!-- Replacing default-compile as it is treated specially by maven -->
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <!-- Replacing default-testCompile as it is treated specially by maven -->
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>repackage</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>nl.jvandis.teambalance.ApplicationKt</mainClass>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeGroupIds>nl.jvandis.teambalance</includeGroupIds>
+                            <includes>static/**/*.*</includes>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                            <useSubDirectoryPerArtifact>false</useSubDirectoryPerArtifact>
+                            <stripVersion>true</stripVersion>
+                            <stripClassifier>true</stripClassifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${jib-maven-plugin.version}</version>
+                <configuration>
+                    <to>
+                        <image>gcr.io/tovoheren5/teambalance</image>
+                    </to>
+                    <container>
+                        <mainClass>nl.jvandis.teambalance.ApplicationKt</mainClass>
+                        <ports>
+                            <port>8080</port>
+                        </ports>
+                    </container>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

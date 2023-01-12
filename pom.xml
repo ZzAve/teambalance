@@ -11,363 +11,48 @@
     <groupId>nl.jvandis</groupId>
     <artifactId>teambalance</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Team balance</name>
+    <packaging>pom</packaging>
+    <name>Team balance parent</name>
     <description>Personal project to monitor team expenses on beer and brown fruit</description>
 
-    <properties>
-        <skip.npm-ci>false</skip.npm-ci>
+    <modules>
+        <module>app</module>
+        <module>backend</module>
+        <module>frontend</module>
+        <module>shadowed-bung-sdk</module>
+    </modules>
 
+    <properties>
         <java.version>17</java.version>
         <kotlin.version>1.6.10</kotlin.version>
-        <!-- installed node/npm version: lts/carbon -->
-        <node.version>v18.12.1</node.version>
-        <npm.version>8.19.2</npm.version>
 
-        <appengine-maven-plugin.version>2.4.1</appengine-maven-plugin.version>
-        <bunq-sdk.version>1.19.11.48</bunq-sdk.version>
-        <caffeine.version>v3.1.1</caffeine.version>
-        <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
+        <verification.skip>false</verification.skip>
         <ktlint.version>0.47.1</ktlint.version>
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
-        <maven-dependency-plugin.version>3.4.0</maven-dependency-plugin.version>
-        <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
-        <postgresql.version>42.5.1</postgresql.version>
-        <spring-cloud-gcp-dependencies.version>3.3.0</spring-cloud-gcp-dependencies.version>
-        <springdoc-openapi.version>1.6.13</springdoc-openapi.version>
-        <liquibase.version>4.17.2</liquibase.version>
+
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.google.cloud</groupId>
-                <artifactId>spring-cloud-gcp-dependencies</artifactId>
-                <version>${spring-cloud-gcp-dependencies.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <!-- Exclude the Tomcat dependency -->
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jetty</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>${liquibase.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>${caffeine.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>spring-cloud-gcp-starter-secretmanager</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.bunq</groupId>
-            <artifactId>sdk_java</artifactId>
-            <version>${bunq-sdk.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-kotlin</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-        </dependency>
-
-        <!-- Swagger -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-            <version>${springdoc-openapi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-kotlin</artifactId>
-            <version>${springdoc-openapi.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-indexer</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
     <build>
-        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>nl.jvandis.teambalance.ApplicationKt</mainClass>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <args>
-                        <arg>-Xjsr305=strict</arg>
-                    </args>
-                    <compilerPlugins>
-                        <plugin>spring</plugin>
-                        <plugin>jpa</plugin>
-                    </compilerPlugins>
-                    <jvmTarget>11</jvmTarget>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>kotlin-maven-allopen</artifactId>
-                        <version>${kotlin.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>kotlin-maven-noarg</artifactId>
-                        <version>${kotlin.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>${maven-dependency-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>unpack-dependencies</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeGroupIds>nl.jvandis.teambalance</includeGroupIds>
-                            <includes>**/*.js</includes>
-                            <outputDirectory>${project.build.directory}/react</outputDirectory>
-                            <useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
-                            <stripVersion>true</stripVersion>
-                            <stripClassifier>true</stripClassifier>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>${frontend-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>install node and npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                        <phase>initialize</phase>
-                        <configuration>
-                            <nodeVersion>${node.version}</nodeVersion>
-                            <npmVersion>${npm.version}</npmVersion>
-                            <installDirectory>${project.basedir}</installDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm ci</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <arguments>ci</arguments>
-                            <skip>${skip.npm-ci}</skip>
-                        </configuration>
-
-                    </execution>
-                    <execution>
-                        <id>npm build</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>prepare-package</phase>
-                        <configuration>
-                            <arguments>run build</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm lint</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>verify</phase>
-                        <configuration>
-                            <arguments>run lint</arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <executions>
-                    <!-- Replacing default-compile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-compile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <!-- Replacing default-testCompile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>java-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>java-test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>3.3.1</version>
-                <configuration>
-                    <to>
-                        <image>gcr.io/tovoheren5/teambalance</image>
-                    </to>
-                    <container>
-                        <mainClass>nl.jvandis.teambalance.ApplicationKt</mainClass>
-                        <ports>
-                            <port>8080</port>
-                        </ports>
-                    </container>
-
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>${maven-antrun-plugin.version}</version>
+                <configuration>
+                    <skip>${verification.skip}</skip>
+                </configuration>
                 <executions>
                     <execution>
                         <id>ktlint</id>
                         <phase>verify</phase>
+                        <inherited>false</inherited>
                         <configuration>
                             <target name="ktlint">
                                 <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
                                       classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
-                                    <arg value="src/**/*.kt"/>
+                                    <arg value="*/src/**/*.kt"/>
                                 </java>
                             </target>
                         </configuration>
@@ -377,12 +62,13 @@
                     </execution>
                     <execution>
                         <id>ktlint-format</id>
+                        <inherited>false</inherited>
                         <configuration>
                             <target name="ktlint">
                                 <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
                                       classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
                                     <arg value="-F"/>
-                                    <arg value="src/**/*.kt"/>
+                                    <arg value="*/src/**/*.kt"/>
                                 </java>
                             </target>
                         </configuration>
@@ -399,9 +85,9 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
         </plugins>
     </build>
-
 
     <profiles>
         <profile>
@@ -413,7 +99,6 @@
                     <optional>true</optional>
                     <scope>provided</scope>
                 </dependency>
-
             </dependencies>
         </profile>
     </profiles>
