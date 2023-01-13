@@ -28,6 +28,7 @@ app:
 
 server:
   forward-headers-strategy: NATIVE
+  shutdown: graceful
 spring:
   devtools:
     add-properties: false

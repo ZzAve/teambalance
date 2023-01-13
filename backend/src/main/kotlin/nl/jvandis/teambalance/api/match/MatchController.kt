@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.match
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMatchException
@@ -30,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
-import javax.validation.Valid
 import kotlin.math.min
 
 @RestController

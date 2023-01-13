@@ -18,8 +18,9 @@
         <liquibase.version>4.9.1</liquibase.version> <!-- to prevent collisions for JOOQ -->
 
 
+        <jetty.version>12.0.0.alpha3</jetty.version>
         <postgresql.version>42.5.1</postgresql.version>
-        <spring-cloud-gcp-dependencies.version>3.3.0</spring-cloud-gcp-dependencies.version>
+        <spring-cloud-gcp-dependencies.version>3.4.1</spring-cloud-gcp-dependencies.version>
         <springdoc-openapi.version>1.6.13</springdoc-openapi.version>
         <testcontainers.version>1.17.3</testcontainers.version>
         <jooq.version>3.14.16</jooq.version> <!-- same as from spring-boot-starter-jooq -->
@@ -74,6 +75,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jetty</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>

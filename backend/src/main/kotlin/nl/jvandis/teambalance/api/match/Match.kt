@@ -1,5 +1,9 @@
 package nl.jvandis.teambalance.api.match
 
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.event.Event
 import nl.jvandis.teambalance.api.event.Place

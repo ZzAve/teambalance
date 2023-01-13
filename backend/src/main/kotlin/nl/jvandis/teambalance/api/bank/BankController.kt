@@ -1,6 +1,8 @@
 package nl.jvandis.teambalance.api.bank
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
 import nl.jvandis.teambalance.api.Error
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -12,8 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
 
 @RestController
 @Validated

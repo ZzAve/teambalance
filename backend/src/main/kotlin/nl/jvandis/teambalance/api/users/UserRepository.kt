@@ -65,8 +65,8 @@ class UserRepository(
         if (userId == NO_ID) {
             throw IllegalStateException(
                 "User with 'special' id $NO_ID can not be deleted. " +
-                    "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back"
+                        "The special no id serves a special purpose in transforming items " +
+                        "from records to entities and back"
             )
         }
         val execute = context.deleteFrom(UZER)
@@ -81,8 +81,8 @@ class UserRepository(
         if (updatedUser.id == NO_ID) {
             throw IllegalStateException(
                 "User with 'special' id $NO_ID can not be deleted. " +
-                    "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back"
+                        "The special no id serves a special purpose in transforming items " +
+                        "from records to entities and back"
             )
         }
         return context

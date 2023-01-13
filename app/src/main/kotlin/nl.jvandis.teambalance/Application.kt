@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance
 
 import nl.jvandis.teambalance.api.bank.BankService
+import nl.jvandis.teambalance.api.match.MatchRepository
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -22,4 +23,8 @@ fun main(args: Array<String>) {
     applicationContext.getBean(BankService::class.java).getBalance()
     applicationContext.getBean(BankService::class.java).getTransactions(1, 0)
     log.info("Retrieved balance and transactions to warm up cache")
+
+    //TODO: remove me
+    log.info(applicationContext.getBean(MatchRepository::class.java).findAll().toString())
+
 }

@@ -16,13 +16,13 @@ data class MiscellaneousEvent(
     val attendees: List<Attendee>? = null
 ) : Event(id, startTime, location, comment) {
     constructor(startTime: LocalDateTime, location: String, comment: String?, title: String?) :
-        this(
-            id = NO_ID,
-            startTime = startTime,
-            location = location,
-            comment = comment,
-            title = title
-        )
+            this(
+                id = NO_ID,
+                startTime = startTime,
+                location = location,
+                comment = comment,
+                title = title
+            )
 
     fun createUpdatedEvent(updateEventRequest: UpdateMiscellaneousEventRequest) = copy(
         startTime = updateEventRequest.startTime ?: startTime,
