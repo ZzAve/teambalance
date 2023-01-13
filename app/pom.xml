@@ -164,6 +164,9 @@
                     </to>
                     <container>
                         <mainClass>nl.jvandis.teambalance.ApplicationKt</mainClass>
+                        <jvmFlags>
+                            <jvmFlag>-Dliquibase.secureParsing=false</jvmFlag>
+                        </jvmFlags>
                         <ports>
                             <port>8080</port>
                         </ports>

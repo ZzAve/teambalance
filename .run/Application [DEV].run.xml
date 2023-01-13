@@ -4,6 +4,7 @@
     <module name="app" />
     <option name="PROGRAM_PARAMETERS" value="-P develop" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="nl.jvandis.teambalance.Application" />
+    <option name="VM_PARAMETERS" value="-Dliquibase.secureParsing=false" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />
       <option name="IS_SUBST" value="false" />
