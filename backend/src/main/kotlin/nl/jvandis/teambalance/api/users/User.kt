@@ -1,5 +1,6 @@
 package nl.jvandis.teambalance.api.users
 
+import nl.jvandis.teambalance.data.NO_ID
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EnumType
@@ -16,7 +17,7 @@ data class Users(
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Long = NO_ID,
 
     @Column(nullable = false, unique = true) val name: String,
 
@@ -29,9 +30,7 @@ data class User(
     @Column(nullable = false) val showForTrainings: Boolean = true,
     @Column(nullable = false) val showForMatches: Boolean = true
 ) {
-    constructor(name: String, role: Role) : this(0, name, role)
-
-    override fun toString() = "User[id=$id, name=$name, role=$role, isActive=$isActive, showForTrainings=$showForTrainings, showForMatches=$showForMatches]"
+    constructor(name: String, role: Role) : this(NO_ID, name, role)
 }
 
 enum class Role {
@@ -43,3 +42,14 @@ enum class Role {
     PASSER,
     OTHER
 }
+
+//FIXME: You don't need me?
+data class JooqUser(
+    val id: Long = NO_ID,
+    val name: String,
+    val role: Role,
+    val isActive: Boolean = true,
+    val jerseyNumber: Int? = null,
+    val showForTrainings: Boolean = true,
+    val showForMatches: Boolean = true
+)

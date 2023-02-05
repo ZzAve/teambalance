@@ -31,7 +31,8 @@ spring:
     add-properties: true
   jpa:
     show-sql: true
-
+  liquibase:
+    enabled: false # FIXME remove me
   security:
     user:
       password: admin
@@ -39,3 +40,7 @@ spring:
       roles:
         - admin
         - user
+
+logging:
+  level:
+    org.jooq: debug

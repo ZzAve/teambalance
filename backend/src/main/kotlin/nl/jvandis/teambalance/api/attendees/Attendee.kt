@@ -1,64 +1,40 @@
 package nl.jvandis.teambalance.api.attendees
 
-import nl.jvandis.teambalance.api.event.Event
-import nl.jvandis.teambalance.api.training.Training
-import nl.jvandis.teambalance.api.users.Role
 import nl.jvandis.teambalance.api.users.User
+import nl.jvandis.teambalance.data.NO_ID
+import nl.jvandis.teambalance.data.TeamBalanceEntityBuilder
 import org.slf4j.LoggerFactory
-import java.time.LocalDateTime
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
-import javax.persistence.Table
-import javax.persistence.UniqueConstraint
 
-@Entity
-@Table(uniqueConstraints = arrayOf(UniqueConstraint(columnNames = arrayOf("USER_ID", "EVENT_ID"))))
 data class Attendee(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
-
-    @ManyToOne
-    @JoinColumn(name = "USER_ID")
+    val id: Long = NO_ID,
     val user: User,
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     val availability: Availability,
-
-    @ManyToOne
-    @JoinColumn(name = "EVENT_ID")
-    val event: Event
+    val eventId: Long
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(Attendee::class.java)
-        private val dummyUser = User("dummy", Role.COACH)
-        private val dummyEvent = Training(LocalDateTime.MIN, "", "")
     }
 
-    /**
-     * no-args constructor
-     */
-    protected constructor() : this(dummyUser, dummyEvent)
-
-    constructor(user: User, event: Event) : this(
+    constructor(user: User, eventId: Long) : this(
         user = user,
-        event = event,
+        eventId = eventId,
         availability = Availability.NOT_RESPONDED
     )
-    constructor(user: User, event: Event, availability: Availability) : this(
-        id = 0,
-        user = user,
-        availability = availability,
-        event = event
-    )
+
+    data class Builder(
+        val id: Long,
+        val userId: Long,
+        val eventId: Long,
+        val availability: Availability,
+        var user: User? = null,
+    ) : TeamBalanceEntityBuilder<Attendee> {
+        override fun build() = Attendee(
+            id = id,
+            user = checkNotNull(user) { "User has not been set." },
+            availability = availability,
+            eventId = eventId
+        )
+    }
 }
 
 enum class Availability {

@@ -1,7 +1,7 @@
 package nl.jvandis.teambalance.api.event.miscellaneous
 
-import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
+import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.expose
 import java.time.LocalDateTime
 
@@ -48,7 +48,13 @@ data class MiscellaneousEventResponse(
     val attendees: List<AttendeeResponse>
 )
 
-fun MiscellaneousEvent.toResponse(attendees: List<Attendee>) = expose(attendees)
+//FIXME: attendees are part of event
+fun MiscellaneousEvent.expose() = expose(attendees ?: emptyList())
+fun MiscellaneousEvent.expose(includeInactiveUsers: Boolean) = expose(
+    attendees
+        ?.filter { a -> includeInactiveUsers || a.user.isActive }
+        ?: emptyList())
+
 fun MiscellaneousEvent.expose(attendees: List<Attendee>) = MiscellaneousEventResponse(
     id = id,
     comment = comment,

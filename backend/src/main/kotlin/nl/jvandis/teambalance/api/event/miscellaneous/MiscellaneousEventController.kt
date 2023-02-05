@@ -9,7 +9,7 @@ import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
 import nl.jvandis.teambalance.api.users.UserRepository
-import nl.jvandis.teambalance.api.users.toAttendee
+import nl.jvandis.teambalance.api.users.toNewAttendee
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
@@ -69,7 +69,6 @@ class MiscellaneousEventController(
 
         return getEventsAndAttendees(
             eventsRepository = eventRepository,
-            attendeeRepository = attendeeRepository,
             page = page,
             limit = limit,
             since = since,
@@ -77,23 +76,13 @@ class MiscellaneousEventController(
         ).toResponse(includeInactiveUsers)
     }
 
-    private fun Pair<Page<MiscellaneousEvent>, Map<Long, List<Attendee>>>.toResponse(includeInactiveUsers: Boolean): MiscellaneousEventsResponse {
-        val eventPage = first
-        val attendees = second
-
-        return MiscellaneousEventsResponse(
-            totalPages = eventPage.totalPages,
-            totalSize = eventPage.totalElements,
-            page = eventPage.number + 1,
-            size = min(eventPage.size, eventPage.content.size),
-            events = eventPage.content.map { t ->
-                val relevantAttendees = attendees[t.id]
-                    ?.filter { a -> a.user.isActive || includeInactiveUsers }
-                    ?: emptyList()
-                t.expose(relevantAttendees)
-            }
-        )
-    }
+    private fun Page<MiscellaneousEvent>.toResponse(includeInactiveUsers: Boolean) = MiscellaneousEventsResponse(
+        totalPages = totalPages,
+        totalSize = totalElements,
+        page = number + 1,
+        size = min(size, content.size),
+        events = content.map { it.expose(includeInactiveUsers) }
+    )
 
     @GetMapping("/{event-id}")
     fun getEvent(
@@ -126,8 +115,8 @@ class MiscellaneousEventController(
         val allUsers = userRepository.findAll()
         val event = potentialEvent.internalize()
 
-        val requestedUsersToAdd = allUsers.filter {
-            potentialEvent.userIds?.any { a -> a == it.id }
+        val requestedUsersToAdd = allUsers.filter { user ->
+            potentialEvent.userIds?.any { it == user.id }
                 ?: true
         }
 
@@ -137,10 +126,10 @@ class MiscellaneousEventController(
             throw CreateEventException("Not all requested userIds exists unfortunately ${potentialEvent.userIds}. Please verify your userIds")
         }
 
-        val attendees = requestedUsersToAdd.map { it.toAttendee(event) }
 
-        val savedEvent = eventRepository.save(event)
-        val savedAttendees = attendeeRepository.saveAll(attendees).toList()
+        val savedEvent = eventRepository.insert(event)
+        val attendees = requestedUsersToAdd.map { it.toNewAttendee(savedEvent) }
+        val savedAttendees = attendeeRepository.insertMany(attendees)
 
         return savedEvent.expose(savedAttendees)
     }
@@ -166,7 +155,7 @@ class MiscellaneousEventController(
         }
 
         return users.map { u ->
-            attendeeRepository.save(u.toAttendee(event))
+            attendeeRepository.insert(u.toNewAttendee(event))
         }
     }
 
@@ -180,7 +169,7 @@ class MiscellaneousEventController(
             .findByIdOrNull(eventId)
             ?.let {
                 val updatedEvent = it.createUpdatedEvent(updateEventRequest)
-                eventRepository.save(updatedEvent)
+                eventRepository.update(updatedEvent)
             }
             ?.expose(emptyList())
             ?: throw InvalidMiscellaneousEventException(eventId)
@@ -197,7 +186,10 @@ class MiscellaneousEventController(
 
         if (deleteAttendees) {
             attendeeRepository.findAllByEventIdIn(listOf(eventId))
-                .let { attendeeRepository.deleteAll(it) }
+                .let {
+                    attendeeRepository.deleteAll(it)
+                        .also { log.info("Deleted $it attendees for event $eventId") }
+                }
         }
         try {
             eventRepository.deleteById(eventId)
@@ -206,3 +198,5 @@ class MiscellaneousEventController(
         }
     }
 }
+
+
