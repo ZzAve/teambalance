@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.bank
 
 import nl.jvandis.teambalance.api.users.User
+import nl.jvandis.teambalance.data.NO_ID
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -20,7 +21,7 @@ data class BankAccountAliases(
 data class BankAccountAlias(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Long = NO_ID,
 
     @Column(nullable = false, name = "alias")
     val alias: String,
@@ -30,5 +31,5 @@ data class BankAccountAlias(
     val user: User
 ) {
 
-    constructor(alias: String, user: User) : this(0, alias, user)
+    constructor(alias: String, user: User) : this(NO_ID, alias, user)
 }

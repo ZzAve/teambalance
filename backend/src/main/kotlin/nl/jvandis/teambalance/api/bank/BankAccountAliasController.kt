@@ -7,7 +7,6 @@ import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType
@@ -65,7 +64,7 @@ class BankAccountAliasController(
         log.debug("postBankAccountAlias $potentialBankAccountAlias")
 
         val bankAccountAlias = potentialBankAccountAlias.internalize()
-        bankAccountAliasRepository.save(bankAccountAlias)
+        bankAccountAliasRepository.insert(bankAccountAlias)
     }
 
     //    @PreAuthorize("hasRole('admin')")

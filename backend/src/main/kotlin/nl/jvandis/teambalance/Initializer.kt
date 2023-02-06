@@ -38,7 +38,7 @@ class Initializer(
     @Bean
     fun initializeDatabase(): InitializingBean? {
         return InitializingBean {
-            userRepository.saveAll(
+            userRepository.insertMany(
                 listOf(
                     User("Julius", Role.DIAGONAL),
                     User("Maurice", Role.COACH),
@@ -55,7 +55,7 @@ class Initializer(
             addTrainings(users)
             addMatches(users)
 
-            bankAccountAliasRepository.saveAll(
+            bankAccountAliasRepository.insertMany(
                 listOf(
                     BankAccountAlias("J. van Dis", users.first { it.name == "Julius" }),
                     BankAccountAlias("J. Post", users.first { it.name == "Bocaj" }),
