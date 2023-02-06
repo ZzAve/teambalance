@@ -176,4 +176,3 @@ class AttendeeRepository(
         .where(ATTENDEE.ID.eq(attendeeId))
         .execute() == 1
 }
-
