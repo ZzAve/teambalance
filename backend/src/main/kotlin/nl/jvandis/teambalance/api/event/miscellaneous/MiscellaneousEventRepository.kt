@@ -1,10 +1,10 @@
 package nl.jvandis.teambalance.api.event.miscellaneous
 
+import nl.jvandis.jooq.support.getField
+import nl.jvandis.jooq.support.getFieldOrThrow
 import nl.jvandis.teambalance.api.match.TeamEventTableAndRecordHandler
 import nl.jvandis.teambalance.api.match.TeamEventsRepository
 import nl.jvandis.teambalance.api.match.findAllWithStartTimeAfterImpl
-import nl.jvandis.teambalance.data.getField
-import nl.jvandis.teambalance.data.getFieldOrThrow
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.MISCELLANEOUS_EVENT
 import org.jooq.DSLContext
@@ -29,7 +29,7 @@ class MiscellaneousEventRepository(
         findAllWithStartTimeAfterImpl(context, since, pageable, entity)
 
     override fun findAll(): List<MiscellaneousEvent> =
-        findAllWithStartTimeAfter(LocalDateTime.MIN, Pageable.unpaged()).content
+        findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
 
     override fun findByIdOrNull(eventId: Long): MiscellaneousEvent? = context
         .select()

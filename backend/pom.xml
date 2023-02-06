@@ -234,6 +234,20 @@
                                     <objectType>COLUMN</objectType>
                                     <includeTypes>home_away</includeTypes>
                                 </forcedType>
+                                <forcedType>
+                                    <userType>nl.jvandis.teambalance.api.attendees.Availability</userType>
+                                    <enumConverter>true</enumConverter>
+                                    <objectType>COLUMN</objectType>
+                                    <includeTypes>availability</includeTypes>
+                                </forcedType>
+
+                                <forcedType>
+                                    <userType>nl.jvandis.teambalance.api.users.Role</userType>
+                                    <enumConverter>true</enumConverter>
+                                    <objectType>COLUMN</objectType>
+                                    <includeTypes>role</includeTypes>
+                                </forcedType>
+
                             </forcedTypes>
                         </database>
                         <target>

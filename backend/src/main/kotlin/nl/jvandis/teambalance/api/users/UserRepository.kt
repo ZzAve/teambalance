@@ -1,9 +1,9 @@
 package nl.jvandis.teambalance.api.users
 
+import nl.jvandis.jooq.support.valuesFrom
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
-import nl.jvandis.teambalance.data.valuesFrom
 import org.jooq.DSLContext
 import org.jooq.exception.DataAccessException
 import org.springframework.data.domain.Sort
@@ -43,7 +43,7 @@ class UserRepository(
         )
             .valuesFrom(
                 users,
-                { it.role.name },
+                { it.role },
                 { it.name },
                 { it.isActive },
                 { it.showForMatches },
@@ -87,7 +87,7 @@ class UserRepository(
         }
         return context
             .update(UZER)
-            .set(UZER.ROLE, updatedUser.role.name)
+            .set(UZER.ROLE, updatedUser.role)
             .set(UZER.NAME, updatedUser.name)
             .set(UZER.IS_ACTIVE, updatedUser.isActive)
             .set(UZER.SHOW_FOR_MATCHES, updatedUser.showForMatches)

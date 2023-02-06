@@ -1,12 +1,12 @@
 package nl.jvandis.teambalance.api.attendees
 
+import nl.jvandis.jooq.support.valuesFrom
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.ATTENDEE
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
-import nl.jvandis.teambalance.data.valuesFrom
 import org.jooq.DSLContext
 import org.jooq.Record1
 import org.jooq.exception.DataAccessException
@@ -43,7 +43,7 @@ class AttendeeRepository(
         }
 
         val insertResult = context.insertInto(ATTENDEE, ATTENDEE.AVAILABILITY, ATTENDEE.EVENT_ID, ATTENDEE.USER_ID)
-            .valuesFrom(attendees, { it.availability.name }, { it.eventId }, { it.user.id })
+            .valuesFrom(attendees, { it.availability }, { it.eventId }, { it.user.id })
             .returningResult(ATTENDEE.ID).fetch()
 
         val attendeesResult =
@@ -66,7 +66,7 @@ class AttendeeRepository(
     fun insert(attendee: Attendee): Attendee {
         val attendeeRecord = context
             .insertInto(ATTENDEE, ATTENDEE.AVAILABILITY, ATTENDEE.EVENT_ID, ATTENDEE.USER_ID)
-            .values(attendee.availability.name, attendee.eventId, attendee.user.id)
+            .values(attendee.availability, attendee.eventId, attendee.user.id)
             .returning(ATTENDEE.ID, ATTENDEE.AVAILABILITY, ATTENDEE.EVENT_ID, ATTENDEE.USER_ID)
             .fetchOne()
             ?: throw DataAccessException("Could not insert Attendee $attendee")
@@ -169,10 +169,7 @@ class AttendeeRepository(
 
     fun updateAvailability(attendeeId: Long, availability: Availability): Boolean = context
         .update(ATTENDEE)
-        .set(
-            ATTENDEE.AVAILABILITY,
-            availability.name
-        )
+        .set(ATTENDEE.AVAILABILITY, availability)
         .where(ATTENDEE.ID.eq(attendeeId))
         .execute() == 1
 }

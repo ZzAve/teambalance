@@ -1,10 +1,10 @@
 package nl.jvandis.teambalance.api.bank
 
+import nl.jvandis.jooq.support.valuesFrom
 import nl.jvandis.teambalance.api.attendees.BankAccountAliasWithUserRecordHandler
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.BANK_ACCOUNT_ALIAS
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
-import nl.jvandis.teambalance.data.valuesFrom
 import org.jooq.DSLContext
 import org.jooq.Record1
 import org.jooq.exception.DataAccessException

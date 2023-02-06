@@ -1,11 +1,11 @@
 package nl.jvandis.teambalance.api.training
 
+import nl.jvandis.jooq.support.getField
+import nl.jvandis.jooq.support.getFieldOrThrow
 import nl.jvandis.teambalance.api.match.TeamEventTableAndRecordHandler
 import nl.jvandis.teambalance.api.match.TeamEventsRepository
 import nl.jvandis.teambalance.api.match.findAllWithStartTimeAfterImpl
 import nl.jvandis.teambalance.api.users.User
-import nl.jvandis.teambalance.data.getField
-import nl.jvandis.teambalance.data.getFieldOrThrow
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.TRAINING
@@ -118,6 +118,6 @@ class TrainingRepository(
     }
 
     override fun findAll(): List<Training> {
-        return findAllWithStartTimeAfter(LocalDateTime.MIN, Pageable.unpaged()).content
+        return findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
     }
 }

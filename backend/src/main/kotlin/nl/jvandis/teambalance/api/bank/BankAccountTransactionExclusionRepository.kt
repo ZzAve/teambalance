@@ -1,8 +1,8 @@
 package nl.jvandis.teambalance.api.bank
 
+import nl.jvandis.jooq.support.valuesFrom
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.TRANSACTION_EXCLUSION
-import nl.jvandis.teambalance.data.valuesFrom
 import org.jooq.DSLContext
 import org.jooq.exception.DataAccessException
 import org.springframework.stereotype.Repository

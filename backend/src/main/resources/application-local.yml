@@ -40,5 +40,4 @@ spring:
 
 logging:
   level:
-#    org.jooq: debug
-    org.jooq: info
+    org.jooq: debug
