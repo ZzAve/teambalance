@@ -100,7 +100,6 @@ const updateMatch: (props: {
 };
 
 const updateCoach = (props: { id: number; coach: string }) => {
-  debugger;
   return matchesClient.callWithBody(
     `matches/${props.id}`,
     {
