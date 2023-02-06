@@ -2,7 +2,6 @@ package nl.jvandis.teambalance.api.attendees
 
 import nl.jvandis.teambalance.api.bank.BankAccountAlias
 import nl.jvandis.teambalance.api.match.TeamBalanceRecordHandler
-import nl.jvandis.teambalance.api.users.JooqUser
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.data.getFieldOrThrow
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.BankAccountAliasRecord
@@ -36,10 +35,9 @@ class BankAccountAliasWithUserRecordHandler : TeamBalanceRecordHandler<BankAccou
         }
     }
 
-
     fun stats(): String {
         return """
-            Nr of records handled: ${recordsHandled}. 
+            Nr of records handled: $recordsHandled. 
             Nr of bankAccountAliases Created: ${bankAccountAliasRecords.size}. 
             Nr of users created: ${userRecords.size}"
         """.trimIndent()
@@ -61,11 +59,6 @@ fun BankAccountAliasRecord.toBankAccountAlias(uzerRecord: UzerRecord): BankAccou
     return BankAccountAlias(
         id = getFieldOrThrow(BANK_ACCOUNT_ALIAS.ID),
         alias = getFieldOrThrow(BANK_ACCOUNT_ALIAS.ALIAS),
-        user = uzerRecord.toUser()
+        user = uzerRecord.into(User::class.java)
     )
-
-}
-
-fun UzerRecord.toUser(): User {
-    return into(JooqUser::class.java).toUser()
 }

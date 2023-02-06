@@ -5,8 +5,8 @@ import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMatchException
 import nl.jvandis.teambalance.api.InvalidUserException
-import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
+import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.attendees.expose
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
 import nl.jvandis.teambalance.api.training.UserAddRequest
@@ -72,7 +72,8 @@ class MatchController(
         totalSize = totalElements,
         page = number + 1,
         size = min(size, content.size),
-        matches = content.map { it.expose(includeInactiveUsers) })
+        matches = content.map { it.expose(includeInactiveUsers) }
+    )
 
     @GetMapping("/{match-id}")
     fun getMatch(

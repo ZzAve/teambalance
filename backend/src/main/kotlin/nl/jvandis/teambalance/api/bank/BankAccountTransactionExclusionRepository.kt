@@ -38,11 +38,13 @@ class BankAccountTransactionExclusionRepository(private val context: DSLContext)
             TRANSACTION_EXCLUSION.COUNTER_PARTY,
             TRANSACTION_EXCLUSION.DESCRIPTION
         )
-            .valuesFrom(transactionExclusions,
+            .valuesFrom(
+                transactionExclusions,
                 { it.date },
                 { it.transactionId },
                 { it.counterParty },
-                { it.description })
+                { it.description }
+            )
             .returningResult(TRANSACTION_EXCLUSION.fields().toList())
             .fetch()
             .into(TransactionExclusion::class.java)
@@ -59,11 +61,13 @@ class BankAccountTransactionExclusionRepository(private val context: DSLContext)
     }
 
     fun deleteById(transactionExclusionId: Long) {
-        if (transactionExclusionId == NO_ID) throw IllegalStateException(
-            "TransactionExclusion with 'special' id $NO_ID can not be deleted. "
-                    + "The special no id serves a special purpose in transforming items "
-                    + "from records to entities and back"
-        )
+        if (transactionExclusionId == NO_ID) {
+            throw IllegalStateException(
+                "TransactionExclusion with 'special' id $NO_ID can not be deleted. " +
+                    "The special no id serves a special purpose in transforming items " +
+                    "from records to entities and back"
+            )
+        }
         val execute = context.deleteFrom(TRANSACTION_EXCLUSION)
             .where(TRANSACTION_EXCLUSION.ID.eq(transactionExclusionId))
             .execute()

@@ -1,16 +1,16 @@
 package nl.jvandis.teambalance
 
-import nl.jvandis.teambalance.api.attendees.Availability
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
+import nl.jvandis.teambalance.api.attendees.Availability
 import nl.jvandis.teambalance.api.bank.BankAccountAlias
 import nl.jvandis.teambalance.api.bank.BankAccountAliasRepository
 import nl.jvandis.teambalance.api.bank.BankAccountTransactionExclusionRepository
 import nl.jvandis.teambalance.api.bank.TransactionExclusion
-import nl.jvandis.teambalance.api.match.MatchRepository
 import nl.jvandis.teambalance.api.match.Match
-import nl.jvandis.teambalance.api.training.TrainingRepository
+import nl.jvandis.teambalance.api.match.MatchRepository
 import nl.jvandis.teambalance.api.training.Training
+import nl.jvandis.teambalance.api.training.TrainingRepository
 import nl.jvandis.teambalance.api.users.Role
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.api.users.UserRepository

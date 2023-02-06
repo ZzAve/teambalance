@@ -16,5 +16,4 @@ abstract class Event(
         val location: String,
         val comment: String?
     )
-
 }

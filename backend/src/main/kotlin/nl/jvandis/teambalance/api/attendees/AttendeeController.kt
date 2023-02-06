@@ -10,7 +10,6 @@ import nl.jvandis.teambalance.api.event.EventRepository
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.NO_CONTENT
@@ -82,7 +81,7 @@ class AttendeeController(
         val user = userRepository.findByIdOrNull(potentialAttendee.userId)
             ?: throw InvalidUserException(potentialAttendee.userId)
 
-        if (!eventRepository.exists(potentialAttendee.eventId)){
+        if (!eventRepository.exists(potentialAttendee.eventId)) {
             throw InvalidTrainingException(potentialAttendee.eventId)
         }
 
@@ -99,7 +98,10 @@ class AttendeeController(
         }
     }
 
-    @Deprecated("Superseded by PUT api/attendees/{id}/availability", replaceWith = ReplaceWith("updateAttendeeAvailability"))
+    @Deprecated(
+        "Superseded by PUT api/attendees/{id}/availability",
+        replaceWith = ReplaceWith("updateAttendeeAvailability")
+    )
     @PutMapping("{id}")
     fun updateAttendee(
         @PathVariable("id") attendeeId: Long,

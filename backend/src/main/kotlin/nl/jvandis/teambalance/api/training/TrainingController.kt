@@ -5,8 +5,8 @@ import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
-import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
+import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.attendees.toResponse
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
 import nl.jvandis.teambalance.api.users.User
@@ -82,7 +82,8 @@ class TrainingController(
         totalSize = totalElements,
         page = number + 1,
         size = min(size, content.size),
-        trainings = content.map { it.expose(includeInactiveUsers) })
+        trainings = content.map { it.expose(includeInactiveUsers) }
+    )
 
     @GetMapping("/{training-id}")
     fun getTraining(

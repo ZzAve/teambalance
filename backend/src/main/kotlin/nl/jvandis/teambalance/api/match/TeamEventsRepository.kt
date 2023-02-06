@@ -31,12 +31,11 @@ interface TeamEventsRepository<T : Event> {
     fun insert(event: T): T
 }
 
-
 inline fun <reified EVENT : Event> findAllWithStartTimeAfterImpl(
     context: DSLContext,
     since: LocalDateTime,
     pageable: Pageable,
-    entity: EntityMap<EVENT>
+    entity: TeamEventTableAndRecordHandler<EVENT>
 ): Page<EVENT> {
     val totalCount = eventsCount(context, since, pageable, entity)
     val events = eventsOfType(context, since, pageable, entity)
@@ -48,7 +47,7 @@ fun <EVENT : Event> eventsCount(
     context: DSLContext,
     since: LocalDateTime,
     pageable: Pageable,
-    entity: EntityMap<EVENT>
+    entity: TeamEventTableAndRecordHandler<EVENT>
 ): Int {
     val (table: Table<out Record>, idField: Field<Long?>) = entity
     return context
@@ -61,12 +60,11 @@ fun <EVENT : Event> eventsCount(
         ?: throw IllegalStateException("Could not perform 'count' on ${EVENT::class.simpleName} table, request params: {since:$since, pageable:$pageable}")
 }
 
-
 fun <EV : Event> eventsOfType(
     context: DSLContext,
     since: LocalDateTime,
     pageable: Pageable,
-    entity: EntityMap<EV>
+    entity: TeamEventTableAndRecordHandler<EV>
 ): List<EV> {
     val (table: Table<out Record>, idField: Field<Long?>, handlerFactory: () -> TeamBalanceRecordHandler<EV>) = entity
     val startTimeSort = EVENT.START_TIME.let {
@@ -93,9 +91,8 @@ fun <EV : Event> eventsOfType(
         .fetch().into(handlerFactory()).build()
 }
 
-
 // Fixme: naming, docs?
-data class EntityMap<OUT>(
+data class TeamEventTableAndRecordHandler<OUT>(
     val table: Table<out Record>,
     val idField: Field<Long?>,
     val handlerFactory: () -> TeamBalanceRecordHandler<OUT>

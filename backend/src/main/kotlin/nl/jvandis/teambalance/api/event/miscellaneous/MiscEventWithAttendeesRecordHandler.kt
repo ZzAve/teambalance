@@ -46,7 +46,7 @@ class MiscEventWithAttendeesRecordHandler : TeamBalanceRecordHandler<Miscellaneo
 
     fun stats(): String {
         return """
-            Nr of records handled: ${recordsHandled}. 
+            Nr of records handled: $recordsHandled. 
             Nr of events: ${events.size}. 
             Nr of subEvents: ${miscEvent.size}. 
             -- Attendees:

@@ -30,10 +30,6 @@ spring:
     url: jdbc:postgresql://localhost:54321/teambalance
   devtools:
     add-properties: true
-  jpa:
-    show-sql: true
-  liquibase:
-    enabled: false # FIXME remove me
   security:
     user:
       password: admin
@@ -44,4 +40,5 @@ spring:
 
 logging:
   level:
-    org.jooq: debug
+#    org.jooq: debug
+    org.jooq: info

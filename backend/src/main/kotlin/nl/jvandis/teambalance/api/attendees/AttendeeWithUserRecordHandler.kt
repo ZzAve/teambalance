@@ -1,7 +1,6 @@
 package nl.jvandis.teambalance.api.attendees
 
 import nl.jvandis.teambalance.api.match.TeamBalanceRecordHandler
-import nl.jvandis.teambalance.api.users.JooqUser
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.AttendeeRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
@@ -32,13 +31,11 @@ class AttendeeWithUserRecordHandler : TeamBalanceRecordHandler<Attendee> {
 
         val user = users.computeIfAbsent(userId) {
             r.into(UzerRecord::class.java)
-                .into(JooqUser::class.java)
-                .toUser()
+                .into(User::class.java)
         }
 
         attendee.user = user
     }
-
 
     fun getAttendees(): List<Attendee.Builder> {
         return attendees.values.toList()
@@ -46,7 +43,7 @@ class AttendeeWithUserRecordHandler : TeamBalanceRecordHandler<Attendee> {
 
     fun stats(): String {
         return """
-            Nr of records handled: ${recordsHandled}. 
+            Nr of records handled: $recordsHandled. 
             Nr of attendeesCreated: ${attendees.size}. 
             Nr of users created: ${users.size}"
         """.trimIndent()
@@ -59,6 +56,4 @@ class AttendeeWithUserRecordHandler : TeamBalanceRecordHandler<Attendee> {
             buildResult
         }
     }
-
-
 }

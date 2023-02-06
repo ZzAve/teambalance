@@ -19,26 +19,26 @@ data class Match(
     val attendees: List<Attendee>? = null
 ) : Event(id, startTime, location, comment) {
     constructor(startTime: LocalDateTime, location: String, comment: String?) :
-            this(
-                id = NO_ID,
-                startTime = startTime,
-                location = location,
-                comment = comment,
-                opponent = "opponent",
-                homeAway = Place.HOME,
-                coach = null
-            )
+        this(
+            id = NO_ID,
+            startTime = startTime,
+            location = location,
+            comment = comment,
+            opponent = "opponent",
+            homeAway = Place.HOME,
+            coach = null
+        )
 
     constructor(startTime: LocalDateTime, location: String, comment: String?, opponent: String, homeAway: Place) :
-            this(
-                id = NO_ID,
-                startTime = startTime,
-                location = location,
-                comment = comment,
-                opponent = opponent,
-                homeAway = homeAway,
-                coach = null
-            )
+        this(
+            id = NO_ID,
+            startTime = startTime,
+            location = location,
+            comment = comment,
+            opponent = opponent,
+            homeAway = homeAway,
+            coach = null
+        )
 
     fun createUpdatedMatch(updateMatchRequestBody: UpdateMatchRequest) = copy(
         startTime = updateMatchRequestBody.startTime ?: startTime,
@@ -72,6 +72,5 @@ data class Match(
                 attendees = attendees?.build()
             )
         }
-
     }
 }

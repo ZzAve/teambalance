@@ -26,7 +26,7 @@ data class Attendee(
         val userId: Long,
         val eventId: Long,
         val availability: Availability,
-        var user: User? = null,
+        var user: User? = null
     ) : TeamBalanceEntityBuilder<Attendee> {
         override fun build() = Attendee(
             id = id,

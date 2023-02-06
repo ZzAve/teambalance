@@ -46,7 +46,7 @@ class TrainingWithAttendeesRecordHandler : TeamBalanceRecordHandler<Training> {
 
     fun stats(): String {
         return """
-            Nr of records handled: ${recordsHandled}. 
+            Nr of records handled: $recordsHandled. 
             Nr of events: ${events.size}. 
             Nr of subEvents: ${trainings.size}. 
             -- Attendees:
@@ -65,6 +65,4 @@ class TrainingWithAttendeesRecordHandler : TeamBalanceRecordHandler<Training> {
         result = buildResult
         buildResult
     }
-
-
 }

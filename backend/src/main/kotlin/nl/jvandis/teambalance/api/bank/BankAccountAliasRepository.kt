@@ -43,9 +43,11 @@ class BankAccountAliasRepository(private val context: DSLContext) {
             BANK_ACCOUNT_ALIAS.USER_ID,
             BANK_ACCOUNT_ALIAS.ALIAS
         )
-            .valuesFrom(aliases,
+            .valuesFrom(
+                aliases,
                 { it.user.id },
-                { it.alias })
+                { it.alias }
+            )
             .returningResult(BANK_ACCOUNT_ALIAS.ID).fetch()
 
         val aliasesResult =
@@ -69,11 +71,13 @@ class BankAccountAliasRepository(private val context: DSLContext) {
     }
 
     fun deleteById(bankAccountAliasId: Long) {
-        if (bankAccountAliasId == NO_ID) throw IllegalStateException(
-            "User with 'special' id $NO_ID can not be deleted. "
-                    + "The special no id serves a special purpose in transforming items "
-                    + "from records to entities and back"
-        )
+        if (bankAccountAliasId == NO_ID) {
+            throw IllegalStateException(
+                "User with 'special' id $NO_ID can not be deleted. " +
+                    "The special no id serves a special purpose in transforming items " +
+                    "from records to entities and back"
+            )
+        }
         val execute = context.deleteFrom(BANK_ACCOUNT_ALIAS)
             .where(BANK_ACCOUNT_ALIAS.ID.eq(bankAccountAliasId))
             .execute()

@@ -19,5 +19,4 @@ class EventRepository(
             .fetchOne()
             ?.let { it.value1() == 1 }
             ?: false
-
 }

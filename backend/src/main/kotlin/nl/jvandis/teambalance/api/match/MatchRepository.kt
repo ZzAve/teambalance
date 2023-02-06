@@ -16,7 +16,7 @@ class MatchRepository(
     private val context: DSLContext
 ) : TeamEventsRepository<Match> {
 
-    private val entity = EntityMap(MATCH, MATCH.ID)  { MatchWithAttendeesRecordHandler() }
+    private val entity = TeamEventTableAndRecordHandler(MATCH, MATCH.ID) { MatchWithAttendeesRecordHandler() }
 
     override fun findAllWithStartTimeAfter(
         since: LocalDateTime,
@@ -55,8 +55,6 @@ class MatchRepository(
                 )
             }
             ?: throw DataAccessException("Could not insert Match")
-
-
     }
 
     // TODO: do smarter updates ? Only update changed fields or something. Or do change whole record?
@@ -79,9 +77,8 @@ class MatchRepository(
             .execute()
             .let { if (it != 1) throw DataAccessException("Could not update Match. MatchRecord was not updated") }
 
-        return event;
+        return event
     }
-
 
     override fun findByIdOrNull(eventId: Long): Match? = context
         .select()

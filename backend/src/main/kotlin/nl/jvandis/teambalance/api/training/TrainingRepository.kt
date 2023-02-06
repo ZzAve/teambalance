@@ -1,6 +1,6 @@
 package nl.jvandis.teambalance.api.training
 
-import nl.jvandis.teambalance.api.match.EntityMap
+import nl.jvandis.teambalance.api.match.TeamEventTableAndRecordHandler
 import nl.jvandis.teambalance.api.match.TeamEventsRepository
 import nl.jvandis.teambalance.api.match.findAllWithStartTimeAfterImpl
 import nl.jvandis.teambalance.api.users.User
@@ -22,7 +22,7 @@ class TrainingRepository(
     private val context: DSLContext
 ) : TeamEventsRepository<Training> {
 
-    private val entity = EntityMap(TRAINING, TRAINING.ID) { TrainingWithAttendeesRecordHandler() }
+    private val entity = TeamEventTableAndRecordHandler(TRAINING, TRAINING.ID) { TrainingWithAttendeesRecordHandler() }
     override fun findAllWithStartTimeAfter(
         since: LocalDateTime,
         pageable: Pageable,
@@ -67,7 +67,7 @@ class TrainingRepository(
             .where(EVENT.ID.eq(eventId))
             .execute() == 1
 
-        //FIXME: if one of the two fails, you want to rollback.. how?
+        // FIXME: if one of the two fails, you want to rollback.. how?
         return trainingDeleteSuccess && eventDeleteSuccess
     }
 
@@ -114,10 +114,10 @@ class TrainingRepository(
             .let { if (it != 1) throw DataAccessException("Could not update Training. TrainingRecord not updated") }
 
         // okay? or fetch from db the result?
-        return event;
+        return event
     }
 
     override fun findAll(): List<Training> {
-        return findAllWithStartTimeAfter(LocalDateTime.MIN, Pageable.unpaged()).content;
+        return findAllWithStartTimeAfter(LocalDateTime.MIN, Pageable.unpaged()).content
     }
 }

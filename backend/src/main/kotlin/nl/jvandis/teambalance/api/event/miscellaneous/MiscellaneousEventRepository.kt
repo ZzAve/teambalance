@@ -1,6 +1,6 @@
 package nl.jvandis.teambalance.api.event.miscellaneous
 
-import nl.jvandis.teambalance.api.match.EntityMap
+import nl.jvandis.teambalance.api.match.TeamEventTableAndRecordHandler
 import nl.jvandis.teambalance.api.match.TeamEventsRepository
 import nl.jvandis.teambalance.api.match.findAllWithStartTimeAfterImpl
 import nl.jvandis.teambalance.data.getField
@@ -19,7 +19,7 @@ class MiscellaneousEventRepository(
     private val context: DSLContext
 ) : TeamEventsRepository<MiscellaneousEvent> {
 
-    private val entity = EntityMap(MISCELLANEOUS_EVENT , MISCELLANEOUS_EVENT.ID) { MiscEventWithAttendeesRecordHandler() }
+    private val entity = TeamEventTableAndRecordHandler(MISCELLANEOUS_EVENT, MISCELLANEOUS_EVENT.ID) { MiscEventWithAttendeesRecordHandler() }
 
     override fun findAllWithStartTimeAfter(
         since: LocalDateTime,
@@ -94,6 +94,6 @@ class MiscellaneousEventRepository(
             .execute()
             .let { if (it != 1) throw DataAccessException("Could not update MiscEvent. MiscEventRecord was not updated") }
 
-        return event;
+        return event
     }
 }

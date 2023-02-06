@@ -17,13 +17,13 @@ data class Training(
     val attendees: List<Attendee>? = null
 ) : Event(id, startTime, location, comment) {
     constructor(startTime: LocalDateTime, location: String, comment: String? = null, trainer: User? = null) :
-            this(
-                id = NO_ID,
-                startTime = startTime,
-                location = location,
-                comment = comment,
-                trainer = trainer
-            )
+        this(
+            id = NO_ID,
+            startTime = startTime,
+            location = location,
+            comment = comment,
+            trainer = trainer
+        )
 
     fun createUpdatedTraining(updateTrainingRequestBody: UpdateTrainingRequest) = copy(
         startTime = updateTrainingRequestBody.startTime ?: startTime,
@@ -45,7 +45,7 @@ data class Training(
 
             // TODO: Trainer can be someone that is not an attendee.
             //  This should be changed in the datamodel, as trainer should be part of the attendees!
-            //check(trainerUserId == trainer?.id) { "Trainer does does not match the `trainerUserId` property" }
+            // check(trainerUserId == trainer?.id) { "Trainer does does not match the `trainerUserId` property" }
 
             return Training(
                 id = event.id,
@@ -58,5 +58,3 @@ data class Training(
         }
     }
 }
-
-

@@ -31,12 +31,12 @@ data class MiscellaneousEvent(
         title = updateEventRequest.title ?: title
     )
 
-    data class Builder (
+    data class Builder(
         val id: Long,
         val title: String?,
         var event: Event.Builder?,
         var attendees: List<Attendee.Builder>?
-    ): TeamBalanceEntityBuilder<MiscellaneousEvent>{
+    ) : TeamBalanceEntityBuilder<MiscellaneousEvent> {
         override fun build(): MiscellaneousEvent {
             val event = checkNotNull(event) { "Event was not set" }
             check(id == event.id) { "Event id does not match (`id` != event.id)" }
@@ -49,8 +49,6 @@ data class MiscellaneousEvent(
                 title = title,
                 attendees = attendees?.build()
             )
-
         }
-
     }
 }

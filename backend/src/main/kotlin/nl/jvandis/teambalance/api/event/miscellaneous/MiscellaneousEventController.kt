@@ -125,7 +125,6 @@ class MiscellaneousEventController(
             throw CreateEventException("Not all requested userIds exists unfortunately ${potentialEvent.userIds}. Please verify your userIds")
         }
 
-
         val savedEvent = eventRepository.insert(event)
         val attendees = requestedUsersToAdd.map { it.toNewAttendee(savedEvent) }
         val savedAttendees = attendeeRepository.insertMany(attendees)
@@ -197,5 +196,3 @@ class MiscellaneousEventController(
         }
     }
 }
-
-

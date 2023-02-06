@@ -50,7 +50,7 @@ fun <U, R : Record, T1, T2, T3> InsertValuesStep3<R, T1, T2, T3>.valuesFrom(
     data: List<U>,
     t1Mapper: (t: U) -> T1,
     t2Mapper: (t: U) -> T2,
-    t3Mapper: (t: U) -> T3,
+    t3Mapper: (t: U) -> T3
 ): InsertValuesStep3<R, T1, T2, T3> = apply {
     data.forEach { values(t1Mapper(it), t2Mapper(it), t3Mapper(it)) }
 }
@@ -60,7 +60,7 @@ fun <U, R : Record, T1, T2, T3, T4> InsertValuesStep4<R, T1, T2, T3, T4>.valuesF
     t1Mapper: (t: U) -> T1,
     t2Mapper: (t: U) -> T2,
     t3Mapper: (t: U) -> T3,
-    t4Mapper: (t: U) -> T4,
+    t4Mapper: (t: U) -> T4
 ): InsertValuesStep4<R, T1, T2, T3, T4> = apply {
     data.forEach { values(t1Mapper(it), t2Mapper(it), t3Mapper(it), t4Mapper(it)) }
 }
@@ -71,7 +71,7 @@ fun <U, R : Record, T1, T2, T3, T4, T5> InsertValuesStep5<R, T1, T2, T3, T4, T5>
     t2Mapper: (t: U) -> T2,
     t3Mapper: (t: U) -> T3,
     t4Mapper: (t: U) -> T4,
-    t5Mapper: (t: U) -> T5,
+    t5Mapper: (t: U) -> T5
 ): InsertValuesStep5<R, T1, T2, T3, T4, T5> = apply {
     data.forEach { values(t1Mapper(it), t2Mapper(it), t3Mapper(it), t4Mapper(it), t5Mapper(it)) }
 }
@@ -83,7 +83,7 @@ fun <U, R : Record, T1, T2, T3, T4, T5, T6> InsertValuesStep6<R, T1, T2, T3, T4,
     t3Mapper: (t: U) -> T3,
     t4Mapper: (t: U) -> T4,
     t5Mapper: (t: U) -> T5,
-    t6Mapper: (t: U) -> T6,
+    t6Mapper: (t: U) -> T6
 ): InsertValuesStep6<R, T1, T2, T3, T4, T5, T6> = apply {
     data.forEach { values(t1Mapper(it), t2Mapper(it), t3Mapper(it), t4Mapper(it), t5Mapper(it), t6Mapper(it)) }
 }

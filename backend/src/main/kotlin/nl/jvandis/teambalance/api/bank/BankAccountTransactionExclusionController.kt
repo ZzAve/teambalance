@@ -30,8 +30,7 @@ class BankAccountTransactionExclusionController(
     private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
-    fun getTransactionExclusions(
-    ): TransactionExclusions {
+    fun getTransactionExclusions(): TransactionExclusions {
         log.debug("getTransactionExclusion")
 
         return TransactionExclusions(transactionExclusionRepository.findAll())
@@ -39,7 +38,7 @@ class BankAccountTransactionExclusionController(
 
     @GetMapping("/{id}")
     fun getTransactionExclusion(
-        @PathVariable(value = "id") transactionExclusionId: Long,
+        @PathVariable(value = "id") transactionExclusionId: Long
     ): TransactionExclusion {
         log.debug("getTransactionExclusion $transactionExclusionId")
 
@@ -49,7 +48,7 @@ class BankAccountTransactionExclusionController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun postTransactionExclusion(
-        @RequestBody potentialTransactionExclusion: PotentialTransactionExclusion,
+        @RequestBody potentialTransactionExclusion: PotentialTransactionExclusion
     ) {
         log.debug("postTransactionExclusion $potentialTransactionExclusion")
 
@@ -60,7 +59,7 @@ class BankAccountTransactionExclusionController(
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun deleteTransactionExclusion(
-        @PathVariable(value = "id") transactionExclusionId: Long,
+        @PathVariable(value = "id") transactionExclusionId: Long
     ) {
         log.debug("deleting transactionExclusion: $transactionExclusionId")
 

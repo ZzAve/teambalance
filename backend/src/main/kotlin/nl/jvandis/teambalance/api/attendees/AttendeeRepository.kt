@@ -1,6 +1,5 @@
 package nl.jvandis.teambalance.api.attendees
 
-import nl.jvandis.teambalance.api.users.JooqUser
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
@@ -8,9 +7,9 @@ import nl.jvandis.teambalance.data.jooq.schema.tables.references.ATTENDEE
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
 import nl.jvandis.teambalance.data.valuesFrom
-import org.jooq.*
+import org.jooq.DSLContext
+import org.jooq.Record1
 import org.jooq.exception.DataAccessException
-import org.jooq.impl.*
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Repository
@@ -21,9 +20,9 @@ class AttendeeRepository(
 ) {
     private val log = LoggerFactory.getLogger(AttendeeRepository::class.java)
 
-
     fun findAllByEventIdIn(
-        eventIds: List<Long>, sort: Sort = Sort.by("user.role", "user.name")
+        eventIds: List<Long>,
+        sort: Sort = Sort.by("user.role", "user.name")
     ): List<Attendee> {
         val fetch = context.select()
             .from(ATTENDEE)
@@ -36,7 +35,6 @@ class AttendeeRepository(
             .fetchInto(AttendeeWithUserRecordHandler())
 
         return fetch.build()
-
     }
 
     fun insertMany(attendees: List<Attendee>): List<Attendee> {
@@ -79,8 +77,7 @@ class AttendeeRepository(
             .fetchOne()
             ?.run {
                 into(UzerRecord::class.java)
-                    .into(JooqUser::class.java)
-                    .toUser()
+                    .into(User::class.java)
             }
             ?: throw DataAccessException("User with id ${attendeeRecord.userId} doesn't exist. ")
 
@@ -90,13 +87,11 @@ class AttendeeRepository(
             .build()
     }
 
-
     fun deleteAll(attendees: List<Attendee>): Int = context
         .also { log.info("Deleting attendees: $attendees") }
         .deleteFrom(ATTENDEE)
         .where(ATTENDEE.ID.`in`(attendees.map { it.id }))
         .execute()
-
 
     fun findAll(): List<Attendee> =
         context.select()
@@ -159,11 +154,13 @@ class AttendeeRepository(
     }
 
     fun deleteById(id: Long) {
-        if (id == NO_ID) throw IllegalStateException(
-            "Attendee with 'special' id $NO_ID can not be deleted. "
-                    + "The special no id serves a special purpose in transforming items "
-                    + "from records to entities and back"
-        )
+        if (id == NO_ID) {
+            throw IllegalStateException(
+                "Attendee with 'special' id $NO_ID can not be deleted. " +
+                    "The special no id serves a special purpose in transforming items " +
+                    "from records to entities and back"
+            )
+        }
         val execute = context.delete(ATTENDEE).where(ATTENDEE.ID.eq(id)).execute()
         if (execute != 1) {
             throw DataAccessException("Removed $execute attendees, expected to remove only 1")
@@ -180,14 +177,3 @@ class AttendeeRepository(
         .execute() == 1
 }
 
-fun JooqUser.toUser(): User {
-    return User(
-        id = id,
-        name = name,
-        role = role,
-        isActive = isActive,
-        jerseyNumber = jerseyNumber,
-        showForTrainings = showForTrainings,
-        showForMatches = showForMatches
-    )
-}

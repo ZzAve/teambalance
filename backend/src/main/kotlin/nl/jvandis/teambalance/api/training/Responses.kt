@@ -1,7 +1,7 @@
 package nl.jvandis.teambalance.api.training
 
-import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.attendees.Attendee
+import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.attendees.expose
 import nl.jvandis.teambalance.api.users.User
 import java.time.LocalDateTime
@@ -53,7 +53,8 @@ fun Training.expose() = expose(attendees ?: emptyList())
 fun Training.expose(includeInactiveUsers: Boolean) = expose(
     attendees
         ?.filter { a -> includeInactiveUsers || a.user.isActive }
-        ?: emptyList())
+        ?: emptyList()
+)
 fun Training.expose(attendees: List<Attendee>) = TrainingResponse(
     id = id,
     comment = comment,

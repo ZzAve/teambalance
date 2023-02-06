@@ -6,7 +6,6 @@ import kotlin.test.assertTrue
 
 class LiquibaseSupportTest {
 
-
     @Test
     fun `just testing`() {
     }
