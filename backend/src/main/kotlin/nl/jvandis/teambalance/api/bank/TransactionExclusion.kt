@@ -1,5 +1,6 @@
 package nl.jvandis.teambalance.api.bank
 
+import nl.jvandis.teambalance.data.NO_ID
 import org.springframework.data.jpa.repository.Temporal
 import java.time.LocalDate
 import javax.persistence.Column
@@ -19,7 +20,7 @@ data class TransactionExclusions(
 data class TransactionExclusion(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Long = NO_ID,
 
     @Temporal(TemporalType.DATE)
     @Column(nullable = true)
@@ -32,7 +33,7 @@ data class TransactionExclusion(
 ) {
 
     constructor(date: LocalDate? = null, transactionId: Int? = null, counterParty: String? = null, description: String? = null) : this(
-        0,
+        NO_ID,
         date,
         transactionId,
         counterParty,

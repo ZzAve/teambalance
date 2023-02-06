@@ -2,6 +2,8 @@ package nl.jvandis.teambalance.data
 
 import org.jooq.InsertValuesStep2
 import org.jooq.InsertValuesStep3
+import org.jooq.InsertValuesStep4
+import org.jooq.InsertValuesStep5
 import org.jooq.InsertValuesStep6
 import org.jooq.Record
 import org.jooq.TableField
@@ -51,6 +53,27 @@ fun <U, R : Record, T1, T2, T3> InsertValuesStep3<R, T1, T2, T3>.valuesFrom(
     t3Mapper: (t: U) -> T3,
 ): InsertValuesStep3<R, T1, T2, T3> = apply {
     data.forEach { values(t1Mapper(it), t2Mapper(it), t3Mapper(it)) }
+}
+
+fun <U, R : Record, T1, T2, T3, T4> InsertValuesStep4<R, T1, T2, T3, T4>.valuesFrom(
+    data: List<U>,
+    t1Mapper: (t: U) -> T1,
+    t2Mapper: (t: U) -> T2,
+    t3Mapper: (t: U) -> T3,
+    t4Mapper: (t: U) -> T4,
+): InsertValuesStep4<R, T1, T2, T3, T4> = apply {
+    data.forEach { values(t1Mapper(it), t2Mapper(it), t3Mapper(it), t4Mapper(it)) }
+}
+
+fun <U, R : Record, T1, T2, T3, T4, T5> InsertValuesStep5<R, T1, T2, T3, T4, T5>.valuesFrom(
+    data: List<U>,
+    t1Mapper: (t: U) -> T1,
+    t2Mapper: (t: U) -> T2,
+    t3Mapper: (t: U) -> T3,
+    t4Mapper: (t: U) -> T4,
+    t5Mapper: (t: U) -> T5,
+): InsertValuesStep5<R, T1, T2, T3, T4, T5> = apply {
+    data.forEach { values(t1Mapper(it), t2Mapper(it), t3Mapper(it), t4Mapper(it), t5Mapper(it)) }
 }
 
 fun <U, R : Record, T1, T2, T3, T4, T5, T6> InsertValuesStep6<R, T1, T2, T3, T4, T5, T6>.valuesFrom(

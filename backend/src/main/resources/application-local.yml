@@ -18,7 +18,8 @@ app:
         expire-after-write: 60s
         refresh-after-write: 30s
         maximum-size: 1
-
+  secret:
+    secret-value: teambalance
 spring:
   cloud:
     gcp:

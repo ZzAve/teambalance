@@ -12,6 +12,28 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class BankAccountAliasRepository(private val context: DSLContext) {
+    fun findAll(): List<BankAccountAlias> {
+        return context.select()
+            .from(BANK_ACCOUNT_ALIAS)
+            .leftJoin(UZER)
+            .on(BANK_ACCOUNT_ALIAS.USER_ID.eq(UZER.ID))
+            .fetchInto(BankAccountAliasWithUserRecordHandler())
+            .build()
+    }
+
+    fun findByIdOrNull(aliasId: Long): BankAccountAlias? =
+        context.select()
+            .from(BANK_ACCOUNT_ALIAS)
+            .leftJoin(UZER)
+            .on(BANK_ACCOUNT_ALIAS.USER_ID.eq(UZER.ID))
+            .where(BANK_ACCOUNT_ALIAS.ID.eq(aliasId))
+            .fetchInto(BankAccountAliasWithUserRecordHandler())
+            .build()
+            .also {
+                check(it.size < 2) { "Fetched more than 1 bankAccountAliases with the same id. Should not be possible!" }
+            }
+            .firstOrNull()
+
     fun insertMany(aliases: List<BankAccountAlias>): List<BankAccountAlias> {
         if (aliases.isEmpty()) {
             return emptyList()
@@ -41,28 +63,6 @@ class BankAccountAliasRepository(private val context: DSLContext) {
             throw DataAccessException("Could not insert aliases $aliases")
         }
     }
-
-    fun findAll(): List<BankAccountAlias> {
-        return context.select()
-            .from(BANK_ACCOUNT_ALIAS)
-            .leftJoin(UZER)
-            .on(BANK_ACCOUNT_ALIAS.USER_ID.eq(UZER.ID))
-            .fetchInto(BankAccountAliasWithUserRecordHandler())
-            .build()
-    }
-
-    fun findByIdOrNull(aliasId: Long): BankAccountAlias? =
-        context.select()
-            .from(BANK_ACCOUNT_ALIAS)
-            .leftJoin(UZER)
-            .on(BANK_ACCOUNT_ALIAS.USER_ID.eq(UZER.ID))
-            .where(BANK_ACCOUNT_ALIAS.ID.eq(aliasId))
-            .fetchInto(BankAccountAliasWithUserRecordHandler())
-            .build()
-            .also {
-                check(it.size < 2) { "Fetched more than 1 bankAccountAliases with the same id. Should not be possible!" }
-            }
-            .firstOrNull()
 
     fun insert(bankAccountAlias: BankAccountAlias): BankAccountAlias {
         return insertMany(listOf(bankAccountAlias)).first()

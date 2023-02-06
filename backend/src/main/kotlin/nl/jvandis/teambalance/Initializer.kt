@@ -68,7 +68,7 @@ class Initializer(
             val aliases = bankAccountAliasRepository.findAll()
             log.info("All aliases: {}", aliases)
 
-            bankAccountTransactionExclusionRepository.saveAll(
+            bankAccountTransactionExclusionRepository.insertMany(
                 listOf(
                     TransactionExclusion(counterParty = "CCV*BUITEN IN DE KUIL")
                 )
