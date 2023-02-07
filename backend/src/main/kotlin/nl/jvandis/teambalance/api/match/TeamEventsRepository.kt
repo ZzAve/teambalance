@@ -85,7 +85,7 @@ fun <EV : Event> eventsOfType(
         .leftJoin(UZER)
         .on(UZER.ID.eq(ATTENDEE.USER_ID))
         .where(EVENT.START_TIME.greaterOrEqual(since))
-        .orderBy(startTimeSort, EVENT.ID.desc())
+        .orderBy(startTimeSort, UZER.ROLE, UZER.NAME, EVENT.ID.desc())
         .offset(offsetOrDefault(pageable))
         .limit(limitOrDefault(pageable))
         .fetch().into(handlerFactory()).build()
