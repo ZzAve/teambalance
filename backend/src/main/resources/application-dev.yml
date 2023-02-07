@@ -4,8 +4,6 @@ app:
       saveSessionToFile: true
 
 spring:
-  jpa:
-    show-sql: true
   datasource:
     username: ${sm://DB_USERNAME_DEV}
     password: ${sm://DB_PASSWORD_DEV}

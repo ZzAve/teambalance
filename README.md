@@ -111,7 +111,7 @@ The frontend includes an authentication flow as well to prevent nosy neighbours 
 Backend app
 
 - Spring boot
-- Spring data (JPA)
+- Spring data (with JOOQ)
 - Spring security
 - Kotlin
 
@@ -142,14 +142,15 @@ Through the [google cloud conseple](https://console.cloud.google.com/run/0), dep
 
 Teambalance makes use of a PostgreSQL database that sits in the cloud
 
-Using [Spring data](https://spring.io/projects/spring-data) and [Postgres](https://www.postgresql.org/) dependency:
+Using [JOOQ](https://www.jooq.org/) 
+(used to be [Spring data jpa](https://spring.io/projects/spring-data) )and [Postgres](https://www.postgresql.org/) dependency:
 
 ```xml
 
 <dependencies>
     <dependency>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
+        <artifactId>spring-boot-starter-jooq</artifactId>
     </dependency>
 
     <dependency>

@@ -8,10 +8,8 @@ import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.event.EventRepository
 import nl.jvandis.teambalance.api.users.UserRepository
-import nl.jvandis.teambalance.api.users.expose
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.NO_CONTENT
@@ -52,13 +50,13 @@ class AttendeeController(
                 eventIds,
                 userIds
             )
+
             eventIds.isNotEmpty() -> attendeeRepository.findAllByEventIdIn(eventIds)
             else -> attendeeRepository.findAllByUserIdIn(userIds)
         }
 
         return attendees
-            .filterNotNull()
-            .map { it.toResponse() }
+            .map(Attendee::expose)
             .let(::AttendeesResponse)
     }
 
@@ -83,14 +81,15 @@ class AttendeeController(
         val user = userRepository.findByIdOrNull(potentialAttendee.userId)
             ?: throw InvalidUserException(potentialAttendee.userId)
 
-        val event = eventRepository.findByIdOrNull(potentialAttendee.eventId)
-            ?: throw InvalidTrainingException(potentialAttendee.eventId)
+        if (!eventRepository.exists(potentialAttendee.eventId)) {
+            throw InvalidTrainingException(potentialAttendee.eventId)
+        }
 
         return try {
-            attendeeRepository.save(
+            attendeeRepository.insert(
                 Attendee(
                     user = user,
-                    event = event,
+                    eventId = potentialAttendee.eventId,
                     availability = potentialAttendee.state
                 )
             ).toResponse()
@@ -99,19 +98,32 @@ class AttendeeController(
         }
     }
 
+    @Deprecated(
+        "Superseded by PUT api/attendees/{id}/availability",
+        replaceWith = ReplaceWith("updateAttendeeAvailability")
+    )
     @PutMapping("{id}")
     fun updateAttendee(
         @PathVariable("id") attendeeId: Long,
         @RequestBody attendeeStateUpdate: AttendeeStateUpdate
     ): AttendeeResponse {
-        val attendee = attendeeRepository.findByIdOrNull(attendeeId)
-            ?: throw InvalidAttendeeException(attendeeId)
+        return updateAttendeeAvailability(attendeeId, attendeeStateUpdate)
+    }
 
-        val updatedAttendee = attendee.let {
-            attendeeRepository.save(it.copy(availability = attendeeStateUpdate.availability))
+    @PutMapping("{id}/availability")
+    fun updateAttendeeAvailability(
+        @PathVariable("id") attendeeId: Long,
+        @RequestBody attendeeStateUpdate: AttendeeStateUpdate
+    ): AttendeeResponse {
+        val success = attendeeRepository
+            .updateAvailability(attendeeId, attendeeStateUpdate.availability)
+
+        if (!success) {
+            throw IllegalStateException("Could not update Attendee state with id $attendeeId.")
         }
-
-        return updatedAttendee.toResponse()
+        return attendeeRepository.findByIdOrNull(attendeeId)
+            ?.toResponse()
+            ?: throw AttendeeNotFoundException(attendeeId, -1L)
     }
 
     @ResponseStatus(NO_CONTENT)
@@ -139,14 +151,6 @@ class AttendeeController(
             }
             ?: throw AttendeeNotFoundException(userId, eventId)
     }
-
-    private fun Attendee.toResponse() =
-        AttendeeResponse(
-            id = id,
-            eventId = event.id,
-            user = user.expose(),
-            state = availability
-        )
 
     @ExceptionHandler(AttendeeNotFoundException::class)
     fun attendeeNotFoundException(e: AttendeeNotFoundException) = ResponseEntity.status(NOT_FOUND)

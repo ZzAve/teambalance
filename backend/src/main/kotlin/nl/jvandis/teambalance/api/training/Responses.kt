@@ -49,9 +49,12 @@ data class TrainingResponse(
     val attendees: List<AttendeeResponse>,
     val trainer: User?
 )
-
-fun Training.toResponse(attendees: List<Attendee>) = expose(attendees)
-fun Training.externalizeWithAttendees(attendees: List<Attendee>) = expose(attendees)
+fun Training.expose() = expose(attendees ?: emptyList())
+fun Training.expose(includeInactiveUsers: Boolean) = expose(
+    attendees
+        ?.filter { a -> includeInactiveUsers || a.user.isActive }
+        ?: emptyList()
+)
 fun Training.expose(attendees: List<Attendee>) = TrainingResponse(
     id = id,
     comment = comment,

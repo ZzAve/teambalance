@@ -18,7 +18,8 @@ app:
         expire-after-write: 60s
         refresh-after-write: 30s
         maximum-size: 1
-
+  secret:
+    secret-value: teambalance
 spring:
   cloud:
     gcp:
@@ -29,9 +30,6 @@ spring:
     url: jdbc:postgresql://localhost:54321/teambalance
   devtools:
     add-properties: true
-  jpa:
-    show-sql: true
-
   security:
     user:
       password: admin
@@ -39,3 +37,7 @@ spring:
       roles:
         - admin
         - user
+
+logging:
+  level:
+    org.jooq: debug

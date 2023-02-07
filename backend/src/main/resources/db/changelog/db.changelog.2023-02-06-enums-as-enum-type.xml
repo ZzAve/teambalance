@@ -1,0 +1,27 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="juliusvandis (generated)" id="1675716081000-1">
+        <sql>CREATE TYPE availability AS ENUM ('PRESENT','ABSENT','UNCERTAIN','NOT_RESPONDED')</sql>
+    </changeSet>
+
+
+    <changeSet author="juliusvandis (generated)" id="1675716081000-2">
+        <modifyDataType columnName="availability"
+                        newDataType="availability"
+                        schemaName="public"
+                        tableName="attendee"/>
+    </changeSet>
+
+    <changeSet author="juliusvandis (generated)" id="1675716081000-3">
+        <sql>CREATE TYPE role AS ENUM ( 'TRAINER', 'COACH', 'SETTER', 'MID', 'DIAGONAL', 'PASSER', 'OTHER')</sql>
+    </changeSet>
+
+    <changeSet author="juliusvandis (generated)" id="1675716081000-4">
+        <modifyDataType columnName="role"
+                        newDataType="role"
+                        schemaName="public"
+                        tableName="uzer"/>
+    </changeSet>
+</databaseChangeLog>

@@ -62,7 +62,7 @@ class UserController(
         log.debug("postUser $potentialUser")
 
         val user = potentialUser.internalize()
-        userRepository.save(user)
+        userRepository.insert(user)
     }
 
     @Admin
@@ -94,7 +94,7 @@ class UserController(
         )
 
         return try {
-            userRepository.save(updatedUser)
+            userRepository.update(updatedUser)
         } catch (e: DataIntegrityViolationException) {
             throw DataConstraintViolationException("Could not update user $userId to $potentialUserUpdate, name already in use")
         }

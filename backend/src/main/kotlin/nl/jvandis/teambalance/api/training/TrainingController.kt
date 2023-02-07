@@ -5,12 +5,13 @@ import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
-import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
+import nl.jvandis.teambalance.api.attendees.AttendeeResponse
+import nl.jvandis.teambalance.api.attendees.toResponse
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.api.users.UserRepository
-import nl.jvandis.teambalance.api.users.toAttendee
+import nl.jvandis.teambalance.api.users.toNewAttendee
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
@@ -69,7 +70,6 @@ class TrainingController(
 
         return getEventsAndAttendees(
             eventsRepository = eventRepository,
-            attendeeRepository = attendeeRepository,
             page = page,
             limit = limit,
             since = since,
@@ -77,23 +77,13 @@ class TrainingController(
         ).toResponse(includeInactiveUsers)
     }
 
-    private fun Pair<Page<Training>, Map<Long, List<Attendee>>>.toResponse(includeInactiveUsers: Boolean): TrainingsResponse {
-        val trainingsPage = first
-        val attendees = second
-
-        return TrainingsResponse(
-            totalPages = trainingsPage.totalPages,
-            totalSize = trainingsPage.totalElements,
-            page = trainingsPage.number + 1,
-            size = min(trainingsPage.size, trainingsPage.content.size),
-            trainings = trainingsPage.content.map { t ->
-                val relevantAttendees = attendees[t.id]
-                    ?.filter { a -> a.user.isActive || includeInactiveUsers }
-                    ?: emptyList()
-                t.externalizeWithAttendees(relevantAttendees)
-            }
-        )
-    }
+    private fun Page<Training>.toResponse(includeInactiveUsers: Boolean) = TrainingsResponse(
+        totalPages = totalPages,
+        totalSize = totalElements,
+        page = number + 1,
+        size = min(size, content.size),
+        trainings = content.map { it.expose(includeInactiveUsers) }
+    )
 
     @GetMapping("/{training-id}")
     fun getTraining(
@@ -123,9 +113,10 @@ class TrainingController(
     ): TrainingResponse {
         log.debug("postTraining $potentialEvent")
         val allUsers = userRepository.findAll()
+        val training = potentialEvent.internalize()
 
-        val requestedUsersToAdd = allUsers.filter {
-            potentialEvent.userIds?.any { a -> a == it.id }
+        val requestedUsersToAdd = allUsers.filter { user ->
+            potentialEvent.userIds?.any { it == user.id }
                 ?: true
         }
 
@@ -135,13 +126,11 @@ class TrainingController(
             throw CreateEventException("Not all requested userIds exists unfortunately ${potentialEvent.userIds}. Please verify your userIds")
         }
 
-        val training = potentialEvent.internalize()
-        val savedTraining = eventRepository.save(training)
+        val savedTraining = eventRepository.insert(training)
+        val attendees = requestedUsersToAdd.map { it.toNewAttendee(savedTraining) }
+        val savedAttendees = attendeeRepository.insertMany(attendees)
 
-        val attendees = requestedUsersToAdd.map { it.toAttendee(training) }
-        val savedAttendees = attendeeRepository.saveAll(attendees).toList()
-
-        return savedTraining.externalizeWithAttendees(savedAttendees)
+        return savedTraining.expose(savedAttendees)
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -151,7 +140,7 @@ class TrainingController(
         @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,
         @RequestBody user: UserAddRequest
 
-    ): List<Attendee> {
+    ): List<AttendeeResponse> {
         log.debug("Adding: $user (or all: $addAll) to training $trainingId")
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
         val users = if (addAll) {
@@ -164,7 +153,7 @@ class TrainingController(
         }
 
         return users.map { u ->
-            attendeeRepository.save(u.toAttendee(training))
+            attendeeRepository.insert(u.toNewAttendee(training)).toResponse()
         }
     }
 
@@ -177,9 +166,9 @@ class TrainingController(
             .findByIdOrNull(trainingId)
             ?.let {
                 val updatedTraining = it.createUpdatedTraining(updateTrainingRequest)
-                eventRepository.save(updatedTraining)
+                eventRepository.update(updatedTraining)
             }
-            ?.externalizeWithAttendees(emptyList())
+            ?.expose(emptyList())
             ?: throw InvalidTrainingException(trainingId)
     }
 
@@ -195,9 +184,9 @@ class TrainingController(
                 val updatedTraining = it.copy(
                     trainer = potentialTrainer
                 )
-                eventRepository.save(updatedTraining)
+                eventRepository.update(updatedTraining)
             }
-            ?.externalizeWithAttendees(emptyList())
+            ?.expose(emptyList())
             ?: throw InvalidTrainingException(trainingId)
     }
 

@@ -13,3 +13,4 @@ src/main/webapp
 /cloud_sql_proxy
 
 .jpb
+.DS_STORE

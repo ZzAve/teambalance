@@ -7,9 +7,10 @@ import nl.jvandis.teambalance.api.bank.BankAccountAlias
 import nl.jvandis.teambalance.api.bank.BankAccountAliasRepository
 import nl.jvandis.teambalance.api.bank.BankAccountTransactionExclusionRepository
 import nl.jvandis.teambalance.api.bank.TransactionExclusion
-import nl.jvandis.teambalance.api.event.EventRepository
 import nl.jvandis.teambalance.api.match.Match
+import nl.jvandis.teambalance.api.match.MatchRepository
 import nl.jvandis.teambalance.api.training.Training
+import nl.jvandis.teambalance.api.training.TrainingRepository
 import nl.jvandis.teambalance.api.users.Role
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.api.users.UserRepository
@@ -24,7 +25,8 @@ import kotlin.random.Random
 // @Profile("dev", "local") // don't use class unless 'dev' profile is activated
 class Initializer(
     private val userRepository: UserRepository,
-    private val eventRepository: EventRepository,
+    private val trainingRepository: TrainingRepository,
+    private val matchRepository: MatchRepository,
     private val attendeeRepository: AttendeeRepository,
     private val bankAccountAliasRepository: BankAccountAliasRepository,
     private val bankAccountTransactionExclusionRepository: BankAccountTransactionExclusionRepository
@@ -36,7 +38,7 @@ class Initializer(
     @Bean
     fun initializeDatabase(): InitializingBean? {
         return InitializingBean {
-            userRepository.saveAll(
+            userRepository.insertMany(
                 listOf(
                     User("Julius", Role.DIAGONAL),
                     User("Maurice", Role.COACH),
@@ -49,11 +51,11 @@ class Initializer(
 
             log.info("After user injection")
             val users = userRepository.findAll()
-            log.info("All users: ", users)
+            log.info("All users: {}", users)
             addTrainings(users)
             addMatches(users)
 
-            bankAccountAliasRepository.saveAll(
+            bankAccountAliasRepository.insertMany(
                 listOf(
                     BankAccountAlias("J. van Dis", users.first { it.name == "Julius" }),
                     BankAccountAlias("J. Post", users.first { it.name == "Bocaj" }),
@@ -66,7 +68,7 @@ class Initializer(
             val aliases = bankAccountAliasRepository.findAll()
             log.info("All aliases: {}", aliases)
 
-            bankAccountTransactionExclusionRepository.saveAll(
+            bankAccountTransactionExclusionRepository.insertMany(
                 listOf(
                     TransactionExclusion(counterParty = "CCV*BUITEN IN DE KUIL")
                 )
@@ -75,14 +77,14 @@ class Initializer(
     }
 
     private fun addTrainings(users: Iterable<User>) {
-        eventRepository.save(
+        trainingRepository.insert(
             Training(
                 startTime = LocalDateTime.now().minusDays(3),
                 location = "Training plaza",
                 comment = "No, this is patrick"
             )
         )
-        eventRepository.save(
+        trainingRepository.insert(
             Training(
                 startTime = LocalDateTime.now().plusDays(10),
                 location = "adsfadf,asdf",
@@ -90,14 +92,14 @@ class Initializer(
                 trainer = users.first()
             )
         )
-        eventRepository.save(
+        trainingRepository.insert(
             Training(
                 startTime = LocalDateTime.now().minusDays(20),
                 location = "Training,asdf",
                 comment = ""
             )
         )
-        eventRepository.save(
+        trainingRepository.insert(
             Training(
                 startTime = LocalDateTime.now().plusDays(22),
                 location = "Train,asdf",
@@ -106,47 +108,47 @@ class Initializer(
         )
 
         log.info("After training injection")
-        val trainings = eventRepository.findAll().filterIsInstance<Training>()
+        val trainings = trainingRepository.findAll()
         log.info("ALl trainings: {} ", trainings)
 
         trainings.forEach { t ->
-            attendeeRepository.saveAll(
+            attendeeRepository.insertMany(
                 users.map { user ->
                     Attendee(
-                        user,
-                        t,
+                        user = user,
+                        eventId = t.id,
                         availability = Availability.values()[Random.nextInt(Availability.values().size)]
                     )
                 }
             )
         }
 
-        log.info("After attendee additions", attendeeRepository.findAll())
+        log.info("After attendee additions {}", attendeeRepository.findAll())
     }
 
     private fun addMatches(users: Iterable<User>) {
-        eventRepository.save(
+        matchRepository.insert(
             Match(
                 startTime = LocalDateTime.now().minusDays(3),
                 location = "Match plaza",
                 comment = "No, this is patrick"
             )
         )
-        eventRepository.save(
+        matchRepository.insert(
             Match(
                 startTime = LocalDateTime.now().plusDays(10),
                 location = "123123,asdf",
                 comment = ""
             )
         )
-        eventRepository.save(
+        matchRepository.insert(
             Match(
                 startTime = LocalDateTime.now().minusDays(20),
                 location = "Match,asdf",
                 comment = ""
             )
         )
-        eventRepository.save(
+        matchRepository.insert(
             Match(
                 startTime = LocalDateTime.now().plusDays(22),
                 location = "Match,asdf",
@@ -155,21 +157,21 @@ class Initializer(
         )
 
         log.info("After Match injection")
-        val matches = eventRepository.findAll().filterIsInstance<Match>()
-        log.info("ALl Match: ", matches)
+        val matches = matchRepository.findAll()
+        log.info("All Match: {}", matches)
 
         matches.forEach { t ->
-            attendeeRepository.saveAll(
+            attendeeRepository.insertMany(
                 users.map { user ->
                     Attendee(
-                        user,
-                        t,
+                        user = user,
+                        eventId = t.id,
                         availability = Availability.values()[Random.nextInt(Availability.values().size)]
                     )
                 }
             )
         }
 
-        log.info("After attendee additions", attendeeRepository.findAll())
+        log.info("After attendee additions {}", attendeeRepository.findAll())
     }
 }

@@ -15,11 +15,15 @@
 
     <properties>
         <caffeine.version>v3.1.1</caffeine.version>
-        <liquibase.version>4.17.2</liquibase.version>
+        <liquibase.version>4.9.1</liquibase.version> <!-- to prevent collisions for JOOQ -->
+
 
         <postgresql.version>42.5.1</postgresql.version>
         <spring-cloud-gcp-dependencies.version>3.3.0</spring-cloud-gcp-dependencies.version>
         <springdoc-openapi.version>1.6.13</springdoc-openapi.version>
+        <testcontainers.version>1.17.3</testcontainers.version>
+        <jooq.version>3.14.16</jooq.version> <!-- same as from spring-boot-starter-jooq -->
+        <testcontainers.postgresql.version>11.18-bullseye</testcontainers.postgresql.version>
     </properties>
 
     <dependencyManagement>
@@ -40,6 +44,11 @@
             <groupId>nl.jvandis</groupId>
             <artifactId>shadowed-bung-sdk</artifactId>
             <version>1.19.11.48</version>
+        </dependency>
+        <dependency>
+            <groupId>nl.jvandis</groupId>
+            <artifactId>jooq-support</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -80,9 +89,9 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        <dependency> <!-- used to deal with Pages and Sort and such. Not necessary?-->
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -101,6 +110,12 @@
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-postgres-extensions</artifactId>
+            <version>3.16.13</version>
+        </dependency>
+
 
         <!-- Swagger -->
         <dependency>
@@ -138,10 +153,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>1.17.6</version>
         </dependency>
 
     </dependencies>
@@ -150,8 +164,6 @@
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
 
         <plugins>
-
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -181,6 +193,68 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>${jooq.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <logging>INFO</logging>
+                    <jdbc>
+                        <driver>
+                            org.testcontainers.jdbc.ContainerDatabaseDriver
+                        </driver>
+                        <url>
+                            jdbc:tc:postgresql:${testcontainers.postgresql.version}://teambalance?TC_INITFUNCTION=nl.jvandis.jooq.support.migrations.LiquibaseSupport::migrate&amp;schema=public&amp;rootPath=${project.basedir}/src/main/resources/db/changelog/&amp;scripts=db.changelog-master.xml&amp;TC_INITSCRIPT=file:${project.basedir}/../docker/postgres/00_init.sql
+                        </url>
+                        <user>teambalance</user>
+                        <password>teambalance</password>
+                    </jdbc>
+                    <generator>
+                        <name>org.jooq.codegen.KotlinGenerator</name>
+                        <database>
+                            <inputSchema>public</inputSchema>
+                            <schemata>
+                                <schema>
+                                    <inputSchema>public</inputSchema>
+                                </schema>
+                            </schemata>
+                            <forcedTypes combine.children="append">
+                                <forcedType>
+                                    <userType>nl.jvandis.teambalance.api.event.Place</userType>
+                                    <enumConverter>true</enumConverter>
+                                    <objectType>COLUMN</objectType>
+                                    <includeTypes>home_away</includeTypes>
+                                </forcedType>
+                                <forcedType>
+                                    <userType>nl.jvandis.teambalance.api.attendees.Availability</userType>
+                                    <enumConverter>true</enumConverter>
+                                    <objectType>COLUMN</objectType>
+                                    <includeTypes>availability</includeTypes>
+                                </forcedType>
+
+                                <forcedType>
+                                    <userType>nl.jvandis.teambalance.api.users.Role</userType>
+                                    <enumConverter>true</enumConverter>
+                                    <objectType>COLUMN</objectType>
+                                    <includeTypes>role</includeTypes>
+                                </forcedType>
+
+                            </forcedTypes>
+                        </database>
+                        <target>
+                            <packageName>nl.jvandis.teambalance.data.jooq.schema</packageName>
+                        </target>
+                    </generator>
+                </configuration>
             </plugin>
 
         </plugins>

@@ -12,10 +12,9 @@ data class AttendeeResponse(
 )
 
 fun Attendee.toResponse() = expose()
-fun Attendee.externalize() = expose()
 fun Attendee.expose() = AttendeeResponse(
     id = id,
-    eventId = event.id,
+    eventId = eventId,
     state = availability,
     user = user.expose()
 )
