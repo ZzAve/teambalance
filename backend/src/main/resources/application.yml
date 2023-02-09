@@ -1,10 +1,9 @@
 management.endpoints.web:
   base-path: /internal/actuator
-
 app:
   title: "Team balance"
   description: "Fancy pants teampot for Tovo heren 5"
-  version: "@project.version@"
+  version: "@project.version@-@git.commit.id.describe@"
   datetime-limit: ${app.bank.datetime-limit}
   secret:
     secret-value: ${sm://API_SECRET}
@@ -66,3 +65,16 @@ springdoc:
     path: /internal/openapi/v3/api-docs
   paths-to-match: /api/**
   writer-with-order-by-keys: true
+management:
+  endpoint:
+    info:
+      enabled: true
+  info:
+    build:
+      enabled: true
+    git:
+      mode: simple
+  endpoints:
+    web:
+      exposure:
+        include: health,info

@@ -15,7 +15,6 @@
     <artifactId>app</artifactId>
 
     <properties>
-        <jib-maven-plugin.version>3.3.1</jib-maven-plugin.version>
         <maven-dependency-plugin.version>3.4.0</maven-dependency-plugin.version>
     </properties>
     <dependencies>
@@ -108,14 +107,22 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>repackage</id>
+                        <id>generate-executable-jar</id>
                         <goals>
+                            <goal>build-info</goal>
                             <goal>repackage</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
                     <mainClass>nl.jvandis.teambalance.ApplicationKt</mainClass>
+                    <classifier>exec</classifier>
+                    <additionalProperties>
+                        <branch>${git.branch}</branch>
+                        <description>${project.description}</description>
+                        <revision>${git.commit.id.describe}</revision>
+                        <tag>${project.version}.${git.commit.id.describe}</tag>
+                    </additionalProperties>
                 </configuration>
             </plugin>
 
@@ -148,8 +155,10 @@
                 <version>${jib-maven-plugin.version}</version>
                 <configuration>
                     <to>
-                        <image>gcr.io/tovoheren5/teambalance</image>
+                        <image>eu.gcr.io/tovoheren5/teambalance</image>
+                        <tags>${project.version}-${git.commit.id.describe}</tags>
                     </to>
+                    <skip>false</skip>
                     <container>
                         <mainClass>nl.jvandis.teambalance.ApplicationKt</mainClass>
                         <jvmFlags>
