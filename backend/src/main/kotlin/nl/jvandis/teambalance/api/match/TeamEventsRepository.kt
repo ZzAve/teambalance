@@ -11,7 +11,7 @@ import org.jooq.Field
 import org.jooq.Record
 import org.jooq.Record1
 import org.jooq.Table
-import org.jooq.impl.DSL
+import org.jooq.impl.DSL.count
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -40,7 +40,7 @@ inline fun <reified EVENT : Event> findAllWithStartTimeAfterImpl(
     val totalCount = eventsCount(context, since, pageable, entity)
     val events = eventsOfType(context, since, pageable, entity)
 
-    return PageImpl(events, pageable, totalCount + 0L) // TODO: Move away from Spring Data Page?
+    return PageImpl(events, pageable, totalCount.toLong()) // TODO: Move away from Spring Data Page?
 }
 
 fun <EVENT : Event> eventsCount(
@@ -51,7 +51,7 @@ fun <EVENT : Event> eventsCount(
 ): Int {
     val (table: Table<out Record>, idField: Field<Long?>) = entity
     return context
-        .select(DSL.count())
+        .select(count())
         .from(table)
         .leftJoin(EVENT)
         .on(idField.eq(EVENT.ID))
@@ -75,6 +75,16 @@ fun <EV : Event> eventsOfType(
         }
     }
 
+    val eligibleEventIds = context
+        .select(EVENT.ID)
+        .from(table)
+        .leftJoin(EVENT)
+        .on(idField.eq(EVENT.ID))
+        .where(EVENT.START_TIME.greaterOrEqual(since))
+        .orderBy(startTimeSort, EVENT.ID.desc())
+        .offset(offsetOrDefault(pageable))
+        .limit(limitOrDefault(pageable))
+
     return context
         .select()
         .from(table)
@@ -84,11 +94,15 @@ fun <EV : Event> eventsOfType(
         .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
         .leftJoin(UZER)
         .on(UZER.ID.eq(ATTENDEE.USER_ID))
-        .where(EVENT.START_TIME.greaterOrEqual(since))
-        .orderBy(startTimeSort, UZER.ROLE, UZER.NAME, EVENT.ID.desc())
-        .offset(offsetOrDefault(pageable))
-        .limit(limitOrDefault(pageable))
-        .fetch().into(handlerFactory()).build()
+        .where(EVENT.ID.`in`(eligibleEventIds))
+        .orderBy(
+            startTimeSort,
+            UZER.ROLE,
+            UZER.NAME,
+            EVENT.ID.desc()
+        )
+        .fetch().into(handlerFactory())
+        .build()
 }
 
 // Fixme: naming, docs?
