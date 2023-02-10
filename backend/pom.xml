@@ -15,7 +15,7 @@
 
     <properties>
         <caffeine.version>v3.1.1</caffeine.version>
-        <liquibase.version>4.9.1</liquibase.version> <!-- to prevent collisions for JOOQ -->
+<!--        <liquibase.version>4.16.129.1</liquibase.version> &lt;!&ndash; to prevent collisions for JOOQ &ndash;&gt;-->
 
 
         <jetty.version>12.0.0.alpha3</jetty.version>
@@ -23,7 +23,7 @@
         <spring-cloud-gcp-dependencies.version>3.4.1</spring-cloud-gcp-dependencies.version>
         <springdoc-openapi.version>1.6.13</springdoc-openapi.version>
         <testcontainers.version>1.17.3</testcontainers.version>
-        <jooq.version>3.14.16</jooq.version> <!-- same as from spring-boot-starter-jooq -->
+        <jooq.version>3.17.6</jooq.version> <!-- same as from spring-boot-starter-jooq -->
         <testcontainers.postgresql.version>11.18-bullseye</testcontainers.postgresql.version>
     </properties>
 
@@ -80,11 +80,6 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
             <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>${liquibase.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
