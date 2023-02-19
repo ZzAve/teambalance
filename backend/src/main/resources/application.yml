@@ -30,18 +30,13 @@ server:
   forward-headers-strategy: NATIVE
   shutdown: graceful
 spring:
-  devtools:
-    add-properties: false
+  config:
+    import: "sm://"
   cloud:
     gcp:
       project-id: ${sm://GCP_PROJECT_ID}
-  security:
-    user:
-      password: ${sm://ADMIN_PASSWORD}
-      name: ${sm://ADMIN_USERNAME}
-      roles:
-        - admin
-        - user
+  devtools:
+    add-properties: false
   datasource:
     username: override-me
     password: override-me
@@ -55,6 +50,13 @@ spring:
   liquibase:
     change-log: "classpath:db/changelog/db.changelog-master.xml"
     enabled: true
+  security:
+    user:
+      password: ${sm://ADMIN_PASSWORD}
+      name: ${sm://ADMIN_USERNAME}
+      roles:
+        - admin
+        - user
 
 springdoc:
   model-and-view-allowed: true
