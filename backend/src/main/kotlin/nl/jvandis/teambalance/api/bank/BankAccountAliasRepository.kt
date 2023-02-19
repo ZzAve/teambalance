@@ -23,7 +23,6 @@ class BankAccountAliasRepository(private val context: DSLContext) {
     }
 
     fun findByIdOrNull(aliasId: Long): BankAccountAlias? {
-
         val recordHandler = BankAccountAliasWithUserRecordHandler()
         context.select()
             .from(BANK_ACCOUNT_ALIAS)
@@ -66,8 +65,6 @@ class BankAccountAliasRepository(private val context: DSLContext) {
             .where(BANK_ACCOUNT_ALIAS.ID.`in`(insertResult.mapNotNull(Record1<Long?>::value1)))
             .fetch().forEach(recordHandler)
 
-
-
         return if (insertResult.size == aliases.size) {
             recordHandler.build()
         } else {
@@ -83,8 +80,8 @@ class BankAccountAliasRepository(private val context: DSLContext) {
         if (bankAccountAliasId == NO_ID) {
             throw IllegalStateException(
                 "User with 'special' id $NO_ID can not be deleted. " +
-                        "The special no id serves a special purpose in transforming items " +
-                        "from records to entities and back"
+                    "The special no id serves a special purpose in transforming items " +
+                    "from records to entities and back"
             )
         }
         val execute = context.deleteFrom(BANK_ACCOUNT_ALIAS)

@@ -179,8 +179,8 @@ class AttendeeRepository(
         if (id == NO_ID) {
             throw IllegalStateException(
                 "Attendee with 'special' id $NO_ID can not be deleted. " +
-                        "The special no id serves a special purpose in transforming items " +
-                        "from records to entities and back"
+                    "The special no id serves a special purpose in transforming items " +
+                    "from records to entities and back"
             )
         }
         val execute = context.delete(ATTENDEE).where(ATTENDEE.ID.eq(id)).execute()
