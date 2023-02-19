@@ -6,7 +6,8 @@
     "default:enableVulnerabilityAlerts",
     ":maintainLockFilesMonthly",
     ":dependencyDashboard",
-    "group:linters"
+    "group:linters",
+    "group:recommended"
   ],
   "packageRules": [
     {
