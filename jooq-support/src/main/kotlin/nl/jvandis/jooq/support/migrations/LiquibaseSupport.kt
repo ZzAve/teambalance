@@ -39,7 +39,7 @@ class LiquibaseSupport {
 
             val liquibase = Liquibase(
                 getParameterValue(queryParams, SCRIPTS),
-                DirectoryResourceAccessor(File(getParameterValue(queryParams, ROOT_PATH))), //Verify me
+                DirectoryResourceAccessor(File(getParameterValue(queryParams, ROOT_PATH))), // Verify me
                 JdbcConnection(connection)
             )
 

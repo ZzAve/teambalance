@@ -84,7 +84,7 @@
                 <version>5.0.0</version>
                 <executions>
                     <execution>
-                        <id>get-the-git-infos</id>
+                        <id>default</id>
                         <goals>
                             <goal>revision</goal>
                         </goals>
@@ -92,7 +92,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <verbose>true</verbose>
+                    <verbose>false</verbose>
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
                     <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
 <!--                    <includeOnlyProperties>-->
