@@ -6,7 +6,11 @@
     "default:enableVulnerabilityAlerts",
     ":maintainLockFilesMonthly",
     ":dependencyDashboard",
-    "group:linters"
+    "group:linters",
+    "group:recommended"
+  ],
+  "ignorePaths": [
+    "shaded-bunq-sdk/*"
   ],
   "packageRules": [
     {
@@ -14,6 +18,10 @@
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "devDependencies (non-major)",
       "groupSlug": "dev-dependencies"
+    },
+    {
+      "matchPackagePatterns": ["^nl.jvandis"],
+      "excludePackagePatterns": ["^nl.jvandis" ]
     },
     {
       "matchPackageNames": ["@date-io/date-fns"],
