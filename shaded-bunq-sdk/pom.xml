@@ -10,7 +10,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>shadowed-bung-sdk</artifactId>
+    <artifactId>shaded-bunq-sdk</artifactId>
     <version>1.19.11.48</version>
 
     <name>Team balance - Shaded Bunq Java SDK</name>
@@ -46,12 +46,14 @@
             <version>2.8.6</version>
         </dependency>
         <!-- exclude okhttp -->
-        <!--        <dependency>-->
-        <!--            <groupId>com.squareup.okhttp3</groupId>-->
-        <!--            <artifactId>okhttp</artifactId>-->
-        <!--            <version>3.14.9</version>-->
-        <!--            <scope>compile</scope>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.14.9</version>
+            <scope>compile</scope>
+            <!-- only have this dependency available in the module, and don't make it transitively available -->
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -59,12 +61,14 @@
             <scope>compile</scope>
         </dependency>
         <!-- exclude okio -->
-        <!--        <dependency>-->
-        <!--            <groupId>com.squareup.okio</groupId>-->
-        <!--            <artifactId>okio</artifactId>-->
-        <!--            <version>1.17.5</version>-->
-        <!--            <scope>compile</scope>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+            <version>1.17.5</version>
+            <scope>compile</scope>
+            <!-- only have this dependency available in the module, and don't make it transitively available -->
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
@@ -142,13 +146,22 @@
                             </filters>
                             <relocations>
                                 <relocation>
-                                    <pattern>com.squareup</pattern>
-                                    <shadedPattern>nl.jvandis.teambalance.shaded.bunqsdk.com.squareup
+                                    <pattern>okio</pattern>
+                                    <shadedPattern>nl.jvandis.teambalance.shaded.bunqsdk.okio
                                     </shadedPattern>
                                     <includes>
                                         <include>com.squareup.*:*</include>
                                     </includes>
                                 </relocation>
+                                <relocation>
+                                    <pattern>okhttp3</pattern>
+                                    <shadedPattern>nl.jvandis.teambalance.shaded.bunqsdk.okhttp3
+                                    </shadedPattern>
+                                    <includes>
+                                        <include>com.squareup.*:*</include>
+                                    </includes>
+                                </relocation>
+
                             </relocations>
                             <dependencyReducedPomLocation>target/reduced-pom.xml</dependencyReducedPomLocation>
                         </configuration>

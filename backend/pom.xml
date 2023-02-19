@@ -43,7 +43,7 @@
     <dependencies>
         <dependency>
             <groupId>nl.jvandis</groupId>
-            <artifactId>shadowed-bung-sdk</artifactId>
+            <artifactId>shaded-bunq-sdk</artifactId>
             <version>1.19.11.48</version>
         </dependency>
         <dependency>
