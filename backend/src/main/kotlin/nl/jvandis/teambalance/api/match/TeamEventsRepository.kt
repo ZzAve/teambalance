@@ -85,7 +85,8 @@ fun <EV : Event> eventsOfType(
         .offset(offsetOrDefault(pageable))
         .limit(limitOrDefault(pageable))
 
-    return context
+    val recordHandler = handlerFactory()
+    context
         .select()
         .from(table)
         .leftJoin(EVENT)
@@ -101,8 +102,9 @@ fun <EV : Event> eventsOfType(
             UZER.NAME,
             EVENT.ID.desc()
         )
-        .fetch().into(handlerFactory())
-        .build()
+        .fetch().forEach(recordHandler)
+
+    return recordHandler.build()
 }
 
 // Fixme: naming, docs?

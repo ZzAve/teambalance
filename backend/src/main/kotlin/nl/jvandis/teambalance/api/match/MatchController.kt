@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.match
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMatchException
@@ -15,7 +16,6 @@ import nl.jvandis.teambalance.api.users.toNewAttendee
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
-import javax.validation.Valid
 import kotlin.math.min
 
 @RestController
@@ -62,8 +61,7 @@ class MatchController(
             eventsRepository = matchRepository,
             page = page,
             limit = limit,
-            since = since,
-            includeAttendees = includeAttendees
+            since = since
         ).toResponse(includeInactiveUsers)
     }
 

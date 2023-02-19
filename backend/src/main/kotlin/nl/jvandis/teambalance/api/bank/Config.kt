@@ -1,7 +1,6 @@
 package nl.jvandis.teambalance.api.bank
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -30,7 +29,6 @@ enum class BunqEnvironment {
     SANDBOX
 }
 
-@ConstructorBinding
 @ConfigurationProperties("app.bank")
 data class BankConfig(
     val bunq: BankBunqConfig,

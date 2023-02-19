@@ -15,15 +15,14 @@
 
     <properties>
         <caffeine.version>v3.1.1</caffeine.version>
-        <liquibase.version>4.9.1</liquibase.version> <!-- to prevent collisions for JOOQ -->
-
-
+        <jetty.version>12.0.0.alpha3</jetty.version>
+        <jooq-postgres-extensions.version>3.16.13</jooq-postgres-extensions.version>
+        <jooq.version>3.17.6</jooq.version> <!-- same as from spring-boot-starter-jooq -->
         <postgresql.version>42.5.1</postgresql.version>
-        <spring-cloud-gcp-dependencies.version>3.3.0</spring-cloud-gcp-dependencies.version>
+        <spring-cloud-gcp-dependencies.version>4.1.0</spring-cloud-gcp-dependencies.version>
         <springdoc-openapi.version>1.6.13</springdoc-openapi.version>
-        <testcontainers.version>1.17.3</testcontainers.version>
-        <jooq.version>3.14.16</jooq.version> <!-- same as from spring-boot-starter-jooq -->
         <testcontainers.postgresql.version>11.18-bullseye</testcontainers.postgresql.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
     </properties>
 
     <dependencyManagement>
@@ -42,7 +41,7 @@
     <dependencies>
         <dependency>
             <groupId>nl.jvandis</groupId>
-            <artifactId>shadowed-bung-sdk</artifactId>
+            <artifactId>shaded-bunq-sdk</artifactId>
             <version>1.19.11.48</version>
         </dependency>
         <dependency>
@@ -76,9 +75,9 @@
             <artifactId>spring-boot-starter-jetty</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>${liquibase.version}</version>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
@@ -92,6 +91,10 @@
         <dependency> <!-- used to deal with Pages and Sort and such. Not necessary?-->
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -113,7 +116,7 @@
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq-postgres-extensions</artifactId>
-            <version>3.16.13</version>
+            <version>${jooq-postgres-extensions.version}</version>
         </dependency>
 
 
@@ -155,7 +158,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.17.6</version>
+            <version>${testcontainers.version}</version>
         </dependency>
 
     </dependencies>
@@ -222,11 +225,8 @@
                         <name>org.jooq.codegen.KotlinGenerator</name>
                         <database>
                             <inputSchema>public</inputSchema>
-                            <schemata>
-                                <schema>
-                                    <inputSchema>public</inputSchema>
-                                </schema>
-                            </schemata>
+                            <catalogVersionProvider>SELECT id || orderexecuted || databasechangelog.md5sum FROM "databasechangelog" ORDER BY dateexecuted desc limit 1</catalogVersionProvider>
+                            <schemaVersionProvider>SELECT id || orderexecuted || databasechangelog.md5sum FROM "databasechangelog" ORDER BY dateexecuted desc limit 1</schemaVersionProvider>
                             <forcedTypes combine.children="append">
                                 <forcedType>
                                     <userType>nl.jvandis.teambalance.api.event.Place</userType>
@@ -256,8 +256,6 @@
                     </generator>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
-
 </project>

@@ -1,11 +1,12 @@
 package nl.jvandis.teambalance.api.match
 
 import org.jooq.Record
-import org.jooq.RecordHandler
+import java.util.function.Consumer
 
 /**
  * // TODO: what am I?
  */
-interface TeamBalanceRecordHandler<OUT> : RecordHandler<Record> {
+interface TeamBalanceRecordHandler<OUT> : Consumer<Record> {
+    override fun accept(record: Record)
     fun build(): List<OUT>
 }

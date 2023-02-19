@@ -21,9 +21,6 @@ app:
   secret:
     secret-value: teambalance
 spring:
-  cloud:
-    gcp:
-      core.enabled: false
   datasource:
     username: teambalance
     password: teambalance

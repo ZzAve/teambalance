@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.7</version>
+        <version>3.0.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>nl.jvandis</groupId>
@@ -20,20 +20,24 @@
         <module>backend</module>
         <module>frontend</module>
         <module>jooq-support</module>
-        <module>shadowed-bung-sdk</module>
+        <module>shaded-bunq-sdk</module>
     </modules>
 
     <properties>
         <java.version>17</java.version>
-        <kotlin.version>1.6.10</kotlin.version>
+        <kotlin.version>1.7.22</kotlin.version>
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <verification.skip>false</verification.skip>
+
         <ktlint.version>0.47.1</ktlint.version>
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
         <jib-maven-plugin.version>3.3.1</jib-maven-plugin.version>
 
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
+<!--        <jakarta-servlet.version>5.0.0</jakarta-servlet.version>-->
     </properties>
 
     <dependencies>
@@ -80,7 +84,7 @@
                 <version>5.0.0</version>
                 <executions>
                     <execution>
-                        <id>get-the-git-infos</id>
+                        <id>default</id>
                         <goals>
                             <goal>revision</goal>
                         </goals>
@@ -88,7 +92,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <verbose>true</verbose>
+                    <verbose>false</verbose>
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
                     <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
 <!--                    <includeOnlyProperties>-->
@@ -126,19 +130,13 @@
                     </args>
                     <compilerPlugins>
                         <plugin>spring</plugin>
-                        <plugin>jpa</plugin>
                     </compilerPlugins>
-                    <jvmTarget>11</jvmTarget>
+                    <jvmTarget>17</jvmTarget>
                 </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.jetbrains.kotlin</groupId>
                         <artifactId>kotlin-maven-allopen</artifactId>
-                        <version>${kotlin.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>kotlin-maven-noarg</artifactId>
                         <version>${kotlin.version}</version>
                     </dependency>
                 </dependencies>

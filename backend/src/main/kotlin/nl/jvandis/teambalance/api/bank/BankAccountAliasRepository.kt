@@ -13,26 +13,32 @@ import org.springframework.stereotype.Repository
 @Repository
 class BankAccountAliasRepository(private val context: DSLContext) {
     fun findAll(): List<BankAccountAlias> {
-        return context.select()
+        val recordHandler = BankAccountAliasWithUserRecordHandler()
+        context.select()
             .from(BANK_ACCOUNT_ALIAS)
             .leftJoin(UZER)
             .on(BANK_ACCOUNT_ALIAS.USER_ID.eq(UZER.ID))
-            .fetchInto(BankAccountAliasWithUserRecordHandler())
-            .build()
+            .fetch().forEach(recordHandler)
+        return recordHandler.build()
     }
 
-    fun findByIdOrNull(aliasId: Long): BankAccountAlias? =
+    fun findByIdOrNull(aliasId: Long): BankAccountAlias? {
+        val recordHandler = BankAccountAliasWithUserRecordHandler()
         context.select()
             .from(BANK_ACCOUNT_ALIAS)
             .leftJoin(UZER)
             .on(BANK_ACCOUNT_ALIAS.USER_ID.eq(UZER.ID))
             .where(BANK_ACCOUNT_ALIAS.ID.eq(aliasId))
-            .fetchInto(BankAccountAliasWithUserRecordHandler())
+            .fetch()
+            .forEach(recordHandler)
+
+        return recordHandler
             .build()
             .also {
                 check(it.size < 2) { "Fetched more than 1 bankAccountAliases with the same id. Should not be possible!" }
             }
             .firstOrNull()
+    }
 
     fun insertMany(aliases: List<BankAccountAlias>): List<BankAccountAlias> {
         if (aliases.isEmpty()) {
@@ -50,17 +56,17 @@ class BankAccountAliasRepository(private val context: DSLContext) {
             )
             .returningResult(BANK_ACCOUNT_ALIAS.ID).fetch()
 
-        val aliasesResult =
-            context.select()
-                .from(BANK_ACCOUNT_ALIAS)
-                .leftJoin(UZER)
-                .on(UZER.ID.eq(BANK_ACCOUNT_ALIAS.USER_ID))
-                .where(BANK_ACCOUNT_ALIAS.ID.`in`(insertResult.mapNotNull(Record1<Long?>::value1)))
-                .fetchInto(BankAccountAliasWithUserRecordHandler())
-                .build()
+        val recordHandler = BankAccountAliasWithUserRecordHandler()
+
+        context.select()
+            .from(BANK_ACCOUNT_ALIAS)
+            .leftJoin(UZER)
+            .on(UZER.ID.eq(BANK_ACCOUNT_ALIAS.USER_ID))
+            .where(BANK_ACCOUNT_ALIAS.ID.`in`(insertResult.mapNotNull(Record1<Long?>::value1)))
+            .fetch().forEach(recordHandler)
 
         return if (insertResult.size == aliases.size) {
-            aliasesResult
+            recordHandler.build()
         } else {
             throw DataAccessException("Could not insert aliases $aliases")
         }

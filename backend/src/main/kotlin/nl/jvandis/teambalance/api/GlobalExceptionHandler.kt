@@ -1,5 +1,6 @@
 package nl.jvandis.teambalance.api
 
+import jakarta.validation.ConstraintViolationException
 import nl.jvandis.teambalance.filters.InvalidDateTimeException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
-import javax.validation.ConstraintViolationException
 
 @ControllerAdvice
 class GlobalExceptionHandler {

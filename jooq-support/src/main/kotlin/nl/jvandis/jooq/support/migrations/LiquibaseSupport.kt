@@ -4,7 +4,7 @@ import liquibase.Contexts
 import liquibase.LabelExpression
 import liquibase.Liquibase
 import liquibase.database.jvm.JdbcConnection
-import liquibase.resource.FileSystemResourceAccessor
+import liquibase.resource.DirectoryResourceAccessor
 import java.io.File
 import java.net.URLDecoder
 import java.sql.Connection
@@ -39,7 +39,7 @@ class LiquibaseSupport {
 
             val liquibase = Liquibase(
                 getParameterValue(queryParams, SCRIPTS),
-                FileSystemResourceAccessor(File(getParameterValue(queryParams, ROOT_PATH))),
+                DirectoryResourceAccessor(File(getParameterValue(queryParams, ROOT_PATH))), // Verify me
                 JdbcConnection(connection)
             )
 

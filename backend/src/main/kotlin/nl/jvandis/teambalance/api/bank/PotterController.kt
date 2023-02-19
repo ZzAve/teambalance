@@ -2,6 +2,8 @@ package nl.jvandis.teambalance.api.bank
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.tags.Tags
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
 import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.filters.InvalidDateTimeException
 import org.springframework.format.annotation.DateTimeFormat
@@ -16,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.Duration
 import java.time.ZonedDateTime
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
 
 @RestController
 @Validated

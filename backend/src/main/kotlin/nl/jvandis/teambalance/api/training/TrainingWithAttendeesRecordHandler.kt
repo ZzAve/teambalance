@@ -18,26 +18,26 @@ class TrainingWithAttendeesRecordHandler : TeamBalanceRecordHandler<Training> {
 
     private var result: List<Training>? = null
 
-    override fun next(r: Record) {
+    override fun accept(record: Record) {
         recordsHandled++
-        val trainingId = r[TRAINING.ID]
-        val eventId = r[EVENT.ID]
+        val trainingId = record[TRAINING.ID]
+        val eventId = record[EVENT.ID]
         if (trainingId == null || eventId == null) {
             return
         }
 
         // handle attendee
-        attendeeRecordHandler.next(r)
+        attendeeRecordHandler.accept(record)
 
         val event = events.computeIfAbsent(eventId) {
             // mapping via EventRecord works better with column name clashes (like `id`)
-            r.into(EventRecord::class.java)
+            record.into(EventRecord::class.java)
                 .into(Event.Builder::class.java)
         }
 
         val training = trainings.computeIfAbsent(trainingId) {
             // mapping via TrainingRecord works better with column name clashes (like `id`)
-            r.into(TrainingRecord::class.java) //
+            record.into(TrainingRecord::class.java) //
                 .into(Training.Builder::class.java)
         }
 

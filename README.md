@@ -221,7 +221,7 @@ As with most projects, it's hardly ever considered finished.
 
 
 ## ❤️‍🩹 Troubleshooting
-### Let Intellij understand the shaded artifact from [shadowed-bung-sdk](shadowed-bung-sdk/pom.xml).
+### Let Intellij understand the shaded artifact from [shaded-bunq-sdk](shaded-bunq-sdk/pom.xml).
 
 Unfortunately, Intellij doesn't understand shaded artifacts ([read up on it here](https://youtrack.jetbrains.com/issue/IDEA-126596))
 

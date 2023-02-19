@@ -70,8 +70,7 @@ class MiscellaneousEventController(
             eventsRepository = eventRepository,
             page = page,
             limit = limit,
-            since = since,
-            includeAttendees = includeAttendees
+            since = since
         ).toResponse(includeInactiveUsers)
     }
 
