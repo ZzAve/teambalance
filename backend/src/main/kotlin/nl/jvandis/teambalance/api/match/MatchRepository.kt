@@ -28,7 +28,6 @@ class MatchRepository(
     override fun findAll(): List<Match> =
         findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
 
-    // TODO: upgrade to upsert?
     override fun insert(event: Match): Match {
         val eventRecord = context
             .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME)
@@ -57,7 +56,6 @@ class MatchRepository(
             ?: throw DataAccessException("Could not insert Match")
     }
 
-    // TODO: do smarter updates ? Only update changed fields or something. Or do change whole record?
     override fun update(event: Match): Match {
         context
             .update(EVENT)

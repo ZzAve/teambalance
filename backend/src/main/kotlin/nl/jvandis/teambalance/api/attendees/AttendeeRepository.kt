@@ -24,7 +24,8 @@ class AttendeeRepository(
         eventIds: List<Long>,
         sort: Sort = Sort.by("user.role", "user.name")
     ): List<Attendee> {
-        val fetch = context.select()
+        val recordHandler = AttendeeWithUserRecordHandler()
+        context.select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
@@ -32,9 +33,10 @@ class AttendeeRepository(
             .on(ATTENDEE.USER_ID.eq(UZER.ID))
             .where(EVENT.ID.`in`(eventIds))
             .orderBy(UZER.ROLE, UZER.NAME).limit(100)
-            .fetchInto(AttendeeWithUserRecordHandler())
+            .fetch()
+            .forEach(recordHandler)
 
-        return fetch.build()
+        return recordHandler.build()
     }
 
     fun insertMany(attendees: List<Attendee>): List<Attendee> {
@@ -46,18 +48,19 @@ class AttendeeRepository(
             .valuesFrom(attendees, { it.availability }, { it.eventId }, { it.user.id })
             .returningResult(ATTENDEE.ID).fetch()
 
-        val attendeesResult =
-            context.select()
-                .from(ATTENDEE)
-                .leftJoin(EVENT)
-                .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
-                .leftJoin(UZER)
-                .on(UZER.ID.eq(ATTENDEE.USER_ID))
-                .where(ATTENDEE.ID.`in`(insertResult.mapNotNull(Record1<Long?>::value1)))
-                .fetchInto(AttendeeWithUserRecordHandler())
+        val recordHandler = AttendeeWithUserRecordHandler()
+        context.select()
+            .from(ATTENDEE)
+            .leftJoin(EVENT)
+            .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
+            .leftJoin(UZER)
+            .on(UZER.ID.eq(ATTENDEE.USER_ID))
+            .where(ATTENDEE.ID.`in`(insertResult.mapNotNull(Record1<Long?>::value1)))
+            .fetch()
+            .forEach(recordHandler)
 
         return if (insertResult.size == attendees.size) {
-            attendeesResult.build()
+            recordHandler.build()
         } else {
             throw DataAccessException("Could not insert jooqAttendees $attendees")
         }
@@ -93,16 +96,22 @@ class AttendeeRepository(
         .where(ATTENDEE.ID.`in`(attendees.map { it.id }))
         .execute()
 
-    fun findAll(): List<Attendee> =
+    fun findAll(): List<Attendee> {
+        val recordHandler = AttendeeWithUserRecordHandler()
         context.select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
             .leftJoin(UZER)
             .on(UZER.ID.eq(ATTENDEE.USER_ID))
-            .fetchInto(AttendeeWithUserRecordHandler()).build()
+            .fetch()
+            .forEach(recordHandler)
 
-    fun findALlByEventIdInAndUserIdIn(eventIds: List<Long>, userIds: List<Long>): List<Attendee> =
+        return recordHandler.build()
+    }
+
+    fun findALlByEventIdInAndUserIdIn(eventIds: List<Long>, userIds: List<Long>): List<Attendee> {
+        val recordHandler = AttendeeWithUserRecordHandler()
         context.select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
@@ -110,9 +119,15 @@ class AttendeeRepository(
             .leftJoin(UZER)
             .on(UZER.ID.eq(ATTENDEE.USER_ID))
             .where(ATTENDEE.EVENT_ID.`in`(eventIds))
-            .and(ATTENDEE.USER_ID.`in`(userIds)).fetchInto(AttendeeWithUserRecordHandler()).build()
+            .and(ATTENDEE.USER_ID.`in`(userIds))
+            .fetch()
+            .forEach(recordHandler)
 
-    fun findAllByUserIdIn(userIds: List<Long>): List<Attendee> =
+        return recordHandler.build()
+    }
+
+    fun findAllByUserIdIn(userIds: List<Long>): List<Attendee> {
+        val recordHandler = AttendeeWithUserRecordHandler()
         context.select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
@@ -120,7 +135,10 @@ class AttendeeRepository(
             .leftJoin(UZER)
             .on(UZER.ID.eq(ATTENDEE.USER_ID))
             .where(ATTENDEE.USER_ID.`in`(userIds))
-            .fetchInto(AttendeeWithUserRecordHandler()).build()
+            .fetch().forEach(recordHandler)
+
+        return recordHandler.build()
+    }
 
     fun findByIdOrNull(attendeeId: Long): Attendee? =
         context.select()
@@ -133,12 +151,13 @@ class AttendeeRepository(
             .fetchOne()
             ?.let {
                 AttendeeWithUserRecordHandler()
-                    .apply { next(it) }
+                    .apply { accept(it) }
                     .build()
                     .first()
             }
 
-    fun findByUserIdAndEventId(userId: Long, eventId: Long): List<Attendee> =
+    fun findByUserIdAndEventId(userId: Long, eventId: Long): List<Attendee> {
+        val recordHandler = AttendeeWithUserRecordHandler()
         context.select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
@@ -147,7 +166,10 @@ class AttendeeRepository(
             .on(UZER.ID.eq(ATTENDEE.USER_ID))
             .where(ATTENDEE.USER_ID.eq(userId))
             .and(ATTENDEE.EVENT_ID.eq(eventId))
-            .fetchInto(AttendeeWithUserRecordHandler()).build()
+            .fetch().forEach(recordHandler)
+
+        return recordHandler.build()
+    }
 
     fun delete(attendee: Attendee) {
         deleteById(attendee.id)
@@ -157,8 +179,8 @@ class AttendeeRepository(
         if (id == NO_ID) {
             throw IllegalStateException(
                 "Attendee with 'special' id $NO_ID can not be deleted. " +
-                    "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back"
+                        "The special no id serves a special purpose in transforming items " +
+                        "from records to entities and back"
             )
         }
         val execute = context.delete(ATTENDEE).where(ATTENDEE.ID.eq(id)).execute()

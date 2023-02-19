@@ -18,26 +18,26 @@ class MiscEventWithAttendeesRecordHandler : TeamBalanceRecordHandler<Miscellaneo
 
     private var result: List<MiscellaneousEvent>? = null
 
-    override fun next(r: Record) {
+    override fun accept(record: Record) {
         recordsHandled++
-        val miscEventId = r[MISCELLANEOUS_EVENT.ID]
-        val eventId = r[EVENT.ID]
+        val miscEventId = record[MISCELLANEOUS_EVENT.ID]
+        val eventId = record[EVENT.ID]
         if (miscEventId == null || eventId == null) {
             return
         }
 
         // handle attendee
-        attendeeRecordHandler.next(r)
+        attendeeRecordHandler.accept(record)
 
         val event = events.computeIfAbsent(eventId) {
             // mapping via EventRecord works better with column name clashes (like `id`)
-            r.into(EventRecord::class.java)
+            record.into(EventRecord::class.java)
                 .into(Event.Builder::class.java)
         }
 
         val miscEvent = miscEvent.computeIfAbsent(miscEventId) {
             // mapping via MiscellaneousEventRecord works better with column name clashes (like `id`)
-            r.into(MiscellaneousEventRecord::class.java) //
+            record.into(MiscellaneousEventRecord::class.java) //
                 .into(MiscellaneousEvent.Builder::class.java)
         }
 

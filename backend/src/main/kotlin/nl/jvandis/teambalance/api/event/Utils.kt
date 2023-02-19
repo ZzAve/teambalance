@@ -10,11 +10,9 @@ fun <T : Event> getEventsAndAttendees(
     eventsRepository: TeamEventsRepository<T>,
     page: Int,
     limit: Int,
-    since: LocalDateTime,
-    includeAttendees: Boolean
+    since: LocalDateTime
 ): Page<T> {
     val pageRequest = PageRequest.of(page - 1, limit, Sort.by("startTime").ascending())
 
-    // FIXME do something with includeAttendees
     return eventsRepository.findAllWithStartTimeAfter(since, pageRequest)
 }

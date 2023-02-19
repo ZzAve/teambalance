@@ -17,21 +17,21 @@ class BankAccountAliasWithUserRecordHandler : TeamBalanceRecordHandler<BankAccou
     private var recordsHandled = 0L
     private var result: List<BankAccountAlias>? = null
 
-    override fun next(r: Record) {
+    override fun accept(record: Record) {
         recordsHandled++
-        val bankAccountAliasId = r[BANK_ACCOUNT_ALIAS.ID]
-        val userId = r[UZER.ID]
+        val bankAccountAliasId = record[BANK_ACCOUNT_ALIAS.ID]
+        val userId = record[UZER.ID]
         if (bankAccountAliasId == null || userId == null) {
             return
         }
 
         bankAccountAliasRecords.computeIfAbsent(bankAccountAliasId) {
             // mapping via AttendeeRecords works better with column name clashes (like `id`)
-            r.into(BankAccountAliasRecord::class.java)
+            record.into(BankAccountAliasRecord::class.java)
         }
 
         userRecords.computeIfAbsent(userId) {
-            r.into(UzerRecord::class.java)
+            record.into(UzerRecord::class.java)
         }
     }
 

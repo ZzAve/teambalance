@@ -15,22 +15,22 @@ class AttendeeWithUserRecordHandler : TeamBalanceRecordHandler<Attendee> {
     private var recordsHandled = 0L
     private var result: List<Attendee>? = null
 
-    override fun next(r: Record) {
+    override fun accept(record: Record) {
         recordsHandled++
-        val attendeeId = r[ATTENDEE.ID]
-        val userId = r[UZER.ID]
+        val attendeeId = record[ATTENDEE.ID]
+        val userId = record[UZER.ID]
         if (attendeeId == null || userId == null) {
             return
         }
 
         val attendee = attendees.computeIfAbsent(attendeeId) {
             // mapping via AttendeeRecords works better with column name clashes (like `id`)
-            r.into(AttendeeRecord::class.java)
+            record.into(AttendeeRecord::class.java)
                 .into(Attendee.Builder::class.java)
         }
 
         val user = users.computeIfAbsent(userId) {
-            r.into(UzerRecord::class.java)
+            record.into(UzerRecord::class.java)
                 .into(User::class.java)
         }
 

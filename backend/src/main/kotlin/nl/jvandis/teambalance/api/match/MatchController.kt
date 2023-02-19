@@ -16,7 +16,6 @@ import nl.jvandis.teambalance.api.users.toNewAttendee
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -62,8 +61,7 @@ class MatchController(
             eventsRepository = matchRepository,
             page = page,
             limit = limit,
-            since = since,
-            includeAttendees = includeAttendees
+            since = since
         ).toResponse(includeInactiveUsers)
     }
 
