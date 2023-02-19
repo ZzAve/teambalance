@@ -9,6 +9,9 @@
     "group:linters",
     "group:recommended"
   ],
+  "ignorePaths": [
+    "shaded-bunq-sdk/*"
+  ],
   "packageRules": [
     {
       "matchDepTypes": ["devDependencies"],
