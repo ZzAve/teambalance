@@ -16,6 +16,10 @@
       "groupSlug": "dev-dependencies"
     },
     {
+      "matchPackagePatterns": ["^nl.jvandis"],
+      "excludePackagePatterns": ["^nl.jvandis" ]
+    },
+    {
       "matchPackageNames": ["@date-io/date-fns"],
       "allowedVersions": "< 2",
       "groupName": "Tightly coupled with material-ui/pickers v3",
