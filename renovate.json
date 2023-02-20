@@ -21,7 +21,8 @@
     },
     {
       "matchPackagePatterns": ["^nl\\.jvandis.*"],
-      "excludePackagePatterns": ["^nl\\.jvandis.*" ]
+      "description": "Disable any intra-module dependency. This is quite an aggressive one, and goes beyond the current repo",
+      "enabled": false
     },
     {
       "matchPackageNames": ["@date-io/date-fns"],
