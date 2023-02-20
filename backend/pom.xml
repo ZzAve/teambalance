@@ -20,7 +20,7 @@
         <jooq.version>3.17.7</jooq.version> <!-- same as from spring-boot-starter-jooq -->
         <postgresql.version>42.5.1</postgresql.version>
         <spring-cloud-gcp-dependencies.version>4.1.0</spring-cloud-gcp-dependencies.version>
-        <springdoc-openapi.version>1.6.13</springdoc-openapi.version>
+        <springdoc-openapi.version>1.6.14</springdoc-openapi.version>
         <testcontainers.postgresql.version>11.18-bullseye</testcontainers.postgresql.version>
         <testcontainers.version>1.17.6</testcontainers.version>
     </properties>
