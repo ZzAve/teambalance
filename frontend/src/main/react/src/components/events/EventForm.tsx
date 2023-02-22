@@ -3,15 +3,8 @@ import { withLoading } from "../../utils/util";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { Navigate, useLocation } from "react-router-dom";
 import { SpinnerWithText } from "../SpinnerWithText";
-import {
-  DatePicker,
-  MuiPickersUtilsProvider,
-  TimePicker,
-} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
 import { nl } from "date-fns/locale";
 import Grid from "@material-ui/core/Grid";
-import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import CheckBox from "@material-ui/core/Checkbox";
 import Button from "@material-ui/core/Button";
@@ -32,6 +25,12 @@ import {
   Training,
   User,
 } from "../../utils/domain";
+import "dayjs/locale/nl";
+import dayjs, { Dayjs } from "dayjs";
+import TextField from "@mui/material/TextField";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
 type EventFormTexts = {
   send_event: Record<EventType, string>;
@@ -117,12 +116,12 @@ export const EventForm = (props: {
   const getInitialSelectedDate = (event?: TeamEvent) => {
     return () => {
       if (event !== undefined && event.startTime) {
-        return event.startTime;
+        return dayjs(event.startTime.toISOString());
       } else {
         // Initialize to 20:00
         let date = new Date();
         date.setHours(20, 0, 0, 0);
-        return date;
+        return dayjs(date.toISOString());
       }
     };
   };
@@ -131,8 +130,8 @@ export const EventForm = (props: {
   const [eventLocation, setEventLocation] = useState(
     props.event?.location || ""
   );
-  const [selectedTime, setSelectedTime] = useState<Date>(
-    getInitialSelectedDate(props.event)
+  const [selectedTime, setSelectedTime] = useState<Dayjs | null>(
+    null //getInitialSelectedDate(props.event)
   );
   const [opponent, setOpponent] = useState(
     isMatch(props.event) ? props.event.opponent : ""
@@ -164,7 +163,7 @@ export const EventForm = (props: {
       let addedProps = {};
       const baseProps = {
         location: eventLocation as string,
-        startTime: selectedTime,
+        startTime: selectedTime?.toDate() || new Date(), //fixme
         comment: comment,
         userIds: Object.entries(userSelection)
           .filter((it) => it[1] === true)
@@ -193,7 +192,7 @@ export const EventForm = (props: {
       await updateEvent(props.eventType, {
         id: id as number,
         location: eventLocation,
-        startTime: selectedTime,
+        startTime: selectedTime?.toDate(),
         title: title || undefined,
         comment: comment,
         opponent: opponent || undefined,
@@ -247,7 +246,7 @@ export const EventForm = (props: {
   }
 
   return (
-    <MuiPickersUtilsProvider utils={DateFnsUtils} locale={nl}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"nl"}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <TextField
@@ -256,42 +255,45 @@ export const EventForm = (props: {
             name="id"
             label="id"
             defaultValue={id}
-            fullWidth
+            // fullWidth
             disabled
           />
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <DatePicker
+          <DateTimePicker
+            renderInput={(props) => <TextField {...props}></TextField>}
+            label="Datum / tijd"
             value={selectedTime}
             onChange={(x) => {
-              if (x !== null) setSelectedTime(x);
+              setSelectedTime(x);
             }}
-            id="startDate"
-            name="startDate"
-            label="Datum"
-            autoOk
-            showTodayButton={true}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TimePicker
-            value={selectedTime}
-            id="startTime"
-            name="startTime"
-            label="Starttijd"
-            minutesStep={15}
             ampm={false}
-            onChange={(x) => {
-              if (x !== null) {
-                setSelectedTime(x);
-              }
-            }}
-            autoOk
-            fullWidth
+            minutesStep={15}
+            // id="startDate"
+            // name="startDateTime"
+            // autoOk
+            // showTodayButton={true}
+            // fullWidth
           />
         </Grid>
+        {/*<Grid item xs={12} sm={6}>*/}
+        {/*  <TimePicker*/}
+        {/*    value={selectedTime}*/}
+        {/*    id="startTime"*/}
+        {/*    name="startTime"*/}
+        {/*    label="Starttijd"*/}
+        {/*    minutesStep={15}*/}
+        {/*    ampm={false}*/}
+        {/*    onChange={(x) => {*/}
+        {/*      if (x !== null) {*/}
+        {/*        setSelectedTime(x);*/}
+        {/*      }*/}
+        {/*    }}*/}
+        {/*    autoOk*/}
+        {/*    fullWidth*/}
+        {/*  />*/}
+        {/*</Grid>*/}
         {props.eventType === "MISC" ? (
           <Grid item xs={12}>
             <TextField
@@ -427,6 +429,6 @@ export const EventForm = (props: {
           </Grid>
         </Grid>
       </Grid>
-    </MuiPickersUtilsProvider>
+    </LocalizationProvider>
   );
 };
