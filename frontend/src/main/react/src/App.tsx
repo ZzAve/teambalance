@@ -9,6 +9,8 @@ import Grid from "@material-ui/core/Grid";
 import EventsPage from "./views/EventsPage";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
+import { makeStyles, ThemeProvider } from "@material-ui/core";
+import { createTheme } from "@material-ui/core/styles";
 
 const Admin = lazy(() => import("./views/Admin"));
 const Login = lazy(() => import("./views/Login"));
@@ -16,6 +18,13 @@ const Overview = lazy(() => import("./views/Overview"));
 const Transaction = lazy(() => import("./views/TransactionsPage"));
 const Users = lazy(() => import("./views/UsersPage"));
 
+const theme = createTheme();
+
+const useStyles = makeStyles((theme) => {
+  {
+    // some CSS that accesses the theme
+  }
+});
 const App = () => {
   const [topBarShouldRefresh, setTopBarShouldRefresh] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
@@ -34,7 +43,7 @@ const App = () => {
 
   console.debug("[App] render");
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <SnackbarProvider maxSnack={5} autoHideDuration={2500}>
         <CssBaseline />
         <Container maxWidth="xl">
@@ -116,7 +125,7 @@ const App = () => {
           </Grid>
         </Container>
       </SnackbarProvider>
-    </>
+    </ThemeProvider>
   );
 };
 
