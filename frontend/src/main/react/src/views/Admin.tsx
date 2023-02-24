@@ -44,7 +44,7 @@ const texts: AdminPageTexts = {
   event_type_name: {
     TRAINING: "Trainingen",
     MATCH: "Wedstrijden",
-    MISC: "Overige Evenementen",
+    MISC: "Overige evenementen",
     OTHER: "Evenementen",
   },
   new_event_button_text: {

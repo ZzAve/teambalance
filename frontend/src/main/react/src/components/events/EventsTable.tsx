@@ -202,7 +202,7 @@ const EventsTable = (props: {
         {formattedDate(new Date(teamEvent.startTime))}&nbsp;
         {formattedTime(new Date(teamEvent.startTime))}
       </TableCell>
-      {props.eventType !== "TRAINING" ? getBodyTitleCell(teamEvent) : ""}
+      {props.eventType !== "TRAINING" ? getBodyTitleCell(teamEvent) : <></>}
       <TableCell align="right">{getBodyLocationCell(teamEvent)}</TableCell>
       <TableCell align="right">{teamEvent.comment}</TableCell>
       <TableCell sx={{ width: "20%" }}>
