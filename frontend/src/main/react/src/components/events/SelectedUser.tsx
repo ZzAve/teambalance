@@ -5,10 +5,11 @@ import {
   IconButton,
   MenuItem,
   Select,
-} from "@material-ui/core";
-import LockIcon from "@material-ui/icons/Lock";
-import LockOpenIcon from "@material-ui/icons/LockOpen";
-import Typography from "@material-ui/core/Typography";
+  SelectChangeEvent,
+} from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import Typography from "@mui/material/Typography";
 import { Attendee } from "../Attendees";
 import { useAlerts } from "../../hooks/alertsHook";
 import { Attendee as AttendeeType, User } from "../../utils/domain";
@@ -42,9 +43,7 @@ export const SelectedUser = (props: {
   );
 
   const { addAlert } = useAlerts();
-  const handleUserSelection = async (
-    event: React.ChangeEvent<{ name?: string; value: unknown }>
-  ) => {
+  const handleUserSelection = async (event: SelectChangeEvent<number>) => {
     if (typeof event.target.value !== "number") {
       console.error("Something is horribly wrong");
       addAlert({
@@ -102,8 +101,9 @@ export const SelectedUser = (props: {
   const attendee = props.attendees.find((it) => it.user.id === selectedUser);
 
   const showUserSelectionDropdown = () => (
-    <FormControl fullWidth>
+    <FormControl variant="standard" fullWidth>
       <Select
+        variant="standard"
         labelId="user-select"
         value={selectedUser}
         onChange={handleUserSelection}

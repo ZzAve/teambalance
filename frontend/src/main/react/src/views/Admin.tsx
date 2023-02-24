@@ -1,8 +1,8 @@
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import PageItem from "../components/PageItem";
 import React, { useState } from "react";
 import Events from "../components/events/Events";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import {
   Link,
   Navigate,
@@ -13,14 +13,14 @@ import {
 } from "react-router-dom";
 import { RequireAuth } from "../components/RequireAuth";
 import Loading from "./Loading";
-import { Button, createStyles, makeStyles } from "@material-ui/core";
-import Hidden from "@material-ui/core/Hidden";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import { Button } from "@mui/material";
+import { createStyles, makeStyles } from "@mui/styles";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EventDetails from "../components/events/EventDetails";
-import List from "@material-ui/core/List";
-import AddIcon from "@material-ui/icons/Add";
+import List from "@mui/material/List";
+import AddIcon from "@mui/icons-material/Add";
 import { EventType } from "../components/events/utils";
-import CheckBox from "@material-ui/core/Checkbox";
+import CheckBox from "@mui/material/Checkbox";
 
 type AdminPageTexts = {
   event_type_name: Record<EventType, string>;
@@ -90,7 +90,13 @@ const Admin = (props: { refresh: boolean }) => {
         </Typography>
         <Button variant="contained" color="primary" onClick={navigateBack}>
           <ArrowBackIcon spacing={5} />
-          <Hidden xsDown> Terug naar de veiligheid</Hidden>
+          <Typography
+            variant={"button"}
+            sx={{ display: { sm: "block", xs: "none" } }}
+          >
+            {" "}
+            Terug naar de veiligheid
+          </Typography>
         </Button>
       </PageItem>
 
@@ -234,9 +240,12 @@ const EventsOverview = (props: { eventType: EventType; refresh: boolean }) => {
             }}
           >
             <AddIcon spacing={5} />
-            <Hidden xsDown>
+            <Typography
+              variant={"button"}
+              sx={{ display: { sm: "block", xs: "none" } }}
+            >
               {getText(props.eventType, "new_event_button_text")}
-            </Hidden>
+            </Typography>
           </Button>
         </Grid>
         <Grid

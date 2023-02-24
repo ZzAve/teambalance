@@ -1,15 +1,16 @@
 import React, { FormEvent, useEffect, useState } from "react";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import LockOpenIcon from "@material-ui/icons/LockOpen";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 import PageItem from "../components/PageItem";
-import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import { withLoading } from "../utils/util";
 import Loading from "./Loading";
 import { Navigate, useLocation } from "react-router-dom";
 import { authenticationManager } from "../utils/AuthenticationManager";
-import { createStyles, makeStyles } from "@material-ui/core";
+import { createStyles, makeStyles } from "@mui/styles";
+
 import { LocationState } from "../components/utils";
 
 const useStyles = makeStyles(() =>
@@ -98,12 +99,14 @@ const Login = (opts: { handleRefresh: () => void }) => {
               </Grid>
               <Grid item>
                 <TextField
+                  variant="standard"
                   className={classes.hidden}
                   type="text"
                   autoComplete="username"
                   value="tovoheren5"
                 />
                 <TextField
+                  variant="standard"
                   id="secret"
                   type="password"
                   autoComplete="password"

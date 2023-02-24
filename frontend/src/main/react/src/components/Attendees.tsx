@@ -1,34 +1,25 @@
 import { SpinnerWithText } from "./SpinnerWithText";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
-import Button from "@material-ui/core/Button";
-import CheckIcon from "@material-ui/icons/Check";
-import ClearIcon from "@material-ui/icons/Clear";
-import HelpIcon from "@material-ui/icons/Help";
-import WarningIcon from "@material-ui/icons/Warning";
+import Button from "@mui/material/Button";
+import CheckIcon from "@mui/icons-material/Check";
+import ClearIcon from "@mui/icons-material/Clear";
+import HelpIcon from "@mui/icons-material/Help";
 import { withLoading } from "../utils/util";
 import { attendeesApiClient } from "../utils/AttendeesApiClient";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { EventType } from "./events/utils";
-import { withStyles } from "@material-ui/styles";
+import { withStyles } from "@mui/styles";
 import { Attendee as AttendeeType, Availability, Role } from "../utils/domain";
 import { useAlerts } from "../hooks/alertsHook";
 
-// @ts-ignore
-const styledBy = (property, mapping) => (props) => mapping[props[property]];
-
-const colorMap: Record<Availability, string> = {
-  PRESENT: "primary",
-  ABSENT: "secondary",
-  UNCERTAIN: "default",
-  NOT_RESPONDED: "default",
+const colorMap: Record<Availability, ButtonColorValue> = {
+  PRESENT: "success",
+  ABSENT: "error",
+  UNCERTAIN: "warning",
+  NOT_RESPONDED: "inherit",
 };
-
-const additionalColorMap: Partial<Record<Availability, string>> = {
-  UNCERTAIN: "tertiary",
-};
-
 type AttendeeTexts = {
   is_present_on_event: Record<EventType, string>;
 };
@@ -78,26 +69,23 @@ const formatUnicorn = (unicorn: string) => {
 };
 
 export const AttendeeStyledButton = withStyles({
-  root: {
-    "&:hover": {
-      background: styledBy("additional-color", {
-        tertiary: "#cbb38a",
-      }),
-    },
-    background: styledBy("additional-color", {
-      tertiary: "#E8D5B5",
-    }),
-  },
-  label: {
-    textTransform: "capitalize",
-  },
+  // label: {
+  //   textTransform: "capitalize",
+  // },
 })(Button);
 
-const buttonColor: (state: Availability) => string = (state: Availability) =>
-  colorMap[state] || "default";
-const additionalButtonColor: (state: Availability) => string = (state) =>
-  additionalColorMap[state] || "default";
-
+type ButtonColorValue =
+  | "primary"
+  | "secondary"
+  | "inherit"
+  | "success"
+  | "error"
+  | "info"
+  | "warning"
+  | undefined;
+const buttonColor: (state: Availability) => ButtonColorValue = (
+  state: Availability
+) => colorMap[state];
 /**
  * Function Attendees component
  */
@@ -112,7 +100,6 @@ const Attendees = (props: {
   const [selectedAttendee, setSelectedAttendee] = useState<
     AttendeeType | undefined
   >(undefined);
-  const [errorMessage, setErrorMessage] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [withAttendeeSummaryDetail, setAttendeeSummaryDetail] = useState(false);
   const { addAlert } = useAlerts();
@@ -182,16 +169,16 @@ const Attendees = (props: {
       ))}
       {showSummary ? (
         <Grid key={"total"} item>
-          <AttendeeStyledButton
+          <Button
             size={size}
             variant="outlined"
-            color="default"
+            color="primary"
             onClick={() => {
               setAttendeeSummaryDetail((x) => !x);
             }}
           >
             {getAttendeesSummary(props.attendees)}
-          </AttendeeStyledButton>
+          </Button>
         </Grid>
       ) : (
         ""
@@ -201,16 +188,6 @@ const Attendees = (props: {
 
   return (
     <Grid container spacing={1}>
-      {!!errorMessage ? (
-        <Grid item xs={12}>
-          <Typography>
-            <WarningIcon spacing={2} /> {errorMessage}{" "}
-          </Typography>
-        </Grid>
-      ) : (
-        ""
-      )}
-
       {!selectedAttendee ? (
         attendeeOverview()
       ) : (
@@ -234,18 +211,17 @@ export const Attendee = (props: {
 }) => {
   const { size = "medium", disabled = false } = props;
   return (
-    <AttendeeStyledButton
+    <Button
       size={size}
       disabled={disabled}
       variant="contained"
       color={buttonColor(props.attendee.state)}
-      additional-color={additionalButtonColor(props.attendee.state)}
       onClick={() => {
         props.onSelection(props.attendee);
       }}
     >
       {props.attendee.user.name}
-    </AttendeeStyledButton>
+    </Button>
   );
 };
 
@@ -276,15 +252,14 @@ const AttendeeRefinement = (props: {
     content: string | JSX.Element
   ) => {
     return (
-      <AttendeeStyledButton
+      <Button
         size={props.size}
         variant="contained"
         color={buttonColor(state)}
-        additional-color={additionalButtonColor(state)}
         onClick={() => handleClick(state)}
       >
         {content}
-      </AttendeeStyledButton>
+      </Button>
     );
   };
 
@@ -295,15 +270,15 @@ const AttendeeRefinement = (props: {
         <Grid item>{AttendeeButton("ABSENT", <ClearIcon />)}</Grid>
         <Grid item>{AttendeeButton("UNCERTAIN", <HelpIcon />)}</Grid>
         <Grid item>
-          <AttendeeStyledButton
+          <Button
             size={props.size}
             variant="contained"
-            color="default"
+            color="primary"
             onClick={() => props.onBack()}
           >
             <ArrowBackIcon />
             <Typography>Terug</Typography>
-          </AttendeeStyledButton>
+          </Button>
         </Grid>
       </Grid>
     );

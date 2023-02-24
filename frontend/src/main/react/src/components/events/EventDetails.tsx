@@ -1,10 +1,9 @@
 import { SpinnerWithText } from "../SpinnerWithText";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import React, { useEffect, useState } from "react";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { withLoading } from "../../utils/util";
 import { usersApiClient } from "../../utils/UsersApiClient";
-import Typography from "@material-ui/core/Typography";
 import { EventForm } from "./EventForm";
 import { EventType } from "./utils";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
@@ -17,7 +16,6 @@ nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
 
 type EventsDetailsTexts = {
   fetch_event_form: Record<EventType, string>;
-  event_details_header: Record<EventType, string>;
 };
 
 const texts: EventsDetailsTexts = {
@@ -26,12 +24,6 @@ const texts: EventsDetailsTexts = {
     MATCH: "ophalen wedstrijdformulier",
     MISC: "ophalen eventformulier",
     OTHER: "ophalen ...",
-  },
-  event_details_header: {
-    TRAINING: "Training Details",
-    MATCH: "Wedstrijd Details",
-    MISC: "Evenement Details",
-    OTHER: "Details",
   },
 };
 const getText = (eventType: EventType, name: keyof EventsDetailsTexts) =>
@@ -129,9 +121,6 @@ const EventDetails = (props: { eventType: EventType; id?: number }) => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Typography variant="h6">
-          {getText(props.eventType, "event_details_header")}
-        </Typography>
         <EventForm eventType={props.eventType} event={event} users={users} />
       </Grid>
     </Grid>

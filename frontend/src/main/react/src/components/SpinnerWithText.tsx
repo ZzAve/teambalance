@@ -1,10 +1,8 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
-import CircularProgress from "@material-ui/core/CircularProgress";
-
-import { ClassNameMap } from "@material-ui/core/styles/withStyles";
+import { ClassNameMap, makeStyles } from "@mui/styles";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const useStyles: (size: number) => (props?: any) => ClassNameMap = (
   size: number

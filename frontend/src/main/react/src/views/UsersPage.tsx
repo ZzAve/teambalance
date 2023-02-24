@@ -1,10 +1,10 @@
-import Grid from "@material-ui/core/Grid";
-import { Button, Card, createStyles, makeStyles } from "@material-ui/core";
+import Grid from "@mui/material/Grid";
+import { createStyles, makeStyles } from "@mui/styles";
+import { Button, Card } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import Hidden from "@material-ui/core/Hidden";
-import Typography from "@material-ui/core/Typography";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Typography from "@mui/material/Typography";
 import PageTitle from "../components/PageTitle";
 import Users from "../components/Users";
 
@@ -31,7 +31,12 @@ const UsersPage = (props: { refresh: boolean }) => {
         <Grid container item xs={12}>
           <Button variant="contained" color="primary" onClick={navigateBack}>
             <ArrowBackIcon />
-            <Hidden xsDown>Terug </Hidden>
+            <Typography
+              variant={"button"}
+              sx={{ display: { sm: "block", xs: "none" } }}
+            >
+              Terug
+            </Typography>
           </Button>
         </Grid>
 

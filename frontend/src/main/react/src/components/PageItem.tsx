@@ -1,5 +1,5 @@
-import Grid, { GridSize } from "@material-ui/core/Grid";
-import { Card, CardContent, CardHeader } from "@material-ui/core";
+import Grid, { GridSize } from "@mui/material/Grid";
+import { Card, CardContent, CardHeader } from "@mui/material";
 import React from "react";
 import PageTitle from "./PageTitle";
 

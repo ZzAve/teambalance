@@ -4,16 +4,16 @@ import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { Navigate, useLocation } from "react-router-dom";
 import { SpinnerWithText } from "../SpinnerWithText";
 import { nl } from "date-fns/locale";
-import Grid from "@material-ui/core/Grid";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import CheckBox from "@material-ui/core/Checkbox";
-import Button from "@material-ui/core/Button";
+import Grid from "@mui/material/Grid";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import CheckBox from "@mui/material/Checkbox";
+import Button from "@mui/material/Button";
 import { EventType, isMatch, isMiscEvent } from "./utils";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import Radio from "@mui/material/Radio";
 import { eventsApiClient } from "../../utils/MiscEventsApiClient";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import { EventUsers } from "./EventUsers";
 import { useAlerts } from "../../hooks/alertsHook";
 import { LocationState } from "../utils";
@@ -114,16 +114,14 @@ export const EventForm = (props: {
   const location = useLocation();
 
   const getInitialSelectedDate = (event?: TeamEvent) => {
-    return () => {
-      if (event !== undefined && event.startTime) {
-        return dayjs(event.startTime.toISOString());
-      } else {
-        // Initialize to 20:00
-        let date = new Date();
-        date.setHours(20, 0, 0, 0);
-        return dayjs(date.toISOString());
-      }
-    };
+    if (event !== undefined && event.startTime) {
+      return dayjs(event.startTime.toISOString());
+    } else {
+      // Initialize to 20:00
+      let date = new Date();
+      date.setHours(20, 0, 0, 0);
+      return dayjs(date.toISOString());
+    }
   };
 
   const [id] = useState(props.event?.id);
@@ -131,7 +129,7 @@ export const EventForm = (props: {
     props.event?.location || ""
   );
   const [selectedTime, setSelectedTime] = useState<Dayjs | null>(
-    null //getInitialSelectedDate(props.event)
+    getInitialSelectedDate(props.event)
   );
   const [opponent, setOpponent] = useState(
     isMatch(props.event) ? props.event.opponent : ""
@@ -248,21 +246,28 @@ export const EventForm = (props: {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"nl"}>
       <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <TextField
-            // required
-            id="trainingId"
-            name="id"
-            label="id"
-            defaultValue={id}
-            // fullWidth
-            disabled
-          />
-        </Grid>
+        {!!props.event?.id ? (
+          <Grid item xs={12}>
+            <TextField
+              variant="standard"
+              // required
+              id="trainingId"
+              name="id"
+              label="id"
+              defaultValue={id}
+              // fullWidth
+              disabled
+            />
+          </Grid>
+        ) : (
+          ""
+        )}
 
         <Grid item xs={12} sm={6}>
           <DateTimePicker
-            renderInput={(props) => <TextField {...props}></TextField>}
+            renderInput={(props) => (
+              <TextField variant="standard" {...props}></TextField>
+            )}
             label="Datum / tijd"
             value={selectedTime}
             onChange={(x) => {
@@ -297,6 +302,7 @@ export const EventForm = (props: {
         {props.eventType === "MISC" ? (
           <Grid item xs={12}>
             <TextField
+              variant="standard"
               id="title"
               name="title"
               label="Titel"
@@ -312,6 +318,7 @@ export const EventForm = (props: {
           <>
             <Grid item xs={12}>
               <TextField
+                variant="standard"
                 required
                 id="opponent"
                 name="opponent"
@@ -350,6 +357,7 @@ export const EventForm = (props: {
         )}
         <Grid item xs={12}>
           <TextField
+            variant="standard"
             required
             id="location"
             name="location"
@@ -363,6 +371,7 @@ export const EventForm = (props: {
         </Grid>
         <Grid item xs={12}>
           <TextField
+            variant="standard"
             id="comment"
             name="comment"
             label="Opmerking"

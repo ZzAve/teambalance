@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { SnackbarKey, useSnackbar } from "notistack";
-import { Button } from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+import { Button } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 export type AlertLevelType = "success" | "info" | "warning" | "error";
 
@@ -38,11 +38,7 @@ export const useAlerts = () => {
     });
 
   const closeButton = (snackbarId: SnackbarKey) => (
-    <Button
-      variant="text"
-      color="default"
-      onClick={() => closeSnackbar(snackbarId)}
-    >
+    <Button variant="text" onClick={() => closeSnackbar(snackbarId)}>
       <CloseIcon />
     </Button>
   );

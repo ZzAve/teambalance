@@ -1,10 +1,10 @@
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import React, { useState } from "react";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import Attendees from "../Attendees";
 import { formattedDate, formattedTime } from "../../utils/util";
 import { EventType, isMatch, isMiscEvent, isTraining } from "./utils";
-import { Pagination } from "@material-ui/lab";
+import { Pagination } from "@mui/lab";
 import { SelectedUser } from "./SelectedUser";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { EditableTextField } from "./EditableTextField";
