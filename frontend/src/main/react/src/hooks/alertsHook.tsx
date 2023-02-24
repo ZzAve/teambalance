@@ -32,19 +32,23 @@ export const useAlerts = () => {
   const addSnackbar = (alert: Alert) =>
     enqueueSnackbar(alert.message, {
       variant: alert.level,
-      action: (snackbarId) => (
-        <>{alert.canClose !== false ? closeButton(snackbarId) : ""}</>
-      ),
+      action: (snackbarId) =>
+        alert.canClose !== false ? closeButton(snackbarId) : <></>,
     });
 
   const closeButton = (snackbarId: SnackbarKey) => (
-    <Button variant="text" onClick={() => closeSnackbar(snackbarId)}>
+    <Button
+      variant="text"
+      color="inherit"
+      onClick={() => closeSnackbar(snackbarId)}
+    >
       <CloseIcon />
     </Button>
   );
 
   /**
-   *
+   * Add a snackbar to alert the user
+   * @param alert
    */
   const addAlert = (alert: Alert) => {
     const alertId = addSnackbar(alert);
@@ -52,6 +56,11 @@ export const useAlerts = () => {
 
     setStates.forEach((it) => it(alerts));
   };
+
+  /**
+   * Remove an alert based on its id
+   * @param alertId
+   */
   const removeAlert = (alertId: string | number) => {
     const alertToRemove = alerts.find((a) => a.id === alertId);
 
