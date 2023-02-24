@@ -10,7 +10,6 @@ import { withLoading } from "../utils/util";
 import { attendeesApiClient } from "../utils/AttendeesApiClient";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { EventType } from "./events/utils";
-import { withStyles } from "@mui/styles";
 import { Attendee as AttendeeType, Availability, Role } from "../utils/domain";
 import { useAlerts } from "../hooks/alertsHook";
 
@@ -68,11 +67,7 @@ const formatUnicorn = (unicorn: string) => {
   };
 };
 
-export const AttendeeStyledButton = withStyles({
-  // label: {
-  //   textTransform: "capitalize",
-  // },
-})(Button);
+export const AttendeeStyledButton = Button;
 
 type ButtonColorValue =
   | "primary"

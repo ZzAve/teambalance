@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import Attendees from "../Attendees";
 import { formattedDate, formattedTime } from "../../utils/util";
 import { EventType, isMatch, isMiscEvent, isTraining } from "./utils";
-import { Pagination } from "@mui/lab";
+import { Pagination } from "@mui/material";
 import { SelectedUser } from "./SelectedUser";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { EditableTextField } from "./EditableTextField";

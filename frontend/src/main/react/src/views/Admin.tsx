@@ -1,4 +1,5 @@
 import Grid from "@mui/material/Grid";
+import { styled } from "@mui/material/styles";
 import PageItem from "../components/PageItem";
 import React, { useState } from "react";
 import Events from "../components/events/Events";
@@ -14,13 +15,23 @@ import {
 import { RequireAuth } from "../components/RequireAuth";
 import Loading from "./Loading";
 import { Button } from "@mui/material";
-import { createStyles, makeStyles } from "@mui/styles";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EventDetails from "../components/events/EventDetails";
 import List from "@mui/material/List";
 import AddIcon from "@mui/icons-material/Add";
 import { EventType } from "../components/events/utils";
 import CheckBox from "@mui/material/Checkbox";
+
+const StyleMenuList = styled(List)((theme) => ({
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+  rowGap: "10px",
+
+  [`& a`]: {
+    textDecoration: "none",
+  },
+}));
 
 type AdminPageTexts = {
   event_type_name: Record<EventType, string>;
@@ -59,34 +70,19 @@ const texts: AdminPageTexts = {
 const getText = (eventsType: EventType, name: keyof AdminPageTexts) =>
   texts[name][eventsType] || name;
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    menu: {
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "space-between",
-      width: "100%",
-
-      "& > a": {
-        textDecoration: "none",
-      },
-    },
-  })
-);
-
 const Admin = (props: { refresh: boolean }) => {
-  const classes = useStyles();
   const navigate = useNavigate();
 
   const navigateBack = () => {
     navigate("../");
   };
 
+  // @ts-ignore
   return (
     <>
-      <PageItem title="⚠️ Admin pagina, Let op!" md={6}>
+      <PageItem title="⚠️ Admin pagina, Let op!" xs={12}>
         <Typography variant="h6">
-          Je begeeft je nu op de 'admin' pagina's. Pas op voor de lactacyd{" "}
+          Je begeeft je nu op de 'admin' pagina's. Pas op voor de lactacyd
         </Typography>
         <Button variant="contained" color="primary" onClick={navigateBack}>
           <ArrowBackIcon spacing={5} />
@@ -94,14 +90,10 @@ const Admin = (props: { refresh: boolean }) => {
             variant={"button"}
             sx={{ display: { sm: "block", xs: "none" } }}
           >
-            {" "}
             Terug naar de veiligheid
           </Typography>
         </Button>
-      </PageItem>
-
-      <Grid item xs={12}>
-        <List component="nav" aria-label="Admin menu" className={classes.menu}>
+        <StyleMenuList component="nav" aria-label="Admin menu">
           <Link to="trainings">
             <Button variant="outlined" color="primary">
               Trainingen
@@ -118,8 +110,8 @@ const Admin = (props: { refresh: boolean }) => {
               Overige events
             </Button>
           </Link>
-        </List>
-      </Grid>
+        </StyleMenuList>
+      </PageItem>
 
       <Routes>
         <Route
@@ -287,10 +279,8 @@ const EventsOverview = (props: { eventType: EventType; refresh: boolean }) => {
 };
 
 const ChangeEvent = (props: { eventType: EventType }) => {
-  const navigate = useNavigate();
   let { id } = useParams();
 
-  // const id = +((computedMatch || {}).params || {}).id;
   console.log("ChangeEvent: ", id, props.eventType);
   if (id === undefined || isNaN(+id)) {
     let target =

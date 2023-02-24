@@ -1,7 +1,6 @@
 import Grid from "@mui/material/Grid";
 import PageItem from "../components/PageItem";
 import { Button, Card } from "@mui/material";
-import { createStyles, makeStyles } from "@mui/styles";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -10,17 +9,8 @@ import Potters from "../components/Potters";
 import Typography from "@mui/material/Typography";
 import PageTitle from "../components/PageTitle";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    transactions: {
-      padding: "16px",
-    },
-  })
-);
-
 const TransactionsPage = (props: { refresh: boolean }) => {
   const navigate = useNavigate();
-  const classes = useStyles();
 
   const navigateBack = () => {
     navigate("../");
@@ -45,7 +35,7 @@ const TransactionsPage = (props: { refresh: boolean }) => {
         <Grid item xs={12}>
           <Card>
             <Grid container item xs={12}>
-              <Grid item xs={12} className={classes.transactions}>
+              <Grid item xs={12} sx={{ padding: "16px" }}>
                 <Typography variant="h5">Transacties</Typography>
               </Grid>
               <Grid item xs={12}>

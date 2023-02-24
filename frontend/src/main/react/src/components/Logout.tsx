@@ -18,8 +18,7 @@ export const Logout = (props: { handleRefresh: () => void }) => {
         variant={"button"}
         sx={{ display: { sm: "block", xs: "none" } }}
       >
-        {" "}
-        Logout{" "}
+        Logout
       </Typography>
     </Button>
   );

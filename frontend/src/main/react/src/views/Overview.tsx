@@ -3,7 +3,6 @@ import Balance from "../components/Balance";
 import TopUp from "../components/TopUp";
 import Potters from "../components/Potters";
 import PageItem from "../components/PageItem";
-import { createStyles, makeStyles } from "@mui/styles";
 import { Button, Card } from "@mui/material";
 import Transactions from "../components/Transactions";
 import React from "react";
@@ -13,16 +12,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Typography from "@mui/material/Typography";
 import PageTitle from "../components/PageTitle";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    transactions: {
-      padding: "16px",
-    },
-  })
-);
-
 const Overview = (props: { refresh: boolean }) => {
-  const classes = useStyles();
   const navigate = useNavigate();
 
   return (
@@ -144,7 +134,7 @@ const Overview = (props: { refresh: boolean }) => {
                 item
                 xs={12}
                 justifyContent="space-between"
-                className={classes.transactions}
+                sx={{ padding: "16px" }}
               >
                 <Grid item>
                   <Typography variant="h5">Transacties</Typography>
@@ -186,7 +176,7 @@ const Overview = (props: { refresh: boolean }) => {
                     Teamleden
                     <ArrowForwardIcon spacing={5} />
                   </Button>
-                </Grid>{" "}
+                </Grid>
               </Grid>
             </PageItem>
           </Grid>

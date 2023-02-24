@@ -9,25 +9,14 @@ import { withLoading } from "../utils/util";
 import Loading from "./Loading";
 import { Navigate, useLocation } from "react-router-dom";
 import { authenticationManager } from "../utils/AuthenticationManager";
-import { createStyles, makeStyles } from "@mui/styles";
 
 import { LocationState } from "../components/utils";
-
-const useStyles = makeStyles(() =>
-  createStyles({
-    hidden: {
-      display: "none",
-    },
-  })
-);
 
 const Login = (opts: { handleRefresh: () => void }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
-
-  const classes = useStyles();
 
   useEffect(() => {
     //On startup , try with current value in authenticationManager
@@ -100,7 +89,7 @@ const Login = (opts: { handleRefresh: () => void }) => {
               <Grid item>
                 <TextField
                   variant="standard"
-                  className={classes.hidden}
+                  sx={{ display: "none" }}
                   type="text"
                   autoComplete="username"
                   value="tovoheren5"

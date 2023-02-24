@@ -1,5 +1,4 @@
 import Grid from "@mui/material/Grid";
-import { createStyles, makeStyles } from "@mui/styles";
 import { Button, Card } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,17 +7,8 @@ import Typography from "@mui/material/Typography";
 import PageTitle from "../components/PageTitle";
 import Users from "../components/Users";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    transactions: {
-      padding: "16px",
-    },
-  })
-);
-
 const UsersPage = (props: { refresh: boolean }) => {
   const navigate = useNavigate();
-  const classes = useStyles();
 
   const navigateBack = () => {
     navigate("../");
@@ -43,7 +33,7 @@ const UsersPage = (props: { refresh: boolean }) => {
         <Grid item xs={12}>
           <Card>
             <Grid container item xs={12}>
-              <Grid item xs={12} className={classes.transactions}>
+              <Grid item xs={12} sx={{ padding: "16px" }}>
                 <Typography variant="h5">Teamleden</Typography>
               </Grid>
               <Grid item xs={12}>

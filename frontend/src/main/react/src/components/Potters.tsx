@@ -88,7 +88,6 @@ export const Potters = (props: {
           <Typography variant="body1"> Month (last 30 days) </Typography>
         </Grid>
         <Grid item>
-          {" "}
           <Switch
             checked={showSeason}
             onChange={(x) => setShowSeasonToggle(x.target.checked)}

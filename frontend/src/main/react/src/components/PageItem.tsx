@@ -17,7 +17,7 @@ const PageItem = (props: {
       <Grid item xs={xs} md={md}>
         <Card>
           <CardHeader title={title} />
-          <CardContent>{children}</CardContent>
+          <CardContent sx={{ width: "100%" }}>{children}</CardContent>
         </Card>
       </Grid>
     </>

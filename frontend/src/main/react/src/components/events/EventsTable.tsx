@@ -9,7 +9,6 @@ import TableBody from "@mui/material/TableBody";
 import React, { ChangeEvent, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { createStyles, makeStyles } from "@mui/styles";
 import {
   Button,
   TableFooter,
@@ -29,21 +28,6 @@ import { eventsApiClient } from "../../utils/MiscEventsApiClient";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
 import { TeamEvent } from "../../utils/domain";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    root: {
-      minWidth: "480px",
-    },
-    attendees: {
-      width: "20%",
-    },
-    changes: {
-      width: "10%",
-      minWidth: "100px",
-    },
-  })
-);
-
 const EventsTable = (props: {
   eventType: EventType;
   events: TeamEvent[];
@@ -59,7 +43,7 @@ const EventsTable = (props: {
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const classes = useStyles();
+
   const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
 
   const handleChangePage = (
@@ -218,10 +202,10 @@ const EventsTable = (props: {
         {formattedDate(new Date(teamEvent.startTime))}&nbsp;
         {formattedTime(new Date(teamEvent.startTime))}
       </TableCell>
-      {getBodyTitleCell(teamEvent)}
+      {props.eventType !== "TRAINING" ? getBodyTitleCell(teamEvent) : ""}
       <TableCell align="right">{getBodyLocationCell(teamEvent)}</TableCell>
       <TableCell align="right">{teamEvent.comment}</TableCell>
-      <TableCell className={classes.attendees}>
+      <TableCell sx={{ width: "20%" }}>
         <Attendees
           size="small"
           attendees={teamEvent.attendees}
@@ -230,7 +214,7 @@ const EventsTable = (props: {
         />
       </TableCell>
       {allowChanges ? (
-        <TableCell className={classes.changes} align="right">
+        <TableCell sx={{ width: "100px" }} align="right">
           {getUpdateIcons({ id: teamEvent.id })}
         </TableCell>
       ) : (
@@ -255,7 +239,11 @@ const EventsTable = (props: {
     <Grid container item xs={12}>
       {getAlertDialogg()}
       <TableContainer component={Paper}>
-        <Table aria-label="simple table" size="medium" className={classes.root}>
+        <Table
+          aria-label="simple table"
+          size="medium"
+          sx={{ minSize: "480px" }}
+        >
           <TableHead>{getTableHead()}</TableHead>
           <TableBody>{getTableBody()}</TableBody>
           {props.withPagination && (
