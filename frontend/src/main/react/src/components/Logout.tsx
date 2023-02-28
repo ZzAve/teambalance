@@ -1,8 +1,8 @@
 import React from "react";
-import LockIcon from "@material-ui/icons/Lock";
+import LockIcon from "@mui/icons-material/Lock";
 import { authenticationManager } from "../utils/AuthenticationManager";
-import Button from "@material-ui/core/Button";
-import Hidden from "@material-ui/core/Hidden";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 
 export const Logout = (props: { handleRefresh: () => void }) => {
   const handleLogout = () => {
@@ -11,9 +11,15 @@ export const Logout = (props: { handleRefresh: () => void }) => {
   };
 
   return (
+    // TODO consider creating a XyzButton that accepts a clickhandler, icon and text to show for sm and up
     <Button variant="contained" color="secondary" onClick={handleLogout}>
       <LockIcon />
-      <Hidden xsDown>Logout</Hidden>
+      <Typography
+        variant={"button"}
+        sx={{ display: { sm: "block", xs: "none" } }}
+      >
+        Logout
+      </Typography>
     </Button>
   );
 };

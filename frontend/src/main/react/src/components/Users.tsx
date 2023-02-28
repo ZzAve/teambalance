@@ -1,44 +1,21 @@
 import React, { useEffect, useState } from "react";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 import { SpinnerWithText } from "./SpinnerWithText";
 import { withLoading } from "../utils/util";
-import {
-  createStyles,
-  makeStyles,
-  useMediaQuery,
-  useTheme,
-} from "@material-ui/core";
+import { useMediaQuery, useTheme } from "@mui/material";
 import { roleMapper, User } from "../utils/domain";
 import { usersApiClient } from "../utils/UsersApiClient";
-
-const useStyles = makeStyles(() =>
-  createStyles({
-    DEBIT: {
-      color: "green",
-    },
-    CREDIT: {
-      color: "red",
-    },
-    hidden: {
-      display: "none",
-    },
-    full: {
-      width: "100%",
-    },
-  })
-);
 
 export const Users = (props: { refresh: boolean }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const classes = useStyles();
   useMediaQuery(useTheme().breakpoints.up("sm"));
   useEffect(() => {
     withLoading(setIsLoading, () =>
@@ -52,7 +29,7 @@ export const Users = (props: { refresh: boolean }) => {
 
   return (
     <TableContainer component={Paper}>
-      <Table className={classes.full} aria-label="Alle spelers en teamleaden">
+      <Table sx={{ width: "100%" }} aria-label="Alle spelers en teamleaden">
         <TableHead>
           <TableRow>
             <TableCell>Naam</TableCell>

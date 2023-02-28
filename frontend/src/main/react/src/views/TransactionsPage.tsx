@@ -1,26 +1,16 @@
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import PageItem from "../components/PageItem";
-import { Button, Card, createStyles, makeStyles } from "@material-ui/core";
+import { Button, Card } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import Hidden from "@material-ui/core/Hidden";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Transactions from "../components/Transactions";
 import Potters from "../components/Potters";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import PageTitle from "../components/PageTitle";
-
-const useStyles = makeStyles(() =>
-  createStyles({
-    transactions: {
-      padding: "16px",
-    },
-  })
-);
 
 const TransactionsPage = (props: { refresh: boolean }) => {
   const navigate = useNavigate();
-  const classes = useStyles();
 
   const navigateBack = () => {
     navigate("../");
@@ -33,14 +23,19 @@ const TransactionsPage = (props: { refresh: boolean }) => {
         <Grid container item xs={12}>
           <Button variant="contained" color="primary" onClick={navigateBack}>
             <ArrowBackIcon />
-            <Hidden xsDown>Terug </Hidden>
+            <Typography
+              variant={"button"}
+              sx={{ display: { sm: "block", xs: "none" } }}
+            >
+              Terug
+            </Typography>
           </Button>
         </Grid>
 
         <Grid item xs={12}>
           <Card>
             <Grid container item xs={12}>
-              <Grid item xs={12} className={classes.transactions}>
+              <Grid item xs={12} sx={{ padding: "16px" }}>
                 <Typography variant="h5">Transacties</Typography>
               </Grid>
               <Grid item xs={12}>

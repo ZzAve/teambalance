@@ -1,15 +1,14 @@
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import PageItem from "../components/PageItem";
-import { Button } from "@material-ui/core";
+import { Button } from "@mui/material";
 import React, { useState } from "react";
 import Events from "../components/events/Events";
 import { useNavigate } from "react-router-dom";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import Hidden from "@material-ui/core/Hidden";
-import Switch from "@material-ui/core/Switch";
-import Typography from "@material-ui/core/Typography";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Switch from "@mui/material/Switch";
+import Typography from "@mui/material/Typography";
 import { EventType } from "../components/events/utils";
-import CheckBox from "@material-ui/core/Checkbox";
+import CheckBox from "@mui/material/Checkbox";
 
 type EventsPageTexts = {
   coming_events: Record<EventType, string>;
@@ -42,7 +41,12 @@ const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
           onClick={() => navigate("../")}
         >
           <ArrowBackIcon />
-          <Hidden xsDown>Terug </Hidden>
+          <Typography
+            variant={"button"}
+            sx={{ display: { sm: "block", xs: "none" } }}
+          >
+            Terug
+          </Typography>
         </Button>
       </Grid>
       <Grid container item xs={12}>

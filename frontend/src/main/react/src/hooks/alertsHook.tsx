@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { SnackbarKey, useSnackbar } from "notistack";
-import { Button } from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+import { Button } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 export type AlertLevelType = "success" | "info" | "warning" | "error";
 
@@ -32,15 +32,14 @@ export const useAlerts = () => {
   const addSnackbar = (alert: Alert) =>
     enqueueSnackbar(alert.message, {
       variant: alert.level,
-      action: (snackbarId) => (
-        <>{alert.canClose !== false ? closeButton(snackbarId) : ""}</>
-      ),
+      action: (snackbarId) =>
+        alert.canClose !== false ? closeButton(snackbarId) : <></>,
     });
 
   const closeButton = (snackbarId: SnackbarKey) => (
     <Button
       variant="text"
-      color="default"
+      color="inherit"
       onClick={() => closeSnackbar(snackbarId)}
     >
       <CloseIcon />
@@ -48,7 +47,8 @@ export const useAlerts = () => {
   );
 
   /**
-   *
+   * Add a snackbar to alert the user
+   * @param alert
    */
   const addAlert = (alert: Alert) => {
     const alertId = addSnackbar(alert);
@@ -56,6 +56,11 @@ export const useAlerts = () => {
 
     setStates.forEach((it) => it(alerts));
   };
+
+  /**
+   * Remove an alert based on its id
+   * @param alertId
+   */
   const removeAlert = (alertId: string | number) => {
     const alertToRemove = alerts.find((a) => a.id === alertId);
 

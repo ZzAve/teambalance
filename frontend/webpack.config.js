@@ -30,22 +30,34 @@ module.exports = {
     publicPath: "/",
   },
   optimization: {
+    runtimeChunk: true,
     splitChunks: {
       chunks: "all",
     },
   },
+  cache: {
+    type: 'filesystem',
+    maxAge: 5184000000, // one month
+    buildDependencies: {
+      // This makes all dependencies of this file - build dependencies
+      config: [__filename],
+      // By default webpack and loaders are build dependencies
+    },
+  },
   resolve: {
     extensions: [".jsx", ".ts", ".js", ".tsx"],
+    symlinks: false,
     fallback: {
       stream: require.resolve("stream-browserify"),
       buffer: require.resolve("buffer"),
     },
   },
-  devtool: "cheap-module-source-map",
+  devtool: "eval-cheap-module-source-map",
   module: {
     rules: [
       {
-        test: /\.js|jsx$/,
+        test: /\.ts|tsx$/,
+        include: path.resolve(__dirname, 'src'),
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
@@ -57,11 +69,20 @@ module.exports = {
       },
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+            },
+          },
+        ],
+        include: path.resolve(__dirname, 'src'),
         exclude: /node_modules/,
       },
       {
         test: /\.css$/i,
+        include: path.resolve(__dirname, 'src'),
         use: ["style-loader", "css-loader"],
       },
     ],

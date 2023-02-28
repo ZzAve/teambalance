@@ -1,5 +1,5 @@
-import Grid, { GridSize } from "@material-ui/core/Grid";
-import { Card, CardContent, CardHeader } from "@material-ui/core";
+import Grid, { GridSize } from "@mui/material/Grid";
+import { Card, CardContent, CardHeader } from "@mui/material";
 import React from "react";
 import PageTitle from "./PageTitle";
 
@@ -17,7 +17,7 @@ const PageItem = (props: {
       <Grid item xs={xs} md={md}>
         <Card>
           <CardHeader title={title} />
-          <CardContent>{children}</CardContent>
+          <CardContent sx={{ width: "100%" }}>{children}</CardContent>
         </Card>
       </Grid>
     </>

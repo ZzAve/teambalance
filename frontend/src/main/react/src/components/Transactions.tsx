@@ -1,40 +1,39 @@
 import React, { useEffect, useState } from "react";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
+import { styled } from "@mui/material/styles";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 import { SpinnerWithText } from "./SpinnerWithText";
 import { BankApiClient as bankApiClient } from "../utils/BankApiClient";
 import { formattedDate, formattedTime, withLoading } from "../utils/util";
 import {
-  createStyles,
-  makeStyles,
   TableFooter,
   TablePagination,
   useMediaQuery,
   useTheme,
-} from "@material-ui/core";
+} from "@mui/material";
 import { Transaction } from "../utils/domain";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    DEBIT: {
-      color: "green",
-    },
-    CREDIT: {
-      color: "red",
-    },
-    hidden: {
-      display: "none",
-    },
-    full: {
-      width: "100%",
-    },
-  })
-);
+const PREFIX = "Transactions";
+
+const transactionClasses = {
+  DEBIT: `${PREFIX}-DEBIT`,
+  CREDIT: `${PREFIX}-CREDIT`,
+};
+
+const TransactionTableCell = styled(TableCell)((theme) => ({
+  [`&.${transactionClasses.DEBIT}`]: {
+    color: "green",
+  },
+
+  [`&.${transactionClasses.CREDIT}`]: {
+    color: "red",
+  },
+}));
 
 export const Transactions = (props: {
   refresh: boolean;
@@ -47,7 +46,6 @@ export const Transactions = (props: {
   const [page, setPage] = useState(0); // get from url?
   const [rowsPerPage, setRowsPerPage] = useState(initialRowsPerPage);
 
-  const classes = useStyles();
   const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
 
   useEffect(() => {
@@ -79,7 +77,7 @@ export const Transactions = (props: {
   return (
     <TableContainer component={Paper}>
       <Table
-        className={classes.full}
+        sx={{ width: "100%" }}
         aria-label="betalingen en inleg voor de teampot"
       >
         <TableHead>
@@ -98,28 +96,35 @@ export const Transactions = (props: {
                 {formattedTime(row.date)}
               </TableCell>
               <TableCell>{row.counterParty}</TableCell>
-              <TableCell className={classes[row.type]} align="right">
+              <TransactionTableCell
+                className={transactionClasses[row.type]}
+                align="right"
+              >
                 {row.amount}
-              </TableCell>
+              </TransactionTableCell>
             </TableRow>
           ))}
         </TableBody>
-        <TableFooter className={withPagination ? "" : classes.hidden}>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
-              count={
-                transactions.length === rowsPerPage
-                  ? -1
-                  : page * rowsPerPage + transactions.length
-              }
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </TableRow>
-        </TableFooter>
+        {withPagination ? (
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={smAndUp ? [10, 20, 50] : []}
+                count={
+                  transactions.length === rowsPerPage
+                    ? -1
+                    : page * rowsPerPage + transactions.length
+                }
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </TableRow>
+          </TableFooter>
+        ) : (
+          <></>
+        )}
       </Table>
     </TableContainer>
   );

@@ -1,9 +1,9 @@
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import React, { useEffect, useState } from "react";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
 import { attendeesApiClient } from "../../utils/AttendeesApiClient";
-import Checkbox from "@material-ui/core/Checkbox";
+import Checkbox from "@mui/material/Checkbox";
 import { useAlerts } from "../../hooks/alertsHook";
 import { TeamEvent, User } from "../../utils/domain";
 import { formattedDate } from "../../utils/util";

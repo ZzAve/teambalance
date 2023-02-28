@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { authenticationManager } from "../utils/AuthenticationManager";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import { Refresh } from "./Refresh";
 import { Logout } from "./Logout";
-import Hidden from "@material-ui/core/Hidden";
 
 const TopBar = (props: { handleRefresh: () => void; refresh: boolean }) => {
   const [isAuth, setIsAuth] = useState(true);
@@ -24,9 +23,7 @@ const TopBar = (props: { handleRefresh: () => void; refresh: boolean }) => {
       <Toolbar>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs>
-            <Typography variant="h6">
-              Tovo Heren 5 <Hidden smDown>Teampot</Hidden>
-            </Typography>
+            <Typography variant="h6">Tovo Heren 5 Team balance</Typography>
           </Grid>
 
           {isAuth ? (

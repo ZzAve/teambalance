@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Box, FormControl, IconButton } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
-import EditIcon from "@material-ui/icons/Edit";
-import CheckIcon from "@material-ui/icons/Check";
-import TextField from "@material-ui/core/TextField";
+import { Box, FormControl, IconButton } from "@mui/material";
+import Typography from "@mui/material/Typography";
+import EditIcon from "@mui/icons-material/Edit";
+import CheckIcon from "@mui/icons-material/Check";
+import TextField from "@mui/material/TextField";
 
 const noUser = "";
+
+// TODO: change this to go form topography to TextField and back rather then disabled/enabled textfield
 export const EditableTextField = (props: {
   label: string;
   updatedTextValueCallback: (value: string) => Promise<boolean>;
@@ -33,8 +35,9 @@ export const EditableTextField = (props: {
 
       <form onSubmit={toggleEdit}>
         <Box display="flex" alignItems="center">
-          <FormControl>
+          <FormControl variant="standard">
             <TextField
+              variant="standard"
               id="coach"
               name="coach"
               placeholder="coach"

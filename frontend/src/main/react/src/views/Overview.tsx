@@ -1,28 +1,18 @@
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import Balance from "../components/Balance";
 import TopUp from "../components/TopUp";
 import Potters from "../components/Potters";
 import PageItem from "../components/PageItem";
-import { Button, Card, createStyles, makeStyles } from "@material-ui/core";
+import { Button, Card } from "@mui/material";
 import Transactions from "../components/Transactions";
 import React from "react";
 import Events from "../components/events/Events";
 import { useNavigate } from "react-router-dom";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
-import Hidden from "@material-ui/core/Hidden";
-import Typography from "@material-ui/core/Typography";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import Typography from "@mui/material/Typography";
 import PageTitle from "../components/PageTitle";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    transactions: {
-      padding: "16px",
-    },
-  })
-);
-
 const Overview = (props: { refresh: boolean }) => {
-  const classes = useStyles();
   const navigate = useNavigate();
 
   return (
@@ -144,7 +134,7 @@ const Overview = (props: { refresh: boolean }) => {
                 item
                 xs={12}
                 justifyContent="space-between"
-                className={classes.transactions}
+                sx={{ padding: "16px" }}
               >
                 <Grid item>
                   <Typography variant="h5">Transacties</Typography>
@@ -173,7 +163,7 @@ const Overview = (props: { refresh: boolean }) => {
                     color="primary"
                     onClick={() => navigate("admin")}
                   >
-                    <Hidden xsDown>Admin dingen </Hidden>
+                    Admin dingen
                     <ArrowForwardIcon spacing={5} />
                   </Button>
                 </Grid>
@@ -183,10 +173,10 @@ const Overview = (props: { refresh: boolean }) => {
                     color="primary"
                     onClick={() => navigate("users")}
                   >
-                    <Hidden xsDown>Teamleden </Hidden>
+                    Teamleden
                     <ArrowForwardIcon spacing={5} />
                   </Button>
-                </Grid>{" "}
+                </Grid>
               </Grid>
             </PageItem>
           </Grid>

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { SpinnerWithText } from "./SpinnerWithText";
 import { BankApiClient as bankApiClient } from "../utils/BankApiClient";
 import { withLoading } from "../utils/util";
-import Typography from "@material-ui/core/Typography";
-import { Grid } from "@material-ui/core";
-import Switch from "@material-ui/core/Switch";
+import Typography from "@mui/material/Typography";
+import { Grid } from "@mui/material";
+import Switch from "@mui/material/Switch";
 import { Potter } from "../utils/domain";
 
 interface SeasonPotters {
@@ -88,7 +88,6 @@ export const Potters = (props: {
           <Typography variant="body1"> Month (last 30 days) </Typography>
         </Grid>
         <Grid item>
-          {" "}
           <Switch
             checked={showSeason}
             onChange={(x) => setShowSeasonToggle(x.target.checked)}
