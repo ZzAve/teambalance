@@ -39,11 +39,13 @@ export const EventsList = (props: {
           </Grid>
         ))}
       {props.withPagination && (
-        <Pagination
-          count={Math.ceil(props.events.length / rowsPerPage)}
-          page={page}
-          onChange={handleChangePage}
-        />
+        <Grid item xs={12}>
+          <Pagination
+            count={Math.ceil(props.events.length / rowsPerPage)}
+            page={page}
+            onChange={handleChangePage}
+          />
+        </Grid>
       )}
     </Grid>
   );

@@ -35,9 +35,7 @@ const texts: AttendeeTexts = {
 const getSimpleText = (
   name: keyof AttendeeTexts,
   args?: { [p: string]: string }
-) => {
-  return getText(name, "OTHER", args);
-};
+): string => getText(name, "OTHER", args);
 const getText = (
   name: keyof AttendeeTexts,
   eventType?: EventType,
@@ -66,8 +64,6 @@ const formatUnicorn = (unicorn: string) => {
     return str;
   };
 };
-
-export const AttendeeStyledButton = Button;
 
 type ButtonColorValue =
   | "primary"

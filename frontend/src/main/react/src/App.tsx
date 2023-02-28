@@ -20,6 +20,7 @@ const Users = lazy(() => import("./views/UsersPage"));
 
 const theme = createTheme({
   palette: {
+    mode: "light",
     warning: {
       main: "#cbb38a",
     },
