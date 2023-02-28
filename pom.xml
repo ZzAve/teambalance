@@ -21,6 +21,7 @@
         <module>frontend</module>
         <module>jooq-support</module>
         <module>shaded-bunq-sdk</module>
+        <module>test-data</module>
     </modules>
 
     <properties>
@@ -35,7 +36,6 @@
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
         <jib-maven-plugin.version>3.3.1</jib-maven-plugin.version>
 
-        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <maven-surefire-plugin.version>3.0.0-M9</maven-surefire-plugin.version>
 <!--        <jakarta-servlet.version>5.0.0</jakarta-servlet.version>-->
     </properties>
