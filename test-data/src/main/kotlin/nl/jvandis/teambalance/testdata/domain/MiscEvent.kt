@@ -4,20 +4,20 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CreateTraining(
+data class CreateMiscEvent(
     val startTime: LocalDateTime,
+    val title: String?,
     val location: String,
     val comment: String?,
     val userIds: List<Long>? = emptyList()
 )
 
-
 @Serializable
-data class Training(
+data class MiscEvent(
     val id: Long,
     val startTime: LocalDateTime,
+    val title: String,
     val location: String,
     val comment: String?,
-    val userIds: List<Long>? = null,
-    val trainer: User? = null
+    val attendees: List<Attendee>
 )
