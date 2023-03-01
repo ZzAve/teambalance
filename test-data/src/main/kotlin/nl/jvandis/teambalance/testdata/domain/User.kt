@@ -3,15 +3,16 @@ package nl.jvandis.teambalance.testdata.domain
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CreateUser (
+data class CreateUser(
     val name: String,
-    val role: Role,
+    val role: Role
 )
 
 @Serializable
 data class Users(
     val users: List<User>
 )
+
 @Serializable
 data class User(
     val name: String,

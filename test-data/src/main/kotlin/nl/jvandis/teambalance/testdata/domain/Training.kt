@@ -11,7 +11,6 @@ data class CreateTraining(
     val userIds: List<Long>? = emptyList()
 )
 
-
 @Serializable
 data class Training(
     val id: Long,

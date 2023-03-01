@@ -9,7 +9,6 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 import ch.qos.logback.classic.Logger as LogbackLogger
 
-
 @OptIn(ExperimentalTime::class)
 fun main(args: Array<String>) {
     val rootLogger: LogbackLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as LogbackLogger
@@ -17,7 +16,7 @@ fun main(args: Array<String>) {
 
     val log: Logger = LoggerFactory.getLogger("DataSpawnApp")
 
-    val apiKey = args[0];
+    val apiKey = args[0]
 
     val config = SpawnDataConfig(
         amountOfTrainings = 100,

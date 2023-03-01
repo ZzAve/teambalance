@@ -8,6 +8,7 @@ data class CreateAttendee(
     val userId: Long,
     val availability: Availability? = null
 )
+
 @Serializable
 data class Attendee(
     val id: Long,

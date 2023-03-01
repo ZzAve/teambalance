@@ -19,7 +19,6 @@ enum class Place {
     AWAY
 }
 
-
 @Serializable
 data class Match(
     val id: Long,

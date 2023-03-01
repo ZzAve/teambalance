@@ -56,32 +56,27 @@ val jsonFormatter = Json {
     encodeDefaults = true
 }
 
-
 fun addHeaders(apiKey: String) = Filter { next ->
     {
         it
             .header("X-Secret", apiKey)
             .header("Content-Type", ContentType.APPLICATION_JSON.value)
             .let(next)
-
     }
 }
 
 class Initializer(
-    apiKey: String,
+    apiKey: String
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
     private val client: HttpHandler = addHeaders(apiKey)(ApacheClient())
 
-
     private val host = "http://localhost:8080"
 
     init {
         // standard client
-
     }
-
 
     val aTrainingLens = Body.auto<Training>().toLens()
     val aMatchLens = Body.auto<Match>().toLens()
@@ -105,7 +100,6 @@ class Initializer(
         if (!response.status.successful) {
             throw IllegalStateException("Something went fetching users: ${response.bodyString()}")
         }
-
 
         return jsonFormatter.decodeFromString<Users>(response.bodyString()).users
     }
@@ -172,7 +166,6 @@ class Initializer(
         return aMiscEvent(response)
     }
 
-
     private fun createAttendee(attendee: CreateAttendee): Attendee {
         val request = Request(POST, "$host/api/attendees")
             .body(jsonFormatter.encodeToString(attendee))
@@ -186,7 +179,7 @@ class Initializer(
     }
 
     @OptIn(ExperimentalTime::class)
-    fun spawnData(config: SpawnDataConfig): Unit {
+    fun spawnData(config: SpawnDataConfig) {
         createUsers()
         log.info("All users in the system: ")
         val allUsers = getAllUsers()
@@ -217,7 +210,6 @@ class Initializer(
 //                TransactionExclusion(counterParty = "CCV*BUITEN IN DE KUIL")
 //            )
 //        )
-
     }
 
     private fun createUsers() {
@@ -267,7 +259,7 @@ class Initializer(
             .
             .
             .
-        """.trimIndent()
+            """.trimIndent()
         )
 
         val dayRange = 100L
@@ -293,7 +285,7 @@ class Initializer(
                 val addedAttendees = addAttendeesToEvent(allUsers, savedTraining.id)
                 log.info("Added attendees to training with id ${savedTraining.id}: ${addedAttendees.map { it.user.name }}")
 
-                //Add trainer, 50% chance
+                // Add trainer, 50% chance
                 if (Random.nextBoolean()) {
                     val trainerId = addedAttendees
                         .take(1)
@@ -333,7 +325,7 @@ class Initializer(
             .
             .
             .
-        """.trimIndent()
+            """.trimIndent()
         )
 
         val dayRange = 100L
@@ -362,7 +354,7 @@ class Initializer(
 
                 log.info("Added attendees to match with id ${savedMatch.id}: ${addedAttendees.map { it.user.name }}")
 
-                //Add coach, 50% chance
+                // Add coach, 50% chance
                 if (Random.nextBoolean()) {
                     val coachToAdd = coaches.random()
                     val updatedMatch = addCoach(savedMatch.id, coachToAdd)
@@ -397,7 +389,7 @@ class Initializer(
             .
             .
             .
-        """.trimIndent()
+            """.trimIndent()
         )
 
         val dayRange = 100L
