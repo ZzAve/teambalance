@@ -34,7 +34,15 @@ spring:
       roles:
         - admin
         - user
+  cloud:
+    gcp:
+      project-id: "nope"
+      core:
+        enabled: false
+      secretmanager:
+        enabled: false
 
 logging:
   level:
+    nl.jvandis.teambalance: debug
     org.jooq: debug

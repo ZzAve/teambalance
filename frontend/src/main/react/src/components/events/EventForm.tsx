@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { withLoading } from "../../utils/util";
-import { trainingsApiClient } from "../../utils/TrainingsApiClient";
+import {
+  CreateTraining,
+  trainingsApiClient,
+} from "../../utils/TrainingsApiClient";
 import { Navigate, useLocation } from "react-router-dom";
 import { SpinnerWithText } from "../SpinnerWithText";
 import { nl } from "date-fns/locale";
@@ -9,19 +12,25 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import CheckBox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
 import { EventType, isMatch, isMiscEvent } from "./utils";
-import { matchesApiClient } from "../../utils/MatchesApiClient";
+import { CreateMatch, matchesApiClient } from "../../utils/MatchesApiClient";
 import RadioGroup from "@mui/material/RadioGroup";
 import Radio from "@mui/material/Radio";
-import { eventsApiClient } from "../../utils/MiscEventsApiClient";
+import {
+  CreateMiscEvent,
+  eventsApiClient,
+} from "../../utils/MiscEventsApiClient";
 import Typography from "@mui/material/Typography";
 import { EventUsers } from "./EventUsers";
 import { useAlerts } from "../../hooks/alertsHook";
 import { LocationState } from "../utils";
 import {
+  eventType,
   Match,
   MiscEvent,
   Place,
+  RecurringEventProperties,
   TeamEvent,
+  TeamEventInterface,
   Training,
   User,
 } from "../../utils/domain";
@@ -31,6 +40,10 @@ import TextField from "@mui/material/TextField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import Switch from "@mui/material/Switch";
+import { Alert, AlertTitle, Divider } from "@mui/material";
+import Conditional from "../Conditional";
+import { RecurringEvent } from "./RecurringEvent";
 
 type EventFormTexts = {
   send_event: Record<EventType, string>;
@@ -48,30 +61,23 @@ const texts: EventFormTexts = {
 const getText = (eventsType: EventType, name: keyof EventFormTexts) =>
   texts[name][eventsType] || name;
 
-type CreateTraining = Omit<Training, "id" | "trainer" | "attendees"> & {
-  userIds: number[];
-};
-type CreateMatch = Omit<Match, "id" | "coach" | "attendees"> & {
-  userIds: number[];
-};
-type CreateMiscEvent = Omit<MiscEvent, "id"> & { userIds: number[] };
-const createEvent = async (
+const createEvent: (
+  eventsType: EventType,
+  apiArgs: CreateTraining | CreateMatch | CreateMiscEvent
+) => Promise<Training[] | Match[] | MiscEvent[]> = async (
   eventsType: EventType,
   apiArgs: CreateTraining | CreateMatch | CreateMiscEvent
 ) => {
   switch (eventsType) {
     case "TRAINING":
-      await trainingsApiClient.createTraining(apiArgs as CreateTraining);
-      break;
+      return await trainingsApiClient.createTraining(apiArgs as CreateTraining);
     case "MATCH":
-      await matchesApiClient.createMatch(apiArgs as CreateMatch);
-      break;
+      return await matchesApiClient.createMatch(apiArgs as CreateMatch);
     case "MISC":
-      await eventsApiClient.createEvent(apiArgs as CreateMiscEvent);
-      break;
+      return await eventsApiClient.createEvent(apiArgs as CreateMiscEvent);
     case "OTHER":
       console.error(`Creating event for type ${eventsType} not supported`);
-      break;
+      throw Error(`Creating event for type ${eventsType} not supported`);
   }
 };
 
@@ -87,21 +93,17 @@ async function updateEvent(
     opponent?: string;
     homeAway?: Place;
   }
-) {
+): Promise<MiscEvent | Training | Match> {
   switch (eventType) {
     case "TRAINING":
-      await trainingsApiClient.updateTraining(apiArgs);
-      break;
+      return await trainingsApiClient.updateTraining(apiArgs);
     case "MATCH":
-      await matchesApiClient.updateMatch(apiArgs);
-      break;
+      return await matchesApiClient.updateMatch(apiArgs);
     case "MISC":
-      // @ts-ignore
-      await eventsApiClient.updateEvent(apiArgs);
-      break;
+      return await eventsApiClient.updateEvent(apiArgs);
     case "OTHER":
       console.error(`Updating event for type ${eventType} not supported`);
-      break;
+      throw Error(`Updating event for type ${eventType} not supported`);
   }
 }
 
@@ -120,15 +122,21 @@ export const EventForm = (props: {
       // Initialize to 20:00
       let date = new Date();
       date.setHours(20, 0, 0, 0);
-      return dayjs(date.toISOString());
+      return dayjs(date);
     }
   };
 
   const [id] = useState(props.event?.id);
+
+  const [isRecurringEvent, setIsRecurringEvent] = useState<boolean>(false);
+  const [recurringEventProperties, setRecurringEventProperties] = useState<
+    RecurringEventProperties | undefined
+  >(undefined);
+
   const [eventLocation, setEventLocation] = useState(
     props.event?.location || ""
   );
-  const [selectedTime, setSelectedTime] = useState<Dayjs | null>(
+  const [selectedDateTime, setSelectedDateTime] = useState<Dayjs | null>(
     getInitialSelectedDate(props.event)
   );
   const [opponent, setOpponent] = useState(
@@ -148,6 +156,7 @@ export const EventForm = (props: {
 
   const [isLoading, setIsLoading] = useState(false);
   const [addAnother, setAddAnother] = useState<boolean>(false);
+
   const [done, setDone] = useState(false);
 
   useEffect(() => {
@@ -156,55 +165,79 @@ export const EventForm = (props: {
 
   const isCreateEvent = () => id === undefined;
 
-  async function save() {
+  const save: () => Promise<TeamEvent[]> = async () => {
     if (isCreateEvent()) {
       let addedProps = {};
-      const baseProps = {
+      const baseProps: Partial<TeamEventInterface> & { userIds: number[] } = {
         location: eventLocation as string,
-        startTime: selectedTime?.toDate() || new Date(), //fixme
+        startTime: selectedDateTime?.toDate() || new Date(), //fixme
         comment: comment,
+        recurringEventProperties: isRecurringEvent
+          ? recurringEventProperties
+          : undefined,
         userIds: Object.entries(userSelection)
-          .filter((it) => it[1] === true)
+          .filter((it) => it[1])
           .map((it) => +it[0]),
       };
       switch (props.eventType) {
         case "MATCH":
           addedProps = {
-            opponent: opponent as string,
+            opponent: opponent,
             homeAway: homeAway,
           };
           break;
         case "MISC":
           addedProps = {
-            title: title as string,
+            title: title,
           };
           break;
         case "OTHER":
           throw Error("eventType 'other' is not supported (yet)");
       }
-      await createEvent(props.eventType, {
+
+      //FIXME
+      // @ts-ignore
+      const apiArgs: CreateTraining | CreateMatch | CreateMiscEvent = {
         ...baseProps,
         ...addedProps,
-      });
+      };
+      return await createEvent(props.eventType, apiArgs);
     } else {
-      await updateEvent(props.eventType, {
+      return await updateEvent(props.eventType, {
         id: id as number,
         location: eventLocation,
-        startTime: selectedTime?.toDate(),
+        startTime: selectedDateTime?.toDate(),
         title: title || undefined,
         comment: comment,
         opponent: opponent || undefined,
         homeAway: homeAway || undefined,
-      });
+      }).then((x) => [x]);
     }
-  }
+  };
 
   const handleSaveEvent = async () => {
     let successfulSave = await withLoading(setIsLoading, async () => {
       try {
-        await save();
+        const savedEvents = await save();
+        let message: string = "";
+        if (savedEvents.length === 1) {
+          message = `${eventType(savedEvents[0])} event (id ${
+            savedEvents[0].id
+          }) ${isCreateEvent() ? "aangemaakt" : "geüpdate"} op ${dayjs(
+            savedEvents[0].startTime,
+            { locale: "nl" }
+          ).format("DD MMMM")}`;
+        } else {
+          message = `${savedEvents.length} ${eventType(
+            savedEvents[0]
+          )} events ${
+            isCreateEvent() ? "aangemaakt" : "geüpdate"
+          } op ${savedEvents.map((it) =>
+            dayjs(it.startTime, { locale: "nl" }).format("DD MMMM")
+          )}`;
+        }
         addAlert({
-          message: `${isCreateEvent() ? "Creatie" : "Update"} successvol`,
+          message: message,
           level: "success",
         });
         return true;
@@ -246,11 +279,10 @@ export const EventForm = (props: {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"nl"}>
       <Grid container spacing={3}>
-        {!!props.event?.id ? (
+        <Conditional condition={!isCreateEvent()}>
           <Grid item xs={12}>
             <TextField
               variant="standard"
-              // required
               id="trainingId"
               name="id"
               label="id"
@@ -259,47 +291,58 @@ export const EventForm = (props: {
               disabled
             />
           </Grid>
-        ) : (
-          ""
-        )}
-
-        <Grid item xs={12} sm={6}>
-          <DateTimePicker
-            renderInput={(props) => (
-              <TextField variant="standard" {...props}></TextField>
-            )}
-            label="Datum / tijd"
-            value={selectedTime}
-            onChange={(x) => {
-              setSelectedTime(x);
-            }}
-            ampm={false}
-            minutesStep={15}
-            // id="startDate"
-            // name="startDateTime"
-            // autoOk
-            // showTodayButton={true}
-            // fullWidth
-          />
+        </Conditional>
+        <Grid item container spacing={2}>
+          <Grid container item spacing={1} marginY="10px" alignItems="center">
+            <Conditional condition={isCreateEvent()}>
+              <Grid item xs={12}>
+                <Alert severity="info">
+                  <AlertTitle>Nieuwe functionaliteit</AlertTitle>
+                  <Typography>
+                    Maak nu ook herhalende events aan! Elke week een training?
+                    Maak dat nu in 1 keer aan 😱. Flip die switch, en gaan met
+                    die banaan.
+                  </Typography>
+                </Alert>
+              </Grid>
+            </Conditional>
+            <Grid item>
+              <DateTimePicker
+                renderInput={(props) => (
+                  <TextField variant="standard" {...props}></TextField>
+                )}
+                label="Datum / tijd"
+                value={selectedDateTime}
+                onChange={(x) => {
+                  setSelectedDateTime(x);
+                }}
+                ampm={false}
+                minutesStep={15}
+              />
+            </Grid>
+            <Conditional condition={isCreateEvent()}>
+              <Grid item>
+                <Switch
+                  checked={isRecurringEvent}
+                  onChange={(event) =>
+                    setIsRecurringEvent(event.target.checked)
+                  }
+                  name="recurringEvent"
+                />{" "}
+                herhalend event?
+              </Grid>
+            </Conditional>
+          </Grid>
+          <Conditional condition={isRecurringEvent && isCreateEvent()}>
+            <RecurringEvent
+              setRecurringEventProperties={setRecurringEventProperties}
+            ></RecurringEvent>
+            <Grid item xs={12}>
+              <Divider variant="fullWidth"></Divider>
+            </Grid>
+          </Conditional>
         </Grid>
-        {/*<Grid item xs={12} sm={6}>*/}
-        {/*  <TimePicker*/}
-        {/*    value={selectedTime}*/}
-        {/*    id="startTime"*/}
-        {/*    name="startTime"*/}
-        {/*    label="Starttijd"*/}
-        {/*    minutesStep={15}*/}
-        {/*    ampm={false}*/}
-        {/*    onChange={(x) => {*/}
-        {/*      if (x !== null) {*/}
-        {/*        setSelectedTime(x);*/}
-        {/*      }*/}
-        {/*    }}*/}
-        {/*    autoOk*/}
-        {/*    fullWidth*/}
-        {/*  />*/}
-        {/*</Grid>*/}
-        {props.eventType === "MISC" ? (
+        <Conditional condition={props.eventType === "MISC"}>
           <Grid item xs={12}>
             <TextField
               variant="standard"
@@ -311,50 +354,40 @@ export const EventForm = (props: {
               onChange={(e) => setTitle(e.target.value)}
             />
           </Grid>
-        ) : (
-          ""
-        )}
-        {props.eventType === "MATCH" ? (
-          <>
-            <Grid item xs={12}>
-              <TextField
-                variant="standard"
-                required
-                id="opponent"
-                name="opponent"
-                label="Tegenstander"
-                value={opponent}
-                onChange={(e) => {
-                  setOpponent(e.target.value);
-                }}
-                fullWidth
+        </Conditional>
+        <Conditional condition={props.eventType === "MATCH"}>
+          <Grid item xs={12}>
+            <TextField
+              variant="standard"
+              required
+              id="opponent"
+              name="opponent"
+              label="Tegenstander"
+              value={opponent}
+              onChange={(event) => {
+                setOpponent(event.target.value);
+              }}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <RadioGroup
+              aria-label="thuis-of-uit"
+              name="thuis-of-uit"
+              value={homeAway}
+              onChange={(event) => {
+                setHomeAway(event.target.value as Place);
+              }}
+            >
+              <FormControlLabel
+                value="HOME"
+                control={<Radio />}
+                label="Thuis"
               />
-            </Grid>
-            <Grid item xs={6}>
-              <RadioGroup
-                aria-label="thuis-of-uit"
-                name="thuis-of-uit"
-                value={homeAway}
-                onChange={(e) => {
-                  setHomeAway(e.target.value as Place);
-                }}
-              >
-                <FormControlLabel
-                  value="HOME"
-                  control={<Radio />}
-                  label="Thuis"
-                />
-                <FormControlLabel
-                  value="AWAY"
-                  control={<Radio />}
-                  label="Uit"
-                />
-              </RadioGroup>
-            </Grid>
-          </>
-        ) : (
-          <></>
-        )}
+              <FormControlLabel value="AWAY" control={<Radio />} label="Uit" />
+            </RadioGroup>
+          </Grid>
+        </Conditional>
         <Grid item xs={12}>
           <TextField
             variant="standard"
@@ -363,12 +396,13 @@ export const EventForm = (props: {
             name="location"
             label="Locatie"
             value={eventLocation}
-            onChange={(e) => {
-              setEventLocation(e.target.value);
+            onChange={(event) => {
+              setEventLocation(event.target.value);
             }}
             fullWidth
           />
         </Grid>
+        ;
         <Grid item xs={12}>
           <TextField
             variant="standard"
@@ -377,10 +411,10 @@ export const EventForm = (props: {
             label="Opmerking"
             fullWidth
             value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            onChange={(event) => setComment(event.target.value)}
           />
         </Grid>
-
+        ;
         <Grid item xs={12}>
           <Typography variant="h6">Teamgenoten</Typography>
           <EventUsers
@@ -392,7 +426,6 @@ export const EventForm = (props: {
             }}
           />
         </Grid>
-
         <Grid
           item
           container
@@ -437,6 +470,7 @@ export const EventForm = (props: {
             </Button>
           </Grid>
         </Grid>
+        ;
       </Grid>
     </LocalizationProvider>
   );

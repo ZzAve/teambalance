@@ -56,29 +56,34 @@ const getTraining: (
   id: number,
   includeAttendees?: boolean
 ) => Promise<Training> = async (id: number, includeAttendees = true) => {
-  let training = trainingsClient.call(
+  const training = trainingsClient.call(
     `trainings/${id}?include-attendees=${includeAttendees}`
   );
 
-  let x = (await training) as TrainingResponse;
-  return internalizeTraining(x);
+  let trainingResponse = (await training) as TrainingResponse;
+  return internalizeTraining(trainingResponse);
 };
-const createTraining: (props: {
-  location: string;
-  comment?: string;
-  startTime: Date;
+
+export type CreateTraining = Omit<Training, "id" | "trainer" | "attendees"> & {
   userIds: number[];
-}) => Promise<TrainingResponse> = async (props) => {
-  return (await trainingsClient.callWithBody(
-    "trainings",
-    {
-      comment: props.comment,
-      location: props.location,
-      startTime: trainingsClient.externalizeDateTime(props.startTime),
-      userIds: props.userIds,
-    },
-    { method: "POST" }
-  )) as TrainingResponse;
+};
+
+const createTraining: (props: CreateTraining) => Promise<Training[]> = async (
+  props
+) => {
+  return (
+    (await trainingsClient.callWithBody(
+      "trainings",
+      {
+        comment: props.comment,
+        location: props.location,
+        startTime: trainingsClient.externalizeDateTime(props.startTime),
+        userIds: props.userIds,
+        recurringEventProperties: props.recurringEventProperties,
+      },
+      { method: "POST" }
+    )) as TrainingsResponse
+  ).trainings.map(internalizeTraining);
 };
 
 const updateTraining: (x: {
@@ -86,8 +91,8 @@ const updateTraining: (x: {
   location?: string;
   comment?: string;
   startTime?: Date;
-}) => Promise<TrainingResponse> = async (x) => {
-  return (await trainingsClient.callWithBody(
+}) => Promise<Training> = async (x) => {
+  const training = (await trainingsClient.callWithBody(
     `trainings/${x.id}`,
     {
       comment: x.comment,
@@ -96,19 +101,21 @@ const updateTraining: (x: {
     },
     { method: "PUT" }
   )) as TrainingResponse;
+  return internalizeTraining(training);
 };
 
 const updateTrainer: (x: {
   id: number;
   trainerUserId?: string;
-}) => Promise<TrainingResponse> = async (x) => {
-  return (await trainingsClient.callWithBody(
+}) => Promise<Training> = async (x) => {
+  const trainingResponse = (await trainingsClient.callWithBody(
     `trainings/${x.id}/trainer`,
     {
       userId: x.trainerUserId,
     },
     { method: "PUT" }
   )) as TrainingResponse;
+  return internalizeTraining(trainingResponse);
 };
 
 const deleteTraining = (id: number, deleteAttendees = true) => {

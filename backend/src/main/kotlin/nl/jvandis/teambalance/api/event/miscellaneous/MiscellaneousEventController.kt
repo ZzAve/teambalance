@@ -107,28 +107,53 @@ class MiscellaneousEventController(
     @PostMapping
     fun createMiscellaneousEvent(
         @RequestBody potentialEvent: PotentialMiscellaneousEvent
-    ): MiscellaneousEventResponse {
+    ): MiscellaneousEventsResponse {
         log.debug("postEvent $potentialEvent")
 
         val allUsers = userRepository.findAll()
-        val event = potentialEvent.internalize()
+        val events = potentialEvent.internalize()
+        log.info("Requested to create miscellaneous events: $events")
 
         val requestedUsersToAdd = allUsers.filter { user ->
             potentialEvent.userIds?.any { it == user.id }
                 ?: true
         }
+        log.info("Users to add to miscellaneous events: $requestedUsersToAdd")
+
 
         if (potentialEvent.userIds != null &&
             potentialEvent.userIds.size != requestedUsersToAdd.size
         ) {
-            throw CreateEventException("Not all requested userIds exists unfortunately ${potentialEvent.userIds}. Please verify your userIds")
+            throw CreateEventException(
+                "Not all requested userIds exists unfortunately ${potentialEvent.userIds}. " +
+                        "Please verify your userIds"
+            )
         }
 
-        val savedEvent = eventRepository.insert(event)
-        val attendees = requestedUsersToAdd.map { it.toNewAttendee(savedEvent) }
-        val savedAttendees = attendeeRepository.insertMany(attendees)
+        val savedEvents = eventRepository.insertMany(events)
+        val savedAttendeesByEvent =
+            savedEvents
+                .map { event -> requestedUsersToAdd.map { userToAdd -> userToAdd.toNewAttendee(event) } }
+                .let { attendees ->
+                    attendeeRepository
+                        .insertMany(attendees.flatten())
+                        .groupBy { it.eventId }
+                }
 
-        return savedEvent.expose(savedAttendees)
+        return savedEvents.map { it.expose(savedAttendeesByEvent[it.id] ?: listOf()) }
+            .let { MiscellaneousEventsResponse(it.size.toLong(), 1, 1, it.size, it) }
+            .also {
+                log.info(
+                    "Created ${it.totalSize} misc events with recurringEventId: ${events.firstOrNull()?.recurringEventId}. " +
+                            "First event date: ${it.events.firstOrNull()?.startTime}, last event date: ${it.events.lastOrNull()?.startTime} "
+                )
+
+                it.events.forEach { e ->
+                    log.info(
+                        "Created event as part of '${events.firstOrNull()?.recurringEventId}': $e"
+                    )
+                }
+            }
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -139,7 +164,7 @@ class MiscellaneousEventController(
         @RequestBody user: UserAddRequest
 
     ): List<Attendee> {
-        log.debug("Adding: $user (or all: $addAll) to event $eventId")
+        log.info("Adding: $user (or all: $addAll) to event $eventId")
 
         val event = eventRepository.findByIdOrNull(eventId) ?: throw InvalidMiscellaneousEventException(eventId)
         val users = if (addAll) {
@@ -179,7 +204,7 @@ class MiscellaneousEventController(
         @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean
 
     ) {
-        log.debug("Deleting event: $eventId")
+        log.info("Deleting event: $eventId")
 
         if (deleteAttendees) {
             attendeeRepository.findAllByEventIdIn(listOf(eventId))

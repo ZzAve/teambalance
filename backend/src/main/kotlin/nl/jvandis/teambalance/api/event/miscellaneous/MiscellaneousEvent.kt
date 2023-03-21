@@ -6,22 +6,25 @@ import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.TeamBalanceEntityBuilder
 import nl.jvandis.teambalance.data.build
 import java.time.LocalDateTime
+import java.util.UUID
 
 data class MiscellaneousEvent(
     override val id: Long,
     override val startTime: LocalDateTime,
     override val location: String,
     override val comment: String? = null,
+    override val recurringEventId: UUID? = null,
     val title: String? = null,
     val attendees: List<Attendee>? = null
-) : Event(id, startTime, location, comment) {
-    constructor(startTime: LocalDateTime, location: String, comment: String?, title: String?) :
+) : Event(id, startTime, location, comment, recurringEventId) {
+    constructor(startTime: LocalDateTime, location: String, comment: String?, title: String?, recurringEventId: UUID?) :
         this(
             id = NO_ID,
             startTime = startTime,
             location = location,
             comment = comment,
-            title = title
+            title = title,
+            recurringEventId = recurringEventId
         )
 
     fun createUpdatedEvent(updateEventRequest: UpdateMiscellaneousEventRequest) = copy(

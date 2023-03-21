@@ -2,6 +2,7 @@ package nl.jvandis.teambalance.api.training
 
 import nl.jvandis.jooq.support.getField
 import nl.jvandis.jooq.support.getFieldOrThrow
+import nl.jvandis.jooq.support.valuesFrom
 import nl.jvandis.teambalance.api.match.TeamEventTableAndRecordHandler
 import nl.jvandis.teambalance.api.match.TeamEventsRepository
 import nl.jvandis.teambalance.api.match.findAllWithStartTimeAfterImpl
@@ -67,9 +68,47 @@ class TrainingRepository(
             .where(EVENT.ID.eq(eventId))
             .execute() == 1
 
-        // FIXME: if one of the two fails, you want to rollback.. how?
+        // FIXME: if one of the two fails, you want to rollback... how?
         return trainingDeleteSuccess && eventDeleteSuccess
     }
+
+    override fun insertMany(events: List<Training>): List<Training> {
+        if (events.isEmpty()) {
+            return emptyList()
+        }
+
+        val insertEventRecordResult = context
+            .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME)
+            .valuesFrom(events, { it.comment }, { it.location }, { it.startTime })
+            .returningResult(EVENT.ID, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME)
+            .fetch()
+            .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
+
+        return context
+            .insertInto(TRAINING, TRAINING.TRAINER_USER_ID, TRAINING.ID)
+            .valuesFrom(
+                events,
+                { it.trainer?.id },
+                { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] })
+            .returningResult(TRAINING.ID, TRAINING.TRAINER_USER_ID)
+            .fetch()
+            .map { trainingRecord ->
+                val eventRecord = insertEventRecordResult.first { a ->
+                    a.getFieldOrThrow(EVENT.ID) == trainingRecord.getFieldOrThrow(TRAINING.ID)
+                }
+                Training(
+                    id = trainingRecord.getFieldOrThrow(TRAINING.ID),
+                    startTime = eventRecord.getFieldOrThrow(EVENT.START_TIME),
+                    location = eventRecord.getFieldOrThrow(EVENT.LOCATION),
+                    comment = eventRecord.getField(EVENT.COMMENT),
+                    trainer = events.first { it.startTime == eventRecord.getFieldOrThrow(EVENT.START_TIME) }.trainer // do better, pretty
+                )
+
+            }
+            .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
+
+    }
+
 
     override fun insert(event: Training): Training {
         val eventRecord = context
@@ -104,7 +143,7 @@ class TrainingRepository(
             .set(EVENT.START_TIME, event.startTime)
             .where(EVENT.ID.eq(event.id))
             .execute()
-            .let { if (it != 1) throw DataAccessException("Could not update Traning. EventRecord not updated") }
+            .let { if (it != 1) throw DataAccessException("Could not update Training. EventRecord not updated") }
 
         context
             .update(TRAINING)

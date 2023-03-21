@@ -7,38 +7,41 @@ import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.TeamBalanceEntityBuilder
 import nl.jvandis.teambalance.data.build
 import java.time.LocalDateTime
+import java.util.UUID
 
 data class Match(
     override val id: Long,
     override val startTime: LocalDateTime,
     override val location: String,
     override val comment: String?,
+    override val recurringEventId: UUID? = null,
     val opponent: String,
     val homeAway: Place,
     val coach: String?,
     val attendees: List<Attendee>? = null
-) : Event(id, startTime, location, comment) {
-    constructor(startTime: LocalDateTime, location: String, comment: String?) :
-        this(
-            id = NO_ID,
-            startTime = startTime,
-            location = location,
-            comment = comment,
-            opponent = "opponent",
-            homeAway = Place.HOME,
-            coach = null
-        )
+) : Event(id, startTime, location, comment, recurringEventId) {
+    constructor(startTime: LocalDateTime, location: String, comment: String?, recurringEventId: UUID?) :
+            this(
+                id = NO_ID,
+                startTime = startTime,
+                location = location,
+                comment = comment,
+                opponent = "opponent",
+                homeAway = Place.HOME,
+                coach = null
+            )
 
-    constructor(startTime: LocalDateTime, location: String, comment: String?, opponent: String, homeAway: Place) :
-        this(
-            id = NO_ID,
-            startTime = startTime,
-            location = location,
-            comment = comment,
-            opponent = opponent,
-            homeAway = homeAway,
-            coach = null
-        )
+    constructor(startTime: LocalDateTime, location: String, comment: String?, opponent: String, homeAway: Place, recurringEventId: UUID?) :
+            this(
+                id = NO_ID,
+                startTime = startTime,
+                location = location,
+                comment = comment,
+                opponent = opponent,
+                homeAway = homeAway,
+                coach = null,
+                recurringEventId = recurringEventId
+            )
 
     fun createUpdatedMatch(updateMatchRequestBody: UpdateMatchRequest) = copy(
         startTime = updateMatchRequestBody.startTime ?: startTime,

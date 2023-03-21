@@ -4,6 +4,10 @@ import { Match, Place } from "./domain";
 
 const matchesClient = ApiClient();
 
+export type CreateMatch = Omit<Match, "id" | "coach" | "attendees"> & {
+  userIds: number[];
+};
+
 interface MatchesResponse {
   totalSize: number;
   totalPages: number;
@@ -52,15 +56,10 @@ const getMatch = async (id: number, includeAttendees = true) => {
   return internalizeMatch(x);
 };
 
-const createMatch = (props: {
-  location: string;
-  comment?: string;
-  startTime: Date;
-  opponent: string;
-  homeAway: string;
-  userIds: number[];
-}) => {
-  return matchesClient.callWithBody(
+const createMatch: (props: CreateMatch) => Promise<Match[]> = async (
+  props: CreateMatch
+) => {
+  const matchResponses = (await matchesClient.callWithBody(
     "matches",
     {
       startTime: matchesClient.externalizeDateTime(props.startTime),
@@ -69,9 +68,12 @@ const createMatch = (props: {
       homeAway: props.homeAway,
       comment: props.comment,
       userIds: props.userIds,
+      recurringEventProperties: props.recurringEventProperties,
     },
     { method: "POST" }
-  );
+  )) as MatchesResponse;
+
+  return matchResponses.matches.map(internalizeMatch);
 };
 
 const updateMatch: (props: {
@@ -81,22 +83,19 @@ const updateMatch: (props: {
   startTime?: Date;
   opponent?: string;
   homeAway?: string;
-}) => Promise<MatchResponse> = (props) => {
-  return matchesClient
-    .callWithBody(
-      `matches/${props.id}`,
-      {
-        startTime: matchesClient.externalizeDateTime(props.startTime),
-        location: props.location,
-        opponent: props.opponent,
-        homeAway: props.homeAway,
-        comment: props.comment,
-      },
-      { method: "PUT" }
-    )
-    .then((data: object) => {
-      return data as MatchResponse;
-    });
+}) => Promise<Match> = async (props) => {
+  const matchResponse = (await matchesClient.callWithBody(
+    `matches/${props.id}`,
+    {
+      startTime: matchesClient.externalizeDateTime(props.startTime),
+      location: props.location,
+      opponent: props.opponent,
+      homeAway: props.homeAway,
+      comment: props.comment,
+    },
+    { method: "PUT" }
+  )) as MatchResponse;
+  return internalizeMatch(matchResponse);
 };
 
 const updateCoach = (props: { id: number; coach: string }) => {
