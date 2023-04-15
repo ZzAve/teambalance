@@ -124,12 +124,22 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CreateEventException::class)
-    fun handleIllegalArgumentException(e: CreateEventException) =
+    fun handleCreateEventException(e: CreateEventException) =
         ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
                     reason = e.message
+                )
+            )
+
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgumentException(e: IllegalArgumentException) =
+        ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(
+                Error(
+                    status = HttpStatus.BAD_REQUEST,
+                    reason = e.message ?: "An illegal argument was provided, somewhere, somehow...."
                 )
             )
 

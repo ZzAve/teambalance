@@ -4,7 +4,7 @@ import { authenticationManager } from "./AuthenticationManager";
 import { InvalidSecretException, TimeoutError } from "./Exceptions";
 
 const DEFAULT_TIMEOUT = 5000; //ms
-const DEFAULT_MIN_DELAY = 400; //ms
+const DEFAULT_MIN_DELAY = 100; //ms
 
 const _mergeFetchOptions = (options: RequestInit, secret?: string) => ({
   ...options,
@@ -16,23 +16,35 @@ const _mergeFetchOptions = (options: RequestInit, secret?: string) => ({
   },
 });
 
-const _throwIfNotOk = (path: string, res: Response) => {
-  if (!res.ok) {
-    //TODO Should be moved to a higher level where AUTH state is reachable
-    if (res.status === 403) {
-      console.log("Status was 403");
-      // setAuthenticated(false);
-      throw new InvalidSecretException("nope");
-    }
-
-    if (res.status === 504) {
-      throw new TimeoutError("Response timed out");
-    }
-
-    throw Error(
-      `Call to '${path}' returned an erroneous response (code ${res.status})`
-    );
+const _throwIfNotOk: (path: string, res: Response) => Promise<Response> = (
+  path: string,
+  res: Response
+) => {
+  if (res.ok) {
+    return new Promise((resolve) => {
+      resolve(res);
+    });
   }
+
+  //TODO Should be moved to a higher level where AUTH state is reachable
+  if (res.status === 403) {
+    console.log("Status was 403");
+    // setAuthenticated(false);
+    throw new InvalidSecretException("nope");
+  }
+  if (res.status === 504) {
+    throw new TimeoutError("Response timed out");
+  }
+  return res
+    .json()
+    .catch((x) => {
+      throw Error(
+        `Call to '${path}' returned an erroneous response (code ${res.status})`
+      );
+    })
+    .then((data) => {
+      throw Error(`${data.reason}`);
+    });
 };
 
 const _resultWithMinDelay = async (
@@ -58,14 +70,15 @@ export const ApiClient = () => {
         body: JSON.stringify(payload),
       },
       timeout
-    ).then((res) => {
-      _throwIfNotOk(path, res);
-      if (res.status === 204) {
-        return {};
-      }
+    )
+      .then((res) => _throwIfNotOk(path, res))
+      .then((res) => {
+        if (res.status === 204) {
+          return {};
+        }
 
-      return res.json();
-    });
+        return res.json();
+      });
 
     return _resultWithMinDelay(apiResult, minDelay);
   };
@@ -80,13 +93,14 @@ export const ApiClient = () => {
       `/api/${path}`,
       _mergeFetchOptions(options, authenticationManager.get()),
       timeout
-    ).then((res) => {
-      _throwIfNotOk(path, res);
-      if (res.status === 204) {
-        return {};
-      }
-      return res.json();
-    });
+    )
+      .then((res) => _throwIfNotOk(path, res))
+      .then((res) => {
+        if (res.status === 204) {
+          return {};
+        }
+        return res.json();
+      });
 
     return _resultWithMinDelay(apiResult, minDelay);
   };

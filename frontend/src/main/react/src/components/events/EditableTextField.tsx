@@ -41,8 +41,9 @@ export const EditableTextField = (props: {
               id="coach"
               name="coach"
               placeholder="coach"
-              autoFocus
-              disabled={!isChanging}
+              InputProps={{
+                readOnly: !isChanging,
+              }}
               value={textValue}
               onChange={(event) => {
                 setTextValue(event.target.value);

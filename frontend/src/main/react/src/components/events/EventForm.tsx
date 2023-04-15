@@ -39,11 +39,11 @@ import dayjs, { Dayjs } from "dayjs";
 import TextField from "@mui/material/TextField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import Switch from "@mui/material/Switch";
-import { Alert, AlertTitle, Divider } from "@mui/material";
+import { Alert, AlertTitle, Divider, FormControl } from "@mui/material";
 import Conditional from "../Conditional";
 import { RecurringEvent } from "./RecurringEvent";
+import { MobileDateTimePicker } from "@mui/x-date-pickers";
 
 type EventFormTexts = {
   send_event: Record<EventType, string>;
@@ -150,9 +150,9 @@ export const EventForm = (props: {
   const [title, setTitle] = useState(
     isMiscEvent(props.event) ? props.event.title : ""
   );
-  const [userSelection, setUserSelection] = useState<{ [u: string]: boolean }>(
-    {}
-  );
+  const [userSelection, setUserSelection] = useState<
+    { [u: string]: boolean } | undefined
+  >(undefined);
 
   const [isLoading, setIsLoading] = useState(false);
   const [addAnother, setAddAnother] = useState<boolean>(false);
@@ -287,13 +287,12 @@ export const EventForm = (props: {
               name="id"
               label="id"
               defaultValue={id}
-              // fullWidth
               disabled
             />
           </Grid>
         </Conditional>
         <Grid item container spacing={2}>
-          <Grid container item spacing={1} marginY="10px" alignItems="center">
+          <Grid container item spacing={1} marginY="10px" alignItems="end">
             <Conditional condition={isCreateEvent()}>
               <Grid item xs={12}>
                 <Alert severity="info">
@@ -307,7 +306,7 @@ export const EventForm = (props: {
               </Grid>
             </Conditional>
             <Grid item>
-              <DateTimePicker
+              <MobileDateTimePicker
                 renderInput={(props) => (
                   <TextField variant="standard" {...props}></TextField>
                 )}
@@ -322,20 +321,22 @@ export const EventForm = (props: {
             </Grid>
             <Conditional condition={isCreateEvent()}>
               <Grid item>
-                <Switch
-                  checked={isRecurringEvent}
-                  onChange={(event) =>
-                    setIsRecurringEvent(event.target.checked)
-                  }
-                  name="recurringEvent"
-                />{" "}
-                herhalend event?
+                <FormControl>
+                  <FormControlLabel
+                    label={"herhalend event?"}
+                    checked={isRecurringEvent}
+                    onChange={(_) => setIsRecurringEvent(!isRecurringEvent)}
+                    name="recurringEvent"
+                    control={<Switch />}
+                  />
+                </FormControl>
               </Grid>
             </Conditional>
           </Grid>
           <Conditional condition={isRecurringEvent && isCreateEvent()}>
             <RecurringEvent
-              setRecurringEventProperties={setRecurringEventProperties}
+              initialValue={recurringEventProperties}
+              onChange={setRecurringEventProperties}
             ></RecurringEvent>
             <Grid item xs={12}>
               <Divider variant="fullWidth"></Divider>
@@ -344,84 +345,93 @@ export const EventForm = (props: {
         </Grid>
         <Conditional condition={props.eventType === "MISC"}>
           <Grid item xs={12}>
-            <TextField
-              variant="standard"
-              id="title"
-              name="title"
-              label="Titel"
-              fullWidth
-              value={title || ""}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+            <FormControl fullWidth>
+              <TextField
+                variant="standard"
+                id="title"
+                name="title"
+                label="Titel"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </FormControl>
           </Grid>
         </Conditional>
         <Conditional condition={props.eventType === "MATCH"}>
           <Grid item xs={12}>
-            <TextField
-              variant="standard"
-              required
-              id="opponent"
-              name="opponent"
-              label="Tegenstander"
-              value={opponent}
-              onChange={(event) => {
-                setOpponent(event.target.value);
-              }}
-              fullWidth
-            />
+            <FormControl fullWidth>
+              <TextField
+                variant="standard"
+                required
+                id="opponent"
+                name="opponent"
+                label="Tegenstander"
+                value={opponent}
+                onChange={(event) => setOpponent(event.target.value)}
+              />
+            </FormControl>
           </Grid>
           <Grid item xs={6}>
-            <RadioGroup
-              aria-label="thuis-of-uit"
-              name="thuis-of-uit"
-              value={homeAway}
-              onChange={(event) => {
-                setHomeAway(event.target.value as Place);
-              }}
-            >
-              <FormControlLabel
-                value="HOME"
-                control={<Radio />}
-                label="Thuis"
-              />
-              <FormControlLabel value="AWAY" control={<Radio />} label="Uit" />
-            </RadioGroup>
+            <FormControl>
+              <RadioGroup
+                aria-label="thuis-of-uit"
+                name="thuis-of-uit"
+                value={homeAway}
+                onChange={(event) => {
+                  setHomeAway(event.target.value as Place);
+                }}
+              >
+                <FormControlLabel
+                  value="HOME"
+                  control={<Radio />}
+                  label="Thuis"
+                />
+                <FormControlLabel
+                  value="AWAY"
+                  control={<Radio />}
+                  label="Uit"
+                />
+              </RadioGroup>
+            </FormControl>
           </Grid>
         </Conditional>
         <Grid item xs={12}>
-          <TextField
-            variant="standard"
-            required
-            id="location"
-            name="location"
-            label="Locatie"
-            value={eventLocation}
-            onChange={(event) => {
-              setEventLocation(event.target.value);
-            }}
-            fullWidth
-          />
+          <FormControl fullWidth required>
+            <TextField
+              variant="standard"
+              required
+              id="location"
+              name="location"
+              label="Locatie"
+              value={eventLocation}
+              onChange={(event) => {
+                setEventLocation(event.target.value);
+              }}
+            />
+          </FormControl>
         </Grid>
-        ;
+
         <Grid item xs={12}>
-          <TextField
-            variant="standard"
-            id="comment"
-            name="comment"
-            label="Opmerking"
-            fullWidth
-            value={comment}
-            onChange={(event) => setComment(event.target.value)}
-          />
+          <FormControl fullWidth>
+            <TextField
+              variant="standard"
+              id="comment"
+              name="comment"
+              label="Opmerking"
+              value={comment}
+              onChange={(event) => setComment(event.target.value)}
+            />
+          </FormControl>
         </Grid>
-        ;
+
         <Grid item xs={12}>
           <Typography variant="h6">Teamgenoten</Typography>
           <EventUsers
             users={props.users}
             event={props.event}
             controlType={isCreateEvent() ? "CHECKBOX" : "SWITCH"}
-            setUserSelection={(x) => {
+            initialValue={userSelection}
+            onChange={(x) => {
               setUserSelection(x);
             }}
           />
@@ -470,7 +480,6 @@ export const EventForm = (props: {
             </Button>
           </Grid>
         </Grid>
-        ;
       </Grid>
     </LocalizationProvider>
   );
