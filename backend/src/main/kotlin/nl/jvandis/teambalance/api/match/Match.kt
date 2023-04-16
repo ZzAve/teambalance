@@ -7,18 +7,20 @@ import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.TeamBalanceEntityBuilder
 import nl.jvandis.teambalance.data.build
 import java.time.LocalDateTime
+import java.util.UUID
 
 data class Match(
     override val id: Long,
     override val startTime: LocalDateTime,
     override val location: String,
     override val comment: String?,
+    override val recurringEventId: UUID? = null,
     val opponent: String,
     val homeAway: Place,
     val coach: String?,
     val attendees: List<Attendee>? = null
-) : Event(id, startTime, location, comment) {
-    constructor(startTime: LocalDateTime, location: String, comment: String?) :
+) : Event(id, startTime, location, comment, recurringEventId) {
+    constructor(startTime: LocalDateTime, location: String, comment: String?, recurringEventId: UUID?) :
         this(
             id = NO_ID,
             startTime = startTime,
@@ -29,7 +31,7 @@ data class Match(
             coach = null
         )
 
-    constructor(startTime: LocalDateTime, location: String, comment: String?, opponent: String, homeAway: Place) :
+    constructor(startTime: LocalDateTime, location: String, comment: String?, opponent: String, homeAway: Place, recurringEventId: UUID?) :
         this(
             id = NO_ID,
             startTime = startTime,
@@ -37,7 +39,8 @@ data class Match(
             comment = comment,
             opponent = opponent,
             homeAway = homeAway,
-            coach = null
+            coach = null,
+            recurringEventId = recurringEventId
         )
 
     fun createUpdatedMatch(updateMatchRequestBody: UpdateMatchRequest) = copy(

@@ -29,6 +29,7 @@ interface TeamEventsRepository<T : Event> {
     fun deleteById(eventId: Long): Boolean
     fun update(event: T): T
     fun insert(event: T): T
+    fun insertMany(events: List<T>): List<T>
 }
 
 inline fun <reified EVENT : Event> findAllWithStartTimeAfterImpl(

@@ -1,7 +1,7 @@
 package nl.jvandis.teambalance.api.bank
 
-import com.bunq.sdk.model.generated.`object`.Amount // ktlint-disable import-ordering
 import com.bunq.sdk.model.generated.endpoint.Payment
+import com.bunq.sdk.model.generated.`object`.Amount
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import nl.jvandis.teambalance.api.users.User
@@ -43,7 +43,7 @@ class BankService(
             .filter(limit, offset)
 
     private fun updateBalance(): String {
-        return bunqRepository.getMonetaryAccountBank().balance
+        return bunqRepository.monetaryAccountBank.balance
             .let {
                 "${it.parseCurrency()} ${it.value}"
             }.also {

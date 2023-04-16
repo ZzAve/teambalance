@@ -108,27 +108,51 @@ class TrainingController(
     @PostMapping
     fun createTraining(
         @RequestBody potentialEvent: PotentialTraining
-    ): TrainingResponse {
+    ): TrainingsResponse {
         log.debug("postTraining $potentialEvent")
         val allUsers = userRepository.findAll()
-        val training = potentialEvent.internalize()
+        val events = potentialEvent.internalize()
+        log.info("Requested to create trainings events: $events")
 
         val requestedUsersToAdd = allUsers.filter { user ->
             potentialEvent.userIds?.any { it == user.id }
                 ?: true
         }
+        log.info("Users to add to training events: $requestedUsersToAdd")
 
         if (potentialEvent.userIds != null &&
             potentialEvent.userIds.size != requestedUsersToAdd.size
         ) {
-            throw CreateEventException("Not all requested userIds exists unfortunately ${potentialEvent.userIds}. Please verify your userIds")
+            throw CreateEventException(
+                "Not all requested userIds exists unfortunately ${potentialEvent.userIds}." +
+                    " Please verify your userIds"
+            )
         }
 
-        val savedTraining = eventRepository.insert(training)
-        val attendees = requestedUsersToAdd.map { it.toNewAttendee(savedTraining) }
-        val savedAttendees = attendeeRepository.insertMany(attendees)
+        val savedTrainings = eventRepository.insertMany(events)
+        val savedAttendeesByEvent =
+            savedTrainings
+                .map { training -> requestedUsersToAdd.map { userToAdd -> userToAdd.toNewAttendee(training) } }
+                .let { attendees ->
+                    attendeeRepository
+                        .insertMany(attendees.flatten())
+                        .groupBy { it.eventId }
+                }
 
-        return savedTraining.expose(savedAttendees)
+        return savedTrainings.map { it.expose(savedAttendeesByEvent[it.id] ?: listOf()) }
+            .let { TrainingsResponse(it.size.toLong(), 1, 1, it.size, it) }
+            .also {
+                log.info(
+                    "Created ${it.totalSize} training events with recurringEventId: ${events.firstOrNull()?.recurringEventId}. " +
+                        "First event date: ${it.trainings.firstOrNull()?.startTime}, last event date: ${it.trainings.lastOrNull()?.startTime} "
+                )
+
+                it.trainings.forEach { e ->
+                    log.info(
+                        "Created event as part of '${events.firstOrNull()?.recurringEventId}': $e"
+                    )
+                }
+            }
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -139,7 +163,7 @@ class TrainingController(
         @RequestBody user: UserAddRequest
 
     ): List<AttendeeResponse> {
-        log.debug("Adding: $user (or all: $addAll) to training $trainingId")
+        log.info("Adding: $user (or all: $addAll) to training $trainingId")
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
         val users = if (addAll) {
             userRepository.findAll()
@@ -160,6 +184,7 @@ class TrainingController(
         @PathVariable(value = "training-id") trainingId: Long,
         @RequestBody updateTrainingRequest: UpdateTrainingRequest
     ): TrainingResponse {
+        log.info("Updating training $trainingId with $updateTrainingRequest")
         return eventRepository
             .findByIdOrNull(trainingId)
             ?.let {
@@ -167,6 +192,7 @@ class TrainingController(
                 eventRepository.update(updatedTraining)
             }
             ?.expose(emptyList())
+            ?.also { log.info("Updated training $trainingId") }
             ?: throw InvalidTrainingException(trainingId)
     }
 
@@ -185,6 +211,7 @@ class TrainingController(
                 eventRepository.update(updatedTraining)
             }
             ?.expose(emptyList())
+            ?.also { log.info("Updated trainer of training $trainingId. New trainer ${it.trainer}") }
             ?: throw InvalidTrainingException(trainingId)
     }
 
@@ -205,7 +232,7 @@ class TrainingController(
         @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean
 
     ) {
-        log.debug("Deleting training: $trainingId")
+        log.info("Deleting training: $trainingId")
         if (deleteAttendees) {
             attendeeRepository.findAllByEventIdIn(listOf(trainingId))
                 .let { attendeeRepository.deleteAll(it) }

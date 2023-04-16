@@ -100,16 +100,17 @@ class MatchController(
     fun createMatch(
         @RequestBody @Valid
         potentialEvent: PotentialMatch
-    ): MatchResponse {
+    ): MatchesResponse {
         log.debug("postMatch $potentialEvent")
-
         val allUsers = userRepository.findAll()
-        val matchToSave = potentialEvent.internalize()
+        val matchesToSave = potentialEvent.internalize()
+        log.info("Requested to create match events: $matchesToSave")
 
         val requestedUsersToAdd = allUsers.filter { user ->
             potentialEvent.userIds?.any { it == user.id }
                 ?: true
         }
+        log.info("Users to add to match events: $requestedUsersToAdd")
 
         if (potentialEvent.userIds != null &&
             potentialEvent.userIds.size != requestedUsersToAdd.size
@@ -117,12 +118,31 @@ class MatchController(
             throw CreateEventException("Not all requested userIds exists unfortunately ${potentialEvent.userIds}. Please verify your userIds")
         }
 
-        val savedMatch = matchRepository.insert(matchToSave)
+        val savedMatches = matchRepository.insertMany(matchesToSave)
+        val savedAttendeesByEvent =
+            savedMatches
+                .map { event -> requestedUsersToAdd.map { userToAdd -> userToAdd.toNewAttendee(event) } }
+                .let { attendees ->
+                    attendeeRepository
+                        .insertMany(attendees.flatten())
+                        .groupBy { it.eventId }
+                }
 
-        val attendees = requestedUsersToAdd.map { it.toNewAttendee(savedMatch) }
-        val savedAttendees = attendeeRepository.insertMany(attendees)
+        val recurringEventId = matchesToSave.firstOrNull()?.recurringEventId
+        return savedMatches.map { it.expose(savedAttendeesByEvent[it.id] ?: listOf()) }
+            .let { MatchesResponse(it.size.toLong(), 1, 1, it.size, it) }
+            .also {
+                log.info(
+                    "Created ${it.totalSize} misc events with recurringEventId: $recurringEventId. " +
+                        "First event date: ${it.matches.firstOrNull()?.startTime}, last event date: ${it.matches.lastOrNull()?.startTime} "
+                )
 
-        return savedMatch.expose(savedAttendees)
+                it.matches.forEach { e ->
+                    log.info(
+                        "Created event as part of '$recurringEventId': $e"
+                    )
+                }
+            }
     }
 
     @ResponseStatus(HttpStatus.CREATED)

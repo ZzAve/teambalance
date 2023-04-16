@@ -2,8 +2,10 @@ package nl.jvandis.teambalance.api.match
 
 import nl.jvandis.jooq.support.getField
 import nl.jvandis.jooq.support.getFieldOrThrow
+import nl.jvandis.jooq.support.valuesFrom
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.MATCH
+import nl.jvandis.teambalance.data.jooq.schema.tables.references.TRAINING
 import org.jooq.DSLContext
 import org.jooq.exception.DataAccessException
 import org.springframework.data.domain.Page
@@ -54,6 +56,47 @@ class MatchRepository(
                 )
             }
             ?: throw DataAccessException("Could not insert Match")
+    }
+
+    override fun insertMany(events: List<Match>): List<Match> {
+        if (events.isEmpty()) {
+            return emptyList()
+        }
+
+        val insertEventRecordResult = context
+            .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME)
+            .valuesFrom(events, { it.comment }, { it.location }, { it.startTime })
+            .returningResult(EVENT.ID, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME)
+            .fetch()
+            .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
+
+        return context
+            .insertInto(MATCH, MATCH.COACH, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
+            .valuesFrom(
+                events,
+                { it.coach },
+                { it.homeAway },
+                { it.opponent },
+                { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] }
+            )
+            .returningResult(MATCH.COACH, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
+            .fetch()
+            .map { matchRecord ->
+                val eventRecord = insertEventRecordResult.first { a ->
+                    a.getFieldOrThrow(EVENT.ID) == matchRecord.getFieldOrThrow(TRAINING.ID)
+                }
+                Match(
+                    id = matchRecord.getFieldOrThrow(MATCH.ID),
+                    startTime = eventRecord.getFieldOrThrow(EVENT.START_TIME),
+                    location = eventRecord.getFieldOrThrow(EVENT.LOCATION),
+                    comment = eventRecord.getField(EVENT.COMMENT),
+                    opponent = matchRecord.getFieldOrThrow(MATCH.OPPONENT),
+                    homeAway = matchRecord.getFieldOrThrow(MATCH.HOME_AWAY),
+                    coach = matchRecord.getField(MATCH.COACH)
+
+                )
+            }
+            .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
     }
 
     override fun update(event: Match): Match {

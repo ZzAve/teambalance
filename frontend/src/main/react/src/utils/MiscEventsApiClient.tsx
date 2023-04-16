@@ -4,6 +4,8 @@ import { MiscEvent } from "./domain";
 
 const eventsClient = ApiClient();
 
+export type CreateMiscEvent = Omit<MiscEvent, "id"> & { userIds: number[] };
+
 interface MiscellaneousEventsResponse {
   totalSize: number;
   totalPages: number;
@@ -43,14 +45,10 @@ const getEvent = (id: number, includeAttendees: boolean = true) =>
     .call(`miscellaneous-events/${id}?include-attendees=${includeAttendees}`)
     .then((x) => internalizeEvent(x as MiscellaneousEventResponse));
 
-const createEvent = (props: {
-  location: string;
-  comment?: string;
-  title: string;
-  startTime: Date;
-  userIds: number[];
-}) => {
-  return eventsClient.callWithBody(
+const createEvent: (props: CreateMiscEvent) => Promise<MiscEvent[]> = async (
+  props: CreateMiscEvent
+) => {
+  const miscellaneousEventResponse = (await eventsClient.callWithBody(
     "miscellaneous-events",
     {
       comment: props.comment,
@@ -58,19 +56,21 @@ const createEvent = (props: {
       title: props.title,
       startTime: eventsClient.externalizeDateTime(props.startTime),
       userIds: props.userIds,
+      recurringEventProperties: props.recurringEventProperties,
     },
     { method: "POST" }
-  );
+  )) as MiscellaneousEventsResponse;
+  return miscellaneousEventResponse.events.map(internalizeEvent);
 };
 
-const updateEvent = (props: {
+const updateEvent = async (props: {
   id: number;
   location?: string;
   title?: string;
   comment?: string;
   startTime?: Date;
 }) => {
-  return eventsClient.callWithBody(
+  const miscEventResponse = (await eventsClient.callWithBody(
     `miscellaneous-events/${props.id}`,
     {
       comment: props.comment,
@@ -79,7 +79,8 @@ const updateEvent = (props: {
       startTime: eventsClient.externalizeDateTime(props.startTime),
     },
     { method: "PUT" }
-  );
+  )) as MiscellaneousEventResponse;
+  return internalizeEvent(miscEventResponse);
 };
 
 const deleteEvent = (id: number, deleteAttendees: boolean = true) => {

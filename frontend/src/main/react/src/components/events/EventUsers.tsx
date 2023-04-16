@@ -14,7 +14,8 @@ export const EventUsers = (props: {
   event?: TeamEvent;
   users: User[];
   controlType: ControlType;
-  setUserSelection: (userSelection: { [p: number]: boolean }) => void;
+  initialValue?: { [p: number]: boolean };
+  onChange: (userSelection: { [p: number]: boolean }) => void;
 }) => {
   const [singleUserCheck, setSingleUserCheck] = useState<{
     [userId: string]: boolean;
@@ -23,26 +24,30 @@ export const EventUsers = (props: {
   const { addAlert } = useAlerts();
 
   useEffect(() => {
-    const attendeeUserIds = (props.event?.attendees || []).map(
-      (it) => it.user.id
-    );
+    if (props.initialValue !== undefined) {
+      //TODO add validation?
+      setSingleUserCheck(props.initialValue);
+    } else {
+      const attendeeUserIds = (props.event?.attendees || []).map(
+        (it) => it.user.id
+      );
 
-    const selectedUserMap: { [userId: number]: boolean } = {};
-    props.users.forEach((user) => {
-      selectedUserMap[user.id] = attendeeUserIds.some((it) => it === user.id);
-    });
+      const selectedUserMap: { [userId: number]: boolean } = {};
+      props.users.forEach((user) => {
+        selectedUserMap[user.id] = attendeeUserIds.some((it) => it === user.id);
+      });
 
-    setSingleUserCheck(selectedUserMap);
+      setSingleUserCheck(selectedUserMap);
+    }
   }, [props.users]);
 
   useEffect(() => {
     const hasUncheckedUsers = Object.values(singleUserCheck).some((it) => !it);
     setAllUsersCheckBox(!hasUncheckedUsers);
-    props.setUserSelection(singleUserCheck);
+    props.onChange(singleUserCheck);
   }, [singleUserCheck]);
 
   const setAllUsersCheckedStateTo = async (isChecked: boolean) => {
-    console.log(`Setting  all users to ${isChecked}`);
     const selectedUserMap: { [p: string]: boolean } = {};
     for (const user of props.users) {
       selectedUserMap[user.id] = isChecked;
@@ -58,12 +63,6 @@ export const EventUsers = (props: {
     await setAllUsersCheckedStateTo(checked);
   };
 
-  const handleSingleAttendeeChangeEvent = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    await handleSingleAttendeeChange(+event.target.name, event.target.checked);
-  };
-
   const handleSingleAttendeeChange = async (
     userId: number,
     checked: boolean
@@ -76,9 +75,7 @@ export const EventUsers = (props: {
     }));
 
     if (props.controlType === "SWITCH" && props.event !== undefined) {
-      const updatedUserName = `${
-        props.users.find((u) => u.id === userId)?.name
-      }`;
+      const updatedUserName = props.users.find((u) => u.id === userId)?.name;
       try {
         if (checked) {
           await attendeesApiClient.addAttendee({
@@ -127,6 +124,10 @@ export const EventUsers = (props: {
                 props.controlType === "CHECKBOX" ? (
                   <Checkbox
                     checked={allUsersCheckBox}
+                    indeterminate={
+                      Object.values(singleUserCheck).some((it) => it) &&
+                      Object.values(singleUserCheck).some((it) => !it)
+                    }
                     onChange={handleAllAttendeesChange}
                     name="all"
                   />
@@ -149,13 +150,27 @@ export const EventUsers = (props: {
                   props.controlType === "CHECKBOX" ? (
                     <Checkbox
                       checked={isChecked(it)}
-                      onChange={handleSingleAttendeeChangeEvent}
+                      onChange={async (
+                        event: React.ChangeEvent<HTMLInputElement>
+                      ) => {
+                        await handleSingleAttendeeChange(
+                          +event.target.name,
+                          event.target.checked
+                        );
+                      }}
                       name={it.id.toString()}
                     />
                   ) : (
                     <Switch
                       checked={isChecked(it)}
-                      onChange={handleSingleAttendeeChangeEvent}
+                      onChange={async (
+                        event: React.ChangeEvent<HTMLInputElement>
+                      ) => {
+                        await handleSingleAttendeeChange(
+                          +event.target.name,
+                          event.target.checked
+                        );
+                      }}
                       name={it.id.toString()}
                     />
                   )

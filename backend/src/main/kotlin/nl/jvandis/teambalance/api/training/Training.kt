@@ -7,22 +7,32 @@ import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.TeamBalanceEntityBuilder
 import nl.jvandis.teambalance.data.build
 import java.time.LocalDateTime
+import java.util.UUID
 
 data class Training(
     override val id: Long,
     override val startTime: LocalDateTime,
     override val location: String,
     override val comment: String? = null,
+    override val recurringEventId: UUID? = null,
     val trainer: User? = null,
     val attendees: List<Attendee>? = null
-) : Event(id, startTime, location, comment) {
-    constructor(startTime: LocalDateTime, location: String, comment: String? = null, trainer: User? = null) :
+
+) : Event(id, startTime, location, comment, recurringEventId) {
+    constructor(
+        startTime: LocalDateTime,
+        location: String,
+        comment: String? = null,
+        trainer: User? = null,
+        recurringEventId: UUID? = null
+    ) :
         this(
             id = NO_ID,
             startTime = startTime,
             location = location,
             comment = comment,
-            trainer = trainer
+            trainer = trainer,
+            recurringEventId = recurringEventId
         )
 
     fun createUpdatedTraining(updateTrainingRequestBody: UpdateTrainingRequest) = copy(
