@@ -16,7 +16,7 @@ data class Training(
     override val comment: String? = null,
     override val recurringEventId: UUID? = null,
     val trainer: User? = null,
-    val attendees: List<Attendee>? = null,
+    val attendees: List<Attendee>? = null
 
 ) : Event(id, startTime, location, comment, recurringEventId) {
     constructor(

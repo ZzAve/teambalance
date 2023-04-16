@@ -120,13 +120,12 @@ class MiscellaneousEventController(
         }
         log.info("Users to add to miscellaneous events: $requestedUsersToAdd")
 
-
         if (potentialEvent.userIds != null &&
             potentialEvent.userIds.size != requestedUsersToAdd.size
         ) {
             throw CreateEventException(
                 "Not all requested userIds exists unfortunately ${potentialEvent.userIds}. " +
-                        "Please verify your userIds"
+                    "Please verify your userIds"
             )
         }
 
@@ -145,7 +144,7 @@ class MiscellaneousEventController(
             .also {
                 log.info(
                     "Created ${it.totalSize} misc events with recurringEventId: ${events.firstOrNull()?.recurringEventId}. " +
-                            "First event date: ${it.events.firstOrNull()?.startTime}, last event date: ${it.events.lastOrNull()?.startTime} "
+                        "First event date: ${it.events.firstOrNull()?.startTime}, last event date: ${it.events.lastOrNull()?.startTime} "
                 )
 
                 it.events.forEach { e ->

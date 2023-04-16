@@ -39,5 +39,4 @@ data class RecurringEventPropertiesRequest(
             error("One or more weekdays should be selected for recurring event")
         }
     }
-
 }

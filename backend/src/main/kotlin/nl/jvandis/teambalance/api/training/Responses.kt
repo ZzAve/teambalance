@@ -50,7 +50,6 @@ data class PotentialTraining(
             recurringEventId = null
         )
     )
-
 }
 
 data class TrainingsResponse(

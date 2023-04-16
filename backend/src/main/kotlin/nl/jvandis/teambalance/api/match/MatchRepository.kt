@@ -72,11 +72,13 @@ class MatchRepository(
 
         return context
             .insertInto(MATCH, MATCH.COACH, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
-            .valuesFrom(events,
+            .valuesFrom(
+                events,
                 { it.coach },
                 { it.homeAway },
                 { it.opponent },
-                { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] })
+                { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] }
+            )
             .returningResult(MATCH.COACH, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
             .fetch()
             .map { matchRecord ->
@@ -95,8 +97,6 @@ class MatchRepository(
                 )
             }
             .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
-
-
     }
 
     override fun update(event: Match): Match {

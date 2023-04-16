@@ -125,7 +125,7 @@ class TrainingController(
         ) {
             throw CreateEventException(
                 "Not all requested userIds exists unfortunately ${potentialEvent.userIds}." +
-                        " Please verify your userIds"
+                    " Please verify your userIds"
             )
         }
 
@@ -144,7 +144,7 @@ class TrainingController(
             .also {
                 log.info(
                     "Created ${it.totalSize} training events with recurringEventId: ${events.firstOrNull()?.recurringEventId}. " +
-                            "First event date: ${it.trainings.firstOrNull()?.startTime}, last event date: ${it.trainings.lastOrNull()?.startTime} "
+                        "First event date: ${it.trainings.firstOrNull()?.startTime}, last event date: ${it.trainings.lastOrNull()?.startTime} "
                 )
 
                 it.trainings.forEach { e ->
@@ -211,7 +211,7 @@ class TrainingController(
                 eventRepository.update(updatedTraining)
             }
             ?.expose(emptyList())
-            ?.also { log.info("Updated trainer of training ${trainingId}. New trainer ${it.trainer}") }
+            ?.also { log.info("Updated trainer of training $trainingId. New trainer ${it.trainer}") }
             ?: throw InvalidTrainingException(trainingId)
     }
 

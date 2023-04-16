@@ -42,7 +42,7 @@ fun RecurringEventPropertiesRequest.getRecurringEventDates(
     val internalSelectedDays = selectedDays.internalize()
     require(internalSelectedDays.contains(startTime.dayOfWeek)) {
         "Start time is not part of the selected days. " +
-                "Please make sure the start time is at one of the selected days."
+            "Please make sure the start time is at one of the selected days."
     }
 
     val eventDates: List<LocalDateTime>
@@ -76,7 +76,6 @@ fun nextEventDate(lastEventDate: LocalDateTime, interval: Period, daysOfWeek: Li
             .filter { it.value > lastEventDate.dayOfWeek.value }
             .minByOrNull { it.value }
 
-
     return if (nextWeekDayInRecurringEvent == null) {
         // take first of the week and add interval
         lastEventDate
@@ -103,4 +102,3 @@ private fun List<Day>.internalize(): List<DayOfWeek> = map {
         SUNDAY -> DayOfWeek.SUNDAY
     }
 }
-

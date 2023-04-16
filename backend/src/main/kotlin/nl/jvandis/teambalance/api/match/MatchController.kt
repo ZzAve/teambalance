@@ -106,13 +106,11 @@ class MatchController(
         val matchesToSave = potentialEvent.internalize()
         log.info("Requested to create match events: $matchesToSave")
 
-
         val requestedUsersToAdd = allUsers.filter { user ->
             potentialEvent.userIds?.any { it == user.id }
                 ?: true
         }
         log.info("Users to add to match events: $requestedUsersToAdd")
-
 
         if (potentialEvent.userIds != null &&
             potentialEvent.userIds.size != requestedUsersToAdd.size
@@ -136,7 +134,7 @@ class MatchController(
             .also {
                 log.info(
                     "Created ${it.totalSize} misc events with recurringEventId: $recurringEventId. " +
-                            "First event date: ${it.matches.firstOrNull()?.startTime}, last event date: ${it.matches.lastOrNull()?.startTime} "
+                        "First event date: ${it.matches.firstOrNull()?.startTime}, last event date: ${it.matches.lastOrNull()?.startTime} "
                 )
 
                 it.matches.forEach { e ->
@@ -145,7 +143,6 @@ class MatchController(
                     )
                 }
             }
-
     }
 
     @ResponseStatus(HttpStatus.CREATED)

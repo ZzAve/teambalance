@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.event
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -11,9 +12,7 @@ import java.time.LocalDateTime
 import java.time.Period
 import java.util.stream.Stream
 
-
 class UtilsKtTest {
-
 
     @ParameterizedTest
     @MethodSource("expectedNextDates")
@@ -39,17 +38,20 @@ class UtilsKtTest {
         // Selecting Friday
         assertThrows(IllegalArgumentException::class.java) {
             RecurringEventPropertiesRequest(
-                1, RecurringEventPropertiesRequest.TimeUnit.WEEK, 10, null, listOf(
+                1,
+                RecurringEventPropertiesRequest.TimeUnit.WEEK,
+                10,
+                null,
+                listOf(
                     RecurringEventPropertiesRequest.Day.MONDAY,
                     RecurringEventPropertiesRequest.Day.TUESDAY,
-                    RecurringEventPropertiesRequest.Day.FRIDAY,
+                    RecurringEventPropertiesRequest.Day.FRIDAY
                 )
             ).getRecurringEventDates(
-                GOOD_FRIDAY.minusDays(1),
+                GOOD_FRIDAY.minusDays(1)
             )
         }
     }
-
 
     companion object {
         val GOOD_FRIDAY: LocalDateTime = LocalDateTime.of(2023, 4, 7, 0, 0, 0)

@@ -89,7 +89,8 @@ class TrainingRepository(
             .valuesFrom(
                 events,
                 { it.trainer?.id },
-                { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] })
+                { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] }
+            )
             .returningResult(TRAINING.ID, TRAINING.TRAINER_USER_ID)
             .fetch()
             .map { trainingRecord ->
@@ -103,12 +104,9 @@ class TrainingRepository(
                     comment = eventRecord.getField(EVENT.COMMENT),
                     trainer = events.first { it.startTime == eventRecord.getFieldOrThrow(EVENT.START_TIME) }.trainer // do better, pretty
                 )
-
             }
             .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
-
     }
-
 
     override fun insert(event: Training): Training {
         val eventRecord = context

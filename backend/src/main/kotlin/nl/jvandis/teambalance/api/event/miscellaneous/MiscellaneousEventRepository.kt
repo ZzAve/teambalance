@@ -96,8 +96,11 @@ class MiscellaneousEventRepository(
 
         return context
             .insertInto(MISCELLANEOUS_EVENT, MISCELLANEOUS_EVENT.TITLE, MISCELLANEOUS_EVENT.ID)
-            .valuesFrom(events, { it.title },
-                { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] })
+            .valuesFrom(
+                events,
+                { it.title },
+                { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] }
+            )
             .returningResult(MISCELLANEOUS_EVENT.TITLE, MISCELLANEOUS_EVENT.ID)
             .fetch()
             .map { matchRecord ->
@@ -113,7 +116,6 @@ class MiscellaneousEventRepository(
                 )
             }
             .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
-
     }
 
     override fun update(event: MiscellaneousEvent): MiscellaneousEvent {
