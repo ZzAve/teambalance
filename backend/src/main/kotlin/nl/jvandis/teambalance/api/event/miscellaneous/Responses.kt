@@ -3,10 +3,9 @@ package nl.jvandis.teambalance.api.event.miscellaneous
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.attendees.expose
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest
+import nl.jvandis.teambalance.api.event.CreateRecurringEventPropertiesRequest
 import nl.jvandis.teambalance.api.event.getRecurringEventDates
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class UserAddRequest(
     val userId: Long
@@ -25,11 +24,10 @@ data class PotentialMiscellaneousEvent(
     val location: String,
     val comment: String?,
     val userIds: List<Long>? = null,
-    val recurringEventProperties: RecurringEventPropertiesRequest? = null
+    val recurringEventProperties: CreateRecurringEventPropertiesRequest? = null
 ) {
     fun internalize(): List<MiscellaneousEvent> =
         recurringEventProperties?.let {
-            val recurringEventId = UUID.randomUUID()
             it
                 .getRecurringEventDates(startTime)
                 .map { e ->
@@ -38,7 +36,7 @@ data class PotentialMiscellaneousEvent(
                         comment = comment,
                         location = location,
                         title = title,
-                        recurringEventId = recurringEventId
+                        recurringEventProperties = it.internalize()
                     )
                 }
         } ?: listOf(
@@ -47,18 +45,10 @@ data class PotentialMiscellaneousEvent(
                 comment = comment,
                 location = location,
                 title = title,
-                recurringEventId = null
+                recurringEventProperties = null
             )
         )
 }
-
-data class MiscellaneousEventsResponse(
-    val totalSize: Long,
-    val totalPages: Int,
-    val page: Int,
-    val size: Int,
-    val events: List<MiscellaneousEventResponse>
-)
 
 data class MiscellaneousEventResponse(
     val id: Long,
@@ -67,6 +57,7 @@ data class MiscellaneousEventResponse(
     val location: String,
     val comment: String?,
     val attendees: List<AttendeeResponse>
+//    val recurringEventProperties: RecurringEventPropertiesResponse?
 )
 
 // FIXME: attendees are part of event
@@ -84,4 +75,5 @@ fun MiscellaneousEvent.expose(attendees: List<Attendee>) = MiscellaneousEventRes
     location = location,
     startTime = startTime,
     attendees = attendees.map(Attendee::expose)
+
 )

@@ -2,7 +2,7 @@ package nl.jvandis.teambalance.api.attendees
 
 import nl.jvandis.jooq.support.getFieldOrThrow
 import nl.jvandis.teambalance.api.bank.BankAccountAlias
-import nl.jvandis.teambalance.api.match.TeamBalanceRecordHandler
+import nl.jvandis.teambalance.api.event.TeamBalanceRecordHandler
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.BankAccountAliasRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord

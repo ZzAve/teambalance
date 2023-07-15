@@ -1,6 +1,6 @@
 package nl.jvandis.teambalance.api.attendees
 
-import nl.jvandis.teambalance.api.match.TeamBalanceRecordHandler
+import nl.jvandis.teambalance.api.event.TeamBalanceRecordHandler
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.AttendeeRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
@@ -17,8 +17,11 @@ class AttendeeWithUserRecordHandler : TeamBalanceRecordHandler<Attendee> {
 
     override fun accept(record: Record) {
         recordsHandled++
-        val attendeeId = record[ATTENDEE.ID]
-        val userId = record[UZER.ID]
+        val fields = record.fields().toList()
+        val attendeeId =
+            if (fields.contains(ATTENDEE.AVAILABILITY)) record.into(AttendeeRecord::class.java).id else null
+        val userId =
+            if (fields.contains(UZER.ROLE)) record.into(UzerRecord::class.java)?.id else null
         if (attendeeId == null || userId == null) {
             return
         }

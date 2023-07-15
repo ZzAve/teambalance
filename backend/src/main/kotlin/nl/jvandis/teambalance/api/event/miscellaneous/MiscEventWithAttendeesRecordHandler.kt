@@ -2,7 +2,7 @@ package nl.jvandis.teambalance.api.event.miscellaneous
 
 import nl.jvandis.teambalance.api.attendees.AttendeeWithUserRecordHandler
 import nl.jvandis.teambalance.api.event.Event
-import nl.jvandis.teambalance.api.match.TeamBalanceRecordHandler
+import nl.jvandis.teambalance.api.event.TeamBalanceRecordHandler
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.EventRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.MiscellaneousEventRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT

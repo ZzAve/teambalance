@@ -37,15 +37,15 @@ class UtilsKtTest {
     fun `Should throw an exception if start date is not part of the recurring event sequence`() {
         // Selecting Friday
         assertThrows(IllegalArgumentException::class.java) {
-            RecurringEventPropertiesRequest(
+            CreateRecurringEventPropertiesRequest(
                 1,
-                RecurringEventPropertiesRequest.TimeUnit.WEEK,
+                RecurringEventProperties.TimeUnit.WEEK,
                 10,
                 null,
                 listOf(
-                    RecurringEventPropertiesRequest.Day.MONDAY,
-                    RecurringEventPropertiesRequest.Day.TUESDAY,
-                    RecurringEventPropertiesRequest.Day.FRIDAY
+                    DayOfWeek.MONDAY,
+                    DayOfWeek.TUESDAY,
+                    DayOfWeek.FRIDAY
                 )
             ).getRecurringEventDates(
                 GOOD_FRIDAY.minusDays(1)

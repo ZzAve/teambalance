@@ -23,10 +23,11 @@ class BunqConfiguration(
     }
 
     private fun initializeProductionSetup(bunqConfig: BankBunqConfig): BunqRepository {
-        ensure(bunqConfig.environment == PRODUCTION) { "Bunq environment was not set to PRODUCTION" }
-        ensure(bunqConfig.apiKey != null) { "No apikey was set for Bunq" }
-        ensure(bunqConfig.bankAccountId != null) { "No bankAccountId was set for Bunq" }
-        val obfuscatedApiKey = "${bunqConfig.apiKey?.take(5)}******"
+        require(bunqConfig.environment == PRODUCTION) { "Bunq environment was not set to PRODUCTION" }
+        require(bunqConfig.apiKey != null) { "No apikey was set for Bunq" }
+        require(bunqConfig.bankAccountId != null) { "No bankAccountId was set for Bunq" }
+
+        val obfuscatedApiKey = "${bunqConfig.apiKey.take(5)}******"
         log.info("Setting up connection with bunq PRODUCTION using api-key '$obfuscatedApiKey'")
 
         return try {
@@ -40,14 +41,14 @@ class BunqConfiguration(
     }
 
     private fun initializeSandboxSetup(bunqConfig: BankBunqConfig): BunqRepository {
-        ensure(bunqConfig.environment == SANDBOX) {
+        require(bunqConfig.environment == SANDBOX) {
             "Bunq environment was not set to PRODUCTION"
         }
-        ensure(bunqConfig.apiKey.isNullOrEmpty()) {
+        require(bunqConfig.apiKey.isNullOrEmpty()) {
             "An apikey was set for Bunq while trying to setup SANDBOX environment. " +
                 "This is not allowed, for your protection"
         }
-        ensure(bunqConfig.bankAccountId == null || bunqConfig.bankAccountId == -1) {
+        require(bunqConfig.bankAccountId == null || bunqConfig.bankAccountId == -1) {
             "A bankAccountId was set while trying to setup SANDBOX environment. " +
                 "This is not allowed, for your protection"
         }
@@ -58,19 +59,5 @@ class BunqConfiguration(
         } catch (t: Throwable) {
             throw IllegalStateException("Could not create bunqRepository for sandbox setup", t)
         }
-    }
-}
-
-inline fun ensure(value: Boolean) {
-    ensure(value) { "Assertion failed" }
-}
-
-/**
- * Throws an [AssertionError] calculated by [lazyMessage] if the [value] is false
- */
-inline fun ensure(value: Boolean, lazyMessage: () -> Any) {
-    if (!value) {
-        val message = lazyMessage()
-        throw AssertionError(message)
     }
 }

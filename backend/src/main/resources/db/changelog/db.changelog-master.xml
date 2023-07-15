@@ -9,4 +9,5 @@
     <include file="db.changelog.2023-01-22-home-away-as-enum-type.xml" relativeToChangelogFile="true"/>
     <include file="db.changelog.2023-02-02-trainer-user-id.xml" relativeToChangelogFile="true"/>
     <include file="db.changelog.2023-02-06-enums-as-enum-type.xml" relativeToChangelogFile="true"/>
+    <include file="db.changelog.2023-04-27-add-recurring-event-id.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

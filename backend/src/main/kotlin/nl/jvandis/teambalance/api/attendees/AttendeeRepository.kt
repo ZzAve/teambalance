@@ -1,18 +1,27 @@
 package nl.jvandis.teambalance.api.attendees
 
+import nl.jvandis.jooq.support.getField
+import nl.jvandis.jooq.support.getFieldOrThrow
 import nl.jvandis.jooq.support.valuesFrom
+import nl.jvandis.teambalance.api.event.AffectedRecurringEvents
+import nl.jvandis.teambalance.api.event.AffectedRecurringEvents.ALL
+import nl.jvandis.teambalance.api.event.AffectedRecurringEvents.CURRENT_AND_FUTURE
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.ATTENDEE
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
+import nl.jvandis.teambalance.data.jooq.schema.tables.references.RECURRING_EVENT_PROPERTIES
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
 import org.jooq.DSLContext
 import org.jooq.Record1
 import org.jooq.exception.DataAccessException
+import org.jooq.impl.DSL.noCondition
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Repository
 class AttendeeRepository(
@@ -33,6 +42,49 @@ class AttendeeRepository(
             .on(ATTENDEE.USER_ID.eq(UZER.ID))
             .where(EVENT.ID.`in`(eventIds))
             .orderBy(UZER.ROLE, UZER.NAME).limit(100)
+            .fetch()
+            .forEach(recordHandler)
+
+        return recordHandler.build()
+    }
+
+    @Transactional
+    fun findAllAttendeesBelongingToEvent(
+        eventId: Long,
+        affectedRecurringEvents: AffectedRecurringEvents?
+    ): List<Attendee> {
+        var deleteBasedOnCurrentEvent = EVENT.ID.eq(eventId)
+        var recurringEventIdCondition = noCondition()
+        var recurringEventInFutureCondition = noCondition()
+        if (listOf(CURRENT_AND_FUTURE, ALL).contains(affectedRecurringEvents)) {
+            val fetchOne = context.select(EVENT.RECURRING_EVENT_ID, EVENT.START_TIME)
+                .from(EVENT)
+                .where(EVENT.ID.eq(eventId))
+                .fetchOne()
+            val recurringEventId: Long? = fetchOne?.getField(EVENT.RECURRING_EVENT_ID)
+            deleteBasedOnCurrentEvent = noCondition()
+            recurringEventIdCondition = EVENT.RECURRING_EVENT_ID.eq(recurringEventId)
+            if (affectedRecurringEvents == CURRENT_AND_FUTURE) {
+                recurringEventInFutureCondition = EVENT.START_TIME.greaterOrEqual(
+                    fetchOne?.getFieldOrThrow(EVENT.START_TIME) ?: LocalDateTime.MIN
+                )
+            }
+        }
+        val eventsToDeleteCondition = deleteBasedOnCurrentEvent
+            .and(recurringEventIdCondition)
+            .and(recurringEventInFutureCondition)
+
+        val recordHandler = AttendeeWithUserRecordHandler()
+        context.select()
+            .from(ATTENDEE)
+            .join(EVENT)
+            .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
+            .leftJoin(RECURRING_EVENT_PROPERTIES)
+            .on(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
+            .join(UZER)
+            .on(ATTENDEE.USER_ID.eq(UZER.ID))
+            .where(eventsToDeleteCondition)
+            .limit(10000)
             .fetch()
             .forEach(recordHandler)
 
@@ -176,6 +228,20 @@ class AttendeeRepository(
     }
 
     fun deleteById(id: Long) {
+        if (id == NO_ID) {
+            throw IllegalStateException(
+                "Attendee with 'special' id $NO_ID can not be deleted. " +
+                    "The special no id serves a special purpose in transforming items " +
+                    "from records to entities and back"
+            )
+        }
+        val execute = context.delete(ATTENDEE).where(ATTENDEE.ID.eq(id)).execute()
+        if (execute != 1) {
+            throw DataAccessException("Removed $execute attendees, expected to remove only 1")
+        }
+    }
+
+    fun deleteById(id: Long, affectedRecurringEvents: AffectedRecurringEvents?) {
         if (id == NO_ID) {
             throw IllegalStateException(
                 "Attendee with 'special' id $NO_ID can not be deleted. " +

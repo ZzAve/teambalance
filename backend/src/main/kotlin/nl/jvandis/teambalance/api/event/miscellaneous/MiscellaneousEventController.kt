@@ -7,6 +7,7 @@ import nl.jvandis.teambalance.api.InvalidMiscellaneousEventException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
+import nl.jvandis.teambalance.api.event.EventsResponse
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
 import nl.jvandis.teambalance.api.users.UserRepository
 import nl.jvandis.teambalance.api.users.toNewAttendee
@@ -51,7 +52,7 @@ class MiscellaneousEventController(
         since: LocalDateTime,
         @RequestParam(value = "limit", defaultValue = "10") limit: Int,
         @RequestParam(value = "page", defaultValue = "1") page: Int
-    ): MiscellaneousEventsResponse {
+    ): EventsResponse<MiscellaneousEventResponse> {
         log.debug("GetAllMiscellaneousEvents")
 
         // In case of testing performance again :)
@@ -74,13 +75,14 @@ class MiscellaneousEventController(
         ).toResponse(includeInactiveUsers)
     }
 
-    private fun Page<MiscellaneousEvent>.toResponse(includeInactiveUsers: Boolean) = MiscellaneousEventsResponse(
-        totalPages = totalPages,
-        totalSize = totalElements,
-        page = number + 1,
-        size = min(size, content.size),
-        events = content.map { it.expose(includeInactiveUsers) }
-    )
+    private fun Page<MiscellaneousEvent>.toResponse(includeInactiveUsers: Boolean) =
+        EventsResponse<MiscellaneousEventResponse>(
+            totalPages = totalPages,
+            totalSize = totalElements,
+            page = number + 1,
+            size = min(size, content.size),
+            events = content.map { it.expose(includeInactiveUsers) }
+        )
 
     @GetMapping("/{event-id}")
     fun getEvent(
@@ -107,7 +109,7 @@ class MiscellaneousEventController(
     @PostMapping
     fun createMiscellaneousEvent(
         @RequestBody potentialEvent: PotentialMiscellaneousEvent
-    ): MiscellaneousEventsResponse {
+    ): EventsResponse<MiscellaneousEventResponse> {
         log.debug("postEvent $potentialEvent")
 
         val allUsers = userRepository.findAll()
@@ -129,7 +131,13 @@ class MiscellaneousEventController(
             )
         }
 
-        val savedEvents = eventRepository.insertMany(events)
+        val savedEvents =
+            if (events.size > 1) {
+                eventRepository.insertRecurringEvent(events)
+            } else {
+                listOf(eventRepository.insertSingleEvent(events.first()))
+            }
+
         val savedAttendeesByEvent =
             savedEvents
                 .map { event -> requestedUsersToAdd.map { userToAdd -> userToAdd.toNewAttendee(event) } }
@@ -140,16 +148,16 @@ class MiscellaneousEventController(
                 }
 
         return savedEvents.map { it.expose(savedAttendeesByEvent[it.id] ?: listOf()) }
-            .let { MiscellaneousEventsResponse(it.size.toLong(), 1, 1, it.size, it) }
+            .let { EventsResponse<MiscellaneousEventResponse>(it.size.toLong(), 1, 1, it.size, it) }
             .also {
                 log.info(
-                    "Created ${it.totalSize} misc events with recurringEventId: ${events.firstOrNull()?.recurringEventId}. " +
+                    "Created ${it.totalSize} misc events with recurringEventId: ${events.firstOrNull()?.recurringEventProperties}. " +
                         "First event date: ${it.events.firstOrNull()?.startTime}, last event date: ${it.events.lastOrNull()?.startTime} "
                 )
 
                 it.events.forEach { e ->
                     log.info(
-                        "Created event as part of '${events.firstOrNull()?.recurringEventId}': $e"
+                        "Created event as part of '${events.firstOrNull()?.recurringEventProperties}': $e"
                     )
                 }
             }
@@ -190,7 +198,7 @@ class MiscellaneousEventController(
             .findByIdOrNull(eventId)
             ?.let {
                 val updatedEvent = it.createUpdatedEvent(updateEventRequest)
-                eventRepository.update(updatedEvent)
+                eventRepository.updateSingleEvent(updatedEvent)
             }
             ?.expose(emptyList())
             ?: throw InvalidMiscellaneousEventException(eventId)

@@ -1,0 +1,41 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="juliusvandis (generated)" id="1682607358000-1">
+        <sql>CREATE TYPE recurring_event_properties_time_unit AS ENUM ('WEEK','MONTH')</sql>
+    </changeSet>
+
+
+    <changeSet author="juliusvandis (generated)" id="1682607358000-2">
+        <createTable tableName="recurring_event_properties">
+            <column autoIncrement="true" name="id" startWith="1" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="recurring_event_properties_pkey"/>
+            </column>
+            <column name="team_balance_id" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="interval_amount" type="integer"/>
+            <column name="interval_time_unit" type="recurring_event_properties_time_unit"/>
+            <column name="amount_limit" type="integer"/>
+            <column name="date_limit" type="date"/>
+            <column name="selected_days" type="integer[]"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="juliusvandis (generated)" id="1682607358000-3">
+        <addColumn tableName="event">
+            <column name="recurring_event_id"
+                    type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="event"
+                                 baseColumnNames="recurring_event_id"
+                                 constraintName="fk_event_recurring_event_id"
+                                 referencedTableName="recurring_event_properties"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"
+                                 onUpdate="NO ACTION"
+                                 validate="true"/>
+    </changeSet>
+</databaseChangeLog>

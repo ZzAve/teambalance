@@ -1,15 +1,5 @@
 package nl.jvandis.teambalance.api.event
 
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest.Day
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest.Day.FRIDAY
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest.Day.MONDAY
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest.Day.SATURDAY
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest.Day.SUNDAY
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest.Day.THURSDAY
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest.Day.TUESDAY
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest.Day.WEDNESDAY
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest.TimeUnit
-import nl.jvandis.teambalance.api.match.TeamEventsRepository
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -31,15 +21,15 @@ fun <T : Event> getEventsAndAttendees(
     return eventsRepository.findAllWithStartTimeAfter(since, pageRequest)
 }
 
-fun RecurringEventPropertiesRequest.getRecurringEventDates(
+fun CreateRecurringEventPropertiesRequest.getRecurringEventDates(
     startTime: LocalDateTime
 ): List<LocalDateTime> {
     val interval = when (intervalTimeUnit) {
-        TimeUnit.WEEK -> Period.ofWeeks(intervalAmount)
-        TimeUnit.MONTH -> Period.ofMonths(intervalAmount)
+        RecurringEventProperties.TimeUnit.WEEK -> Period.ofWeeks(intervalAmount)
+        RecurringEventProperties.TimeUnit.MONTH -> Period.ofMonths(intervalAmount)
     }
 
-    val internalSelectedDays = selectedDays.internalize()
+    val internalSelectedDays = selectedDays
     require(internalSelectedDays.contains(startTime.dayOfWeek)) {
         "Start time is not part of the selected days. " +
             "Please make sure the start time is at one of the selected days."
@@ -91,14 +81,11 @@ fun nextEventDate(lastEventDate: LocalDateTime, interval: Period, daysOfWeek: Li
 //    return lastEventDate.plusDays(0L + daysTillNextEvent)
 }
 
-private fun List<Day>.internalize(): List<DayOfWeek> = map {
-    when (it) {
-        MONDAY -> DayOfWeek.MONDAY
-        TUESDAY -> DayOfWeek.TUESDAY
-        WEDNESDAY -> DayOfWeek.WEDNESDAY
-        THURSDAY -> DayOfWeek.THURSDAY
-        FRIDAY -> DayOfWeek.FRIDAY
-        SATURDAY -> DayOfWeek.SATURDAY
-        SUNDAY -> DayOfWeek.SUNDAY
-    }
-}
+fun RecurringEventProperties.expose() = RecurringEventPropertiesResponse(
+    teamBalanceId = teamBalanceId,
+    intervalAmount = intervalAmount,
+    intervalTimeUnit = intervalTimeUnit,
+    amountLimit = amountLimit,
+    dateLimit = dateLimit,
+    selectedDays = selectedDays.map(DayOfWeek::of)
+)

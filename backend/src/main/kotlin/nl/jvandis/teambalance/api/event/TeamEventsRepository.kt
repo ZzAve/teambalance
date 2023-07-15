@@ -1,8 +1,8 @@
-package nl.jvandis.teambalance.api.match
+package nl.jvandis.teambalance.api.event
 
-import nl.jvandis.teambalance.api.event.Event
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.ATTENDEE
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
+import nl.jvandis.teambalance.data.jooq.schema.tables.references.RECURRING_EVENT_PROPERTIES
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
 import nl.jvandis.teambalance.data.limitOrDefault
 import nl.jvandis.teambalance.data.offsetOrDefault
@@ -15,6 +15,7 @@ import org.jooq.impl.DSL.count
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import java.time.Duration
 import java.time.LocalDateTime
 
 interface TeamEventsRepository<T : Event> {
@@ -26,10 +27,43 @@ interface TeamEventsRepository<T : Event> {
         withAttendees: Boolean = true
     ): Page<T>
 
-    fun deleteById(eventId: Long): Boolean
-    fun update(event: T): T
-    fun insert(event: T): T
-    fun insertMany(events: List<T>): List<T>
+    fun deleteById(eventId: Long, affectedRecurringEvents: AffectedRecurringEvents? = null): Int
+    fun updateSingleEvent(event: T, removeRecurringEvent: Boolean = false): T
+    fun insertSingleEvent(event: T): T
+    fun insertRecurringEvent(events: List<T>): List<T>
+
+    /**
+     * Partitions the recurringEvent with the given `recurringEventId`, into:
+     *
+     * - a recurringEvent with a startTime before the given startTime, and with a new Id
+     * - a recurringEvent with events with a startTime at or after the given startTime.
+     *
+     * The latter recurringEvent will keep the provided id, the former will get a new one, which is also returned.
+     *
+     * @return the recurringEventId which is applied to all events before the given startTime. If no events occur
+     * before the given startTime, it returns null
+     */
+    fun partitionRecurringEvent(
+        currentRecurringEventId: RecurringEventPropertiesId,
+        startTime: LocalDateTime,
+        newRecurringEventId: RecurringEventPropertiesId
+    ): RecurringEventPropertiesId?
+
+    /**
+     * Removes the recurringEventId from the event with the provided `id`
+     */
+    fun removeRecurringEvent(eventId: Long): Unit
+
+    /**
+     * Update all events in a recurring event series.It is up to the implementer to choose the fields to update.
+     * No guarantees are given about which ones are, other than the startTime, which is updated according to
+     * the provided `durationToAddToEachEvent`
+     */
+    fun updateAllFromRecurringEvent(
+        recurringEventId: RecurringEventPropertiesId,
+        examplarUpdatedTraining: T,
+        durationToAddToEachEvent: Duration
+    ): List<T>
 }
 
 inline fun <reified EVENT : Event> findAllWithStartTimeAfterImpl(
@@ -87,11 +121,13 @@ fun <EV : Event> eventsOfType(
         .limit(limitOrDefault(pageable))
 
     val recordHandler = handlerFactory()
-    context
+    return context
         .select()
         .from(table)
         .leftJoin(EVENT)
         .on(idField.eq(EVENT.ID))
+        .leftJoin(RECURRING_EVENT_PROPERTIES)
+        .on(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
         .leftJoin(ATTENDEE)
         .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
         .leftJoin(UZER)
@@ -103,9 +139,38 @@ fun <EV : Event> eventsOfType(
             UZER.NAME,
             EVENT.ID.desc()
         )
-        .fetch().forEach(recordHandler)
+        .fetch()
+        .handleWith(recordHandler)
+}
 
-    return recordHandler.build()
+/**
+ * if recurring event properties are not linked to event anymore, remove recurring event
+ */
+context(LoggingContext)
+fun deleteStaleRecurringEvent(context: DSLContext) {
+    log.info("Trying to delete stale recurringEventProperties records")
+    // CTE: which recurring event properties are not linked from any event
+    val staleRecurringEventProperties =
+        context.select(RECURRING_EVENT_PROPERTIES.ID).from(RECURRING_EVENT_PROPERTIES).leftAntiJoin(EVENT).on(
+            EVENT.RECURRING_EVENT_ID.eq(
+                RECURRING_EVENT_PROPERTIES.ID
+            )
+        ).asTable("StaleRecurringEventProperties")
+
+    context.delete(RECURRING_EVENT_PROPERTIES)
+        .using(staleRecurringEventProperties)
+        .where(
+            RECURRING_EVENT_PROPERTIES.ID.eq(staleRecurringEventProperties.field(RECURRING_EVENT_PROPERTIES.ID))
+        )
+        .returning()
+        .fetch()
+        .also {
+            if (it.size > 1) {
+                log.warn(
+                    "More than 1 recurringEvent was deleted when trying stale recurring event properties."
+                )
+            }
+        }
 }
 
 // Fixme: naming, docs?

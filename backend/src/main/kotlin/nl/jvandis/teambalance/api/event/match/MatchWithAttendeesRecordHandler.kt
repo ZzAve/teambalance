@@ -1,7 +1,8 @@
-package nl.jvandis.teambalance.api.match
+package nl.jvandis.teambalance.api.event.match
 
 import nl.jvandis.teambalance.api.attendees.AttendeeWithUserRecordHandler
 import nl.jvandis.teambalance.api.event.Event
+import nl.jvandis.teambalance.api.event.TeamBalanceRecordHandler
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.EventRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.MatchRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
