@@ -35,7 +35,7 @@
         <ktlint.version>0.47.1</ktlint.version>
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
         <jib-maven-plugin.version>3.3.1</jib-maven-plugin.version>
-
+        <testcontainers.version>1.18.0</testcontainers.version>
         <maven-surefire-plugin.version>3.0.0-M9</maven-surefire-plugin.version>
 <!--        <jakarta-servlet.version>5.0.0</jakarta-servlet.version>-->
     </properties>
@@ -127,9 +127,11 @@
                 <configuration>
                     <args>
                         <arg>-Xjsr305=strict</arg>
+                        <arg>-Xcontext-receivers</arg>
                     </args>
                     <compilerPlugins>
                         <plugin>spring</plugin>
+                        <plugin>all-open</plugin>
                     </compilerPlugins>
                     <jvmTarget>17</jvmTarget>
                 </configuration>
