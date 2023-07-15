@@ -4,6 +4,7 @@ import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.attendees.expose
 import nl.jvandis.teambalance.api.event.CreateRecurringEventPropertiesRequest
+import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest
 import nl.jvandis.teambalance.api.event.getRecurringEventDates
 import java.time.LocalDateTime
 
@@ -13,7 +14,8 @@ data class UpdateMatchRequest(
     val opponent: String?,
     val homeAway: Place?,
     val comment: String?,
-    val coach: String?
+    val coach: String?,
+    val recurringEventProperties: RecurringEventPropertiesRequest?
 )
 
 data class PotentialMatch(
@@ -68,6 +70,7 @@ fun Match.expose(includeInactiveUsers: Boolean) = expose(
         ?: emptyList()
 )
 
+fun List<Match>.expose(attendees: List<Attendee>) = map { it.expose(attendees) }
 fun Match.expose(attendees: List<Attendee>) = MatchResponse(
     id = id,
     comment = comment,

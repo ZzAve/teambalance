@@ -50,10 +50,7 @@ class TrainingController(
     fun getTrainings(
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
-        @RequestParam(
-            value = "since",
-            defaultValue = "2022-08-01T00:00"
-        )
+        @RequestParam(value = "since", defaultValue = "2022-08-01T00:00")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         since: LocalDateTime,
         @RequestParam(value = "limit", defaultValue = "10") limit: Int,
@@ -143,7 +140,7 @@ class TrainingController(
 
         val savedAttendeesByEvent =
             savedEvents
-                .map { training -> requestedUsersToAdd.map { userToAdd -> userToAdd.toNewAttendee(training) } }
+                .map { event -> requestedUsersToAdd.map { userToAdd -> userToAdd.toNewAttendee(event) } }
                 .let { attendees ->
                     attendeeRepository
                         .insertMany(attendees.flatten())
@@ -151,7 +148,7 @@ class TrainingController(
                 }
 
         return savedEvents.map { it.expose(savedAttendeesByEvent[it.id] ?: listOf()) }
-            .let { EventsResponse<TrainingResponse>(it.size.toLong(), 1, 1, it.size, it) }
+            .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
             .also {
                 log.info(
                     "Created ${it.totalSize} training events with recurringEventId: ${events.firstOrNull()?.recurringEventProperties}. " +
@@ -199,7 +196,7 @@ class TrainingController(
         log.info("Updating training $trainingId with $updateTrainingRequest")
         return trainingService.updateTraining(trainingId, affectedRecurringEvents, updateTrainingRequest)
             .expose(attendees = emptyList())
-            .let { EventsResponse<TrainingResponse>(it.size.toLong(), 1, 1, it.size, it) }
+            .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
             .also { log.info("Updated training $trainingId") }
     }
 

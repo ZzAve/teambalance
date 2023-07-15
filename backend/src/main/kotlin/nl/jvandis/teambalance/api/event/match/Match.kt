@@ -43,15 +43,6 @@ data class Match(
             recurringEventProperties = recurringEventProperties
         )
 
-    fun createUpdatedMatch(updateMatchRequestBody: UpdateMatchRequest) = copy(
-        startTime = updateMatchRequestBody.startTime ?: startTime,
-        location = updateMatchRequestBody.location ?: location,
-        opponent = updateMatchRequestBody.opponent ?: opponent,
-        homeAway = updateMatchRequestBody.homeAway ?: homeAway,
-        comment = updateMatchRequestBody.comment ?: comment, // TODO allow setting `null`?
-        coach = updateMatchRequestBody.coach ?: coach // TODO allow setting 'null'?
-    )
-
     data class Builder(
         val id: Long,
         val opponent: String,

@@ -88,3 +88,12 @@ data class RecurringEventPropertiesResponse(
     val dateLimit: LocalDate?,
     val selectedDays: List<DayOfWeek>
 )
+
+fun RecurringEventProperties.expose() = RecurringEventPropertiesResponse(
+    teamBalanceId = teamBalanceId,
+    intervalAmount = intervalAmount,
+    intervalTimeUnit = intervalTimeUnit,
+    amountLimit = amountLimit,
+    dateLimit = dateLimit,
+    selectedDays = selectedDays.map(DayOfWeek::of)
+)

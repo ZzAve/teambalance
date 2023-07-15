@@ -81,11 +81,3 @@ fun nextEventDate(lastEventDate: LocalDateTime, interval: Period, daysOfWeek: Li
 //    return lastEventDate.plusDays(0L + daysTillNextEvent)
 }
 
-fun RecurringEventProperties.expose() = RecurringEventPropertiesResponse(
-    teamBalanceId = teamBalanceId,
-    intervalAmount = intervalAmount,
-    intervalTimeUnit = intervalTimeUnit,
-    amountLimit = amountLimit,
-    dateLimit = dateLimit,
-    selectedDays = selectedDays.map(DayOfWeek::of)
-)

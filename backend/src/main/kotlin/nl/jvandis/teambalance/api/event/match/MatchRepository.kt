@@ -7,41 +7,128 @@ import nl.jvandis.teambalance.api.event.AffectedRecurringEvents
 import nl.jvandis.teambalance.api.event.RecurringEventPropertiesId
 import nl.jvandis.teambalance.api.event.TeamEventTableAndRecordHandler
 import nl.jvandis.teambalance.api.event.TeamEventsRepository
+import nl.jvandis.teambalance.api.event.deleteStaleRecurringEvent
 import nl.jvandis.teambalance.api.event.findAllWithStartTimeAfterImpl
+import nl.jvandis.teambalance.api.event.handleWith
 import nl.jvandis.teambalance.api.event.insertRecurringEventPropertyRecord
+import nl.jvandis.teambalance.data.jooq.schema.tables.references.ATTENDEE
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.MATCH
-import nl.jvandis.teambalance.data.jooq.schema.tables.references.TRAINING
+import nl.jvandis.teambalance.data.jooq.schema.tables.references.RECURRING_EVENT_PROPERTIES
+import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
+import nl.jvandis.teambalance.loggerFor
+import org.jooq.Condition
 import org.jooq.DSLContext
+import org.jooq.DatePart
 import org.jooq.exception.DataAccessException
+import org.jooq.impl.DSL.localDateTimeAdd
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.time.LocalDateTime
 
 @Repository
 class MatchRepository(
     private val context: DSLContext
-) : TeamEventsRepository<Match> {
+) : TeamEventsRepository<Match>(context) {
+    override val log = loggerFor()
 
-    private val entity = TeamEventTableAndRecordHandler(MATCH, MATCH.ID) { MatchWithAttendeesRecordHandler() }
+    override fun findAll(): List<Match> =
+        findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
+
+    private fun findAllByIds(eventIds: Collection<Long>): List<Match> {
+        val recordHandler = MatchWithAttendeesRecordHandler()
+        return context
+            .select()
+            .from(MATCH)
+            .leftJoin(EVENT)
+            .on(MATCH.ID.eq(EVENT.ID))
+            .leftJoin(RECURRING_EVENT_PROPERTIES)
+            .on(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
+            .leftJoin(ATTENDEE)
+            .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
+            .leftJoin(UZER)
+            .on(UZER.ID.eq(ATTENDEE.USER_ID))
+            .where(EVENT.ID.`in`(eventIds))
+            .orderBy(
+                EVENT.START_TIME,
+                UZER.ROLE,
+                UZER.NAME,
+                EVENT.ID.desc()
+            )
+            .fetch()
+            .handleWith(recordHandler)
+    }
 
     override fun findAllWithStartTimeAfter(
         since: LocalDateTime,
         pageable: Pageable,
         withAttendees: Boolean
     ): Page<Match> =
-        findAllWithStartTimeAfterImpl(context, since, pageable, entity)
+        findAllWithStartTimeAfterImpl(
+            context,
+            since,
+            pageable,
+            TeamEventTableAndRecordHandler(MATCH, MATCH.ID) { MatchWithAttendeesRecordHandler() }
+        )
 
-    override fun findAll(): List<Match> =
-        findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
+    override fun findByIdOrNull(eventId: Long): Match? {
+        val recordHandler = MatchWithAttendeesRecordHandler()
+        return context
+            .select()
+            .from(MATCH)
+            .leftJoin(EVENT)
+            .on(MATCH.ID.eq(EVENT.ID))
+            .leftJoin(RECURRING_EVENT_PROPERTIES)
+            .on(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
+            .where(MATCH.ID.eq(eventId))
+            .fetchOne()
+            .handleWith(recordHandler)
+            .also {
+                log.debug(recordHandler.stats())
+            }
+    }
+
+    @Transactional
+    override fun deleteById(eventId: Long, affectedRecurringEvents: AffectedRecurringEvents?): Int {
+        val allEventsToDeleteConditions: Condition = allEventsToDeleteCondition(eventId, affectedRecurringEvents)
+
+        val deletedMatchRecords = context.deleteFrom(MATCH)
+            .using(EVENT)
+            .where(allEventsToDeleteConditions)
+            .and(EVENT.ID.eq(MATCH.ID))
+            .execute()
+
+        val deletedEventRecords = context.delete(EVENT)
+            .where(allEventsToDeleteConditions)
+            .execute()
+
+        if (deletedMatchRecords != deletedEventRecords) {
+            throw DataAccessException(
+                "Tried to delete a different amount of matches ($deletedMatchRecords) " +
+                    "from events ($deletedEventRecords)."
+            )
+        }
+
+        // if recurring event properties are not linked to event anymore, remove recurring event
+        if (affectedRecurringEvents != null) {
+            deleteStaleRecurringEvent(context)
+        }
+
+        return deletedMatchRecords
+    }
 
     override fun insertSingleEvent(event: Match): Match {
+        require(event.recurringEventProperties == null) {
+            "recurringEventProperties is expected to be null when inserting a single event"
+        }
+
         val eventRecord = context
-            .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME)
-            .values(event.comment, event.location, event.startTime)
-            .returningResult(EVENT.ID, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME)
+            .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
+            .values(event.comment, event.location, event.startTime, null)
+            .returningResult(EVENT.ID, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
             .fetchOne()
             ?: throw DataAccessException("Could not insert Match")
 
@@ -60,7 +147,6 @@ class MatchRepository(
                     homeAway = matchRecord.getFieldOrThrow(MATCH.HOME_AWAY),
                     coach = matchRecord.getField(MATCH.COACH),
                     recurringEventProperties = null
-
                 )
             }
             ?: throw DataAccessException("Could not insert Match")
@@ -70,7 +156,6 @@ class MatchRepository(
         if (events.isEmpty()) {
             return emptyList()
         }
-
         val e = events.first()
         require(
             events.all { it.recurringEventProperties == e.recurringEventProperties }
@@ -82,9 +167,9 @@ class MatchRepository(
         val insertEventRecordResult = context
             .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
             .valuesFrom(events, { it.comment }, { it.location }, { it.startTime }, { recurringEventProperties.id })
-            .returningResult(EVENT.ID, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME)
+            .returningResult(EVENT.fields().toList())
             .fetch()
-            .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
+            .also { if (it.size != events.size) throw DataAccessException("Could not insert Matches $events. One or more failed") }
 
         return context
             .insertInto(MATCH, MATCH.COACH, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
@@ -99,7 +184,7 @@ class MatchRepository(
             .fetch()
             .map { matchRecord ->
                 val eventRecord = insertEventRecordResult.first { a ->
-                    a.getFieldOrThrow(EVENT.ID) == matchRecord.getFieldOrThrow(TRAINING.ID)
+                    a.getFieldOrThrow(EVENT.ID) == matchRecord.getFieldOrThrow(MATCH.ID)
                 }
                 Match(
                     id = matchRecord.getFieldOrThrow(MATCH.ID),
@@ -115,12 +200,62 @@ class MatchRepository(
             .also { if (it.size != events.size) throw DataAccessException("Could not insert Matches $events. One or more failed") }
     }
 
+    @Transactional
+    override fun updateAllFromRecurringEvent(
+        recurringEventId: RecurringEventPropertiesId,
+        examplarUpdatedEvent: Match,
+        durationToAddToEachEvent: Duration
+    ): List<Match> {
+        val updatedEventIds = context.update(EVENT)
+            .set(
+                EVENT.START_TIME,
+                localDateTimeAdd(EVENT.START_TIME, durationToAddToEachEvent.toSeconds(), DatePart.SECOND)
+            )
+            .set(EVENT.COMMENT, examplarUpdatedEvent.comment)
+            .set(EVENT.LOCATION, examplarUpdatedEvent.location)
+            .from(RECURRING_EVENT_PROPERTIES)
+            .where(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
+            .and(RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID.eq(recurringEventId.value))
+            .returningResult(EVENT.ID)
+            .fetch()
+            .map { t -> t.getFieldOrThrow(MATCH.ID) }
+            .toSet()
+
+        val matchingMatches = context.select(MATCH.ID)
+            .from(MATCH)
+            .join(EVENT).on(MATCH.ID.eq(EVENT.ID))
+            .join(RECURRING_EVENT_PROPERTIES).on(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
+            .where(RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID.eq(recurringEventId.value)).asTable("MatchingMatches")
+
+        val updatedMatchesIds = context.update(MATCH)
+            .set(MATCH.COACH, examplarUpdatedEvent.coach)
+            .set(MATCH.OPPONENT, examplarUpdatedEvent.opponent)
+            .set(MATCH.HOME_AWAY, examplarUpdatedEvent.homeAway)
+            .from(matchingMatches)
+            .where(MATCH.ID.eq(matchingMatches.field(MATCH.ID)))
+            .returningResult(MATCH.ID)
+            .fetch()
+            .map { t -> t.getFieldOrThrow(MATCH.ID) }
+            .toSet()
+
+        if (updatedEventIds != updatedMatchesIds) {
+            throw DataAccessException("Deleted an different amount of event records ($updatedEventIds) from match records ($updatedMatchesIds)")
+        }
+
+        return findAllByIds(updatedEventIds)
+    }
+
     override fun updateSingleEvent(event: Match, removeRecurringEvent: Boolean): Match {
         context
             .update(EVENT)
             .set(EVENT.COMMENT, event.comment)
             .set(EVENT.LOCATION, event.location)
             .set(EVENT.START_TIME, event.startTime)
+            .apply {
+                if (removeRecurringEvent) {
+                    setNull(EVENT.RECURRING_EVENT_ID)
+                }
+            }
             .where(EVENT.ID.eq(event.id))
             .execute()
             .let { if (it != 1) throw DataAccessException("Could not update Match. EventRecord was not updated") }
@@ -135,53 +270,5 @@ class MatchRepository(
             .let { if (it != 1) throw DataAccessException("Could not update Match. MatchRecord was not updated") }
 
         return event
-    }
-
-    override fun findByIdOrNull(eventId: Long): Match? = context
-        .select()
-        .from(MATCH)
-        .leftJoin(EVENT)
-        .on(MATCH.ID.eq(EVENT.ID))
-        .where(MATCH.ID.eq(eventId))
-        .fetchOne()
-        ?.into(Match::class.java)
-
-    override fun deleteById(eventId: Long, affectedRecurringEvents: AffectedRecurringEvents?): Int {
-        val deletedMatchRecords = context.delete(MATCH)
-            .where(MATCH.ID.eq(eventId))
-            .execute()
-
-        val deletedEventRecords = context.delete(EVENT)
-            .where(EVENT.ID.eq(eventId))
-            .execute()
-
-        if (deletedMatchRecords != deletedEventRecords) {
-            throw DataAccessException(
-                "Tried to delete a different amount of matches ($deletedMatchRecords) " +
-                    "from events ($deletedEventRecords)."
-            )
-        }
-
-        return deletedMatchRecords
-    }
-
-    override fun partitionRecurringEvent(
-        currentRecurringEventId: RecurringEventPropertiesId,
-        startTime: LocalDateTime,
-        newRecurringEventId: RecurringEventPropertiesId
-    ): RecurringEventPropertiesId {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeRecurringEvent(eventId: Long) {
-        TODO("Not yet implemented")
-    }
-
-    override fun updateAllFromRecurringEvent(
-        recurringEventId: RecurringEventPropertiesId,
-        examplarUpdatedTraining: Match,
-        durationToAddToEachEvent: Duration
-    ): List<Match> {
-        TODO("Not yet implemented")
     }
 }

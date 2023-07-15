@@ -98,7 +98,7 @@ class TrainingService(
     ): List<Training> {
         return trainingRepository.updateAllFromRecurringEvent(
             recurringEventId = recurringEventId,
-            examplarUpdatedTraining = originalTraining.createUpdatedTraining(updateTrainingRequest),
+            examplarUpdatedEvent = originalTraining.createUpdatedTraining(updateTrainingRequest),
             durationToAddToEachEvent = Duration.between(originalTraining.startTime, updateTrainingRequest.startTime)
         )
     }

@@ -97,7 +97,7 @@ class MiscellaneousEventRepository(
 
     override fun updateAllFromRecurringEvent(
         recurringEventId: RecurringEventPropertiesId,
-        examplarUpdatedTraining: MiscellaneousEvent,
+        examplarUpdatedEvent: MiscellaneousEvent,
         durationToAddToEachEvent: Duration
     ): List<MiscellaneousEvent> {
         TODO("Not yet implemented")
