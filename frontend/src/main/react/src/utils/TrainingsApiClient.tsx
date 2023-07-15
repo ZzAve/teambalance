@@ -1,20 +1,17 @@
 import { ApiClient } from "./ApiClient";
-import { Training } from "./domain";
+import {
+  AffectedRecurringEvents,
+  RecurringEventProperties,
+  Training,
+} from "./domain";
 import {
   AttendeeResponse,
   internalizeAttendees,
   UserResponse,
 } from "./CommonApiResponses";
+import { EventsResponse } from "./util";
 
 const trainingsClient = ApiClient();
-
-interface TrainingsResponse {
-  totalSize: number;
-  totalPages: number;
-  page: number;
-  size: number;
-  trainings: TrainingResponse[];
-}
 
 interface TrainingResponse {
   id: number;
@@ -47,7 +44,7 @@ const getTrainings: (
   const trainings = trainingsClient.call(
     `trainings?since=${since}&include-attendees=${includeAttendees}&limit=${limit}`
   );
-  return ((await trainings) as TrainingsResponse).trainings.map(
+  return ((await trainings) as EventsResponse<TrainingResponse>).events.map(
     internalizeTraining
   );
 };
@@ -82,26 +79,32 @@ const createTraining: (props: CreateTraining) => Promise<Training[]> = async (
         recurringEventProperties: props.recurringEventProperties,
       },
       { method: "POST" }
-    )) as TrainingsResponse
-  ).trainings.map(internalizeTraining);
+    )) as EventsResponse<TrainingResponse>
+  ).events.map(internalizeTraining);
 };
 
-const updateTraining: (x: {
-  id: number;
-  location?: string;
-  comment?: string;
-  startTime?: Date;
-}) => Promise<Training> = async (x) => {
-  const training = (await trainingsClient.callWithBody(
-    `trainings/${x.id}`,
-    {
-      comment: x.comment,
-      location: x.location,
-      startTime: trainingsClient.externalizeDateTime(x.startTime),
-    },
-    { method: "PUT" }
-  )) as TrainingResponse;
-  return internalizeTraining(training);
+const updateTraining: (
+  recur: AffectedRecurringEvents,
+  x: {
+    id: number;
+    location?: string;
+    comment?: string;
+    startTime?: Date;
+    recurringEventProperties?: RecurringEventProperties;
+  }
+) => Promise<Training[]> = async (recur, x) => {
+  return (
+    (await trainingsClient.callWithBody(
+      `trainings/${x.id}?affected-recurring-events=${recur}`,
+      {
+        comment: x.comment,
+        location: x.location,
+        startTime: trainingsClient.externalizeDateTime(x.startTime),
+        recurringEventProperties: x.recurringEventProperties,
+      },
+      { method: "PUT" }
+    )) as EventsResponse<TrainingResponse>
+  ).events.map(internalizeTraining);
 };
 
 const updateTrainer: (x: {
@@ -118,9 +121,16 @@ const updateTrainer: (x: {
   return internalizeTraining(trainingResponse);
 };
 
-const deleteTraining = (id: number, deleteAttendees = true) => {
+const deleteTraining = (
+  id: number,
+  affectedEvents?: AffectedRecurringEvents
+) => {
+  const deleteAttendees = true;
+  const affectedRecurringEvents = !!affectedEvents
+    ? `&affected-recurring-events=${affectedEvents}`
+    : "";
   return trainingsClient.call(
-    `trainings/${id}?delete-attendees=${deleteAttendees}`,
+    `trainings/${id}?delete-attendees=${deleteAttendees}${affectedRecurringEvents}`,
     { method: "DELETE" }
   );
 };

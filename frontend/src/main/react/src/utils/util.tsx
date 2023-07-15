@@ -55,3 +55,11 @@ export const toBase64 = (text: string) => {
   const buf = Buffer.from(text, "utf-8");
   return buf.toString("base64");
 };
+
+export interface EventsResponse<T> {
+  totalSize: number;
+  totalPages: number;
+  page: number;
+  size: number;
+  events: T[];
+}

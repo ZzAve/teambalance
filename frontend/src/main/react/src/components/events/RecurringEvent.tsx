@@ -1,4 +1,5 @@
 import {
+  AffectedRecurringEvents,
   Day,
   label,
   RecurringEventProperties,
@@ -11,8 +12,10 @@ import {
   Alert,
   AlertTitle,
   FormControl,
+  FormLabel,
   InputAdornment,
   MenuItem,
+  RadioGroup,
   Select,
   ToggleButton,
 } from "@mui/material";
@@ -28,6 +31,8 @@ import Radio from "@mui/material/Radio";
  * until {@code limit} is reached, on {@code selected days}
  */
 interface RecurringEventPropertiesInternal {
+  /* id */
+  teamBalanceId?: string;
   /* to repeat every x amount of time */
   intervalAmount: number;
   /* interval sizing to combine 'every' with */
@@ -54,6 +59,7 @@ const internalize = (
     NO_DAYS
   );
   return {
+    teamBalanceId: r.teamBalanceId,
     amountLimit: r.amountLimit || 10,
     dateLimit: r.dateLimit || dayjs(new Date()).add(3, "months"),
     intervalAmount: r.intervalAmount,
@@ -70,9 +76,86 @@ const NO_DAYS = {
   SATURDAY: false,
   SUNDAY: false,
 };
+
 export const RecurringEvent = (props: {
   initialValue?: RecurringEventProperties;
   onChange: (props: RecurringEventProperties) => void;
+  initialAffectedEvents: AffectedRecurringEvents;
+  onAffectedEventsChange: (props: AffectedRecurringEvents) => void;
+  readOnly: boolean;
+  isCreateEvent: boolean;
+}) => {
+  return (
+    <>
+      {props.isCreateEvent ? (
+        <CreateRecurringEvent
+          initialValue={props.initialValue}
+          onChange={props.onChange}
+          readOnly={props.readOnly}
+        />
+      ) : (
+        <AffectedRecurringEvent
+          initialValue={props.initialAffectedEvents}
+          onChange={props.onAffectedEventsChange}
+        />
+      )}
+    </>
+  );
+};
+
+export const AffectedRecurringEvent = (props: {
+  initialValue?: AffectedRecurringEvents;
+  onChange: (props: AffectedRecurringEvents) => void;
+}) => {
+  const [affectedRecurringEvents, setAffectedRecurringEvents] =
+    useState<AffectedRecurringEvents>(props.initialValue ?? "ALL");
+
+  useEffect(() => {
+    props.onChange(affectedRecurringEvents);
+  }, [affectedRecurringEvents, props.onChange]);
+
+  return (
+    <Grid container item>
+      <FormControl>
+        <FormLabel id="affected-recurring-events-label">
+          Welke events wil je aanpassen?
+        </FormLabel>
+        <RadioGroup
+          row
+          aria-labelledby="affected-recurring-events-label"
+          value={affectedRecurringEvents}
+          onChange={(x) =>
+            setAffectedRecurringEvents(
+              (x.target as HTMLInputElement).value as AffectedRecurringEvents
+            )
+          }
+          name="affected-recurring-events-radio-group"
+        >
+          <FormControlLabel
+            value="CURRENT"
+            control={<Radio />}
+            label="Dit event"
+          />
+          <FormControlLabel
+            value="CURRENT_AND_FUTURE"
+            control={<Radio />}
+            label="Dit en toekomstige events"
+          />
+          <FormControlLabel
+            value="ALL"
+            control={<Radio />}
+            label="Alle events"
+          />
+        </RadioGroup>
+      </FormControl>
+    </Grid>
+  );
+};
+
+export const CreateRecurringEvent = (props: {
+  initialValue?: RecurringEventProperties;
+  onChange: (props: RecurringEventProperties) => void;
+  readOnly: boolean;
 }) => {
   const [recurringLimitType, setRecurringLimitType] =
     useState<RecurringLimitType>(
@@ -86,6 +169,7 @@ export const RecurringEvent = (props: {
       action: Partial<RecurringEventPropertiesInternal>
     ) => ({ ...state, ...action }),
     internalize(props.initialValue) || {
+      teamBalanceId: undefined,
       amountLimit: 10,
       dateLimit: dayjs(new Date()).add(3, "months"),
       intervalAmount: 1,
@@ -96,6 +180,7 @@ export const RecurringEvent = (props: {
 
   useEffect(() => {
     const recurringEventProperties: RecurringEventProperties = {
+      teamBalanceId: recProps.teamBalanceId,
       amountLimit: recProps.amountLimit,
       dateLimit: recProps.dateLimit,
       intervalAmount: recProps.intervalAmount,
@@ -151,6 +236,7 @@ export const RecurringEvent = (props: {
                     },
                   },
                 }}
+                disabled={props.readOnly}
                 variant="standard"
                 id="interval-amount"
                 type="number"
@@ -170,6 +256,7 @@ export const RecurringEvent = (props: {
               <Select
                 variant="standard"
                 labelId="interval-time-unit"
+                disabled={props.readOnly}
                 value={recProps.intervalTimeUnit}
                 onChange={(x) =>
                   setRecProps({
@@ -199,6 +286,7 @@ export const RecurringEvent = (props: {
               <ToggleButton
                 color="primary"
                 selected={recProps.selectedDays[dayType]}
+                disabled={props.readOnly}
                 onChange={() =>
                   setRecProps({
                     selectedDays: {
@@ -227,6 +315,7 @@ export const RecurringEvent = (props: {
                 value="EndDate"
                 control={<Radio />}
                 label="Op"
+                disabled={props.readOnly}
                 checked={recurringLimitType === "EndDate"}
                 onChange={(_) => setRecurringLimitType("EndDate")}
               />
@@ -240,7 +329,7 @@ export const RecurringEvent = (props: {
               minDate={dayjs("2020-01-01")}
               maxDate={dayjs("2030-01-01")}
               value={recProps.dateLimit}
-              disabled={recurringLimitType !== "EndDate"}
+              disabled={props.readOnly || recurringLimitType !== "EndDate"}
               onChange={(x) =>
                 setRecProps({ dateLimit: x || dayjs(new Date()) })
               }
@@ -254,7 +343,9 @@ export const RecurringEvent = (props: {
                 value="AmountOfEvents"
                 control={<Radio />}
                 label="Na"
-                checked={recurringLimitType === "AmountOfEvents"}
+                checked={
+                  props.readOnly || recurringLimitType === "AmountOfEvents"
+                }
                 onChange={(_) => setRecurringLimitType("AmountOfEvents")}
               />
             </FormControl>
@@ -273,12 +364,15 @@ export const RecurringEvent = (props: {
                 name="title"
                 type="number"
                 InputProps={{
+                  // readOnly: props.readOnly,
                   endAdornment: (
                     <InputAdornment position="end">keer</InputAdornment>
                   ),
                 }}
                 value={recProps.amountLimit}
-                disabled={recurringLimitType !== "AmountOfEvents"}
+                disabled={
+                  props.readOnly || recurringLimitType !== "AmountOfEvents"
+                }
                 onChange={(x) => setRecProps({ amountLimit: +x.target.value })}
               />
             </Grid>

@@ -1,20 +1,13 @@
 import { ApiClient } from "./ApiClient";
 import { AttendeeResponse } from "./CommonApiResponses";
-import { Match, Place } from "./domain";
+import { AffectedRecurringEvents, Match, Place } from "./domain";
+import { EventsResponse } from "./util";
 
 const matchesClient = ApiClient();
 
 export type CreateMatch = Omit<Match, "id" | "coach" | "attendees"> & {
   userIds: number[];
 };
-
-interface MatchesResponse {
-  totalSize: number;
-  totalPages: number;
-  page: number;
-  size: number;
-  matches: MatchResponse[];
-}
 
 interface MatchResponse {
   id: number;
@@ -43,8 +36,8 @@ const getMatches = async (
   let matches = matchesClient.call(
     `matches?since=${since}&include-attendees=${includeAttendees}&limit=${limit}`
   );
-  let x = (await matches) as MatchesResponse;
-  return x.matches.map(internalizeMatch);
+  let x = (await matches) as EventsResponse<MatchResponse>;
+  return x.events.map(internalizeMatch);
 };
 
 const getMatch = async (id: number, includeAttendees = true) => {
@@ -71,11 +64,12 @@ const createMatch: (props: CreateMatch) => Promise<Match[]> = async (
       recurringEventProperties: props.recurringEventProperties,
     },
     { method: "POST" }
-  )) as MatchesResponse;
+  )) as EventsResponse<MatchResponse>;
 
-  return matchResponses.matches.map(internalizeMatch);
+  return matchResponses.events.map(internalizeMatch);
 };
 
+//TODO
 const updateMatch: (props: {
   id: number;
   location?: string;
@@ -83,7 +77,7 @@ const updateMatch: (props: {
   startTime?: Date;
   opponent?: string;
   homeAway?: string;
-}) => Promise<Match> = async (props) => {
+}) => Promise<Match[]> = async (props) => {
   const matchResponse = (await matchesClient.callWithBody(
     `matches/${props.id}`,
     {
@@ -95,7 +89,7 @@ const updateMatch: (props: {
     },
     { method: "PUT" }
   )) as MatchResponse;
-  return internalizeMatch(matchResponse);
+  return [internalizeMatch(matchResponse)];
 };
 
 const updateCoach = (props: { id: number; coach: string }) => {
@@ -108,7 +102,9 @@ const updateCoach = (props: { id: number; coach: string }) => {
   );
 };
 
-const deleteMatch = (id: number, deleteAttendees = true) => {
+//TODO
+const deleteMatch = (id: number, affectedEvents?: AffectedRecurringEvents) => {
+  const deleteAttendees = true;
   return matchesClient.call(
     `matches/${id}?delete-attendees=${deleteAttendees}`,
     { method: "DELETE" }

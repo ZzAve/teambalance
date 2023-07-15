@@ -1,18 +1,11 @@
 import { ApiClient } from "./ApiClient";
 import { AttendeeResponse } from "./CommonApiResponses";
-import { MiscEvent } from "./domain";
+import { AffectedRecurringEvents, MiscEvent } from "./domain";
+import { EventsResponse } from "./util";
 
 const eventsClient = ApiClient();
 
 export type CreateMiscEvent = Omit<MiscEvent, "id"> & { userIds: number[] };
-
-interface MiscellaneousEventsResponse {
-  totalSize: number;
-  totalPages: number;
-  page: number;
-  size: number;
-  events: MiscellaneousEventResponse[];
-}
 
 interface MiscellaneousEventResponse {
   id: number;
@@ -37,7 +30,9 @@ const getEvents = (since: string, limit: number, includeAttendees = true) =>
       `miscellaneous-events?since=${since}&include-attendees=${includeAttendees}&limit=${limit}`
     )
     .then((x) =>
-      (x as MiscellaneousEventsResponse).events.map(internalizeEvent)
+      (x as EventsResponse<MiscellaneousEventResponse>).events.map(
+        internalizeEvent
+      )
     );
 
 const getEvent = (id: number, includeAttendees: boolean = true) =>
@@ -59,17 +54,18 @@ const createEvent: (props: CreateMiscEvent) => Promise<MiscEvent[]> = async (
       recurringEventProperties: props.recurringEventProperties,
     },
     { method: "POST" }
-  )) as MiscellaneousEventsResponse;
+  )) as EventsResponse<MiscellaneousEventResponse>;
   return miscellaneousEventResponse.events.map(internalizeEvent);
 };
 
+//TODO
 const updateEvent = async (props: {
   id: number;
   location?: string;
   title?: string;
   comment?: string;
   startTime?: Date;
-}) => {
+}): Promise<MiscEvent[]> => {
   const miscEventResponse = (await eventsClient.callWithBody(
     `miscellaneous-events/${props.id}`,
     {
@@ -80,10 +76,12 @@ const updateEvent = async (props: {
     },
     { method: "PUT" }
   )) as MiscellaneousEventResponse;
-  return internalizeEvent(miscEventResponse);
+  return [internalizeEvent(miscEventResponse)];
 };
 
-const deleteEvent = (id: number, deleteAttendees: boolean = true) => {
+//TODO
+const deleteEvent = (id: number, affectedEvents?: AffectedRecurringEvents) => {
+  const deleteAttendees: boolean = true;
   return eventsClient.call(
     `miscellaneous-events/${id}?delete-attendees=${deleteAttendees}`,
     { method: "DELETE" }

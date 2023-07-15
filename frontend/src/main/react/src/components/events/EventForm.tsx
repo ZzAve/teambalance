@@ -24,6 +24,7 @@ import { EventUsers } from "./EventUsers";
 import { useAlerts } from "../../hooks/alertsHook";
 import { LocationState } from "../utils";
 import {
+  AffectedRecurringEvents,
   eventType,
   Match,
   MiscEvent,
@@ -83,6 +84,7 @@ const createEvent: (
 
 async function updateEvent(
   eventType: EventType,
+  recurringEventUpdateType: AffectedRecurringEvents,
   apiArgs: {
     // TODO: consider Partial utility types Partial<Training> | Partial<Match>
     id: number;
@@ -92,11 +94,15 @@ async function updateEvent(
     comment?: string;
     opponent?: string;
     homeAway?: Place;
+    recurringEventProperties?: RecurringEventProperties;
   }
-): Promise<MiscEvent | Training | Match> {
+): Promise<Training[] | Match[] | MiscEvent[]> {
   switch (eventType) {
     case "TRAINING":
-      return await trainingsApiClient.updateTraining(apiArgs);
+      return await trainingsApiClient.updateTraining(
+        recurringEventUpdateType,
+        apiArgs
+      );
     case "MATCH":
       return await matchesApiClient.updateMatch(apiArgs);
     case "MISC":
@@ -127,11 +133,14 @@ export const EventForm = (props: {
   };
 
   const [id] = useState(props.event?.id);
-
   const [isRecurringEvent, setIsRecurringEvent] = useState<boolean>(false);
+
   const [recurringEventProperties, setRecurringEventProperties] = useState<
     RecurringEventProperties | undefined
-  >(undefined);
+  >(props.event?.recurringEventProperties);
+
+  const [affectedRecurringEvents, setAffectedRecurringEvents] =
+    useState<AffectedRecurringEvents>("ALL");
 
   const [eventLocation, setEventLocation] = useState(
     props.event?.location || ""
@@ -161,7 +170,8 @@ export const EventForm = (props: {
 
   useEffect(() => {
     console.debug(`[EventForm ${props.eventType}] Loaded!`);
-  }, []);
+    setIsRecurringEvent(!!recurringEventProperties);
+  }, [props.eventType, recurringEventProperties]);
 
   const isCreateEvent = () => id === undefined;
 
@@ -175,7 +185,7 @@ export const EventForm = (props: {
         recurringEventProperties: isRecurringEvent
           ? recurringEventProperties
           : undefined,
-        userIds: Object.entries(userSelection)
+        userIds: Object.entries(userSelection!)
           .filter((it) => it[1])
           .map((it) => +it[0]),
       };
@@ -203,7 +213,7 @@ export const EventForm = (props: {
       };
       return await createEvent(props.eventType, apiArgs);
     } else {
-      return await updateEvent(props.eventType, {
+      return await updateEvent(props.eventType, affectedRecurringEvents, {
         id: id as number,
         location: eventLocation,
         startTime: selectedDateTime?.toDate(),
@@ -211,7 +221,8 @@ export const EventForm = (props: {
         comment: comment,
         opponent: opponent || undefined,
         homeAway: homeAway || undefined,
-      }).then((x) => [x]);
+        recurringEventProperties: recurringEventProperties,
+      });
     }
   };
 
@@ -279,6 +290,31 @@ export const EventForm = (props: {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"nl"}>
       <Grid container spacing={3}>
+        <Conditional condition={isCreateEvent()}>
+          <Grid item xs={12}>
+            <Alert severity="info">
+              <AlertTitle>Nieuwe functionaliteit</AlertTitle>
+              <Typography>
+                Maak nu ook herhalende events aan! Elke week een training? Maak
+                dat nu in 1 keer aan 😱. Flip die switch, en gaan met die
+                banaan.
+              </Typography>
+            </Alert>
+          </Grid>
+        </Conditional>
+        <Conditional condition={isRecurringEvent}>
+          <RecurringEvent
+            initialValue={recurringEventProperties}
+            onChange={setRecurringEventProperties}
+            initialAffectedEvents={affectedRecurringEvents}
+            onAffectedEventsChange={setAffectedRecurringEvents}
+            readOnly={!isCreateEvent()}
+            isCreateEvent={isCreateEvent()}
+          ></RecurringEvent>
+          <Grid item xs={12}>
+            <Divider variant="fullWidth"></Divider>
+          </Grid>
+        </Conditional>
         <Conditional condition={!isCreateEvent()}>
           <Grid item xs={12}>
             <TextField
@@ -293,18 +329,6 @@ export const EventForm = (props: {
         </Conditional>
         <Grid item container spacing={2}>
           <Grid container item spacing={1} marginY="10px" alignItems="end">
-            <Conditional condition={isCreateEvent()}>
-              <Grid item xs={12}>
-                <Alert severity="info">
-                  <AlertTitle>Nieuwe functionaliteit</AlertTitle>
-                  <Typography>
-                    Maak nu ook herhalende events aan! Elke week een training?
-                    Maak dat nu in 1 keer aan 😱. Flip die switch, en gaan met
-                    die banaan.
-                  </Typography>
-                </Alert>
-              </Grid>
-            </Conditional>
             <Grid item>
               <MobileDateTimePicker
                 renderInput={(props) => (
@@ -333,15 +357,6 @@ export const EventForm = (props: {
               </Grid>
             </Conditional>
           </Grid>
-          <Conditional condition={isRecurringEvent && isCreateEvent()}>
-            <RecurringEvent
-              initialValue={recurringEventProperties}
-              onChange={setRecurringEventProperties}
-            ></RecurringEvent>
-            <Grid item xs={12}>
-              <Divider variant="fullWidth"></Divider>
-            </Grid>
-          </Conditional>
         </Grid>
         <Conditional condition={props.eventType === "MISC"}>
           <Grid item xs={12}>
