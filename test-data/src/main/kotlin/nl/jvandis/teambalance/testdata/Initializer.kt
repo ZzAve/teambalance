@@ -21,6 +21,7 @@ import nl.jvandis.teambalance.testdata.domain.CreateMatch
 import nl.jvandis.teambalance.testdata.domain.CreateMiscEvent
 import nl.jvandis.teambalance.testdata.domain.CreateTraining
 import nl.jvandis.teambalance.testdata.domain.CreateUser
+import nl.jvandis.teambalance.testdata.domain.EventResponse
 import nl.jvandis.teambalance.testdata.domain.Match
 import nl.jvandis.teambalance.testdata.domain.MiscEvent
 import nl.jvandis.teambalance.testdata.domain.Place
@@ -54,6 +55,9 @@ import kotlin.time.measureTime
 
 val jsonFormatter = Json {
     encodeDefaults = true
+    isLenient = true
+    ignoreUnknownKeys = true
+//    prettyPrint = true
 }
 
 fun addHeaders(apiKey: String) = Filter { next ->
@@ -78,9 +82,11 @@ class Initializer(
         // standard client
     }
 
+    val trainingsLens = Body.auto<EventResponse<Training>>().toLens()
     val aTrainingLens = Body.auto<Training>().toLens()
+    val matchesLens = Body.auto<EventResponse<Match>>().toLens()
     val aMatchLens = Body.auto<Match>().toLens()
-    val aMiscEvent = Body.auto<MiscEvent>().toLens()
+    val aMiscEvent = Body.auto<EventResponse<MiscEvent>>().toLens()
     val anAttendeeLens = Body.auto<Attendee>().toLens()
 
     private fun createUser(user: CreateUser): User {
@@ -104,7 +110,7 @@ class Initializer(
         return jsonFormatter.decodeFromString<Users>(response.bodyString()).users
     }
 
-    private fun createTraining(training: CreateTraining): Training {
+    private fun createTraining(training: CreateTraining): EventResponse<Training> {
         val request = Request(POST, "$host/api/trainings")
             .body(jsonFormatter.encodeToString(training))
         val response: Response = client(request)
@@ -113,7 +119,7 @@ class Initializer(
             throw IllegalStateException("Something went wrong creating a training: [${response.status}] ${response.bodyString()}")
         }
 
-        return aTrainingLens(response)
+        return trainingsLens(response)
     }
 
     private fun addTrainer(id: Long, trainerId: Long?): Training {
@@ -129,7 +135,7 @@ class Initializer(
         return aTrainingLens(response)
     }
 
-    private fun createMatch(match: CreateMatch): Match {
+    private fun createMatch(match: CreateMatch): EventResponse<Match> {
         val request = Request(POST, "$host/api/matches")
             .body(jsonFormatter.encodeToString(match))
         val response: Response = client(request)
@@ -138,7 +144,7 @@ class Initializer(
             throw IllegalStateException("Something went wrong creating a match: [${response.status}] ${response.bodyString()}")
         }
 
-        return aMatchLens(response)
+        return matchesLens(response)
     }
 
     private fun addCoach(id: Long, coach: String): Match {
@@ -154,7 +160,7 @@ class Initializer(
         return aMatchLens(response)
     }
 
-    private fun createMiscEvent(miscEvent: CreateMiscEvent): MiscEvent {
+    private fun createMiscEvent(miscEvent: CreateMiscEvent): EventResponse<MiscEvent> {
         val request = Request(POST, "$host/api/miscellaneous-events")
             .body(jsonFormatter.encodeToString(miscEvent))
         val response: Response = client(request)
@@ -279,7 +285,7 @@ class Initializer(
                     comment = comments.random()
                 )
 
-                val savedTraining = createTraining(training)
+                val savedTraining = createTraining(training).events.first()
                 log.info("Added training with id ${savedTraining.id}: $savedTraining")
 
                 val addedAttendees = addAttendeesToEvent(allUsers, savedTraining.id)
@@ -347,7 +353,7 @@ class Initializer(
                     comment = comments.random()
                 )
 
-                val savedMatch = createMatch(match)
+                val savedMatch = createMatch(match).events.first()
                 log.info("Added match with id ${savedMatch.id}: $savedMatch")
 
                 val addedAttendees = addAttendeesToEvent(allUsers, savedMatch.id)
@@ -410,7 +416,7 @@ class Initializer(
                     comment = comments.random()
                 )
 
-                val savedMiscEvent = createMiscEvent(miscEvent)
+                val savedMiscEvent = createMiscEvent(miscEvent).events.first()
                 log.info("Added misc event with id ${savedMiscEvent.id}: $savedMiscEvent")
 
                 val addedAttendees = addAttendeesToEvent(allUsers, savedMiscEvent.id)
