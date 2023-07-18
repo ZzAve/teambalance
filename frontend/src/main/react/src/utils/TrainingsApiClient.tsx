@@ -15,14 +15,14 @@ const trainingsClient = ApiClient();
 
 interface TrainingResponse {
   id: number;
-  startTime: string; //(ISO 8601 datetimestring)
+  startTime: string; // ISO 8601 datetime string,
   location: string;
   comment?: string;
   attendees: AttendeeResponse[];
   trainer?: UserResponse;
 }
 
-const internalizeTraining: (externalTraining: TrainingResponse) => Training = (
+const internalize: (externalTraining: TrainingResponse) => Training = (
   externalTraining: TrainingResponse
 ) => {
   return {
@@ -45,7 +45,7 @@ const getTrainings: (
     `trainings?since=${since}&include-attendees=${includeAttendees}&limit=${limit}`
   );
   return ((await trainings) as EventsResponse<TrainingResponse>).events.map(
-    internalizeTraining
+    internalize
   );
 };
 
@@ -58,7 +58,7 @@ const getTraining: (
   );
 
   let trainingResponse = (await training) as TrainingResponse;
-  return internalizeTraining(trainingResponse);
+  return internalize(trainingResponse);
 };
 
 export type CreateTraining = Omit<Training, "id" | "trainer" | "attendees"> & {
@@ -72,53 +72,53 @@ const createTraining: (props: CreateTraining) => Promise<Training[]> = async (
     (await trainingsClient.callWithBody(
       "trainings",
       {
-        comment: props.comment,
-        location: props.location,
         startTime: trainingsClient.externalizeDateTime(props.startTime),
+        location: props.location,
+        comment: props.comment,
         userIds: props.userIds,
         recurringEventProperties: props.recurringEventProperties,
       },
       { method: "POST" }
     )) as EventsResponse<TrainingResponse>
-  ).events.map(internalizeTraining);
+  ).events.map(internalize);
 };
 
 const updateTraining: (
-  recur: AffectedRecurringEvents,
-  x: {
+  affectedRecurringEvents: AffectedRecurringEvents,
+  eventProps: {
     id: number;
+    startTime?: Date;
     location?: string;
     comment?: string;
-    startTime?: Date;
     recurringEventProperties?: RecurringEventProperties;
   }
-) => Promise<Training[]> = async (recur, x) => {
+) => Promise<Training[]> = async (affectedRecurringEvents, eventProps) => {
   return (
     (await trainingsClient.callWithBody(
-      `trainings/${x.id}?affected-recurring-events=${recur}`,
+      `trainings/${eventProps.id}?affected-recurring-events=${affectedRecurringEvents}`,
       {
-        comment: x.comment,
-        location: x.location,
-        startTime: trainingsClient.externalizeDateTime(x.startTime),
-        recurringEventProperties: x.recurringEventProperties,
+        startTime: trainingsClient.externalizeDateTime(eventProps.startTime),
+        location: eventProps.location,
+        comment: eventProps.comment,
+        recurringEventProperties: eventProps.recurringEventProperties,
       },
       { method: "PUT" }
     )) as EventsResponse<TrainingResponse>
-  ).events.map(internalizeTraining);
+  ).events.map(internalize);
 };
 
-const updateTrainer: (x: {
+const updateTrainer: (props: {
   id: number;
   trainerUserId?: string;
-}) => Promise<Training> = async (x) => {
+}) => Promise<Training> = async (props) => {
   const trainingResponse = (await trainingsClient.callWithBody(
-    `trainings/${x.id}/trainer`,
+    `trainings/${props.id}/trainer`,
     {
-      userId: x.trainerUserId,
+      userId: props.trainerUserId,
     },
     { method: "PUT" }
   )) as TrainingResponse;
-  return internalizeTraining(trainingResponse);
+  return internalize(trainingResponse);
 };
 
 const deleteTraining = (

@@ -24,10 +24,8 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 @Repository
-class MiscellaneousEventRepository(
-    private val context: DSLContext
-) : TeamEventsRepository<MiscellaneousEvent> {
-    private val LOG = loggerFor()
+class MiscellaneousEventRepository(context: DSLContext) : TeamEventsRepository<MiscellaneousEvent>(context) {
+    override val log = loggerFor()
 
     private val entity = TeamEventTableAndRecordHandler(
         MISCELLANEOUS_EVENT,
@@ -57,7 +55,7 @@ class MiscellaneousEventRepository(
             .fetchOne()
             .handleWith(recordHandler)
             .also {
-                LOG.debug(recordHandler.stats())
+                log.debug(recordHandler.stats())
             }
     }
 
@@ -81,18 +79,6 @@ class MiscellaneousEventRepository(
 
         // TODO
         return deletedMiscEventRecords
-    }
-
-    override fun partitionRecurringEvent(
-        currentRecurringEventId: RecurringEventPropertiesId,
-        startTime: LocalDateTime,
-        newRecurringEventId: RecurringEventPropertiesId
-    ): RecurringEventPropertiesId {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeRecurringEvent(eventId: Long) {
-        TODO("Not yet implemented")
     }
 
     override fun updateAllFromRecurringEvent(

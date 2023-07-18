@@ -30,9 +30,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 @Repository
-class TrainingRepository(
-    private val context: DSLContext
-) : TeamEventsRepository<Training>(context) {
+class TrainingRepository(context: DSLContext) : TeamEventsRepository<Training>(context) {
     override val log = loggerFor()
 
     override fun findAll(): List<Training> {
@@ -111,7 +109,7 @@ class TrainingRepository(
         if (deletedTrainingRecords != deletedEventRecords) {
             throw DataAccessException(
                 "Tried to delete a different amount of trainings ($deletedTrainingRecords) " +
-                    "from events ($deletedEventRecords)."
+                        "from events ($deletedEventRecords)."
             )
         }
 

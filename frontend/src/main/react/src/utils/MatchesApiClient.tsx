@@ -1,13 +1,14 @@
 import { ApiClient } from "./ApiClient";
-import { AttendeeResponse } from "./CommonApiResponses";
-import { AffectedRecurringEvents, Match, Place } from "./domain";
+import { AttendeeResponse, internalizeAttendees } from "./CommonApiResponses";
+import {
+  AffectedRecurringEvents,
+  Match,
+  Place,
+  RecurringEventProperties,
+} from "./domain";
 import { EventsResponse } from "./util";
 
 const matchesClient = ApiClient();
-
-export type CreateMatch = Omit<Match, "id" | "coach" | "attendees"> & {
-  userIds: number[];
-};
 
 interface MatchResponse {
   id: number;
@@ -20,15 +21,21 @@ interface MatchResponse {
   coach?: string;
 }
 
-const internalizeMatch: (externalMatch: MatchResponse) => Match = (
+const internalize: (externalMatch: MatchResponse) => Match = (
   externalMatch: MatchResponse
-) => ({
-  ...externalMatch,
-  startTime: new Date(externalMatch.startTime),
-  attendees: externalMatch.attendees || [],
-});
+) => {
+  return {
+    ...externalMatch,
+    startTime: new Date(externalMatch.startTime),
+    attendees: externalMatch.attendees?.map(internalizeAttendees) || [],
+  };
+};
 
-const getMatches = async (
+const getMatches: (
+  since: string,
+  limit: number,
+  includeAttendees?: boolean
+) => Promise<Match[]> = async (
   since: string,
   limit: number,
   includeAttendees = true
@@ -36,77 +43,94 @@ const getMatches = async (
   let matches = matchesClient.call(
     `matches?since=${since}&include-attendees=${includeAttendees}&limit=${limit}`
   );
-  let x = (await matches) as EventsResponse<MatchResponse>;
-  return x.events.map(internalizeMatch);
+  return ((await matches) as EventsResponse<MatchResponse>).events.map(
+    internalize
+  );
 };
 
-const getMatch = async (id: number, includeAttendees = true) => {
-  let match = matchesClient.call(
+const getMatch: (
+  id: number,
+  includeAttendees?: boolean
+) => Promise<Match> = async (id: number, includeAttendees = true) => {
+  const match = matchesClient.call(
     `matches/${id}?include-attendees=${includeAttendees}`
   );
 
-  let x = (await match) as MatchResponse;
-  return internalizeMatch(x);
+  let matchResponse = (await match) as MatchResponse;
+  return internalize(matchResponse);
+};
+
+export type CreateMatch = Omit<Match, "id" | "coach" | "attendees"> & {
+  userIds: number[];
 };
 
 const createMatch: (props: CreateMatch) => Promise<Match[]> = async (
   props: CreateMatch
 ) => {
-  const matchResponses = (await matchesClient.callWithBody(
-    "matches",
-    {
-      startTime: matchesClient.externalizeDateTime(props.startTime),
-      location: props.location,
-      opponent: props.opponent,
-      homeAway: props.homeAway,
-      comment: props.comment,
-      userIds: props.userIds,
-      recurringEventProperties: props.recurringEventProperties,
-    },
-    { method: "POST" }
-  )) as EventsResponse<MatchResponse>;
-
-  return matchResponses.events.map(internalizeMatch);
+  return (
+    (await matchesClient.callWithBody(
+      "matches",
+      {
+        startTime: matchesClient.externalizeDateTime(props.startTime),
+        location: props.location,
+        comment: props.comment,
+        userIds: props.userIds,
+        opponent: props.opponent,
+        homeAway: props.homeAway,
+        recurringEventProperties: props.recurringEventProperties,
+      },
+      { method: "POST" }
+    )) as EventsResponse<MatchResponse>
+  ).events.map(internalize);
 };
 
 //TODO
-const updateMatch: (props: {
-  id: number;
-  location?: string;
-  comment?: string;
-  startTime?: Date;
-  opponent?: string;
-  homeAway?: string;
-}) => Promise<Match[]> = async (props) => {
-  const matchResponse = (await matchesClient.callWithBody(
-    `matches/${props.id}`,
-    {
-      startTime: matchesClient.externalizeDateTime(props.startTime),
-      location: props.location,
-      opponent: props.opponent,
-      homeAway: props.homeAway,
-      comment: props.comment,
-    },
-    { method: "PUT" }
-  )) as MatchResponse;
-  return [internalizeMatch(matchResponse)];
+const updateMatch: (
+  affectedRecurringEvents: AffectedRecurringEvents,
+  eventProps: {
+    id: number;
+    startTime?: Date;
+    location?: string;
+    comment?: string;
+    recurringEventProperties?: RecurringEventProperties;
+    opponent?: string;
+    homeAway?: string;
+  }
+) => Promise<Match[]> = async (affectedRecurringEvents, eventProps) => {
+  return (
+    (await matchesClient.callWithBody(
+      `matches/${eventProps.id}?affected-recurring-events=${affectedRecurringEvents}`,
+      {
+        startTime: matchesClient.externalizeDateTime(eventProps.startTime),
+        location: eventProps.location,
+        comment: eventProps.comment,
+        recurringEventProperties: eventProps.recurringEventProperties,
+        opponent: eventProps.opponent,
+        homeAway: eventProps.homeAway,
+      },
+      { method: "PUT" }
+    )) as EventsResponse<MatchResponse>
+  ).events.map(internalize);
 };
 
-const updateCoach = (props: { id: number; coach: string }) => {
-  return matchesClient.callWithBody(
+const updateCoach = async (props: { id: number; coach: string }) => {
+  const matchResponse = (await matchesClient.callWithBody(
     `matches/${props.id}`,
     {
       coach: props.coach,
     },
     { method: "PUT" }
-  );
+  )) as MatchResponse;
+  return internalize(matchResponse);
 };
 
-//TODO
 const deleteMatch = (id: number, affectedEvents?: AffectedRecurringEvents) => {
   const deleteAttendees = true;
+  const affectedRecurringEvents = !!affectedEvents
+    ? `&affected-recurring-events=${affectedEvents}`
+    : "";
   return matchesClient.call(
-    `matches/${id}?delete-attendees=${deleteAttendees}`,
+    `matches/${id}?delete-attendees=${deleteAttendees}${affectedRecurringEvents}`,
     { method: "DELETE" }
   );
 };

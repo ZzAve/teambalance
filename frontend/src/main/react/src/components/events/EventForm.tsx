@@ -104,7 +104,10 @@ async function updateEvent(
         apiArgs
       );
     case "MATCH":
-      return await matchesApiClient.updateMatch(apiArgs);
+      return await matchesApiClient.updateMatch(
+        recurringEventUpdateType,
+        apiArgs
+      );
     case "MISC":
       return await eventsApiClient.updateEvent(apiArgs);
     case "OTHER":

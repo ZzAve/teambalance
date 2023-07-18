@@ -25,7 +25,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 abstract class TeamEventsRepository<T : Event>(
-    private val context: DSLContext
+    protected val context: DSLContext
 ) : LoggingContext {
     abstract fun findByIdOrNull(eventId: Long): T?
     abstract fun findAll(): List<T>

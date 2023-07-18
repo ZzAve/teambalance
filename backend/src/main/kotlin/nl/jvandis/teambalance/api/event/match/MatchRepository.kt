@@ -30,9 +30,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 @Repository
-class MatchRepository(
-    private val context: DSLContext
-) : TeamEventsRepository<Match>(context) {
+class MatchRepository(context: DSLContext) : TeamEventsRepository<Match>(context) {
     override val log = loggerFor()
 
     override fun findAll(): List<Match> =
