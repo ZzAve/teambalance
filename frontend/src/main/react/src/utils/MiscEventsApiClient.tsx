@@ -1,11 +1,13 @@
 import { ApiClient } from "./ApiClient";
-import { AttendeeResponse } from "./CommonApiResponses";
-import { AffectedRecurringEvents, MiscEvent } from "./domain";
+import { AttendeeResponse, internalizeAttendees } from "./CommonApiResponses";
+import {
+  AffectedRecurringEvents,
+  MiscEvent,
+  RecurringEventProperties,
+} from "./domain";
 import { EventsResponse } from "./util";
 
 const eventsClient = ApiClient();
-
-export type CreateMiscEvent = Omit<MiscEvent, "id"> & { userIds: number[] };
 
 interface MiscellaneousEventResponse {
   id: number;
@@ -16,74 +18,104 @@ interface MiscellaneousEventResponse {
   attendees: AttendeeResponse[];
 }
 
-const internalizeEvent: (
+const internalize: (externalEvent: MiscellaneousEventResponse) => MiscEvent = (
   externalEvent: MiscellaneousEventResponse
-) => MiscEvent = (externalEvent: MiscellaneousEventResponse) => ({
+) => ({
   ...externalEvent,
   startTime: new Date(externalEvent.startTime),
-  attendees: externalEvent.attendees || [],
+  attendees: externalEvent.attendees?.map(internalizeAttendees) || [],
 });
 
-const getEvents = (since: string, limit: number, includeAttendees = true) =>
-  eventsClient
-    .call(
-      `miscellaneous-events?since=${since}&include-attendees=${includeAttendees}&limit=${limit}`
-    )
-    .then((x) =>
-      (x as EventsResponse<MiscellaneousEventResponse>).events.map(
-        internalizeEvent
-      )
-    );
+const getEvents: (
+  since: string,
+  limit: number,
+  includeAttendees?: boolean
+) => Promise<MiscEvent[]> = async (
+  since: string,
+  limit: number,
+  includeAttendees = true
+) => {
+  let events = eventsClient.call(
+    `miscellaneous-events?since=${since}&include-attendees=${includeAttendees}&limit=${limit}`
+  );
 
-const getEvent = (id: number, includeAttendees: boolean = true) =>
-  eventsClient
-    .call(`miscellaneous-events/${id}?include-attendees=${includeAttendees}`)
-    .then((x) => internalizeEvent(x as MiscellaneousEventResponse));
+  return (
+    (await events) as EventsResponse<MiscellaneousEventResponse>
+  ).events.map(internalize);
+};
+
+const getEvent: (
+  id: number,
+  includeAttendees?: boolean
+) => Promise<MiscEvent> = async (
+  id: number,
+  includeAttendees: boolean = true
+) => {
+  const event = eventsClient.call(
+    `miscellaneous-events/${id}?include-attendees=${includeAttendees}`
+  );
+
+  let eventResponse = (await event) as MiscellaneousEventResponse;
+  return internalize(eventResponse);
+};
+
+export type CreateMiscEvent = Omit<MiscEvent, "id"> & { userIds: number[] };
 
 const createEvent: (props: CreateMiscEvent) => Promise<MiscEvent[]> = async (
   props: CreateMiscEvent
 ) => {
-  const miscellaneousEventResponse = (await eventsClient.callWithBody(
-    "miscellaneous-events",
-    {
-      comment: props.comment,
-      location: props.location,
-      title: props.title,
-      startTime: eventsClient.externalizeDateTime(props.startTime),
-      userIds: props.userIds,
-      recurringEventProperties: props.recurringEventProperties,
-    },
-    { method: "POST" }
-  )) as EventsResponse<MiscellaneousEventResponse>;
-  return miscellaneousEventResponse.events.map(internalizeEvent);
+  return (
+    (await eventsClient.callWithBody(
+      "miscellaneous-events",
+      {
+        startTime: eventsClient.externalizeDateTime(props.startTime),
+        location: props.location,
+        comment: props.comment,
+        userIds: props.userIds,
+        title: props.title,
+        recurringEventProperties: props.recurringEventProperties,
+      },
+      { method: "POST" }
+    )) as EventsResponse<MiscellaneousEventResponse>
+  ).events.map(internalize);
 };
 
-//TODO
-const updateEvent = async (props: {
-  id: number;
-  location?: string;
-  title?: string;
-  comment?: string;
-  startTime?: Date;
-}): Promise<MiscEvent[]> => {
-  const miscEventResponse = (await eventsClient.callWithBody(
-    `miscellaneous-events/${props.id}`,
-    {
-      comment: props.comment,
-      location: props.location,
-      title: props.title,
-      startTime: eventsClient.externalizeDateTime(props.startTime),
-    },
-    { method: "PUT" }
-  )) as MiscellaneousEventResponse;
-  return [internalizeEvent(miscEventResponse)];
+const updateEvent: (
+  affectedRecurringEvents: AffectedRecurringEvents,
+  eventProps: {
+    id: number;
+    startTime?: Date;
+    location?: string;
+    comment?: string;
+    recurringEventProperties?: RecurringEventProperties;
+    title?: string;
+  }
+) => Promise<MiscEvent[]> = async (
+  affectedRecurringEvents,
+  eventProps
+): Promise<MiscEvent[]> => {
+  return (
+    (await eventsClient.callWithBody(
+      `miscellaneous-events/${eventProps.id}?affected-recurring-events=${affectedRecurringEvents}`,
+      {
+        startTime: eventsClient.externalizeDateTime(eventProps.startTime),
+        location: eventProps.location,
+        comment: eventProps.comment,
+        recurringEventProperties: eventProps.recurringEventProperties,
+        title: eventProps.title,
+      },
+      { method: "PUT" }
+    )) as EventsResponse<MiscellaneousEventResponse>
+  ).events.map(internalize);
 };
 
-//TODO
 const deleteEvent = (id: number, affectedEvents?: AffectedRecurringEvents) => {
   const deleteAttendees: boolean = true;
+  const affectedRecurringEvents = !!affectedEvents
+    ? `&affected-recurring-events=${affectedEvents}`
+    : "";
   return eventsClient.call(
-    `miscellaneous-events/${id}?delete-attendees=${deleteAttendees}`,
+    `miscellaneous-events/${id}?delete-attendees=${deleteAttendees}${affectedRecurringEvents}`,
     { method: "DELETE" }
   );
 };

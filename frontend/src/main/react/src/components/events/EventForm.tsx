@@ -109,7 +109,10 @@ async function updateEvent(
         apiArgs
       );
     case "MISC":
-      return await eventsApiClient.updateEvent(apiArgs);
+      return await eventsApiClient.updateEvent(
+        recurringEventUpdateType,
+        apiArgs
+      );
     case "OTHER":
       console.error(`Updating event for type ${eventType} not supported`);
       throw Error(`Updating event for type ${eventType} not supported`);

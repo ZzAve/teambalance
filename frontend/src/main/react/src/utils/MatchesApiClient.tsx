@@ -23,13 +23,11 @@ interface MatchResponse {
 
 const internalize: (externalMatch: MatchResponse) => Match = (
   externalMatch: MatchResponse
-) => {
-  return {
-    ...externalMatch,
-    startTime: new Date(externalMatch.startTime),
-    attendees: externalMatch.attendees?.map(internalizeAttendees) || [],
-  };
-};
+) => ({
+  ...externalMatch,
+  startTime: new Date(externalMatch.startTime),
+  attendees: externalMatch.attendees?.map(internalizeAttendees) || [],
+});
 
 const getMatches: (
   since: string,
@@ -84,7 +82,6 @@ const createMatch: (props: CreateMatch) => Promise<Match[]> = async (
   ).events.map(internalize);
 };
 
-//TODO
 const updateMatch: (
   affectedRecurringEvents: AffectedRecurringEvents,
   eventProps: {
