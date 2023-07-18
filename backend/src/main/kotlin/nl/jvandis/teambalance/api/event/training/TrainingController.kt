@@ -7,7 +7,7 @@ import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
-import nl.jvandis.teambalance.api.attendees.toResponse
+import nl.jvandis.teambalance.api.attendees.expose
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents
 import nl.jvandis.teambalance.api.event.DeletedEventsResponse
 import nl.jvandis.teambalance.api.event.EventsResponse
@@ -74,10 +74,10 @@ class TrainingController(
             page = page,
             limit = limit,
             since = since
-        ).toResponse(includeInactiveUsers)
+        ).expose(includeInactiveUsers)
     }
 
-    private fun Page<Training>.toResponse(includeInactiveUsers: Boolean) = EventsResponse(
+    private fun Page<Training>.expose(includeInactiveUsers: Boolean) = EventsResponse(
         totalPages = totalPages,
         totalSize = totalElements,
         page = number + 1,
@@ -90,7 +90,6 @@ class TrainingController(
         @PathVariable("training-id") trainingId: Long,
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
-
     ): TrainingResponse {
         log.debug("Get training $trainingId")
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
@@ -169,7 +168,6 @@ class TrainingController(
         @PathVariable(value = "training-id") trainingId: Long,
         @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,
         @RequestBody user: UserAddRequest
-
     ): List<AttendeeResponse> {
         log.info("Adding: $user (or all: $addAll) to training $trainingId")
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
@@ -183,7 +181,7 @@ class TrainingController(
         }
 
         return users.map { u ->
-            attendeeRepository.insert(u.toNewAttendee(training)).toResponse()
+            attendeeRepository.insert(u.toNewAttendee(training)).expose()
         }
     }
 

@@ -65,7 +65,6 @@ data class TrainingResponse(
     val recurringEventProperties: RecurringEventPropertiesResponse?
 )
 
-fun Training.expose() = expose(attendees ?: emptyList())
 fun Training.expose(includeInactiveUsers: Boolean) = expose(
     attendees
         ?.filter { a -> includeInactiveUsers || a.user.isActive }

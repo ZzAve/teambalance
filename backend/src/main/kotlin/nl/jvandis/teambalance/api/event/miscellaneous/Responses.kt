@@ -4,6 +4,9 @@ import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.attendees.expose
 import nl.jvandis.teambalance.api.event.CreateRecurringEventPropertiesRequest
+import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest
+import nl.jvandis.teambalance.api.event.RecurringEventPropertiesResponse
+import nl.jvandis.teambalance.api.event.expose
 import nl.jvandis.teambalance.api.event.getRecurringEventDates
 import java.time.LocalDateTime
 
@@ -15,7 +18,8 @@ data class UpdateMiscellaneousEventRequest(
     val startTime: LocalDateTime?,
     val location: String?,
     val comment: String?,
-    val title: String?
+    val title: String?,
+    val recurringEventProperties: RecurringEventPropertiesRequest?
 )
 
 data class PotentialMiscellaneousEvent(
@@ -28,6 +32,7 @@ data class PotentialMiscellaneousEvent(
 ) {
     fun internalize(): List<MiscellaneousEvent> =
         recurringEventProperties?.let {
+            val recurringEventProperties = it.internalize()
             it
                 .getRecurringEventDates(startTime)
                 .map { e ->
@@ -36,7 +41,7 @@ data class PotentialMiscellaneousEvent(
                         comment = comment,
                         location = location,
                         title = title,
-                        recurringEventProperties = it.internalize()
+                        recurringEventProperties = recurringEventProperties
                     )
                 }
         } ?: listOf(
@@ -56,11 +61,10 @@ data class MiscellaneousEventResponse(
     val title: String,
     val location: String,
     val comment: String?,
-    val attendees: List<AttendeeResponse>
-//    val recurringEventProperties: RecurringEventPropertiesResponse?
+    val attendees: List<AttendeeResponse>,
+    val recurringEventProperties: RecurringEventPropertiesResponse?
 )
 
-// FIXME: attendees are part of event
 fun MiscellaneousEvent.expose() = expose(attendees ?: emptyList())
 fun MiscellaneousEvent.expose(includeInactiveUsers: Boolean) = expose(
     attendees
@@ -68,12 +72,14 @@ fun MiscellaneousEvent.expose(includeInactiveUsers: Boolean) = expose(
         ?: emptyList()
 )
 
+fun List<MiscellaneousEvent>.expose(attendees: List<Attendee>) = map { it.expose(attendees) }
 fun MiscellaneousEvent.expose(attendees: List<Attendee>) = MiscellaneousEventResponse(
     id = id,
     comment = comment,
     title = title ?: "Overig event",
     location = location,
     startTime = startTime,
-    attendees = attendees.map(Attendee::expose)
+    attendees = attendees.map(Attendee::expose),
+    recurringEventProperties = recurringEventProperties?.expose()
 
 )

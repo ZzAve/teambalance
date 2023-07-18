@@ -216,7 +216,7 @@ class MatchRepository(context: DSLContext) : TeamEventsRepository<Match>(context
             .and(RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID.eq(recurringEventId.value))
             .returningResult(EVENT.ID)
             .fetch()
-            .map { t -> t.getFieldOrThrow(MATCH.ID) }
+            .map { t -> t.getFieldOrThrow(EVENT.ID) }
             .toSet()
 
         val matchingMatches = context.select(MATCH.ID)

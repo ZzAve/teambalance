@@ -5,8 +5,11 @@ import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMiscellaneousEventException
 import nl.jvandis.teambalance.api.InvalidUserException
-import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
+import nl.jvandis.teambalance.api.attendees.AttendeeResponse
+import nl.jvandis.teambalance.api.attendees.expose
+import nl.jvandis.teambalance.api.event.AffectedRecurringEvents
+import nl.jvandis.teambalance.api.event.DeletedEventsResponse
 import nl.jvandis.teambalance.api.event.EventsResponse
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
 import nl.jvandis.teambalance.api.users.UserRepository
@@ -17,6 +20,7 @@ import org.springframework.data.domain.Page
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -34,6 +38,7 @@ import kotlin.math.min
 @Tag(name = "miscellaneous-events")
 @RequestMapping(path = ["/api/miscellaneous-events"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class MiscellaneousEventController(
+    private val miscellaneousEventService: MiscellaneousEventService,
     private val eventRepository: MiscellaneousEventRepository,
     private val userRepository: UserRepository,
     private val attendeeRepository: AttendeeRepository
@@ -44,10 +49,7 @@ class MiscellaneousEventController(
     fun getEvents(
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
-        @RequestParam(
-            value = "since",
-            defaultValue = "2022-08-01T00:00"
-        )
+        @RequestParam(value = "since", defaultValue = "2022-08-01T00:00")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         since: LocalDateTime,
         @RequestParam(value = "limit", defaultValue = "10") limit: Int,
@@ -72,17 +74,16 @@ class MiscellaneousEventController(
             page = page,
             limit = limit,
             since = since
-        ).toResponse(includeInactiveUsers)
+        ).expose(includeInactiveUsers)
     }
 
-    private fun Page<MiscellaneousEvent>.toResponse(includeInactiveUsers: Boolean) =
-        EventsResponse<MiscellaneousEventResponse>(
-            totalPages = totalPages,
-            totalSize = totalElements,
-            page = number + 1,
-            size = min(size, content.size),
-            events = content.map { it.expose(includeInactiveUsers) }
-        )
+    private fun Page<MiscellaneousEvent>.expose(includeInactiveUsers: Boolean) = EventsResponse(
+        totalPages = totalPages,
+        totalSize = totalElements,
+        page = number + 1,
+        size = min(size, content.size),
+        events = content.map { it.expose(includeInactiveUsers) }
+    )
 
     @GetMapping("/{event-id}")
     fun getEvent(
@@ -91,7 +92,6 @@ class MiscellaneousEventController(
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
     ): MiscellaneousEventResponse {
         log.debug("Get miscellaneous event $eventId")
-
         val event = eventRepository.findByIdOrNull(eventId) ?: throw InvalidMiscellaneousEventException(eventId)
         val attendees =
             if (!includeAttendees) {
@@ -111,7 +111,6 @@ class MiscellaneousEventController(
         @RequestBody potentialEvent: PotentialMiscellaneousEvent
     ): EventsResponse<MiscellaneousEventResponse> {
         log.debug("postEvent $potentialEvent")
-
         val allUsers = userRepository.findAll()
         val events = potentialEvent.internalize()
         log.info("Requested to create miscellaneous events: $events")
@@ -126,8 +125,8 @@ class MiscellaneousEventController(
             potentialEvent.userIds.size != requestedUsersToAdd.size
         ) {
             throw CreateEventException(
-                "Not all requested userIds exists unfortunately ${potentialEvent.userIds}. " +
-                    "Please verify your userIds"
+                "Not all requested userIds exists unfortunately ${potentialEvent.userIds}." +
+                    " Please verify your userIds"
             )
         }
 
@@ -148,7 +147,7 @@ class MiscellaneousEventController(
                 }
 
         return savedEvents.map { it.expose(savedAttendeesByEvent[it.id] ?: listOf()) }
-            .let { EventsResponse<MiscellaneousEventResponse>(it.size.toLong(), 1, 1, it.size, it) }
+            .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
             .also {
                 log.info(
                     "Created ${it.totalSize} misc events with recurringEventId: ${events.firstOrNull()?.recurringEventProperties}. " +
@@ -169,10 +168,8 @@ class MiscellaneousEventController(
         @PathVariable(value = "event-id") eventId: Long,
         @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,
         @RequestBody user: UserAddRequest
-
-    ): List<Attendee> {
+    ): List<AttendeeResponse> {
         log.info("Adding: $user (or all: $addAll) to event $eventId")
-
         val event = eventRepository.findByIdOrNull(eventId) ?: throw InvalidMiscellaneousEventException(eventId)
         val users = if (addAll) {
             userRepository.findAll()
@@ -184,44 +181,42 @@ class MiscellaneousEventController(
         }
 
         return users.map { u ->
-            attendeeRepository.insert(u.toNewAttendee(event))
+            attendeeRepository.insert(u.toNewAttendee(event)).expose()
         }
     }
 
     @PutMapping("/{event-id}")
     fun updateEvent(
         @PathVariable(value = "event-id") eventId: Long,
+        @RequestParam(value = "affected-recurring-events") affectedRecurringEvents: AffectedRecurringEvents?,
         @RequestBody updateEventRequest: UpdateMiscellaneousEventRequest
+    ): EventsResponse<MiscellaneousEventResponse> {
+        log.info("Updating miscellaneousEvent $eventId with $updateEventRequest")
 
-    ): MiscellaneousEventResponse {
-        return eventRepository
-            .findByIdOrNull(eventId)
-            ?.let {
-                val updatedEvent = it.createUpdatedEvent(updateEventRequest)
-                eventRepository.updateSingleEvent(updatedEvent)
-            }
-            ?.expose(emptyList())
-            ?: throw InvalidMiscellaneousEventException(eventId)
+        return miscellaneousEventService.updateMiscellaneousEvent(eventId, affectedRecurringEvents, updateEventRequest)
+            .expose(attendees = emptyList())
+            .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
+            .also { log.info("Updated miscellaneousEvent $eventId") }
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{event-id}")
+    @Transactional
     fun deleteEvent(
         @PathVariable(value = "event-id") eventId: Long,
-        @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean
-
-    ) {
+        @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean,
+        @RequestParam(value = "affected-recurring-events") affectedRecurringEvents: AffectedRecurringEvents?
+    ): DeletedEventsResponse {
         log.info("Deleting event: $eventId")
 
         if (deleteAttendees) {
-            attendeeRepository.findAllByEventIdIn(listOf(eventId))
-                .let {
-                    attendeeRepository.deleteAll(it)
-                        .also { log.info("Deleted $it attendees for event $eventId") }
-                }
+            attendeeRepository.findAllAttendeesBelongingToEvent(eventId, affectedRecurringEvents)
+                .let { attendeeRepository.deleteAll(it) }
         }
+
         try {
-            eventRepository.deleteById(eventId)
+            return eventRepository.deleteById(eventId, affectedRecurringEvents)
+                .let(::DeletedEventsResponse)
         } catch (e: DataIntegrityViolationException) {
             throw DataConstraintViolationException("Event $eventId could not be deleted. There are still attendees bound to this event")
         }

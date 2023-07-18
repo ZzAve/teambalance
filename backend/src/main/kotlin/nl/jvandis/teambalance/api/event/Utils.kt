@@ -80,4 +80,3 @@ fun nextEventDate(lastEventDate: LocalDateTime, interval: Period, daysOfWeek: Li
 //
 //    return lastEventDate.plusDays(0L + daysTillNextEvent)
 }
-

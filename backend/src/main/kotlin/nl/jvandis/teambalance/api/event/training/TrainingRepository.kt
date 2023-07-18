@@ -33,9 +33,8 @@ import java.time.LocalDateTime
 class TrainingRepository(context: DSLContext) : TeamEventsRepository<Training>(context) {
     override val log = loggerFor()
 
-    override fun findAll(): List<Training> {
-        return findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
-    }
+    override fun findAll(): List<Training> =
+        findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
 
     private fun findAllByIds(eventIds: List<Long>): List<Training> {
         val recordHandler = TrainingWithAttendeesRecordHandler()
@@ -109,7 +108,7 @@ class TrainingRepository(context: DSLContext) : TeamEventsRepository<Training>(c
         if (deletedTrainingRecords != deletedEventRecords) {
             throw DataAccessException(
                 "Tried to delete a different amount of trainings ($deletedTrainingRecords) " +
-                        "from events ($deletedEventRecords)."
+                    "from events ($deletedEventRecords)."
             )
         }
 
