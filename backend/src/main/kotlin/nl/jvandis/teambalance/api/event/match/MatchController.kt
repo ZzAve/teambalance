@@ -5,6 +5,7 @@ import jakarta.validation.Valid
 import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMatchException
+import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
@@ -191,6 +192,25 @@ class MatchController(
             .expose(attendees = emptyList())
             .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
             .also { log.info("Updated match $matchId") }
+    }
+
+    @PutMapping("/{match-id}/coach")
+    fun updateCoach(
+        @PathVariable(value = "match-id") matchId: Long,
+        @RequestBody updateCoachRequest: UpdateCoachRequest
+    ): MatchResponse {
+        return eventRepository
+            .findByIdOrNull(matchId)
+            ?.let {
+                val potentialCoach = updateCoachRequest.coach
+                eventRepository.updateCoach(it, potentialCoach)
+                it.copy(
+                    coach = potentialCoach
+                )
+            }
+            ?.expose(emptyList())
+            ?.also { log.info("Updated trainer of training $matchId. New coach ${it.coach}") }
+            ?: throw InvalidTrainingException(matchId)
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

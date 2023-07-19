@@ -108,7 +108,6 @@ class MatchService(
         location = updateMatchRequestBody.location ?: location,
         opponent = updateMatchRequestBody.opponent ?: opponent,
         homeAway = updateMatchRequestBody.homeAway ?: homeAway,
-        comment = updateMatchRequestBody.comment ?: comment, // TODO allow setting `null`?
-        coach = updateMatchRequestBody.coach ?: coach // TODO allow setting 'null'?
+        comment = updateMatchRequestBody.comment ?: comment
     )
 }

@@ -243,6 +243,15 @@ class MatchRepository(context: DSLContext) : TeamEventsRepository<Match>(context
         return findAllByIds(updatedEventIds)
     }
 
+    fun updateCoach(event: Match, coach: String) {
+        context
+            .update(MATCH)
+            .set(MATCH.COACH, coach)
+            .where(MATCH.ID.eq(event.id))
+            .execute()
+            .also { if (it != 1) throw DataAccessException("Could not update Match. MatchRecord was not updated") }
+    }
+
     override fun updateSingleEvent(event: Match, removeRecurringEvent: Boolean): Match {
         context
             .update(EVENT)

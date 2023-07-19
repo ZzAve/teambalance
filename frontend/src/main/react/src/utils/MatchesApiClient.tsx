@@ -112,7 +112,7 @@ const updateMatch: (
 
 const updateCoach = async (props: { id: number; coach: string }) => {
   const matchResponse = (await matchesClient.callWithBody(
-    `matches/${props.id}`,
+    `matches/${props.id}/coach`,
     {
       coach: props.coach,
     },

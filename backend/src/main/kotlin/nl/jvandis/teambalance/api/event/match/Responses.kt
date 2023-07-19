@@ -16,8 +16,11 @@ data class UpdateMatchRequest(
     val opponent: String?,
     val homeAway: Place?,
     val comment: String?,
-    val coach: String?,
     val recurringEventProperties: RecurringEventPropertiesRequest?
+)
+
+data class UpdateCoachRequest(
+    val coach: String
 )
 
 data class PotentialMatch(

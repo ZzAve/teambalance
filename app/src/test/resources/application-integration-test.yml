@@ -11,7 +11,7 @@ app:
   secret:
     secret-value: teambalance
   bank:
-    bunq:ss
+    bunq:
       api-key: ""
       bank-account-id: -1
       environment: SANDBOX
