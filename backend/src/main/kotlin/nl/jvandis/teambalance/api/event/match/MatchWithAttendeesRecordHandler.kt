@@ -1,9 +1,13 @@
-package nl.jvandis.teambalance.api.match
+package nl.jvandis.teambalance.api.event.match
 
+import nl.jvandis.jooq.support.getField
 import nl.jvandis.teambalance.api.attendees.AttendeeWithUserRecordHandler
 import nl.jvandis.teambalance.api.event.Event
+import nl.jvandis.teambalance.api.event.RecurringEventProperties
+import nl.jvandis.teambalance.api.event.TeamBalanceRecordHandler
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.EventRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.MatchRecord
+import nl.jvandis.teambalance.data.jooq.schema.tables.records.RecurringEventPropertiesRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.MATCH
 import org.jooq.Record
@@ -13,14 +17,16 @@ class MatchWithAttendeesRecordHandler : TeamBalanceRecordHandler<Match> {
     private var recordsHandled = 0L
 
     private val events = mutableMapOf<Long, Event.Builder>()
+    private val recurringEventsPropertiesMap = mutableMapOf<Long, RecurringEventProperties>()
     private val matches = mutableMapOf<Long, Match.Builder>()
 
     private var result: List<Match>? = null
 
     override fun accept(record: Record) {
         recordsHandled++
-        val matchId = record[MATCH.ID]
-        val eventId = record[EVENT.ID]
+        val matchId = record.getField(MATCH.ID)
+        val eventId = record.getField(EVENT.ID)
+        val recurringEventId = record.getField(EVENT.RECURRING_EVENT_ID)
         if (matchId == null || eventId == null) {
             return
         }
@@ -33,6 +39,12 @@ class MatchWithAttendeesRecordHandler : TeamBalanceRecordHandler<Match> {
             record.into(EventRecord::class.java)
                 .into(Event.Builder::class.java)
         }
+        val recurringEventProperties = recurringEventId?.let {
+            recurringEventsPropertiesMap.computeIfAbsent(it) {
+                record.into(RecurringEventPropertiesRecord::class.java)
+                    .into(RecurringEventProperties::class.java)
+            }
+        }
 
         val match = matches.computeIfAbsent(matchId) {
             // mapping via MatchRecord works better with column name clashes (like `id`)
@@ -40,6 +52,7 @@ class MatchWithAttendeesRecordHandler : TeamBalanceRecordHandler<Match> {
                 .into(Match.Builder::class.java)
         }
 
+        event.recurringEventProperties = recurringEventProperties
         match.event = event
     }
 

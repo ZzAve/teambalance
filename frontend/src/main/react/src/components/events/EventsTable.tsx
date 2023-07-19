@@ -26,7 +26,23 @@ import { SpinnerWithText } from "../SpinnerWithText";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { eventsApiClient } from "../../utils/MiscEventsApiClient";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
-import { TeamEvent } from "../../utils/domain";
+import { AffectedRecurringEvents, TeamEvent } from "../../utils/domain";
+import { AffectedRecurringEvent } from "./RecurringEvent";
+import { useAlerts } from "../../hooks/alertsHook";
+
+const recurringEventTagline = (
+  affectedEvents: "ALL" | "CURRENT_AND_FUTURE" | "CURRENT"
+) => {
+  if (affectedEvents === "ALL") {
+    return "en alle events van die serie";
+  } else if (affectedEvents === "CURRENT") {
+    return "";
+  } else if (affectedEvents === "CURRENT_AND_FUTURE") {
+    return "en alle toekomstige events van die serie";
+  } else {
+    return "🤷";
+  }
+};
 
 const EventsTable = (props: {
   eventType: EventType;
@@ -43,9 +59,11 @@ const EventsTable = (props: {
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
+  const [affectedEvents, setAffectedEvents] = useState<
+    AffectedRecurringEvents | undefined
+  >(undefined);
   const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
-
+  const { addAlert } = useAlerts();
   const handleChangePage = (
     _: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -81,28 +99,55 @@ const EventsTable = (props: {
     setOpenDeleteAlertEventId(eventId);
   };
 
-  const handleDelete = (shouldDelete: boolean, eventId: number) => {
+  const handleDelete = (
+    shouldDelete: boolean,
+    eventId: number,
+    affectedEvents?: AffectedRecurringEvents
+  ) => {
+    // debugger;
     setOpenDeleteAlertEventId(undefined);
     if (shouldDelete) {
       console.warn("Deleting event #", eventId);
       withLoading(setIsLoading, () => {
         switch (props.eventType) {
           case "TRAINING":
-            return trainingsApiClient.deleteTraining(eventId);
+            return trainingsApiClient.deleteTraining(eventId, affectedEvents);
           case "MATCH":
-            return matchesApiClient.deleteMatch(eventId);
+            return matchesApiClient.deleteMatch(eventId, affectedEvents);
           case "MISC":
-            return eventsApiClient.deleteEvent(eventId);
+            return eventsApiClient.deleteEvent(eventId, affectedEvents);
           case "OTHER":
             console.error(`Could not delete event for type ${props.eventType}`);
             break;
         }
-      }).then(() => {
-        console.log(`Deleted event ${eventId}`);
-        withLoading(setIsLoading, () => props.updateTrigger()).then();
-      });
+      })
+        .then(() => {
+          console.log(
+            `Deleted event ${eventId} (recurring event series deletion: ${affectedEvents})`
+          );
+          addAlert({
+            message: `Event #${eventId} ${
+              !!affectedEvents ? recurringEventTagline(affectedEvents) : ""
+            } is verwijderd.`,
+            level: "success",
+          });
+          withLoading(setIsLoading, () => props.updateTrigger()).then();
+        })
+        .catch((e) => {
+          console.error("Could not delete event with id ", eventId, e.message);
+          addAlert({
+            message: `Kon event #${eventId} ${
+              !!affectedEvents ? recurringEventTagline(affectedEvents) : ""
+            } niet verwijderen vanwege een error: ${e.message}`,
+            level: "error",
+          });
+        });
     } else {
       console.log("Should not delete event with id #", eventId);
+      addAlert({
+        message: `Nope, Event #${eventId} mag blijven leven`,
+        level: "info",
+      });
     }
   };
 
@@ -166,31 +211,48 @@ const EventsTable = (props: {
     return teamEvent.location + " " + locationAddendum;
   };
 
-  const getAlertDialogg = () => {
+  const getAlertDialog = () => {
     const openDeleteAlertEvent =
       openDeleteAlertEventId &&
       props.events.find((e) => e.id === openDeleteAlertEventId);
-    return (
-      <>{openDeleteAlertEvent ? getAlertDialog(openDeleteAlertEvent) : ""}</>
-    );
+    return <>{openDeleteAlertEvent ? alertDialog(openDeleteAlertEvent) : ""}</>;
   };
 
-  const getAlertDialog = (teamEvent: TeamEvent) => {
+  const alertDialog = (teamEvent: TeamEvent) => {
     const eventListItem = (
-      <EventListItem
-        event={teamEvent}
-        eventType={props.eventType}
-        onUpdate={() => false}
-        allowUpdating={false}
-      />
+      <>
+        {!!teamEvent.recurringEventProperties ? (
+          <>
+            <AffectedRecurringEvent
+              initialValue="ALL"
+              onChange={(x) => {
+                setAffectedEvents(x);
+              }}
+            />
+          </>
+        ) : (
+          ""
+        )}
+        <EventListItem
+          event={teamEvent}
+          eventType={props.eventType}
+          onUpdate={() => false}
+          allowUpdating={false}
+        />
+      </>
     );
 
+    const recurringEventTitlePrefix = affectedEvents
+      ? "⚠️ Let op, dit is een herhalend event. "
+      : "";
+    const recurringEventTitle = `${recurringEventTitlePrefix}Weet je zeker dat je ${props.eventType.toLowerCase()}  
+      met id #${teamEvent.id} wil verwijderen (en mogelijk meer)?`;
     return (
       <AlertDialog
-        onResult={(result: boolean) => handleDelete(result, teamEvent.id)}
-        title={`Weet je zeker dat je ${props.eventType.toLowerCase()} met id #${
-          teamEvent.id
-        } wil verwijderen?`}
+        onResult={(result: boolean) =>
+          handleDelete(result, teamEvent.id, affectedEvents)
+        }
+        title={recurringEventTitle}
         body={eventListItem}
       />
     );
@@ -237,7 +299,7 @@ const EventsTable = (props: {
 
   return (
     <Grid container item xs={12}>
-      {getAlertDialogg()}
+      {getAlertDialog()}
       <TableContainer component={Paper}>
         <Table
           aria-label="simple table"

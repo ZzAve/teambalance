@@ -68,7 +68,7 @@ class AttendeeController(
 
         val attendee = attendeeRepository.findByIdOrNull(attendeeId) ?: throw InvalidAttendeeException(attendeeId)
 
-        return attendee.toResponse()
+        return attendee.expose()
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -92,7 +92,7 @@ class AttendeeController(
                     eventId = potentialAttendee.eventId,
                     availability = potentialAttendee.state
                 )
-            ).toResponse()
+            ).expose()
         } catch (e: DataIntegrityViolationException) {
             throw DataConstraintViolationException("Could not add user ${potentialAttendee.userId} to training ${potentialAttendee.eventId}. User already added")
         }
@@ -122,7 +122,7 @@ class AttendeeController(
             throw IllegalStateException("Could not update Attendee state with id $attendeeId.")
         }
         return attendeeRepository.findByIdOrNull(attendeeId)
-            ?.toResponse()
+            ?.expose()
             ?: throw AttendeeNotFoundException(attendeeId, -1L)
     }
 

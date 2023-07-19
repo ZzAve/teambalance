@@ -1,4 +1,4 @@
-package nl.jvandis.teambalance.api.event.miscellaneous
+package nl.jvandis.teambalance.api.event.training
 
 import nl.jvandis.jooq.support.getField
 import nl.jvandis.jooq.support.getFieldOrThrow
@@ -13,7 +13,6 @@ import nl.jvandis.teambalance.api.event.handleWith
 import nl.jvandis.teambalance.api.event.insertRecurringEventPropertyRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.ATTENDEE
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
-import nl.jvandis.teambalance.data.jooq.schema.tables.references.MISCELLANEOUS_EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.RECURRING_EVENT_PROPERTIES
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.TRAINING
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
@@ -31,19 +30,19 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 @Repository
-class MiscellaneousEventRepository(context: DSLContext) : TeamEventsRepository<MiscellaneousEvent>(context) {
+class TrainingRepository(context: DSLContext) : TeamEventsRepository<Training>(context) {
     override val log = loggerFor()
 
-    override fun findAll(): List<MiscellaneousEvent> =
+    override fun findAll(): List<Training> =
         findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
 
-    private fun findAllByIds(eventIds: Collection<Long>): List<MiscellaneousEvent> {
-        val recordHandler = MiscEventWithAttendeesRecordHandler()
+    private fun findAllByIds(eventIds: List<Long>): List<Training> {
+        val recordHandler = TrainingWithAttendeesRecordHandler()
         return context
             .select()
-            .from(MISCELLANEOUS_EVENT)
+            .from(TRAINING)
             .leftJoin(EVENT)
-            .on(MISCELLANEOUS_EVENT.ID.eq(EVENT.ID))
+            .on(TRAINING.ID.eq(EVENT.ID))
             .leftJoin(RECURRING_EVENT_PROPERTIES)
             .on(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
             .leftJoin(ATTENDEE)
@@ -65,27 +64,26 @@ class MiscellaneousEventRepository(context: DSLContext) : TeamEventsRepository<M
         since: LocalDateTime,
         pageable: Pageable,
         withAttendees: Boolean
-    ): Page<MiscellaneousEvent> =
+    ): Page<Training> =
         findAllWithStartTimeAfterImpl(
             context,
             since,
             pageable,
-            TeamEventTableAndRecordHandler(
-                MISCELLANEOUS_EVENT,
-                MISCELLANEOUS_EVENT.ID
-            ) { MiscEventWithAttendeesRecordHandler() }
+            TeamEventTableAndRecordHandler(TRAINING, TRAINING.ID) { TrainingWithAttendeesRecordHandler() }
         )
 
-    override fun findByIdOrNull(eventId: Long): MiscellaneousEvent? {
-        val recordHandler = MiscEventWithAttendeesRecordHandler()
+    override fun findByIdOrNull(eventId: Long): Training? {
+        val recordHandler = TrainingWithAttendeesRecordHandler()
         return context
             .select()
-            .from(MISCELLANEOUS_EVENT)
+            .from(TRAINING)
             .leftJoin(EVENT)
-            .on(MISCELLANEOUS_EVENT.ID.eq(EVENT.ID))
+            .on(TRAINING.ID.eq(EVENT.ID))
             .leftJoin(RECURRING_EVENT_PROPERTIES)
             .on(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
-            .where(MISCELLANEOUS_EVENT.ID.eq(eventId))
+            .leftJoin(UZER)
+            .on(TRAINING.TRAINER_USER_ID.eq(UZER.ID))
+            .where(TRAINING.ID.eq(eventId))
             .fetchOne()
             .handleWith(recordHandler)
             .also {
@@ -97,19 +95,19 @@ class MiscellaneousEventRepository(context: DSLContext) : TeamEventsRepository<M
     override fun deleteById(eventId: Long, affectedRecurringEvents: AffectedRecurringEvents?): Int {
         val allEventsToDeleteConditions: Condition = allEventsToDeleteCondition(eventId, affectedRecurringEvents)
 
-        val deletedMiscEventRecords = context.delete(MISCELLANEOUS_EVENT)
+        val deletedTrainingRecords = context.deleteFrom(TRAINING)
             .using(EVENT)
             .where(allEventsToDeleteConditions)
-            .and(EVENT.ID.eq(MISCELLANEOUS_EVENT.ID))
+            .and(EVENT.ID.eq(TRAINING.ID))
             .execute()
 
         val deletedEventRecords = context.delete(EVENT)
             .where(allEventsToDeleteConditions)
             .execute()
 
-        if (deletedMiscEventRecords != deletedEventRecords) {
+        if (deletedTrainingRecords != deletedEventRecords) {
             throw DataAccessException(
-                "Tried to delete a different amount of events ($deletedMiscEventRecords) " +
+                "Tried to delete a different amount of trainings ($deletedTrainingRecords) " +
                     "from events ($deletedEventRecords)."
             )
         }
@@ -119,10 +117,10 @@ class MiscellaneousEventRepository(context: DSLContext) : TeamEventsRepository<M
             deleteStaleRecurringEvent(context)
         }
 
-        return deletedMiscEventRecords
+        return deletedTrainingRecords
     }
 
-    override fun insertSingleEvent(event: MiscellaneousEvent): MiscellaneousEvent {
+    override fun insertSingleEvent(event: Training): Training {
         require(event.recurringEventProperties == null) {
             "recurringEventProperties is expected to be null when inserting a single event"
         }
@@ -132,27 +130,27 @@ class MiscellaneousEventRepository(context: DSLContext) : TeamEventsRepository<M
             .values(event.comment, event.location, event.startTime, null)
             .returningResult(EVENT.ID, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
             .fetchOne()
-            ?: throw DataAccessException("Could not insert Event part of MiscEvent")
+            ?: throw DataAccessException("Could not insert Training")
 
         return context
-            .insertInto(MISCELLANEOUS_EVENT, MISCELLANEOUS_EVENT.TITLE, MISCELLANEOUS_EVENT.ID)
-            .values(event.title, eventRecord[EVENT.ID])
-            .returningResult(MISCELLANEOUS_EVENT.TITLE, MISCELLANEOUS_EVENT.ID)
+            .insertInto(TRAINING, TRAINING.TRAINER_USER_ID, TRAINING.ID)
+            .values(event.trainer?.id, eventRecord[EVENT.ID])
+            .returningResult(TRAINING.ID, TRAINING.TRAINER_USER_ID)
             .fetchOne()
-            ?.let { matchRecord ->
-                MiscellaneousEvent(
-                    id = matchRecord.getFieldOrThrow(MISCELLANEOUS_EVENT.ID),
+            ?.let { trainingRecord ->
+                Training(
+                    id = trainingRecord.getFieldOrThrow(TRAINING.ID),
                     startTime = eventRecord.getFieldOrThrow(EVENT.START_TIME),
                     location = eventRecord.getFieldOrThrow(EVENT.LOCATION),
                     comment = eventRecord.getField(EVENT.COMMENT),
-                    title = matchRecord.getField(MISCELLANEOUS_EVENT.TITLE),
+                    trainer = event.trainer, // do better, pretty
                     recurringEventProperties = null
                 )
             }
-            ?: throw DataAccessException("Could not insert MiscEvent")
+            ?: throw DataAccessException("Could not insert Match")
     }
 
-    override fun insertRecurringEvent(events: List<MiscellaneousEvent>): List<MiscellaneousEvent> {
+    override fun insertRecurringEvent(events: List<Training>): List<Training> {
         if (events.isEmpty()) {
             return emptyList()
         }
@@ -169,39 +167,39 @@ class MiscellaneousEventRepository(context: DSLContext) : TeamEventsRepository<M
             .valuesFrom(events, { it.comment }, { it.location }, { it.startTime }, { recurringEventProperties.id })
             .returningResult(EVENT.fields().toList())
             .fetch()
-            .also { if (it.size != events.size) throw DataAccessException("Could not insert Events $events. One or more failed") }
+            .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
 
         return context
-            .insertInto(MISCELLANEOUS_EVENT, MISCELLANEOUS_EVENT.TITLE, MISCELLANEOUS_EVENT.ID)
+            .insertInto(TRAINING, TRAINING.TRAINER_USER_ID, TRAINING.ID)
             .valuesFrom(
                 events,
-                { it.title },
+                { it.trainer?.id },
                 { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] }
             )
-            .returningResult(MISCELLANEOUS_EVENT.TITLE, MISCELLANEOUS_EVENT.ID)
+            .returningResult(TRAINING.ID, TRAINING.TRAINER_USER_ID)
             .fetch()
-            .map { matchRecord ->
+            .map { trainingRecord ->
                 val eventRecord = insertEventRecordResult.first { a ->
-                    a.getFieldOrThrow(EVENT.ID) == matchRecord.getFieldOrThrow(TRAINING.ID)
+                    a.getFieldOrThrow(EVENT.ID) == trainingRecord.getFieldOrThrow(TRAINING.ID)
                 }
-                MiscellaneousEvent(
-                    id = matchRecord.getFieldOrThrow(MISCELLANEOUS_EVENT.ID),
+                Training(
+                    id = trainingRecord.getFieldOrThrow(TRAINING.ID),
                     startTime = eventRecord.getFieldOrThrow(EVENT.START_TIME),
                     location = eventRecord.getFieldOrThrow(EVENT.LOCATION),
                     comment = eventRecord.getField(EVENT.COMMENT),
-                    title = matchRecord.getField(MISCELLANEOUS_EVENT.TITLE),
+                    trainer = events.first { it.startTime == eventRecord.getFieldOrThrow(EVENT.START_TIME) }.trainer, // do better, pretty
                     recurringEventProperties = recurringEventProperties
                 )
             }
-            .also { if (it.size != events.size) throw DataAccessException("Could not insert MiscEvents $events. One or more failed") }
+            .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
     }
 
     @Transactional
     override fun updateAllFromRecurringEvent(
         recurringEventId: RecurringEventPropertiesId,
-        examplarUpdatedEvent: MiscellaneousEvent,
+        examplarUpdatedEvent: Training,
         durationToAddToEachEvent: Duration
-    ): List<MiscellaneousEvent> {
+    ): List<Training> {
         val updatedEventIds = context.update(EVENT)
             .set(
                 EVENT.START_TIME,
@@ -214,32 +212,11 @@ class MiscellaneousEventRepository(context: DSLContext) : TeamEventsRepository<M
             .and(RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID.eq(recurringEventId.value))
             .returningResult(EVENT.ID)
             .fetch()
-            .map { t -> t.getFieldOrThrow(EVENT.ID) }
-            .toSet()
 
-        val matchingMiscEvents = context.select(MISCELLANEOUS_EVENT.ID)
-            .from(MISCELLANEOUS_EVENT)
-            .join(EVENT).on(MISCELLANEOUS_EVENT.ID.eq(EVENT.ID))
-            .join(RECURRING_EVENT_PROPERTIES).on(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
-            .where(RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID.eq(recurringEventId.value)).asTable("MatchingMiscEvents")
-
-        val updatedMiscEventIds = context.update(MISCELLANEOUS_EVENT)
-            .set(MISCELLANEOUS_EVENT.TITLE, examplarUpdatedEvent.title)
-            .from(matchingMiscEvents)
-            .where(MISCELLANEOUS_EVENT.ID.eq(matchingMiscEvents.field(MISCELLANEOUS_EVENT.ID)))
-            .returningResult(MISCELLANEOUS_EVENT.ID)
-            .fetch()
-            .map { t -> t.getFieldOrThrow(MISCELLANEOUS_EVENT.ID) }
-            .toSet()
-
-        if (updatedEventIds != updatedMiscEventIds) {
-            throw DataAccessException("Deleted an different amount of event records ($updatedEventIds) from match records ($updatedMiscEventIds)")
-        }
-
-        return findAllByIds(updatedEventIds)
+        return findAllByIds(updatedEventIds.map { it.getFieldOrThrow(EVENT.ID) })
     }
 
-    override fun updateSingleEvent(event: MiscellaneousEvent, removeRecurringEvent: Boolean): MiscellaneousEvent {
+    override fun updateSingleEvent(event: Training, removeRecurringEvent: Boolean): Training {
         context
             .update(EVENT)
             .set(EVENT.COMMENT, event.comment)
@@ -252,15 +229,16 @@ class MiscellaneousEventRepository(context: DSLContext) : TeamEventsRepository<M
             }
             .where(EVENT.ID.eq(event.id))
             .execute()
-            .let { if (it != 1) throw DataAccessException("Could not update MiscEvent. EventRecord was not updated") }
+            .let { if (it != 1) throw DataAccessException("Could not update Training. EventRecord not updated") }
 
         context
-            .update(MISCELLANEOUS_EVENT)
-            .set(MISCELLANEOUS_EVENT.TITLE, event.title)
-            .where(MISCELLANEOUS_EVENT.ID.eq(event.id))
+            .update(TRAINING)
+            .set(TRAINING.TRAINER_USER_ID, event.trainer?.id)
+            .where(TRAINING.ID.eq(event.id))
             .execute()
-            .let { if (it != 1) throw DataAccessException("Could not update MiscEvent. MiscEventRecord was not updated") }
+            .let { if (it != 1) throw DataAccessException("Could not update Training. TrainingRecord not updated") }
 
+        // okay? or fetch from db the result?
         return event
     }
 }

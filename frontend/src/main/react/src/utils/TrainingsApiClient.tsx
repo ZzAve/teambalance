@@ -1,31 +1,28 @@
 import { ApiClient } from "./ApiClient";
-import { Training } from "./domain";
+import {
+  AffectedRecurringEvents,
+  RecurringEventProperties,
+  Training,
+} from "./domain";
 import {
   AttendeeResponse,
   internalizeAttendees,
   UserResponse,
 } from "./CommonApiResponses";
+import { EventsResponse } from "./util";
 
 const trainingsClient = ApiClient();
 
-interface TrainingsResponse {
-  totalSize: number;
-  totalPages: number;
-  page: number;
-  size: number;
-  trainings: TrainingResponse[];
-}
-
 interface TrainingResponse {
   id: number;
-  startTime: string; //(ISO 8601 datetimestring)
+  startTime: string; // ISO 8601 datetime string,
   location: string;
   comment?: string;
   attendees: AttendeeResponse[];
   trainer?: UserResponse;
 }
 
-const internalizeTraining: (externalTraining: TrainingResponse) => Training = (
+const internalize: (externalTraining: TrainingResponse) => Training = (
   externalTraining: TrainingResponse
 ) => {
   return {
@@ -47,8 +44,8 @@ const getTrainings: (
   const trainings = trainingsClient.call(
     `trainings?since=${since}&include-attendees=${includeAttendees}&limit=${limit}`
   );
-  return ((await trainings) as TrainingsResponse).trainings.map(
-    internalizeTraining
+  return ((await trainings) as EventsResponse<TrainingResponse>).events.map(
+    internalize
   );
 };
 
@@ -61,7 +58,7 @@ const getTraining: (
   );
 
   let trainingResponse = (await training) as TrainingResponse;
-  return internalizeTraining(trainingResponse);
+  return internalize(trainingResponse);
 };
 
 export type CreateTraining = Omit<Training, "id" | "trainer" | "attendees"> & {
@@ -75,52 +72,65 @@ const createTraining: (props: CreateTraining) => Promise<Training[]> = async (
     (await trainingsClient.callWithBody(
       "trainings",
       {
-        comment: props.comment,
-        location: props.location,
         startTime: trainingsClient.externalizeDateTime(props.startTime),
+        location: props.location,
+        comment: props.comment,
         userIds: props.userIds,
         recurringEventProperties: props.recurringEventProperties,
       },
       { method: "POST" }
-    )) as TrainingsResponse
-  ).trainings.map(internalizeTraining);
+    )) as EventsResponse<TrainingResponse>
+  ).events.map(internalize);
 };
 
-const updateTraining: (x: {
-  id: number;
-  location?: string;
-  comment?: string;
-  startTime?: Date;
-}) => Promise<Training> = async (x) => {
-  const training = (await trainingsClient.callWithBody(
-    `trainings/${x.id}`,
-    {
-      comment: x.comment,
-      location: x.location,
-      startTime: trainingsClient.externalizeDateTime(x.startTime),
-    },
-    { method: "PUT" }
-  )) as TrainingResponse;
-  return internalizeTraining(training);
+const updateTraining: (
+  affectedRecurringEvents: AffectedRecurringEvents,
+  eventProps: {
+    id: number;
+    startTime?: Date;
+    location?: string;
+    comment?: string;
+    recurringEventProperties?: RecurringEventProperties;
+  }
+) => Promise<Training[]> = async (affectedRecurringEvents, eventProps) => {
+  return (
+    (await trainingsClient.callWithBody(
+      `trainings/${eventProps.id}?affected-recurring-events=${affectedRecurringEvents}`,
+      {
+        startTime: trainingsClient.externalizeDateTime(eventProps.startTime),
+        location: eventProps.location,
+        comment: eventProps.comment,
+        recurringEventProperties: eventProps.recurringEventProperties,
+      },
+      { method: "PUT" }
+    )) as EventsResponse<TrainingResponse>
+  ).events.map(internalize);
 };
 
-const updateTrainer: (x: {
+const updateTrainer: (props: {
   id: number;
   trainerUserId?: string;
-}) => Promise<Training> = async (x) => {
+}) => Promise<Training> = async (props) => {
   const trainingResponse = (await trainingsClient.callWithBody(
-    `trainings/${x.id}/trainer`,
+    `trainings/${props.id}/trainer`,
     {
-      userId: x.trainerUserId,
+      userId: props.trainerUserId,
     },
     { method: "PUT" }
   )) as TrainingResponse;
-  return internalizeTraining(trainingResponse);
+  return internalize(trainingResponse);
 };
 
-const deleteTraining = (id: number, deleteAttendees = true) => {
+const deleteTraining = (
+  id: number,
+  affectedEvents?: AffectedRecurringEvents
+) => {
+  const deleteAttendees = true;
+  const affectedRecurringEvents = !!affectedEvents
+    ? `&affected-recurring-events=${affectedEvents}`
+    : "";
   return trainingsClient.call(
-    `trainings/${id}?delete-attendees=${deleteAttendees}`,
+    `trainings/${id}?delete-attendees=${deleteAttendees}${affectedRecurringEvents}`,
     { method: "DELETE" }
   );
 };

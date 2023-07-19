@@ -1,13 +1,14 @@
-package nl.jvandis.teambalance.api.match
+package nl.jvandis.teambalance.api.event.match
 
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.attendees.expose
-import nl.jvandis.teambalance.api.event.Place
+import nl.jvandis.teambalance.api.event.CreateRecurringEventPropertiesRequest
 import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest
+import nl.jvandis.teambalance.api.event.RecurringEventPropertiesResponse
+import nl.jvandis.teambalance.api.event.expose
 import nl.jvandis.teambalance.api.event.getRecurringEventDates
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class UpdateMatchRequest(
     val startTime: LocalDateTime?,
@@ -15,7 +16,11 @@ data class UpdateMatchRequest(
     val opponent: String?,
     val homeAway: Place?,
     val comment: String?,
-    val coach: String?
+    val recurringEventProperties: RecurringEventPropertiesRequest?
+)
+
+data class UpdateCoachRequest(
+    val coach: String
 )
 
 data class PotentialMatch(
@@ -25,9 +30,10 @@ data class PotentialMatch(
     val homeAway: Place,
     val comment: String?,
     val userIds: List<Long>? = null,
-    val recurringEventProperties: RecurringEventPropertiesRequest? = null
+    val recurringEventProperties: CreateRecurringEventPropertiesRequest? = null
 ) {
     fun internalize(): List<Match> = recurringEventProperties?.let {
+        val recurringEventProperties = it.internalize()
         it
             .getRecurringEventDates(startTime)
             .map { e ->
@@ -37,9 +43,9 @@ data class PotentialMatch(
                     opponent = opponent,
                     homeAway = homeAway,
                     comment = comment,
-                    recurringEventId = UUID.randomUUID()
+                    recurringEventProperties = recurringEventProperties
                 )
-            }.let { listOf() }
+            }
     } ?: listOf(
         Match(
             startTime = startTime,
@@ -47,18 +53,10 @@ data class PotentialMatch(
             opponent = opponent,
             homeAway = homeAway,
             comment = comment,
-            recurringEventId = null
+            recurringEventProperties = null
         )
     )
 }
-
-data class MatchesResponse(
-    val totalSize: Long,
-    val totalPages: Int,
-    val page: Int,
-    val size: Int,
-    val matches: List<MatchResponse>
-)
 
 data class MatchResponse(
     val id: Long,
@@ -68,7 +66,8 @@ data class MatchResponse(
     val attendees: List<AttendeeResponse>,
     val opponent: String,
     val homeAway: Place,
-    val coach: String?
+    val coach: String?,
+    val recurringEventProperties: RecurringEventPropertiesResponse?
 )
 
 fun Match.expose() = expose(attendees ?: emptyList())
@@ -78,6 +77,7 @@ fun Match.expose(includeInactiveUsers: Boolean) = expose(
         ?: emptyList()
 )
 
+fun List<Match>.expose(attendees: List<Attendee>) = map { it.expose(attendees) }
 fun Match.expose(attendees: List<Attendee>) = MatchResponse(
     id = id,
     comment = comment,
@@ -86,5 +86,7 @@ fun Match.expose(attendees: List<Attendee>) = MatchResponse(
     attendees = attendees.map(Attendee::expose),
     coach = coach,
     opponent = opponent,
-    homeAway = homeAway
+    homeAway = homeAway,
+    recurringEventProperties = recurringEventProperties?.expose()
+
 )

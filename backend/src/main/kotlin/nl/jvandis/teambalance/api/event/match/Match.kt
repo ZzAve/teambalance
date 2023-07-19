@@ -1,26 +1,25 @@
-package nl.jvandis.teambalance.api.match
+package nl.jvandis.teambalance.api.event.match
 
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.event.Event
-import nl.jvandis.teambalance.api.event.Place
+import nl.jvandis.teambalance.api.event.RecurringEventProperties
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.TeamBalanceEntityBuilder
 import nl.jvandis.teambalance.data.build
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class Match(
     override val id: Long,
     override val startTime: LocalDateTime,
     override val location: String,
     override val comment: String?,
-    override val recurringEventId: UUID? = null,
+    override val recurringEventProperties: RecurringEventProperties?,
     val opponent: String,
     val homeAway: Place,
     val coach: String?,
     val attendees: List<Attendee>? = null
-) : Event(id, startTime, location, comment, recurringEventId) {
-    constructor(startTime: LocalDateTime, location: String, comment: String?, recurringEventId: UUID?) :
+) : Event(id, startTime, location, comment, recurringEventProperties) {
+    constructor(startTime: LocalDateTime, location: String, comment: String?, recurringEventProperties: RecurringEventProperties?) :
         this(
             id = NO_ID,
             startTime = startTime,
@@ -28,10 +27,11 @@ data class Match(
             comment = comment,
             opponent = "opponent",
             homeAway = Place.HOME,
-            coach = null
+            coach = null,
+            recurringEventProperties = recurringEventProperties
         )
 
-    constructor(startTime: LocalDateTime, location: String, comment: String?, opponent: String, homeAway: Place, recurringEventId: UUID?) :
+    constructor(startTime: LocalDateTime, location: String, comment: String?, opponent: String, homeAway: Place, recurringEventProperties: RecurringEventProperties?) :
         this(
             id = NO_ID,
             startTime = startTime,
@@ -40,17 +40,8 @@ data class Match(
             opponent = opponent,
             homeAway = homeAway,
             coach = null,
-            recurringEventId = recurringEventId
+            recurringEventProperties = recurringEventProperties
         )
-
-    fun createUpdatedMatch(updateMatchRequestBody: UpdateMatchRequest) = copy(
-        startTime = updateMatchRequestBody.startTime ?: startTime,
-        location = updateMatchRequestBody.location ?: location,
-        opponent = updateMatchRequestBody.opponent ?: opponent,
-        homeAway = updateMatchRequestBody.homeAway ?: homeAway,
-        comment = updateMatchRequestBody.comment ?: comment, // TODO allow setting `null`?
-        coach = updateMatchRequestBody.coach ?: coach // TODO allow setting 'null'?
-    )
 
     data class Builder(
         val id: Long,
@@ -63,6 +54,7 @@ data class Match(
         override fun build(): Match {
             val event = checkNotNull(event) { "Event was not set" }
             check(id == event.id) { "Event id does not match (`id` != event.id)" }
+            event.validate()
 
             return Match(
                 id = event.id,
@@ -72,8 +64,14 @@ data class Match(
                 opponent = opponent,
                 homeAway = homeAway,
                 coach = coach,
-                attendees = attendees?.build()
+                attendees = attendees?.build(),
+                recurringEventProperties = event.recurringEventProperties
             )
         }
     }
+}
+
+enum class Place {
+    HOME,
+    AWAY
 }

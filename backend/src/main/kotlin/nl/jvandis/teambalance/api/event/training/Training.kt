@@ -1,30 +1,30 @@
-package nl.jvandis.teambalance.api.training
+package nl.jvandis.teambalance.api.event.training
 
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.event.Event
+import nl.jvandis.teambalance.api.event.RecurringEventProperties
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.TeamBalanceEntityBuilder
 import nl.jvandis.teambalance.data.build
 import java.time.LocalDateTime
-import java.util.UUID
 
 data class Training(
     override val id: Long,
     override val startTime: LocalDateTime,
     override val location: String,
     override val comment: String? = null,
-    override val recurringEventId: UUID? = null,
+    override val recurringEventProperties: RecurringEventProperties?,
     val trainer: User? = null,
     val attendees: List<Attendee>? = null
 
-) : Event(id, startTime, location, comment, recurringEventId) {
-    constructor(
+) : Event(id, startTime, location, comment, recurringEventProperties) {
+    internal constructor(
         startTime: LocalDateTime,
         location: String,
         comment: String? = null,
         trainer: User? = null,
-        recurringEventId: UUID? = null
+        recurringEventProperties: RecurringEventProperties? = null
     ) :
         this(
             id = NO_ID,
@@ -32,15 +32,8 @@ data class Training(
             location = location,
             comment = comment,
             trainer = trainer,
-            recurringEventId = recurringEventId
+            recurringEventProperties = recurringEventProperties
         )
-
-    fun createUpdatedTraining(updateTrainingRequestBody: UpdateTrainingRequest) = copy(
-        startTime = updateTrainingRequestBody.startTime ?: startTime,
-        comment = updateTrainingRequestBody.comment ?: comment,
-        location = updateTrainingRequestBody.location ?: location
-
-    )
 
     data class Builder(
         val id: Long,
@@ -56,6 +49,7 @@ data class Training(
             // TODO: Trainer can be someone that is not an attendee.
             //  This should be changed in the datamodel, as trainer should be part of the attendees!
             // check(trainerUserId == trainer?.id) { "Trainer does does not match the `trainerUserId` property" }
+            event.validate()
 
             return Training(
                 id = event.id,
@@ -63,7 +57,8 @@ data class Training(
                 location = event.location,
                 comment = event.comment,
                 trainer = trainer,
-                attendees = attendees?.build()
+                attendees = attendees?.build(),
+                recurringEventProperties = event.recurringEventProperties
             )
         }
     }

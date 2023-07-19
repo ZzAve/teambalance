@@ -32,14 +32,17 @@ import kotlin.text.Charsets.UTF_8
 class LiquibaseSupport {
     companion object {
 
+        private const val SCHEMA_PARAM = "schema"
+
+        private const val ROOT_PATH = "rootPath"
+        private const val SCRIPTS = "scripts"
+
         @JvmStatic
         @Throws(SQLException::class)
-        fun migrate(connection: Connection) {
-            val queryParams = getQueryParams(connection.metaData.url)
-
+        fun migrate(connection: Connection, scripts: String, rootPath: String, schemaName: String) {
             val liquibase = Liquibase(
-                getParameterValue(queryParams, SCRIPTS),
-                DirectoryResourceAccessor(File(getParameterValue(queryParams, ROOT_PATH))), // Verify me
+                scripts,
+                DirectoryResourceAccessor(File(rootPath)), // Verify me
                 JdbcConnection(connection)
             )
 
@@ -49,12 +52,24 @@ class LiquibaseSupport {
             System.setProperty("liquibase.secure.parsing", "false")
             System.setProperty("LIQUIBASE_SECURE_PARSING", "false")
 
-            liquibase.database.liquibaseSchemaName = getParameterValue(queryParams, SCHEMA_PARAM)
+            liquibase.database.liquibaseSchemaName = schemaName
             if (liquibase.isSafeToRunUpdate) {
                 liquibase.update(Contexts(), LabelExpression())
             } else {
                 throw IllegalStateException("Cannot run migrations, liquibase does not deem it safe.")
             }
+        }
+
+        @JvmStatic
+        @Throws(SQLException::class)
+        fun migrate(connection: Connection) {
+            val queryParams = getQueryParams(connection.metaData.url)
+
+            val scripts = getParameterValue(queryParams, SCRIPTS)
+            val rootPath = getParameterValue(queryParams, ROOT_PATH)
+            val schemaName = getParameterValue(queryParams, SCHEMA_PARAM)
+
+            migrate(connection, scripts, rootPath, schemaName)
         }
 
         fun getQueryParams(uri: String): Map<String, String> {
@@ -81,9 +96,5 @@ class LiquibaseSupport {
                 )
 
         private fun String.decode(): String = URLDecoder.decode(this, UTF_8)
-
-        private const val SCHEMA_PARAM = "schema"
-        private const val ROOT_PATH = "rootPath"
-        private const val SCRIPTS = "scripts"
     }
 }

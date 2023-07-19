@@ -1,9 +1,12 @@
-package nl.jvandis.teambalance.api.training
+package nl.jvandis.teambalance.api.event.training
 
+import nl.jvandis.jooq.support.getField
 import nl.jvandis.teambalance.api.attendees.AttendeeWithUserRecordHandler
 import nl.jvandis.teambalance.api.event.Event
-import nl.jvandis.teambalance.api.match.TeamBalanceRecordHandler
+import nl.jvandis.teambalance.api.event.RecurringEventProperties
+import nl.jvandis.teambalance.api.event.TeamBalanceRecordHandler
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.EventRecord
+import nl.jvandis.teambalance.data.jooq.schema.tables.records.RecurringEventPropertiesRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.TrainingRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.TRAINING
@@ -14,14 +17,16 @@ class TrainingWithAttendeesRecordHandler : TeamBalanceRecordHandler<Training> {
     private var recordsHandled = 0L
 
     private val events = mutableMapOf<Long, Event.Builder>()
+    private val recurringEventsPropertiesMap = mutableMapOf<Long, RecurringEventProperties>()
     private val trainings = mutableMapOf<Long, Training.Builder>()
 
     private var result: List<Training>? = null
 
     override fun accept(record: Record) {
         recordsHandled++
-        val trainingId = record[TRAINING.ID]
-        val eventId = record[EVENT.ID]
+        val trainingId = record.getField(TRAINING.ID)
+        val eventId = record.getField(EVENT.ID)
+        val recurringEventId = record.getField(EVENT.RECURRING_EVENT_ID)
         if (trainingId == null || eventId == null) {
             return
         }
@@ -34,6 +39,12 @@ class TrainingWithAttendeesRecordHandler : TeamBalanceRecordHandler<Training> {
             record.into(EventRecord::class.java)
                 .into(Event.Builder::class.java)
         }
+        val recurringEventProperties = recurringEventId?.let {
+            recurringEventsPropertiesMap.computeIfAbsent(it) {
+                record.into(RecurringEventPropertiesRecord::class.java)
+                    .into(RecurringEventProperties::class.java)
+            }
+        }
 
         val training = trainings.computeIfAbsent(trainingId) {
             // mapping via TrainingRecord works better with column name clashes (like `id`)
@@ -41,6 +52,7 @@ class TrainingWithAttendeesRecordHandler : TeamBalanceRecordHandler<Training> {
                 .into(Training.Builder::class.java)
         }
 
+        event.recurringEventProperties = recurringEventProperties
         training.event = event
     }
 

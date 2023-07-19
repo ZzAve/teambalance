@@ -25,7 +25,7 @@ const _throwIfNotOk: (path: string, res: Response) => Promise<Response> = (
       resolve(res);
     });
   }
-
+  // debugger;
   //TODO Should be moved to a higher level where AUTH state is reachable
   if (res.status === 403) {
     console.log("Status was 403");

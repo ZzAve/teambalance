@@ -11,7 +11,6 @@ data class AttendeeResponse(
     val user: ExternalUser
 )
 
-fun Attendee.toResponse() = expose()
 fun Attendee.expose() = AttendeeResponse(
     id = id,
     eventId = eventId,

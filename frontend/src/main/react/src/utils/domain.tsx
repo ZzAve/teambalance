@@ -114,6 +114,8 @@ export const label = (day: keyof typeof Day) => DayLabels[day];
  * until {@code limit} is reached, on {@code selected days}
  */
 export interface RecurringEventProperties {
+  /* UUID identifying the recurring event's properties. undefined for newly created ones */
+  teamBalanceId?: string;
   /* to repeat every x amount of time */
   intervalAmount: number;
   /* interval sizing to combine 'every' with */
@@ -126,6 +128,20 @@ export interface RecurringEventProperties {
   dateLimit?: Dayjs;
 }
 
+/**
+ * Derived from RecurringEventProperties, but without the "teamBalanceId"
+ */
+export type CreateRecurringEventProperties = Omit<
+  RecurringEventProperties,
+  "teamBalanceId"
+>;
+
+export type AffectedRecurringEvents = "ALL" | "CURRENT_AND_FUTURE" | "CURRENT";
+export interface RecurringEventUpdate {
+  id: string;
+  type: AffectedRecurringEvents;
+  recurringEventProperties: AffectedRecurringEvents;
+}
 export const eventType = (event: TeamEvent) => {
   if (isTraining(event)) {
     return "Training";

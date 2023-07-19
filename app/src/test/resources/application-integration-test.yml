@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    username: --overwrite-me-through-test--
+    password: --overwrite-me-through-test--
+    url: --overwrite-me-through-test--
+
+  liquibase:
+    enabled: false
+
+app:
+  secret:
+    secret-value: teambalance
+  bank:
+    bunq:
+      api-key: ""
+      bank-account-id: -1
+      environment: SANDBOX
+      saveSessionToFile: false
