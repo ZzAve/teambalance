@@ -1,17 +1,17 @@
 package nl.jvandis.teambalance.api.users
 
 import nl.jvandis.jooq.support.valuesFrom
+import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
-import org.jooq.DSLContext
 import org.jooq.exception.DataAccessException
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Repository
 
 @Repository
 class UserRepository(
-    val context: DSLContext
+    val context: MultiTenantDslContext
 ) {
     fun findByIdOrNull(userId: Long): User? =
         context.select()
@@ -65,8 +65,8 @@ class UserRepository(
         if (userId == NO_ID) {
             throw IllegalStateException(
                 "User with 'special' id $NO_ID can not be deleted. " +
-                    "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back"
+                        "The special no id serves a special purpose in transforming items " +
+                        "from records to entities and back"
             )
         }
         val execute = context.deleteFrom(UZER)
@@ -81,8 +81,8 @@ class UserRepository(
         if (updatedUser.id == NO_ID) {
             throw IllegalStateException(
                 "User with 'special' id $NO_ID can not be deleted. " +
-                    "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back"
+                        "The special no id serves a special purpose in transforming items " +
+                        "from records to entities and back"
             )
         }
         return context

@@ -1,16 +1,11 @@
-management.endpoints.web:
-  base-path: /internal/actuator
 app:
   title: "Team balance"
-  description: "Fancy pants teampot for Tovo heren 5"
+  description: "Fancy pants teampot for sport teams w/ regular events and drinks"
   version: "@project.version@-@git.commit.id.describe@"
   datetime-limit: ${app.bank.datetime-limit}
-  secret:
-    secret-value: ${sm://API_SECRET}
   bank:
     bunq:
       api-key: ${sm://BUNQ_APIKEY}
-      bank-account-id: ${sm://BUNQ_BANK_ACCOUNT_ID}
       environment: PRODUCTION
     transaction-limit: 200 # up this when pagination is built (max is 200 from bunq)
     datetime-limit: 2022-08-01T00:00:00+02:00
@@ -19,12 +14,21 @@ app:
         enabled: true
         expire-after-write: 60s
         refresh-after-write: 30s
-        maximum-size: 1
+        maximum-size: 2 # TODO: make dynamic based on tenant size
       transactions:
         enabled: true
         expire-after-write: 60s
         refresh-after-write: 30s
-        maximum-size: 1
+        maximum-size: 2 # TODO: make dynamic based on tenant size
+  multi-tenancy:
+    tenants:
+      - domain: tovoheren4.nl
+        secret: ${sm://API_SECRET} # setup a new key!
+        tenant: tovo_heren_4
+
+      - domain: tovoheren5.nl
+        secret: ${sm://API_SECRET}
+        tenant: tovo_heren_5
 
 server:
   forward-headers-strategy: NATIVE
@@ -57,7 +61,6 @@ spring:
       roles:
         - admin
         - user
-
 springdoc:
   model-and-view-allowed: true
   swagger-ui:
@@ -68,6 +71,7 @@ springdoc:
     path: /internal/openapi/v3/api-docs
   paths-to-match: /api/**
   writer-with-order-by-keys: true
+
 management:
   endpoint:
     info:
@@ -79,5 +83,6 @@ management:
       mode: simple
   endpoints:
     web:
+      base-path: /internal/actuator
       exposure:
         include: health,info

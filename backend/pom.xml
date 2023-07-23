@@ -21,7 +21,7 @@
         <postgresql.version>42.5.1</postgresql.version>
         <spring-cloud-gcp-dependencies.version>4.1.0</spring-cloud-gcp-dependencies.version>
         <springdoc-openapi.version>2.0.2</springdoc-openapi.version>
-        <testcontainers.postgresql.version>11.18-bullseye</testcontainers.postgresql.version>
+        <testcontainers.postgresql.version>11.18-alpine</testcontainers.postgresql.version>
 
         <kminrandom.version>1.0.4</kminrandom.version>
         <mockito-kotlin.version>4.0.0</mockito-kotlin.version>

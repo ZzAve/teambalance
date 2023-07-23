@@ -2,16 +2,16 @@ package nl.jvandis.teambalance.api.bank
 
 import nl.jvandis.jooq.support.valuesFrom
 import nl.jvandis.teambalance.api.attendees.BankAccountAliasWithUserRecordHandler
+import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.BANK_ACCOUNT_ALIAS
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
-import org.jooq.DSLContext
 import org.jooq.Record1
 import org.jooq.exception.DataAccessException
 import org.springframework.stereotype.Repository
 
 @Repository
-class BankAccountAliasRepository(private val context: DSLContext) {
+class BankAccountAliasRepository(private val context: MultiTenantDslContext) {
     fun findAll(): List<BankAccountAlias> {
         val recordHandler = BankAccountAliasWithUserRecordHandler()
         context.select()

@@ -11,6 +11,7 @@ import nl.jvandis.teambalance.api.event.deleteStaleRecurringEvent
 import nl.jvandis.teambalance.api.event.findAllWithStartTimeAfterImpl
 import nl.jvandis.teambalance.api.event.handleWith
 import nl.jvandis.teambalance.api.event.insertRecurringEventPropertyRecord
+import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.ATTENDEE
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.RECURRING_EVENT_PROPERTIES
@@ -18,7 +19,6 @@ import nl.jvandis.teambalance.data.jooq.schema.tables.references.TRAINING
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
 import nl.jvandis.teambalance.loggerFor
 import org.jooq.Condition
-import org.jooq.DSLContext
 import org.jooq.DatePart
 import org.jooq.exception.DataAccessException
 import org.jooq.impl.DSL.localDateTimeAdd
@@ -29,8 +29,9 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.time.LocalDateTime
 
+
 @Repository
-class TrainingRepository(context: DSLContext) : TeamEventsRepository<Training>(context) {
+class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<Training>(context) {
     override val log = loggerFor()
 
     override fun findAll(): List<Training> =
@@ -108,7 +109,7 @@ class TrainingRepository(context: DSLContext) : TeamEventsRepository<Training>(c
         if (deletedTrainingRecords != deletedEventRecords) {
             throw DataAccessException(
                 "Tried to delete a different amount of trainings ($deletedTrainingRecords) " +
-                    "from events ($deletedEventRecords)."
+                        "from events ($deletedEventRecords)."
             )
         }
 

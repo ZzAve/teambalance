@@ -1,13 +1,12 @@
 package nl.jvandis.teambalance
 
-import org.slf4j.LoggerFactory
 import kotlin.math.pow
 import kotlin.math.round
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 import kotlin.system.measureTimeMillis
 
-private val log = LoggerFactory.getLogger("MeasurementUtils")
+private val log = loggerFor(" nl.jvandis.teambalance.MeasurementUtils")
 
 fun measureTiming(
     repetitions: Int = 50,

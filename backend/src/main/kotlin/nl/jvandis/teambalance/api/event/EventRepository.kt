@@ -1,16 +1,16 @@
 package nl.jvandis.teambalance.api.event
 
+import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.RecurringEventPropertiesRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.RECURRING_EVENT_PROPERTIES
-import org.jooq.DSLContext
 import org.jooq.exception.DataAccessException
 import org.jooq.impl.DSL.count
 import org.springframework.stereotype.Repository
 
 @Repository
 class EventRepository(
-    private val context: DSLContext
+    private val context: MultiTenantDslContext
 ) {
     /**
      * Returns whether an event with id {@code eventId} exists
@@ -24,7 +24,7 @@ class EventRepository(
             ?: false
 }
 
-fun DSLContext.insertRecurringEventPropertyRecord(event: Event): RecurringEventProperties {
+fun MultiTenantDslContext.insertRecurringEventPropertyRecord(event: Event): RecurringEventProperties {
     val er = event.recurringEventProperties!!
     val insertRecurringEventPropertiesResult = insertInto(
         RECURRING_EVENT_PROPERTIES,

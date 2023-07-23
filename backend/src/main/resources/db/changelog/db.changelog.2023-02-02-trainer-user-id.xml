@@ -8,7 +8,6 @@
                       newColumnName="trainer_user_id"
                       oldColumnName="user_id"
                       remarks="Be more explicit about data type"
-                      schemaName="public"
                       tableName="training"/>
     </changeSet>
 

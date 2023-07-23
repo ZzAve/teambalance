@@ -1,6 +1,7 @@
-package nl.jvandis.teambalance
+package nl.jvandis.teambalance.api.database.flyway
 
 import nl.jvandis.jooq.support.migrations.LiquibaseSupport
+import nl.jvandis.teambalance.loggerFor
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL.using
@@ -22,22 +23,15 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 @Testcontainers
-@Transactional("transactionManager")
+@Transactional
 @SpringBootTest
-@ActiveProfiles("integration-test")
+@ActiveProfiles("test")
 @ContextConfiguration(initializers = [AbstractIntegrationTest.Initializer::class])
 @AutoConfigureMockMvc
 class AbstractIntegrationTest {
 
-//    @Autowired
-//    lateinit var webApplicationContext: WebApplicationContext
-//    protected lateinit var mockMvc: MockMvc
-
     internal class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
         override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
-            // detect running db
-
-            // if not start testcontainers thing
             postgresqlContainer.start()
             runLiquibaseMigrations()
 
@@ -48,9 +42,6 @@ class AbstractIntegrationTest {
             ).applyTo(configurableApplicationContext.environment)
         }
 
-        /**
-         * //FIXME to work with multi tenance
-         */
         private fun runLiquibaseMigrations() {
             connection = DriverManager.getConnection(
                 postgresqlContainer.jdbcUrl,
@@ -67,7 +58,7 @@ class AbstractIntegrationTest {
                 LiquibaseSupport.migrate(
                     connection,
                     "db.changelog-master.xml",
-                    "${System.getProperty("user.dir")}/../backend/src/main/resources/db/changelog/", // TODO: change me to classpath resource
+                    "${System.getProperty("user.dir")}/src/main/resources/db/changelog/",
                     "public"
                 )
                 log.info("Finished setup")
@@ -77,8 +68,6 @@ class AbstractIntegrationTest {
 
     @BeforeEach
     fun `open a transaction`() {
-//        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
-//            .build();
 //        ctx.transaction{x -> DefaultTransactionProvider(x.connectionProvider())}
     }
 
@@ -101,7 +90,7 @@ class AbstractIntegrationTest {
 
         @JvmStatic
         @BeforeAll
-        fun `setup mockmvc default header`() {
+        fun `get postgres`() {
         }
     }
 }

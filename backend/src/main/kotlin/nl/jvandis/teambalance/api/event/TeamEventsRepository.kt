@@ -2,6 +2,7 @@ package nl.jvandis.teambalance.api.event
 
 import nl.jvandis.jooq.support.getField
 import nl.jvandis.jooq.support.getFieldOrThrow
+import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.ATTENDEE
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.RECURRING_EVENT_PROPERTIES
@@ -9,7 +10,6 @@ import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
 import nl.jvandis.teambalance.data.limitOrDefault
 import nl.jvandis.teambalance.data.offsetOrDefault
 import org.jooq.Condition
-import org.jooq.DSLContext
 import org.jooq.Field
 import org.jooq.Record
 import org.jooq.Record1
@@ -25,7 +25,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 abstract class TeamEventsRepository<T : Event>(
-    protected val context: DSLContext
+    protected val context: MultiTenantDslContext
 ) : LoggingContext {
     abstract fun findByIdOrNull(eventId: Long): T?
     abstract fun findAll(): List<T>
@@ -119,7 +119,7 @@ abstract class TeamEventsRepository<T : Event>(
 }
 
 inline fun <reified EVENT : Event> findAllWithStartTimeAfterImpl(
-    context: DSLContext,
+    context: MultiTenantDslContext,
     since: LocalDateTime,
     pageable: Pageable,
     entity: TeamEventTableAndRecordHandler<EVENT>
@@ -131,7 +131,7 @@ inline fun <reified EVENT : Event> findAllWithStartTimeAfterImpl(
 }
 
 fun <EVENT : Event> eventsCount(
-    context: DSLContext,
+    context: MultiTenantDslContext,
     since: LocalDateTime,
     pageable: Pageable,
     entity: TeamEventTableAndRecordHandler<EVENT>
@@ -148,7 +148,7 @@ fun <EVENT : Event> eventsCount(
 }
 
 fun <EV : Event> eventsOfType(
-    context: DSLContext,
+    context: MultiTenantDslContext,
     since: LocalDateTime,
     pageable: Pageable,
     entity: TeamEventTableAndRecordHandler<EV>
@@ -199,7 +199,7 @@ fun <EV : Event> eventsOfType(
  * if recurring event properties are not linked to event anymore, remove recurring event
  */
 context(LoggingContext)
-fun deleteStaleRecurringEvent(context: DSLContext) {
+fun deleteStaleRecurringEvent(context: MultiTenantDslContext) {
     log.info("Trying to delete stale recurringEventProperties records")
     // CTE: which recurring event properties are not linked from any event
     val staleRecurringEventProperties =
@@ -227,7 +227,7 @@ fun deleteStaleRecurringEvent(context: DSLContext) {
 
 context(LoggingContext)
 fun partitionRecurringEvent(
-    context: DSLContext,
+    context: MultiTenantDslContext,
     currentRecurringEventId: RecurringEventPropertiesId,
     startTime: LocalDateTime,
     newRecurringEventId: RecurringEventPropertiesId

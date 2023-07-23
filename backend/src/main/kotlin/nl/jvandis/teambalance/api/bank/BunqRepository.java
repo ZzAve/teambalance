@@ -7,16 +7,13 @@ import com.bunq.sdk.exception.BunqException;
 import com.bunq.sdk.exception.ForbiddenException;
 import com.bunq.sdk.http.BunqHeader;
 import com.bunq.sdk.http.Pagination;
-import com.bunq.sdk.model.generated.endpoint.MonetaryAccountBank;
-import com.bunq.sdk.model.generated.endpoint.Payment;
-import com.bunq.sdk.model.generated.endpoint.RequestInquiry;
-import com.bunq.sdk.model.generated.endpoint.SandboxUserPerson;
-import com.bunq.sdk.model.generated.endpoint.User;
+import com.bunq.sdk.model.generated.endpoint.*;
 import com.bunq.sdk.model.generated.object.Amount;
 import com.bunq.sdk.model.generated.object.Pointer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
+import jakarta.annotation.Nullable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -24,7 +21,6 @@ import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -101,7 +97,7 @@ public class BunqRepository {
      */
 
     private static final Duration acquireMaxWaitDuration = Duration.ofSeconds(5);
-    private final int accountId;
+//    private final int accountId;
 
     private final ApiEnvironmentType environmentType;
 
@@ -115,10 +111,10 @@ public class BunqRepository {
 
     public BunqRepository(ApiEnvironmentType environmentType,
                           @Nullable String apiKey,
-                          @Nullable Integer accountId,
+//                          @Nullable Integer accountId,
                           Boolean saveSessionToFile) throws UnknownHostException {
         log.info("Starting BunqRepository");
-        assert (ApiEnvironmentType.PRODUCTION != environmentType) || (apiKey != null && accountId != null);
+        assert (ApiEnvironmentType.PRODUCTION != environmentType) || (apiKey != null);
 
         this.environmentType = environmentType;
         this.apiKey = apiKey;
@@ -128,18 +124,18 @@ public class BunqRepository {
         this.user = User.get().getValue();
         this.requestSpendingMoneyIfNeeded();
 
-        if (environmentType == ApiEnvironmentType.PRODUCTION) {
-            this.accountId = this.validateAccountId(accountId);
-        } else {
-            this.accountId = this.getAccountId();
-        }
+//        if (environmentType == ApiEnvironmentType.PRODUCTION) {
+//            this.accountId = this.validateAccountId(accountId);
+//        } else {
+//            this.accountId = this.getAccountId();
+//        }
     }
 
     public BunqRepository(BankBunqConfig config) throws UnknownHostException {
         this(
                 toApiEnvironmentType(config.getEnvironment()),
                 config.getApiKey(),
-                config.getBankAccountId(),
+//                config.getBankAccountId(),
                 config.getSaveSessionToFile()
         );
     }
@@ -183,11 +179,11 @@ public class BunqRepository {
         };
     }
 
-    public MonetaryAccountBank getMonetaryAccountBank() {
+    public MonetaryAccountBank getMonetaryAccountBank(int accountId) {
         return withSemaphore(() -> MonetaryAccountBank.get(accountId).getValue());
     }
 
-    public List<Payment> getAllPayments(int count) {
+    public List<Payment> getAllPayments(int accountId, int count) {
         return withSemaphore(() -> {
             Pagination pagination = new Pagination();
             pagination.setCount(count);

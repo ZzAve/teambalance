@@ -10,7 +10,6 @@
     <changeSet author="juliusvandis (generated)" id="1675716081000-2">
         <modifyDataType columnName="availability"
                         newDataType="availability"
-                        schemaName="public"
                         tableName="attendee"/>
     </changeSet>
 
@@ -21,7 +20,6 @@
     <changeSet author="juliusvandis (generated)" id="1675716081000-4">
         <modifyDataType columnName="role"
                         newDataType="role"
-                        schemaName="public"
                         tableName="uzer"/>
     </changeSet>
 </databaseChangeLog>
