@@ -17,8 +17,7 @@ class TrainingIntegrationTest : AbstractIntegrationTest() {
     private lateinit var mockMvc: MockMvc
 
     @Test
-    fun contextLoads(){
-
+    fun contextLoads() {
     }
 
     @Test

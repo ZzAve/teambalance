@@ -80,7 +80,6 @@ class AbstractIntegrationTest {
         }
     }
 
-
     @BeforeEach
     fun `open a transaction`() {
         log.info("Before each")
@@ -118,6 +117,5 @@ class AbstractIntegrationTest {
         }
     }
 }
-
 
 internal class IntegrationTestConfig

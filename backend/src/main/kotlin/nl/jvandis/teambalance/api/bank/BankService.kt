@@ -131,7 +131,7 @@ class BankService(
         Caffeine.newBuilder()
             .expireAfterWrite(config.expireAfterWrite)
             .apply { if (config.refreshAfterWrite != null) refreshAfterWrite(config.refreshAfterWrite) }
-            .maximumSize(if (config.enabled) config.maximumSize else 0)
+            .maximumSize(if (config.enabled) Tenant.entries.size.toLong() else 0)
             .buildAsync { key -> loadingFunction(key) }
 
     private fun String.getAlias(aliases: Map<String, User>): User? {
@@ -149,5 +149,4 @@ class BankService(
         val key = "bunq-account-id.${MultiTenantContext.getCurrentTenant().name.lowercase()}"
         return configurationService.getConfig(key, Int::class)
     }
-
 }

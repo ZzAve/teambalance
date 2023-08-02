@@ -11,12 +11,10 @@ app:
         enabled: true
         expire-after-write: 60s
         refresh-after-write: 30s
-        maximum-size: 1
       transactions:
         enabled: true
         expire-after-write: 60s
         refresh-after-write: 30s
-        maximum-size: 1
   multi-tenancy:
     tenants:
       - domain: 5.teambalance.local:8080

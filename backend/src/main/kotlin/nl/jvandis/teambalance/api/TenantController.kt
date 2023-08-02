@@ -29,6 +29,6 @@ class TenantController(
 data class TenantResponse(
     val domain: String,
     val title: String,
-    val bunqMeBaseUrl: String,
+    val bunqMeBaseUrl: String
 
-    )
+)
