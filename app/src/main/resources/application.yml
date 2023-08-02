@@ -24,11 +24,15 @@ app:
     tenants:
       - domain: tovoheren4.nl
         secret: ${sm://API_SECRET} # setup a new key!
+        bunq-me-base-url: ${sm://TOVO_HEREN_4_BUNQ_ME}
         tenant: tovo_heren_4
+        title: "Tovo Heren 4"
 
       - domain: tovoheren5.nl
         secret: ${sm://API_SECRET}
+        bunq-me-base-url: ${sm://TOVO_HEREN_5_BUNQ_ME}
         tenant: tovo_heren_5
+        title: "Tovo Heren 5"
 
 server:
   forward-headers-strategy: NATIVE
@@ -47,6 +51,7 @@ spring:
     url: override-me
     hikari:
       maximum-pool-size: 1
+    driver-class-name: org.postgresql.Driver
   jackson:
     serialization:
       write_dates_as_timestamps: false

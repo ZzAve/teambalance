@@ -53,6 +53,8 @@ class LiquibaseSupport {
             System.setProperty("LIQUIBASE_SECURE_PARSING", "false")
 
             liquibase.database.liquibaseSchemaName = schemaName
+            liquibase.database.defaultSchemaName = schemaName
+
             if (liquibase.isSafeToRunUpdate) {
                 liquibase.update(Contexts(), LabelExpression())
             } else {

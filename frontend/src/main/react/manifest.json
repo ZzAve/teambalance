@@ -1,7 +1,7 @@
 {
-  "short_name": "TeamBalance",
-  "name": "Fancy pants teampot voor heren 5",
-  "description": "For sv Tovo '67 HS5, this is the place too keep attendance of beer consumption, and events like trainings or matches",
+  "short_name": "Teambalance",
+  "name": "Fancy pants teampot voor Tovo",
+  "description": "For your sv Tovo '67 team, this is the place too keep attendance of beer consumption, and events like trainings or matches",
   "icons": [
     {
       "src": "images/favicon.ico",

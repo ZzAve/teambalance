@@ -15,5 +15,4 @@ class ConfigurationRepository(private val context: MultiTenantDslContext) {
             .into(String::class.java)
             .firstOrNull()
     }
-
 }

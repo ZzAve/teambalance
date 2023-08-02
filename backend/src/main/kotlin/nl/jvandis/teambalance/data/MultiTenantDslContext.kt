@@ -39,7 +39,7 @@ class MultiTenantDslContext(private val context: DSLContext) {
             ?: createContext(MultiTenantContext.getCurrentTenant())
 
     private fun createContext(tenant: Tenant): DefaultDSLContext {
-        //https://www.jooq.org/doc/latest/manual/sql-building/dsl-context/custom-settings/settings-render-mapping/#mapping-dev-to-my_book_world-with-jooq
+        // https://www.jooq.org/doc/latest/manual/sql-building/dsl-context/custom-settings/settings-render-mapping/#mapping-dev-to-my_book_world-with-jooq
         val settings: Settings = Settings().withRenderMapping(
             RenderMapping().withSchemata(
                 MappedSchema().withInputExpression(Pattern.compile("public"))
@@ -47,7 +47,9 @@ class MultiTenantDslContext(private val context: DSLContext) {
             )
         )
         val tenantContext = DefaultDSLContext(
-            context.configuration().connectionProvider(), context.dialect(), settings
+            context.configuration().connectionProvider(),
+            context.dialect(),
+            settings
         )
         contexts[tenant] = tenantContext
         return tenantContext
@@ -65,14 +67,14 @@ class MultiTenantDslContext(private val context: DSLContext) {
     fun <R : Record, T1, T2> insertInto(
         into: Table<R>,
         field1: Field<T1>,
-        field2: Field<T2>,
+        field2: Field<T2>
     ): InsertValuesStep2<R, T1, T2> = tenantContext().insertInto(into, field1, field2)
 
     fun <R : Record, T1, T2, T3> insertInto(
         into: Table<R>,
         field1: Field<T1>,
         field2: Field<T2>,
-        field3: Field<T3>,
+        field3: Field<T3>
     ): InsertValuesStep3<R, T1, T2, T3> = tenantContext().insertInto(into, field1, field2, field3)
 
     fun <R : Record, T1, T2, T3, T4> insertInto(
@@ -80,7 +82,7 @@ class MultiTenantDslContext(private val context: DSLContext) {
         field1: Field<T1>,
         field2: Field<T2>,
         field3: Field<T3>,
-        field4: Field<T4>,
+        field4: Field<T4>
     ): InsertValuesStep4<R, T1, T2, T3, T4> = tenantContext().insertInto(into, field1, field2, field3, field4)
 
     fun <R : Record, T1, T2, T3, T4, T5> insertInto(
@@ -89,7 +91,7 @@ class MultiTenantDslContext(private val context: DSLContext) {
         field2: Field<T2>,
         field3: Field<T3>,
         field4: Field<T4>,
-        field5: Field<T5>,
+        field5: Field<T5>
     ): InsertValuesStep5<R, T1, T2, T3, T4, T5> =
         tenantContext().insertInto(into, field1, field2, field3, field4, field5)
 

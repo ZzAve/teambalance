@@ -21,17 +21,24 @@ app:
     tenants:
       - domain: 5.teambalance.local:8080
         secret: teambalance
+        bunq-me-base-url: https://bunq.com/5
         tenant: tovo_heren_5
+        title: "Tovo Heren 5 (local 8080)"
       - domain: 5.teambalance.local:3000
         secret: teambalance
+        bunq-me-base-url: https://bunq.com/5
         tenant: tovo_heren_5
-
+        title: "Tovo Heren 5 (local 3000)"
       - domain: 4.teambalance.local:8080
         secret: teambalance
+        bunq-me-base-url: https://bunq.com/4
         tenant: tovo_heren_4
+        title: "Tovo Heren 4 (local 8080)"
       - domain: 4.teambalance.local:3000
         secret: teambalance
+        bunq-me-base-url: https://bunq.com/4
         tenant: tovo_heren_4
+        title: "Tovo Heren 4 (local 3000)"
 
 spring:
   datasource:

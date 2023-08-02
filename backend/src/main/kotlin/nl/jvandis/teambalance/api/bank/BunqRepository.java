@@ -7,7 +7,10 @@ import com.bunq.sdk.exception.BunqException;
 import com.bunq.sdk.exception.ForbiddenException;
 import com.bunq.sdk.http.BunqHeader;
 import com.bunq.sdk.http.Pagination;
-import com.bunq.sdk.model.generated.endpoint.*;
+import com.bunq.sdk.model.generated.endpoint.MonetaryAccountBank;
+import com.bunq.sdk.model.generated.endpoint.Payment;
+import com.bunq.sdk.model.generated.endpoint.RequestInquiry;
+import com.bunq.sdk.model.generated.endpoint.SandboxUserPerson;
 import com.bunq.sdk.model.generated.object.Amount;
 import com.bunq.sdk.model.generated.object.Pointer;
 import com.google.gson.Gson;
@@ -30,31 +33,35 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+/**
+ * This repository translates teambalance's domain into bunq domain, and performs requests to Bunq through its Java SDK.
+ * <p>
+ * Copy/pasted and adapted from <a href="https://github.com/bunq/tinker_java">Bunq's tinker project </a>
+ */
 public class BunqRepository {
-
-    private static final int DEFAULT_FETCH_COUNT = 10;
+    private static final Logger log = LoggerFactory.getLogger(BunqRepository.class);
 
     /**
      * Error constants.
      */
-    private static final String ERROR_COULD_NOT_FIND_ALIAS_TYPE_IBAN = "Could not find alias with type IBAN for monetary account \"%s\"";
     private static final String ERROR_COULD_NOT_GENERATE_NEW_API_KEY = "Encountered error while retrieving new sandbox ApiKey.\nError message %s";
-    private static final String ERROR_COULD_NOT_FIND_CONFIG_FILE = "Could not find a bunq configuration to load.";
 
     /**
-     * FileName constatns.
+     * FileName constants.
      */
     private static final String FILE_NAME_BUNQ_CONF_PRODUCTION = "bunq-production.conf";
     private static final String FILE_NAME_BUNQ_CONF_SANDBOX = "bunq-sandbox.conf";
 
     /**
-     * Field constatns.
+     * Field constants.
      */
     private static final String FIELD_RESPONSE = "Response";
     private static final String FIELD_API_KEY = "ApiKey";
@@ -71,13 +78,10 @@ public class BunqRepository {
      */
     private static final int INDEX_FIRST = 0;
 
-    private static final String MONETARY_ACCOUNT_STATUS_ACTIVE = "ACTIVE";
-
     /**
      * Http constants.
      */
     private static final int HTTP_STATUS_OK = 200;
-    private static final String ERROR_COULD_NOT_DETERMINE_USER_TYPE = "Could not determine user type";
 
     /**
      * Request spending money constants.
@@ -97,79 +101,72 @@ public class BunqRepository {
      */
 
     private static final Duration acquireMaxWaitDuration = Duration.ofSeconds(5);
-//    private final int accountId;
-
+    /**
+     * A semaphore is used to limit the amount of open calls to Bunq to 1.
+     */
+    private static final Semaphore semaphore = new Semaphore(1);
+    private final Map<Integer, Integer> accountIdsToValidatedAccountIds = new HashMap<>();
     private final ApiEnvironmentType environmentType;
-
     private final String apiKey;
     private final Boolean saveSessionToFile;
 
-    private final User user;
-
-    private static final Logger log = LoggerFactory.getLogger(BunqRepository.class);
-    private static final Semaphore semaphore = new Semaphore(1);
-
     public BunqRepository(ApiEnvironmentType environmentType,
                           @Nullable String apiKey,
-//                          @Nullable Integer accountId,
                           Boolean saveSessionToFile) throws UnknownHostException {
-        log.info("Starting BunqRepository");
         assert (ApiEnvironmentType.PRODUCTION != environmentType) || (apiKey != null);
+        log.info("Starting BunqRepository of type {}", environmentType);
 
         this.environmentType = environmentType;
         this.apiKey = apiKey;
         this.saveSessionToFile = saveSessionToFile;
 
         this.setupContext();
-        this.user = User.get().getValue();
         this.requestSpendingMoneyIfNeeded();
-
-//        if (environmentType == ApiEnvironmentType.PRODUCTION) {
-//            this.accountId = this.validateAccountId(accountId);
-//        } else {
-//            this.accountId = this.getAccountId();
-//        }
     }
 
     public BunqRepository(BankBunqConfig config) throws UnknownHostException {
         this(
                 toApiEnvironmentType(config.getEnvironment()),
                 config.getApiKey(),
-//                config.getBankAccountId(),
                 config.getSaveSessionToFile()
         );
     }
 
-    private int getAccountId() {
-        return withSemaphore(() -> {
-            Pagination pagination = new Pagination();
-            pagination.setCount(100);
-
-            List<MonetaryAccountBank> allAccount = MonetaryAccountBank.list(pagination.getUrlParamsCountOnly()).getValue();
-
-            return allAccount.stream()
-                    .findFirst().orElseThrow(() -> {
-                        throw new IllegalStateException("There are no active accounts enabled for the current user / session");
-                    }).getId();
+    private Integer checkAccountId(Integer accountId) {
+        return accountIdsToValidatedAccountIds.computeIfAbsent(accountId, x -> {
+            if (environmentType == ApiEnvironmentType.PRODUCTION) {
+                return this.validateAccountId(accountId);
+            } else {
+                return this.getAccountId();
+            }
         });
     }
 
+    private int getAccountId() {
+        Pagination pagination = new Pagination();
+        pagination.setCount(100);
+
+        List<MonetaryAccountBank> allAccount = MonetaryAccountBank.list(pagination.getUrlParamsCountOnly()).getValue();
+
+        return allAccount.stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("There are no active accounts enabled for the current user / session")).getId();
+    }
+
     private int validateAccountId(Integer accountId) {
-        return withSemaphore(() -> {
-            Pagination pagination = new Pagination();
-            pagination.setCount(100);
+        Pagination pagination = new Pagination();
+        pagination.setCount(100);
 
-            List<MonetaryAccountBank> allAccount = MonetaryAccountBank.list(pagination.getUrlParamsCountOnly()).getValue();
+        List<MonetaryAccountBank> allAccount = MonetaryAccountBank.list(pagination.getUrlParamsCountOnly()).getValue();
 
-            return allAccount.stream()
-                    .filter(monetaryAccountBank -> accountId.equals(monetaryAccountBank.getId()))
-                    .findFirst().orElseThrow(() -> {
-                        final String error = String.format("There is no account with id %s present " +
-                                "and/or enabled for access with the current API key ", accountId);
-                        log.error(error);
-                        throw new IllegalStateException(error);
-                    }).getId();
-        });
+        return allAccount.stream()
+                .filter(monetaryAccountBank -> accountId.equals(monetaryAccountBank.getId()))
+                .findFirst().orElseThrow(() -> {
+                    final String error = String.format("There is no account with id %s present " +
+                            "and/or enabled for access with the current API key ", accountId);
+                    log.error(error);
+                    return new IllegalStateException(error);
+                }).getId();
     }
 
     private static ApiEnvironmentType toApiEnvironmentType(BunqEnvironment environment) {
@@ -180,15 +177,19 @@ public class BunqRepository {
     }
 
     public MonetaryAccountBank getMonetaryAccountBank(int accountId) {
-        return withSemaphore(() -> MonetaryAccountBank.get(accountId).getValue());
+        return withSemaphore(() -> {
+            var validatedAccountId = checkAccountId(accountId);
+            return MonetaryAccountBank.get(validatedAccountId).getValue();
+        });
     }
 
     public List<Payment> getAllPayments(int accountId, int count) {
         return withSemaphore(() -> {
             Pagination pagination = new Pagination();
             pagination.setCount(count);
+            var validatedAccountId = checkAccountId(accountId);
             return Payment.list(
-                    accountId,
+                    validatedAccountId,
                     pagination.getUrlParamsCountOnly()
             ).getValue();
 
@@ -201,6 +202,7 @@ public class BunqRepository {
 
     private <T> T withSemaphore(Supplier<T> action) {
         boolean permit = false;
+        // TODO: use try with resources (autoclosable ?)
         try {
             permit = semaphore.tryAcquire(acquireMaxWaitDuration.getSeconds(), TimeUnit.SECONDS);
             if (permit) {

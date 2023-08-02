@@ -110,7 +110,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
         if (deletedMiscEventRecords != deletedEventRecords) {
             throw DataAccessException(
                 "Tried to delete a different amount of events ($deletedMiscEventRecords) " +
-                        "from events ($deletedEventRecords)."
+                    "from events ($deletedEventRecords)."
             )
         }
 

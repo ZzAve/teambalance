@@ -46,7 +46,6 @@ import org.http4k.format.KotlinxSerialization.auto
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import kotlin.random.Random
-import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 // Enable me if you want to populate the database on application startup
@@ -70,13 +69,12 @@ fun addHeaders(apiKey: String) = Filter { next ->
 }
 
 class Initializer(
-    apiKey: String
+    apiKey: String,
+    private val host: String = "http://localhost:8080"
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
     private val client: HttpHandler = addHeaders(apiKey)(ApacheClient())
-
-    private val host = "http://localhost:8080"
 
     init {
         // standard client
@@ -148,7 +146,7 @@ class Initializer(
     }
 
     private fun addCoach(id: Long, coach: String): Match {
-        val request = Request(PUT, "$host/api/matches/$id")
+        val request = Request(PUT, "$host/api/matches/$id/coach")
             .body("""{ "coach": "$coach"  }""")
 
         val response: Response = client(request)
@@ -184,7 +182,6 @@ class Initializer(
         return anAttendeeLens(response)
     }
 
-    @OptIn(ExperimentalTime::class)
     fun spawnData(config: SpawnDataConfig) {
         createUsers()
         log.info("All users in the system: ")
@@ -349,7 +346,7 @@ class Initializer(
                         .toKotlinLocalDateTime(),
                     location = locations.random(),
                     opponent = opponents.random(),
-                    homeAway = Place.values().random(),
+                    homeAway = Place.entries.random(),
                     comment = comments.random()
                 )
 

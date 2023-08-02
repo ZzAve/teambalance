@@ -1,6 +1,5 @@
 package nl.jvandis.teambalance
 
-
 enum class Tenant {
     TOVO_HEREN_4, TOVO_HEREN_5
 }

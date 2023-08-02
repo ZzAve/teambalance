@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { authenticationManager } from "../utils/AuthenticationManager";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -6,9 +6,16 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import { Refresh } from "./Refresh";
 import { Logout } from "./Logout";
+import { TeamBalanceTheme, TenantContext } from "../TenantContext";
+import { ThemeToggler } from "./ThemeToggler";
 
-const TopBar = (props: { handleRefresh: () => void; refresh: boolean }) => {
-  const [isAuth, setIsAuth] = useState(true);
+const TopBar = (props: {
+  handleRefresh: () => void;
+  refresh: boolean;
+  setTheme: (theme: TeamBalanceTheme) => void;
+}) => {
+  const [isAuth, setIsAuth] = useState(false);
+  const tenantContext = useContext(TenantContext);
 
   useEffect(() => {
     authenticationManager.checkAuthentication().then((it) => {
@@ -23,9 +30,14 @@ const TopBar = (props: { handleRefresh: () => void; refresh: boolean }) => {
       <Toolbar>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs>
-            <Typography variant="h6">Tovo Heren 5 Team balance</Typography>
+            <Typography variant="h6">
+              {tenantContext.title} Team balance
+            </Typography>
           </Grid>
 
+          <Grid item>
+            <ThemeToggler setTheme={props.setTheme} />
+          </Grid>
           {isAuth ? (
             <>
               <Grid item>

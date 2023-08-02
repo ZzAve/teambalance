@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.time.LocalDateTime
 
-
 @Repository
 class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<Training>(context) {
     override val log = loggerFor()
@@ -109,7 +108,7 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
         if (deletedTrainingRecords != deletedEventRecords) {
             throw DataAccessException(
                 "Tried to delete a different amount of trainings ($deletedTrainingRecords) " +
-                        "from events ($deletedEventRecords)."
+                    "from events ($deletedEventRecords)."
             )
         }
 

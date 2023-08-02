@@ -15,16 +15,13 @@ app:
       saveSessionToFile: false
   multi-tenancy:
     tenants:
-      - domain: 5.teambalance.local:8080
+      - domain: 5.teambalance.local
         secret: teambalance
+        bunq-me-base-url: https://bunq.com/5
         tenant: tovo_heren_5
-      - domain: 5.teambalance.local:3000
+        title: "Tovo Heren 5"
+      - domain: 4.teambalance.local
         secret: teambalance
-        tenant: tovo_heren_5
-
-      - domain: 4.teambalance.local:8080
-        secret: teambalance
+        bunq-me-base-url: https://bunq.com/4
         tenant: tovo_heren_4
-      - domain: 4.teambalance.local:3000
-        secret: teambalance
-        tenant: tovo_heren_4
+        title: "Tovo Heren 4"

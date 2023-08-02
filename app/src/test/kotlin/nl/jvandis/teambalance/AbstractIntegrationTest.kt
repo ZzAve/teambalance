@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.sql.Connection
@@ -29,13 +30,10 @@ import java.sql.DriverManager
 @AutoConfigureMockMvc
 class AbstractIntegrationTest {
 
-//    @Autowired
-//    lateinit var webApplicationContext: WebApplicationContext
-//    protected lateinit var mockMvc: MockMvc
-
     internal class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
         override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
             // detect running db
+            log.info("Running initializer")
 
             // if not start testcontainers thing
             postgresqlContainer.start()
@@ -48,9 +46,6 @@ class AbstractIntegrationTest {
             ).applyTo(configurableApplicationContext.environment)
         }
 
-        /**
-         * //FIXME to work with multi tenance
-         */
         private fun runLiquibaseMigrations() {
             connection = DriverManager.getConnection(
                 postgresqlContainer.jdbcUrl,
@@ -58,45 +53,63 @@ class AbstractIntegrationTest {
                 postgresqlContainer.password
             )
 
-            ctx = using(connection, SQLDialect.POSTGRES)
+            // Note: naive way of creating a DSLContext that is NOT tenant / schema aware.
+            // FIXME
+            context = using(connection, SQLDialect.POSTGRES)
 
             connection.createStatement().use { s ->
-                log.info("Setting up database")
-
-                log.info("Migrating data with liquibase")
-                LiquibaseSupport.migrate(
-                    connection,
-                    "db.changelog-master.xml",
-                    "${System.getProperty("user.dir")}/../backend/src/main/resources/db/changelog/", // TODO: change me to classpath resource
-                    "public"
-                )
-                log.info("Finished setup")
+                Tenant.entries.forEach { tenant ->
+                    log.info("Creating schema ${tenant.name.lowercase()}")
+                    val execute =
+                        s.execute("CREATE SCHEMA IF NOT EXISTS ${tenant.name.lowercase()} AUTHORIZATION ${postgresqlContainer.username};")
+                    log.info("Creating successful? {}", execute)
+                }
+            }
+            Tenant.entries.forEach { tenant ->
+                connection.createStatement().use { s ->
+                    log.info("Migrating data with liquibase")
+                    LiquibaseSupport.migrate(
+                        connection,
+                        "db.changelog-master.xml",
+                        "${System.getProperty("user.dir")}/../backend/src/main/resources/db/changelog/", // TODO: change me to classpath resource
+                        tenant.name.lowercase()
+                    )
+                    log.info("Finished setup")
+                }
             }
         }
     }
 
+
     @BeforeEach
     fun `open a transaction`() {
-//        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
-//            .build();
-//        ctx.transaction{x -> DefaultTransactionProvider(x.connectionProvider())}
+        log.info("Before each")
     }
 
     @AfterEach
     fun `close a transaction, rolling back any changes`() {
+        log.info("After each")
     }
 
     companion object {
 
         private var log = loggerFor()
         lateinit var connection: Connection
-        lateinit var ctx: DSLContext
+
+        /**
+         * WARNING: This context is tenant specific; be advised
+         */
+        lateinit var context: DSLContext
 
         @Container
         val postgresqlContainer = PostgreSQLContainer("postgres:11.18-bullseye").apply {
             withDatabaseName("teambalance")
             withUsername("teambalance")
             withPassword("teambalance")
+            withUrlParam("loggerLevel", "DEBUG")
+            waitingFor(
+                Wait.forLogMessage(".*ready to accept connections.*\\n", 1)
+            ).withConnectTimeoutSeconds(20)
         }
 
         @JvmStatic
@@ -105,5 +118,6 @@ class AbstractIntegrationTest {
         }
     }
 }
+
 
 internal class IntegrationTestConfig

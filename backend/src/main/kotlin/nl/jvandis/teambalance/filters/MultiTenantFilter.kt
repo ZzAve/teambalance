@@ -7,11 +7,11 @@ import nl.jvandis.teambalance.MultiTenantContext
 import nl.jvandis.teambalance.Tenant
 import nl.jvandis.teambalance.loggerFor
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.bind.ConstructorBinding
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
-
 
 @ConfigurationProperties("app.multi-tenancy")
 data class TenantsConfig(
@@ -27,17 +27,22 @@ data class TenantsConfig(
     data class TenantConfig(
         val domain: String,
         val tenant: Tenant,
-        val secret: Secret
+        val bunqMeBaseUrl: String,
+        val secret: Secret,
+        val title: String
     ) {
         /**
          * Specific constructor for configuration binding by spring. Highly unideal,
          * and deliberately had to put 'tenant' on top, to avoid JVM signature clashes between the constructors
          */
+        @ConstructorBinding
         constructor(
             tenant: Tenant,
             domain: String,
+            bunqMeBaseUrl: String,
             secret: String,
-        ) : this(domain, tenant, Secret(secret))
+            title: String
+        ) : this(domain, tenant, bunqMeBaseUrl, Secret(secret), title)
     }
 
     @JvmInline
@@ -69,6 +74,7 @@ class MultiTenantFilter(
             response.sendError(401, "Unknown domain. $host doesn't have anything to do with teambalance it seems")
         } else {
             MultiTenantContext.setCurrentTenant(tenant.tenant)
+            response.addHeader("X-Tenant", MultiTenantContext.getCurrentTenant().name.lowercase())
         }
 
         filterChain.doFilter(request, response)
