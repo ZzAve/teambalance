@@ -19,26 +19,11 @@
         <jooq-postgres-extensions.version>3.16.13</jooq-postgres-extensions.version>
         <jooq.version>3.17.7</jooq.version> <!-- same as from spring-boot-starter-jooq -->
         <postgresql.version>42.5.1</postgresql.version>
-        <spring-cloud-gcp-dependencies.version>4.1.0</spring-cloud-gcp-dependencies.version>
         <springdoc-openapi.version>2.0.2</springdoc-openapi.version>
         <testcontainers.postgresql.version>11.18-alpine</testcontainers.postgresql.version>
 
         <kminrandom.version>1.0.4</kminrandom.version>
-        <mockito-kotlin.version>4.0.0</mockito-kotlin.version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.google.cloud</groupId>
-                <artifactId>spring-cloud-gcp-dependencies</artifactId>
-                <version>${spring-cloud-gcp-dependencies.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
 
     <dependencies>
         <dependency>
@@ -102,10 +87,7 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>spring-cloud-gcp-starter-secretmanager</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -163,6 +145,7 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
             <version>${testcontainers.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
@@ -174,6 +157,7 @@
             <groupId>org.mockito.kotlin</groupId>
             <artifactId>mockito-kotlin</artifactId>
             <version>${mockito-kotlin.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>

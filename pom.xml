@@ -32,12 +32,12 @@
 
         <verification.skip>false</verification.skip>
 
+        <jib-maven-plugin.version>3.3.1</jib-maven-plugin.version>
         <ktlint.version>0.47.1</ktlint.version>
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
-        <jib-maven-plugin.version>3.3.1</jib-maven-plugin.version>
-        <testcontainers.version>1.18.0</testcontainers.version>
         <maven-surefire-plugin.version>3.0.0-M9</maven-surefire-plugin.version>
-<!--        <jakarta-servlet.version>5.0.0</jakarta-servlet.version>-->
+        <mockito-kotlin.version>4.0.0</mockito-kotlin.version>
+        <testcontainers.version>1.18.0</testcontainers.version>
     </properties>
 
     <dependencies>

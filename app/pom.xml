@@ -16,8 +16,29 @@
 
     <properties>
         <maven-dependency-plugin.version>3.4.0</maven-dependency-plugin.version>
+        <spring-cloud-gcp-dependencies.version>4.1.0</spring-cloud-gcp-dependencies.version>
     </properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>spring-cloud-gcp-dependencies</artifactId>
+                <version>${spring-cloud-gcp-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
     <dependencies>
+        <dependency>
+            <groupId>nl.jvandis.teambalance</groupId>
+            <artifactId>backend</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>nl.jvandis.teambalance</groupId>
             <artifactId>frontend</artifactId>
@@ -25,11 +46,15 @@
         </dependency>
 
         <dependency>
-            <groupId>nl.jvandis.teambalance</groupId>
-            <artifactId>backend</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>spring-cloud-gcp-starter-secretmanager</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.mockito.kotlin</groupId>
+            <artifactId>mockito-kotlin</artifactId>
+            <version>${mockito-kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -46,14 +71,18 @@
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
 
-
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -85,7 +114,7 @@
                 </executions>
                 <configuration>
                     <mainClass>nl.jvandis.teambalance.ApplicationKt</mainClass>
-<!--                    <classifier>exec</classifier>-->
+                    <!--                    <classifier>exec</classifier>-->
                     <additionalProperties>
                         <branch>${git.branch}</branch>
                         <description>${project.description}</description>
