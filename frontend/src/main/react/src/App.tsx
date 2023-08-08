@@ -41,7 +41,6 @@ const themeLight = createTheme({
   },
 });
 
-// TODO: make sure 'inherit' colors on buttons still work (grayed out version in light mode)
 const themeDark = createTheme({
   palette: {
     mode: "dark",

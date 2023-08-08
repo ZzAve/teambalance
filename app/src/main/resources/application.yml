@@ -21,7 +21,7 @@ app:
   multi-tenancy:
     tenants:
       - domain: heren4.tovoheren5.nl # temporary setup
-        secret: ${sm://API_SECRET_TOVO_HEREN_4 } # setup a new key!
+        secret: ${sm://API_SECRET_TOVO_HEREN_4}
         bunq-me-base-url: ${sm://TOVO_HEREN_4_BUNQ_ME}
         tenant: tovo_heren_4
         title: "Tovo Heren 4"
