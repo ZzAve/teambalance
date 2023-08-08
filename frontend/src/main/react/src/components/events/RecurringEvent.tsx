@@ -9,8 +9,6 @@ import React, { useEffect, useReducer, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import Grid from "@mui/material/Grid";
 import {
-  Alert,
-  AlertTitle,
   FormControl,
   FormLabel,
   InputAdornment,
@@ -199,19 +197,6 @@ export const CreateRecurringEvent = (props: {
 
   return (
     <Grid container item spacing={2} alignItems="center" marginY="10px">
-      <Grid item xs={12}>
-        <Alert severity="warning">
-          <AlertTitle>Ontbrekende link tussen gecreeerde events</AlertTitle>
-          <Typography>
-            De 'herhaal event' optie is nog vrij nieuw en niet helemaal af. Je
-            kunt herhalende events creeeren, maar ze daarna als groep aanpassen
-            of verwijderen kan helaas nog niet.
-          </Typography>
-          <Typography>
-            Er wordt aan gewerkt om óók dat mogelijk te maken.
-          </Typography>
-        </Alert>
-      </Grid>
       <Grid item container xs={12}>
         <Grid container item spacing={2}>
           <Grid item>
