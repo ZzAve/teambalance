@@ -1,17 +1,17 @@
 package nl.jvandis.teambalance.api.users
 
 import nl.jvandis.jooq.support.valuesFrom
+import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
-import org.jooq.DSLContext
 import org.jooq.exception.DataAccessException
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Repository
 
 @Repository
 class UserRepository(
-    val context: DSLContext
+    val context: MultiTenantDslContext
 ) {
     fun findByIdOrNull(userId: Long): User? =
         context.select()

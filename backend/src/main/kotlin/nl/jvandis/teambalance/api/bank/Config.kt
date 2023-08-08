@@ -8,8 +8,7 @@ import java.time.ZonedDateTime
 data class CacheConfig(
     val enabled: Boolean = true,
     val expireAfterWrite: Duration,
-    val refreshAfterWrite: Duration?,
-    val maximumSize: Long
+    val refreshAfterWrite: Duration?
 )
 
 data class BankCacheConfig(

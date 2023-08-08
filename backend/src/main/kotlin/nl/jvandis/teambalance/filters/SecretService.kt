@@ -1,20 +1,22 @@
 package nl.jvandis.teambalance.filters
 
+import nl.jvandis.teambalance.MultiTenantContext
 import nl.jvandis.teambalance.api.InvalidSecretException
-import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
+import nl.jvandis.teambalance.loggerFor
 import org.springframework.stereotype.Service
 import java.util.Base64
 
 @Service
 class SecretService(
-    @Value("\${app.secret.secret-value}") private val validSecretValue: String
+    private val tenantsConfig: TenantsConfig
 ) {
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = loggerFor()
 
     fun ensureSecret(secret: String?) {
         val decodedSecret = decodeSecret(secret)
-        if (decodedSecret != validSecretValue) {
+        val validSecretValue = tenantsConfig.tenants.first { it.tenant == MultiTenantContext.getCurrentTenant() }.secret
+
+        if (decodedSecret != validSecretValue.value) {
             throw InvalidSecretException("There was no secret provided, or value was not valid")
         }
     }

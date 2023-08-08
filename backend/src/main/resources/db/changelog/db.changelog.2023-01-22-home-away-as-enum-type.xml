@@ -9,7 +9,6 @@
     <changeSet author="juliusvandis (generated)" id="1674399959000-2">
         <modifyDataType  columnName="home_away"
                          newDataType="home_away"
-                         schemaName="public"
                          tableName="match"/>
     </changeSet>
 </databaseChangeLog>

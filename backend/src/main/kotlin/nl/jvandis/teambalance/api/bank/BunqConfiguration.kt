@@ -25,7 +25,7 @@ class BunqConfiguration(
     private fun initializeProductionSetup(bunqConfig: BankBunqConfig): BunqRepository {
         require(bunqConfig.environment == PRODUCTION) { "Bunq environment was not set to PRODUCTION" }
         require(bunqConfig.apiKey != null) { "No apikey was set for Bunq" }
-        require(bunqConfig.bankAccountId != null) { "No bankAccountId was set for Bunq" }
+//        require(bunqConfig.bankAccountId != null) { "No bankAccountId was set for Bunq" }
 
         val obfuscatedApiKey = "${bunqConfig.apiKey.take(5)}******"
         log.info("Setting up connection with bunq PRODUCTION using api-key '$obfuscatedApiKey'")
@@ -48,10 +48,10 @@ class BunqConfiguration(
             "An apikey was set for Bunq while trying to setup SANDBOX environment. " +
                 "This is not allowed, for your protection"
         }
-        require(bunqConfig.bankAccountId == null || bunqConfig.bankAccountId == -1) {
-            "A bankAccountId was set while trying to setup SANDBOX environment. " +
-                "This is not allowed, for your protection"
-        }
+//        require(bunqConfig.bankAccountId == null || bunqConfig.bankAccountId == -1) {
+//            "A bankAccountId was set while trying to setup SANDBOX environment. " +
+//                "This is not allowed, for your protection"
+//        }
         log.info("Setting up connection with bunq SANDBOX")
 
         return try {

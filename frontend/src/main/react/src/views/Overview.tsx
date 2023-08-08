@@ -14,7 +14,6 @@ import PageTitle from "../components/PageTitle";
 
 const Overview = (props: { refresh: boolean }) => {
   const navigate = useNavigate();
-
   return (
     <>
       <PageTitle title="Team Balance" withSuffix={false} />

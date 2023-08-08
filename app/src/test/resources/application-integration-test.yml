@@ -8,11 +8,20 @@ spring:
     enabled: false
 
 app:
-  secret:
-    secret-value: teambalance
   bank:
     bunq:
       api-key: ""
-      bank-account-id: -1
       environment: SANDBOX
       saveSessionToFile: false
+  multi-tenancy:
+    tenants:
+      - domain: 5.teambalance.local
+        secret: teambalance
+        bunq-me-base-url: https://bunq.com/5
+        tenant: tovo_heren_5
+        title: "Tovo Heren 5"
+      - domain: 4.teambalance.local
+        secret: teambalance
+        bunq-me-base-url: https://bunq.com/4
+        tenant: tovo_heren_4
+        title: "Tovo Heren 4"

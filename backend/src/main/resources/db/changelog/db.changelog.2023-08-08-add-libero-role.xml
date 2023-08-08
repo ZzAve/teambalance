@@ -2,13 +2,7 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
-    <changeSet author="juliusvandis (generated)" id="1675357674000-1">
-        <renameColumn
-                      columnDataType="BIGINT"
-                      newColumnName="trainer_user_id"
-                      oldColumnName="user_id"
-                      remarks="Be more explicit about data type"
-                      tableName="training"/>
+    <changeSet author="juliusvandis (generated)" runInTransaction="false" id="1691525551000-1">
+        <sql> ALTER TYPE role ADD VALUE IF NOT EXISTS  'LIBERO';</sql>
     </changeSet>
-
 </databaseChangeLog>

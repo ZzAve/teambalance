@@ -4,8 +4,11 @@ import com.bunq.sdk.model.generated.endpoint.Payment
 import com.bunq.sdk.model.generated.`object`.Amount
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
+import nl.jvandis.teambalance.MultiTenantContext
+import nl.jvandis.teambalance.Tenant
+import nl.jvandis.teambalance.api.ConfigurationService
 import nl.jvandis.teambalance.api.users.User
-import org.slf4j.LoggerFactory
+import nl.jvandis.teambalance.loggerFor
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import java.time.ZoneId
@@ -26,24 +29,37 @@ class BankService(
     @Lazy private val bunqRepository: BunqRepository,
     private val bankAccountAliasRepository: BankAccountAliasRepository,
     private val transactionExclusionRepository: BankAccountTransactionExclusionRepository,
-    private val bankConfig: BankConfig
+    private val bankConfig: BankConfig,
+    private val configurationService: ConfigurationService
 ) {
-    private val log = LoggerFactory.getLogger(BankService::class.java)
+    private val log = loggerFor()
 
-    private val balanceCache: AsyncLoadingCache<String, String> =
-        setupCache(bankConfig.cache.balance) { _: String -> updateBalance() }
+    private val balanceCache: AsyncLoadingCache<Tenant, String> =
+        setupCache(bankConfig.cache.balance) { tenant: Tenant ->
+            MultiTenantContext.setCurrentTenant(tenant)
+            val accountId = getAccountId()
+            val updateBalance = updateBalance(accountId)
+            MultiTenantContext.clear()
+            updateBalance
+        }
 
-    private val transactionsCache: AsyncLoadingCache<String, Transactions> =
-        setupCache(bankConfig.cache.transactions) { _: String -> updateTransactions() }
+    private val transactionsCache: AsyncLoadingCache<Tenant, Transactions> =
+        setupCache(bankConfig.cache.transactions) { tenant: Tenant ->
+            MultiTenantContext.setCurrentTenant(tenant)
+            val accountId = getAccountId()
+            val updatedTransactions = updateTransactions(accountId)
+            MultiTenantContext.clear()
+            updatedTransactions
+        }
 
-    fun getBalance(): String = balanceCache["teambalance-bank-account"].get()
+    fun getBalance(): String = balanceCache[MultiTenantContext.getCurrentTenant()].get()
 
     fun getTransactions(limit: Int = bankConfig.transactionLimit, offset: Int = 0): Transactions =
-        transactionsCache["teambalance-bank-account"].get()
+        transactionsCache[MultiTenantContext.getCurrentTenant()].get()
             .filter(limit, offset)
 
-    private fun updateBalance(): String {
-        return bunqRepository.monetaryAccountBank.balance
+    private fun updateBalance(accountId: Int): String {
+        return bunqRepository.getMonetaryAccountBank(accountId).balance
             .let {
                 "${it.parseCurrency()} ${it.value}"
             }.also {
@@ -52,8 +68,8 @@ class BankService(
     }
 
     // TODO: Fetch all transactions up to datelimit
-    private fun updateTransactions(): Transactions =
-        bunqRepository.getAllPayments(bankConfig.transactionLimit)
+    private fun updateTransactions(accountId: Int): Transactions =
+        bunqRepository.getAllPayments(accountId, bankConfig.transactionLimit)
             .let {
                 val aliases = getAllAliases()
                 val exclusions = getAllTransactionExclusions()
@@ -115,7 +131,7 @@ class BankService(
         Caffeine.newBuilder()
             .expireAfterWrite(config.expireAfterWrite)
             .apply { if (config.refreshAfterWrite != null) refreshAfterWrite(config.refreshAfterWrite) }
-            .maximumSize(if (config.enabled) config.maximumSize else 0)
+            .maximumSize(if (config.enabled) Tenant.entries.size.toLong() else 0)
             .buildAsync { key -> loadingFunction(key) }
 
     private fun String.getAlias(aliases: Map<String, User>): User? {
@@ -128,4 +144,9 @@ class BankService(
 
     private fun getAllTransactionExclusions() = transactionExclusionRepository
         .findAll()
+
+    private fun getAccountId(): Int {
+        val key = "bunq-account-id.${MultiTenantContext.getCurrentTenant().name.lowercase()}"
+        return configurationService.getConfig(key, Int::class)
+    }
 }

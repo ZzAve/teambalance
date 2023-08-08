@@ -1,6 +1,6 @@
 <div align="center">
     <h1>teambalance</h1>
-    <img src="src/main/react/images/logo512.png" width="200px" alt="Boy throwing a volleyball"/>
+    <img src="./frontend/src/main/react/images/logo512.png" width="200px" alt="Boy throwing a volleyball"/>
     <p>A pet project to monitor event attendance ✅, and team expenses 💸 on beer 🍻 and borrels 🍸🍟</p>
 </div>
 
@@ -18,7 +18,7 @@ Team balance started off a hobby project and technology explorer (see setup).
 
 ### Use case
 
-[Tovo](https://tovo.nl/)'s Heren 5 is a volleybal team in Utrecht, The Netherlands. They have a training on a weekly
+[Tovo](https://tovo.nl/) is a Utrecht based Volleybal club, consisting of many. The teams have a training on a weekly
 basis, and play a competion is a poule of 11, meaning they'll play 20 matches per year. What's more, there are some
 other (obligatory) events for the team to meet. During events (most notably the matches), members meet in the canteen of
 the sports hall before and after the match for some drinks.
@@ -63,14 +63,14 @@ The money pool aspect:
       where one can own a page a allow people to pay whatever they want, and include a message.
 3. more...
 
-## Parts
+## Components
 
 Team balance has 2 main functional parts:
 
 - A money pool
 - (calendar)Event creation and moderation
 
-## 🔌 Money pool through Bunq 🌈 API integration
+### 🔌 Money pool through Bunq 🌈 API integration
 
 There is an integration available with Bunq, through their [`sdk_java`](https://github.com/bunq/sdk_java).
 
@@ -88,7 +88,7 @@ They money pool is build an a basis of mutual trust, where there is a single ban
 owned by one of the team members. All team member are expected to contribute fairly. There is no concept of keeping
 track of individual consumption
 
-## 📆 Events creation / moderation
+### 📆 Events creation / moderation
 
 The Events api allows team members to register availability for upcoming events in three categories:
 
@@ -127,16 +127,43 @@ Persistence
 
 Infra
 
-- Jib , GCP container registry
+- Jib, GCP container registry
 - Google cloud run
 
 ## Setup
 
-### 🚀 Deploying to PRO:
+### Getting started
+
+Build everything
+```bash
+./mvnw clean install
+```
+
+To be able to run this locally there are two options:
+
+1. by using the 'dev' application profile, teambalance tries to fetch the properties from GCP, which are stored in GCP
+   secret manager. One should make sure to be connected to gcloud, and having [credentials for a service account
+   for a service account](https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login)
+2. by using the 'local' application profile, teambalances assumes one has a local postgres instance running, exposed on
+   port `54321` (note the trailing `1`), with a database named `teambalance`
+   - Hint: `docker compose up -d` 
+
+> ⚠️ Attention
+> Because of the multitenant setup of teambalance, it is necessary to access teambalance through a recognised domain.
+> The ones that are set up are:
+> 
+> - 4.teambalance.local
+> - 5.teambalance.local
+> 
+> Make sure configure your local `/etc/hosts` file to map these domains to `127.0.0.1` in order to work with teambalance locally.
+> ([Both port 3000 and 8080 work for the local setup](app/src/main/resources/application-local.yml))
+
+
+### 🚀 Deploying to production:
 
 Any commit to master, use the [gcp](.github/workflows/gcp.yml) workflow to build and push a docker image to GCR.
 
-Through the [google cloud conseple](https://console.cloud.google.com/run/0), deployments can be managed for the tovo heren 5 website
+Through [google cloud console](https://console.cloud.google.com/run/0), deployments can be managed
 
 ### 💾 PostgreSQL database
 
@@ -146,7 +173,6 @@ Using [JOOQ](https://www.jooq.org/)
 (used to be [Spring data jpa](https://spring.io/projects/spring-data) )and [Postgres](https://www.postgresql.org/) dependency:
 
 ```xml
-
 <dependencies>
     <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -170,13 +196,6 @@ spring:
     url: <jdbc-url>>
 ```
 
-To be able to run this locally there are two options:
-
-1. by using the 'dev' application profile, teambalance tries to fetch the properties from GCP, which are stored in GCP
-   secret manager. One should make sure to be connected to gcloud, and having [credentials for a service account
-   for a service account](https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login)
-2. by using the 'local' application profile, teambalances assumes one has a local postgres instance running, exposed on
-   port `54321` (note the trailing `1`), with a database named `teambalance`
 
 ## 📈 Next steps:
 

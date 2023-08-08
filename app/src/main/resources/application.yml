@@ -1,16 +1,11 @@
-management.endpoints.web:
-  base-path: /internal/actuator
 app:
   title: "Team balance"
-  description: "Fancy pants teampot for Tovo heren 5"
+  description: "Fancy pants teampot for sport teams w/ regular events and drinks"
   version: "@project.version@-@git.commit.id.describe@"
   datetime-limit: ${app.bank.datetime-limit}
-  secret:
-    secret-value: ${sm://API_SECRET}
   bank:
     bunq:
       api-key: ${sm://BUNQ_APIKEY}
-      bank-account-id: ${sm://BUNQ_BANK_ACCOUNT_ID}
       environment: PRODUCTION
     transaction-limit: 200 # up this when pagination is built (max is 200 from bunq)
     datetime-limit: 2022-08-01T00:00:00+02:00
@@ -19,12 +14,23 @@ app:
         enabled: true
         expire-after-write: 60s
         refresh-after-write: 30s
-        maximum-size: 1
       transactions:
         enabled: true
         expire-after-write: 60s
         refresh-after-write: 30s
-        maximum-size: 1
+  multi-tenancy:
+    tenants:
+      - domain: heren4.tovoheren5.nl # temporary setup
+        secret: ${sm://API_SECRET_TOVO_HEREN_4 } # setup a new key!
+        bunq-me-base-url: ${sm://TOVO_HEREN_4_BUNQ_ME}
+        tenant: tovo_heren_4
+        title: "Tovo Heren 4"
+
+      - domain: tovoheren5.nl
+        secret: ${sm://API_SECRET_TOVO_HEREN_5}
+        bunq-me-base-url: ${sm://TOVO_HEREN_5_BUNQ_ME}
+        tenant: tovo_heren_5
+        title: "Tovo Heren 5"
 
 server:
   forward-headers-strategy: NATIVE
@@ -43,6 +49,7 @@ spring:
     url: override-me
     hikari:
       maximum-pool-size: 1
+    driver-class-name: org.postgresql.Driver
   jackson:
     serialization:
       write_dates_as_timestamps: false
@@ -57,7 +64,6 @@ spring:
       roles:
         - admin
         - user
-
 springdoc:
   model-and-view-allowed: true
   swagger-ui:
@@ -68,6 +74,7 @@ springdoc:
     path: /internal/openapi/v3/api-docs
   paths-to-match: /api/**
   writer-with-order-by-keys: true
+
 management:
   endpoint:
     info:
@@ -79,5 +86,6 @@ management:
       mode: simple
   endpoints:
     web:
+      base-path: /internal/actuator
       exposure:
         include: health,info

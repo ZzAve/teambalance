@@ -16,7 +16,7 @@ class SecretFilter(
 ) : OncePerRequestFilter() {
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-        return !request.requestURI.startsWith("/api")
+        return !request.requestURI.startsWith("/api") || request.requestURI == "/api/tenants/me"
     }
 
     override fun destroy() {}

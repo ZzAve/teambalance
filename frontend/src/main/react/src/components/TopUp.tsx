@@ -1,13 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Button } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-
-const bunqMeUrl = "https://bunq.me/tovoheren5";
+import { TenantContext } from "../TenantContext";
 
 const TopUp = () => {
+  const tenantContext = useContext(TenantContext);
   const createTopUpLink = (price: number) => () => {
-    let url = bunqMeUrl;
+    let url = tenantContext.bunqMeBaseUrl;
     if (!!price) {
       url += `/${price}/Meer%20Muntjes%20Meer%20Beter`;
     }

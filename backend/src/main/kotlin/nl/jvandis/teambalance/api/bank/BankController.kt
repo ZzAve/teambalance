@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import nl.jvandis.teambalance.api.Error
-import org.slf4j.LoggerFactory
+import nl.jvandis.teambalance.loggerFor
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController
 class BankController(
     private val bankService: BankService
 ) {
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log = loggerFor()
 
     @GetMapping("/balance")
     fun getBalance(): BalanceResponse {

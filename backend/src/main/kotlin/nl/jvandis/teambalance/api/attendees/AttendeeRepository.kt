@@ -7,13 +7,13 @@ import nl.jvandis.teambalance.api.event.AffectedRecurringEvents
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents.ALL
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents.CURRENT_AND_FUTURE
 import nl.jvandis.teambalance.api.users.User
+import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.ATTENDEE
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.RECURRING_EVENT_PROPERTIES
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
-import org.jooq.DSLContext
 import org.jooq.Record1
 import org.jooq.exception.DataAccessException
 import org.jooq.impl.DSL.noCondition
@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 
 @Repository
 class AttendeeRepository(
-    private val context: DSLContext
+    private val context: MultiTenantDslContext
 ) {
     private val log = LoggerFactory.getLogger(AttendeeRepository::class.java)
 
