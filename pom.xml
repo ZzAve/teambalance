@@ -94,13 +94,14 @@
                 <configuration>
                     <verbose>false</verbose>
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
-<!--                    <includeOnlyProperties>-->
-<!--                        <includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>-->
-<!--                        <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>-->
-<!--                    </includeOnlyProperties>-->
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties
+                    </generateGitPropertiesFilename>
+                    <!--                    <includeOnlyProperties>-->
+                    <!--                        <includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>-->
+                    <!--                        <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>-->
+                    <!--                    </includeOnlyProperties>-->
                     <skipPoms>false</skipPoms>
-<!--                    <commitIdGenerationMode>full</commitIdGenerationMode>-->
+                    <!--                    <commitIdGenerationMode>full</commitIdGenerationMode>-->
                 </configuration>
             </plugin>
 
@@ -169,6 +170,8 @@
                             <target name="ktlint">
                                 <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
                                       classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
+                                    <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
+                                    <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
                                     <arg value="*/src/**/*.kt"/>
                                 </java>
                             </target>
@@ -184,9 +187,12 @@
                             <target name="ktlint">
                                 <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
                                       classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
+                                    <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
+                                    <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
                                     <arg value="-F"/>
                                     <arg value="*/src/**/*.kt"/>
                                 </java>
+
                             </target>
                         </configuration>
                         <goals>

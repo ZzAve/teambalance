@@ -66,16 +66,14 @@ class AbstractIntegrationTest {
                 }
             }
             Tenant.entries.forEach { tenant ->
-                connection.createStatement().use { s ->
-                    log.info("Migrating data with liquibase")
-                    LiquibaseSupport.migrate(
-                        connection,
-                        "db.changelog-master.xml",
-                        "${System.getProperty("user.dir")}/../backend/src/main/resources/db/changelog/", // TODO: change me to classpath resource
-                        tenant.name.lowercase()
-                    )
-                    log.info("Finished setup")
-                }
+                log.info("Migrating data with liquibase")
+                LiquibaseSupport.migrate(
+                    connection,
+                    "db.changelog-master.xml",
+                    "${System.getProperty("user.dir")}/../backend/src/main/resources/db/changelog/", // TODO: change me to classpath resource
+                    tenant.name.lowercase()
+                )
+                log.info("Finished setup")
             }
         }
     }
@@ -117,5 +115,3 @@ class AbstractIntegrationTest {
         }
     }
 }
-
-internal class IntegrationTestConfig

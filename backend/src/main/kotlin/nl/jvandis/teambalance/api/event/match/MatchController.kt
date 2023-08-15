@@ -17,6 +17,7 @@ import nl.jvandis.teambalance.api.event.getEventsAndAttendees
 import nl.jvandis.teambalance.api.event.training.UserAddRequest
 import nl.jvandis.teambalance.api.users.UserRepository
 import nl.jvandis.teambalance.api.users.toNewAttendee
+import nl.jvandis.teambalance.filters.START_OF_SEASON_RAW
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
@@ -51,7 +52,7 @@ class MatchController(
     fun getMatches(
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
-        @RequestParam(value = "since", defaultValue = "2022-08-01T00:00")
+        @RequestParam(value = "since", defaultValue = START_OF_SEASON_RAW)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         since: LocalDateTime,
         @RequestParam(value = "limit", defaultValue = "10") limit: Int,
@@ -105,7 +106,7 @@ class MatchController(
         @RequestBody @Valid
         potentialEvent: PotentialMatch
     ): EventsResponse<MatchResponse> {
-        log.debug("postMatch $potentialEvent")
+        log.debug("postMatch {}", potentialEvent)
         val allUsers = userRepository.findAll()
         val events = potentialEvent.internalize()
         log.info("Requested to create match events: $events")
@@ -165,7 +166,7 @@ class MatchController(
         @RequestBody user: UserAddRequest
 
     ): List<AttendeeResponse> {
-        log.debug("Adding: $user (or all: $addAll) to match $matchId")
+        log.debug("Adding: {} (or all: {}) to match {}", user, addAll, matchId)
         val match = eventRepository.findByIdOrNull(matchId) ?: throw InvalidMatchException(matchId)
         val users = if (addAll) {
             userRepository.findAll()

@@ -8,7 +8,7 @@ import nl.jvandis.teambalance.MultiTenantContext
 import nl.jvandis.teambalance.Tenant
 import nl.jvandis.teambalance.api.ConfigurationService
 import nl.jvandis.teambalance.api.users.User
-import nl.jvandis.teambalance.loggerFor
+import nl.jvandis.teambalance.filters.START_OF_SEASON_ZONED
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import java.time.ZoneId
@@ -32,8 +32,6 @@ class BankService(
     private val bankConfig: BankConfig,
     private val configurationService: ConfigurationService
 ) {
-    private val log = loggerFor()
-
     private val balanceCache: AsyncLoadingCache<Tenant, String> =
         setupCache(bankConfig.cache.balance) { tenant: Tenant ->
             MultiTenantContext.setCurrentTenant(tenant)
@@ -76,7 +74,7 @@ class BankService(
                 val transactions = it
                     .filter { p -> !p.shouldBeExcluded(exclusions) }
                     .map { payment -> payment.toDomain(aliases) }
-                    .filter { t -> t.date > bankConfig.dateTimeLimit }
+                    .filter { t -> t.date > START_OF_SEASON_ZONED }
 
                 Transactions(
                     transactions = transactions,
@@ -90,9 +88,9 @@ class BankService(
     private fun Payment.shouldBeExcluded(exclusions: List<TransactionExclusion>) =
         exclusions.any { e ->
             (e.transactionId == null || id == e.transactionId) &&
-                (e.date == null || created.toZonedDateTime().toLocalDate() == e.date) &&
-                (e.description == null || description == e.description) &&
-                (e.counterParty == null || counterpartyAlias.displayName == e.counterParty)
+                    (e.date == null || created.toZonedDateTime().toLocalDate() == e.date) &&
+                    (e.description == null || description == e.description) &&
+                    (e.counterParty == null || counterpartyAlias.displayName == e.counterParty)
         }
 
     private fun Payment.toDomain(aliases: Map<String, User>): Transaction {

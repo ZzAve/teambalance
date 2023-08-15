@@ -1,9 +1,7 @@
 package nl.jvandis.teambalance.api.bank
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.format.annotation.DateTimeFormat
 import java.time.Duration
-import java.time.ZonedDateTime
 
 data class CacheConfig(
     val enabled: Boolean = true,
@@ -32,6 +30,5 @@ enum class BunqEnvironment {
 data class BankConfig(
     val bunq: BankBunqConfig,
     val cache: BankCacheConfig,
-    val transactionLimit: Int,
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) val dateTimeLimit: ZonedDateTime
+    val transactionLimit: Int
 )

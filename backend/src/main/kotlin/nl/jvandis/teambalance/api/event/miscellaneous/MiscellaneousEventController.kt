@@ -14,6 +14,7 @@ import nl.jvandis.teambalance.api.event.EventsResponse
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
 import nl.jvandis.teambalance.api.users.UserRepository
 import nl.jvandis.teambalance.api.users.toNewAttendee
+import nl.jvandis.teambalance.filters.START_OF_SEASON_RAW
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
@@ -49,7 +50,7 @@ class MiscellaneousEventController(
     fun getEvents(
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
-        @RequestParam(value = "since", defaultValue = "2022-08-01T00:00")
+        @RequestParam(value = "since", defaultValue = START_OF_SEASON_RAW)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         since: LocalDateTime,
         @RequestParam(value = "limit", defaultValue = "10") limit: Int,
@@ -110,7 +111,7 @@ class MiscellaneousEventController(
     fun createMiscellaneousEvent(
         @RequestBody potentialEvent: PotentialMiscellaneousEvent
     ): EventsResponse<MiscellaneousEventResponse> {
-        log.debug("postEvent $potentialEvent")
+        log.debug("postEvent {}", potentialEvent)
         val allUsers = userRepository.findAll()
         val events = potentialEvent.internalize()
         log.info("Requested to create miscellaneous events: $events")

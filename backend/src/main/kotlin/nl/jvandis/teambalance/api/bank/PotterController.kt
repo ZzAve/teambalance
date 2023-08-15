@@ -5,7 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tags
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import nl.jvandis.teambalance.api.Error
-import nl.jvandis.teambalance.filters.InvalidDateTimeException
+import nl.jvandis.teambalance.filters.START_OF_SEASON_RAW
+import nl.jvandis.teambalance.filters.toZonedDateTime
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.Duration
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 @RestController
@@ -24,8 +26,7 @@ import java.time.ZonedDateTime
 @Tags(value = [Tag(name = "aliases"), Tag(name = "bank")])
 @RequestMapping(path = ["/api/bank"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class PotterController(
-    private val potterService: PotterService,
-    private val bankConfig: BankConfig
+    private val potterService: PotterService
 ) {
 
     @GetMapping("/potters")
@@ -34,32 +35,29 @@ class PotterController(
         @Max(200)
         @Min(1)
         limit: Int,
-
         @RequestParam(value = "sort", defaultValue = "desc") sort: Sort,
-        @RequestParam(value = "since", defaultValue = "2022-08-01T00:00:00+02:00")
+        @RequestParam(value = "since", defaultValue = START_OF_SEASON_RAW)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-        sinceInput: ZonedDateTime,
-
+        sinceInput: LocalDateTime,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
     ): PottersResponse {
-        if (sinceInput < bankConfig.dateTimeLimit) {
-            throw InvalidDateTimeException("Since input argument is before lower limit of ${bankConfig.dateTimeLimit}. Input was $sinceInput")
-        }
-        val pottersFullPeriod = potterService.getPotters(sinceInput, includeInactiveUsers)
+        val pottersFullPeriod = potterService.getPotters(sinceInput.toZonedDateTime(), includeInactiveUsers)
         val now = ZonedDateTime.now()
-        val pottersLastMonthResponse: PottersResponse? = when {
-            Duration.between(sinceInput, now) > Duration.ofDays(30) ->
-                potterService.getPotters(now.minusDays(30), includeInactiveUsers)
+        val pottersLastMonthResponse: PottersResponse? =
+            if (Duration.between(sinceInput, now) > Duration.ofDays(30)) {
+                potterService
+                    .getPotters(now.minusDays(30), includeInactiveUsers)
                     .toPottersResponse(limit)
-            else -> null
-        }
+            } else {
+                null
+            }
         return pottersFullPeriod.toPottersResponse(limit, pottersLastMonthResponse)
     }
 
     private fun Potters.toPottersResponse(limit: Int, pottersLastMonthResponse: PottersResponse? = null) =
         PottersResponse(
-            toppers = this.potters.map { it.toPotterResponse(currency) }.sortedByDescending { it.amount }.take(limit),
-            floppers = this.potters.map { it.toPotterResponse(currency) }.sortedBy { it.amount }.take(limit),
+            toppers = potters.map { it.toPotterResponse(currency) }.sortedByDescending { it.amount }.take(limit),
+            floppers = potters.map { it.toPotterResponse(currency) }.sortedBy { it.amount }.take(limit),
             amountOfConsideredTransactions = amountOfTransactions,
             from = from,
             until = until,
