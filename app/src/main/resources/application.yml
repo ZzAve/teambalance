@@ -18,17 +18,7 @@ app:
         refresh-after-write: 30s
   multi-tenancy:
     tenants:
-      - domain: heren4.tovoheren5.nl # temporary setup
-        secret: ${sm://API_SECRET_TOVO_HEREN_4}
-        bunq-me-base-url: ${sm://TOVO_HEREN_4_BUNQ_ME}
-        tenant: tovo_heren_4
-        title: "Tovo Heren 4"
-
-      - domain: tovoheren5.nl
-        secret: ${sm://API_SECRET_TOVO_HEREN_5}
-        bunq-me-base-url: ${sm://TOVO_HEREN_5_BUNQ_ME}
-        tenant: tovo_heren_5
-        title: "Tovo Heren 5"
+      # to be filled by a specific profile
 
 server:
   forward-headers-strategy: NATIVE
