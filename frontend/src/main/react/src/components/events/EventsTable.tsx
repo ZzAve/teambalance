@@ -11,13 +11,17 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Button,
+  IconButton,
   TableFooter,
   TablePagination,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Attendees from "../Attendees";
+import Attendees, {
+  presentAttendeesPerRole,
+  totalNumberOfPlayingRoles,
+} from "../Attendees";
 import { formattedDate, formattedTime, withLoading } from "../../utils/util";
 import { EventType, isMatch, isTraining } from "./utils";
 import AlertDialog from "../Alert";
@@ -29,6 +33,9 @@ import { matchesApiClient } from "../../utils/MatchesApiClient";
 import { AffectedRecurringEvents, TeamEvent } from "../../utils/domain";
 import { AffectedRecurringEvent } from "./RecurringEvent";
 import { useAlerts } from "../../hooks/alertsHook";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import Conditional from "../Conditional";
 
 const recurringEventTagline = (
   affectedEvents: "ALL" | "CURRENT_AND_FUTURE" | "CURRENT"
@@ -62,6 +69,7 @@ const EventsTable = (props: {
   const [affectedEvents, setAffectedEvents] = useState<
     AffectedRecurringEvents | undefined
   >(undefined);
+  const [isAttendeesExpanded, setAttendeesExpanded] = useState(false);
   const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
   const { addAlert } = useAlerts();
   const handleChangePage = (
@@ -71,6 +79,7 @@ const EventsTable = (props: {
     setPage(newPage);
   };
 
+  const theme = useTheme();
   const handleChangeRowsPerPage = (
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
@@ -104,7 +113,6 @@ const EventsTable = (props: {
     eventId: number,
     affectedEvents?: AffectedRecurringEvents
   ) => {
-    // debugger;
     setOpenDeleteAlertEventId(undefined);
     if (shouldDelete) {
       console.warn("Deleting event #", eventId);
@@ -174,20 +182,32 @@ const EventsTable = (props: {
     </Grid>
   );
 
-  const getHeaderTitleCell = () => (
-    <TableCell align="right">
-      {props.eventType === "MATCH" ? "Tegenstander" : "Titel"}
-    </TableCell>
-  );
-
   const getTableHead = () => (
     <TableRow>
       <TableCell>Datum</TableCell>
-      {props.eventType !== "TRAINING" ? getHeaderTitleCell() : <></>}
+      <Conditional condition={props.eventType !== "TRAINING"}>
+        <TableCell align="right">
+          {props.eventType === "MATCH" ? "Tegenstander" : "Titel"}
+        </TableCell>
+      </Conditional>
       <TableCell align="right">Locatie</TableCell>
       <TableCell align="right">Opmerking</TableCell>
-      <TableCell align="center">Deelnemers</TableCell>
-      {allowChanges ? <TableCell align="right">Aanpassen</TableCell> : <></>}
+      <TableCell align="center">Σ</TableCell>
+      <TableCell align="center">pl</TableCell>
+      <TableCell align="center">mid</TableCell>
+      <TableCell align="center">dia</TableCell>
+      <TableCell align="center">spel</TableCell>
+      <TableCell align="center">libero</TableCell>
+      <TableCell align="center">tl</TableCell>
+      <TableCell align="center">
+        Deelnemers
+        <IconButton onClick={() => setAttendeesExpanded((x) => !x)}>
+          {isAttendeesExpanded ? <VisibilityOffIcon /> : <VisibilityIcon />}
+        </IconButton>
+      </TableCell>
+      <Conditional condition={allowChanges}>
+        <TableCell align="right">Aanpassen</TableCell>
+      </Conditional>
     </TableRow>
   );
 
@@ -222,14 +242,12 @@ const EventsTable = (props: {
     const eventListItem = (
       <>
         {!!teamEvent.recurringEventProperties ? (
-          <>
-            <AffectedRecurringEvent
-              initialValue="ALL"
-              onChange={(x) => {
-                setAffectedEvents(x);
-              }}
-            />
-          </>
+          <AffectedRecurringEvent
+            initialValue="ALL"
+            onChange={(x) => {
+              setAffectedEvents(x);
+            }}
+          />
         ) : (
           ""
         )}
@@ -258,32 +276,63 @@ const EventsTable = (props: {
     );
   };
 
-  const getTableBodyRow = (teamEvent: TeamEvent) => (
-    <TableRow key={teamEvent.id}>
-      <TableCell component="th" scope="row">
-        {formattedDate(new Date(teamEvent.startTime))}&nbsp;
-        {formattedTime(new Date(teamEvent.startTime))}
-      </TableCell>
-      {props.eventType !== "TRAINING" ? getBodyTitleCell(teamEvent) : <></>}
-      <TableCell align="right">{getBodyLocationCell(teamEvent)}</TableCell>
-      <TableCell align="right">{teamEvent.comment}</TableCell>
-      <TableCell sx={{ width: "20%" }}>
-        <Attendees
-          size="small"
-          attendees={teamEvent.attendees}
-          onUpdate={props.updateTrigger}
-          showSummary={false}
-        />
-      </TableCell>
-      {allowChanges ? (
-        <TableCell sx={{ width: "100px" }} align="right">
-          {getUpdateIcons({ id: teamEvent.id })}
-        </TableCell>
-      ) : (
-        <></>
-      )}
-    </TableRow>
+  const getBackgroundColor = (someNumber: number, minForGreen: number) => {
+    if (someNumber >= minForGreen) {
+      return theme.palette.success.light;
+    } else if (someNumber >= minForGreen / 2.0) {
+      return theme.palette.warning.light;
+    } else {
+      return theme.palette.error.light;
+    }
+  };
+
+  const attendanceRow = (number: number, minForGreen: number) => (
+    <TableCell
+      align="center"
+      sx={{ backgroundColor: getBackgroundColor(number, minForGreen) }}
+    >
+      {number}
+    </TableCell>
   );
+
+  const getTableBodyRow = (teamEvent: TeamEvent) => {
+    const attendeesPerRole = presentAttendeesPerRole(teamEvent.attendees);
+    return (
+      <TableRow key={teamEvent.id}>
+        <TableCell component="th" scope="row">
+          {formattedDate(new Date(teamEvent.startTime))}&nbsp;
+          {formattedTime(new Date(teamEvent.startTime))}
+        </TableCell>
+        <Conditional condition={props.eventType !== "TRAINING"}>
+          {getBodyTitleCell(teamEvent)}
+        </Conditional>
+        <TableCell align="right">{getBodyLocationCell(teamEvent)}</TableCell>
+        <TableCell align="right">{teamEvent.comment}</TableCell>
+        {attendanceRow(totalNumberOfPlayingRoles(attendeesPerRole), 6)}
+        {attendanceRow(attendeesPerRole["PASSER"], 3)}
+        {attendanceRow(attendeesPerRole["MID"], 3)}
+        {attendanceRow(attendeesPerRole["DIAGONAL"], 2)}
+        {attendanceRow(attendeesPerRole["SETTER"], 2)}
+        {attendanceRow(attendeesPerRole["LIBERO"], 1)}
+        <TableCell align="center">{attendeesPerRole["OTHER"]}</TableCell>
+        <TableCell sx={{ minWidth: "200px", maxWidth: "500px" }}>
+          <Attendees
+            size="small"
+            attendees={teamEvent.attendees}
+            onUpdate={props.updateTrigger}
+            showSummary={false}
+            showExpand={true}
+            initiallyExpanded={isAttendeesExpanded}
+          />
+        </TableCell>
+        <Conditional condition={allowChanges}>
+          <TableCell sx={{ width: "100px" }} align="right">
+            {getUpdateIcons({ id: teamEvent.id })}
+          </TableCell>
+        </Conditional>
+      </TableRow>
+    );
+  };
 
   const getTableBody = () => (
     <>
@@ -301,14 +350,10 @@ const EventsTable = (props: {
     <Grid container item xs={12}>
       {getAlertDialog()}
       <TableContainer component={Paper}>
-        <Table
-          aria-label="simple table"
-          size="medium"
-          sx={{ minSize: "480px" }}
-        >
+        <Table aria-label="simple table" size="small" sx={{ minSize: "480px" }}>
           <TableHead>{getTableHead()}</TableHead>
           <TableBody>{getTableBody()}</TableBody>
-          {props.withPagination && (
+          <Conditional condition={props.withPagination}>
             <TableFooter>
               <TableRow>
                 <TablePagination
@@ -321,7 +366,7 @@ const EventsTable = (props: {
                 />
               </TableRow>
             </TableFooter>
-          )}
+          </Conditional>
         </Table>
       </TableContainer>
     </Grid>

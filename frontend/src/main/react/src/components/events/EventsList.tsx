@@ -10,7 +10,8 @@ import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { EditableTextField } from "./EditableTextField";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
 import { useAlerts } from "../../hooks/alertsHook";
-import { Match, Place, TeamEvent } from "../../utils/domain";
+import { Match, Place, TeamEvent, Training } from "../../utils/domain";
+import Conditional from "../Conditional";
 
 export const EventsList = (props: {
   eventType: EventType;
@@ -60,6 +61,7 @@ const formattedHomeVsAway = (event: Match) => (
 );
 
 const eventTypesWithSummary: EventType[] = ["TRAINING", "MATCH"];
+const eventTypesWithSummaryOpen: EventType[] = ["MATCH"];
 
 /**
  * Event has 2 states
@@ -157,40 +159,33 @@ export const EventListItem = (props: {
         <Typography variant="body1">
           ⏰ {formattedTime(startDateTime)}
         </Typography>
-        {isMatch(props.event) ? (
+        <Conditional condition={isMatch(props.event)}>
           <Typography variant="body1">
-            👥 {props.event.opponent} ({formattedHomeVsAway(props.event)})
+            👥 {(props.event as Match).opponent} (
+            {formattedHomeVsAway(props.event as Match)})
           </Typography>
-        ) : (
-          ""
-        )}
+        </Conditional>
         <Typography variant="body1">📍 {props.event.location}</Typography>
-        {!!props.event.comment ? (
+        <Conditional condition={!!props.event.comment}>
           <Typography variant="body1">
             📝 <em>{props.event.comment}</em>
           </Typography>
-        ) : (
-          ""
-        )}
-        {isMatch(props.event) ? (
+        </Conditional>
+        <Conditional condition={isMatch(props.event)}>
           <EditableTextField
             label="👮‍"
-            initialText={props.event.coach}
+            initialText={(props.event as Match).coach}
             updatedTextValueCallback={handleCoachSelection}
           ></EditableTextField>
-        ) : (
-          ""
-        )}
-        {isTraining(props.event) ? (
+        </Conditional>
+        <Conditional condition={isTraining(props.event)}>
           <SelectedUser
             label="Trainer"
             attendees={props.event.attendees}
-            initialUser={props.event.trainer}
+            initialUser={(props.event as Training).trainer}
             selectedUserCallback={handleTrainerSelection}
           ></SelectedUser>
-        ) : (
-          ""
-        )}
+        </Conditional>
       </Grid>
       <Grid item xs={12} sm={6} md={12} lg={8}>
         <Attendees
@@ -198,6 +193,10 @@ export const EventListItem = (props: {
           onUpdate={props.onUpdate}
           readOnly={!allowUpdating}
           showSummary={eventTypesWithSummary.includes(props.eventType)}
+          initiallyExpandedSummary={eventTypesWithSummaryOpen.includes(
+            props.eventType
+          )}
+          showExpand={false}
         />
       </Grid>
     </Grid>

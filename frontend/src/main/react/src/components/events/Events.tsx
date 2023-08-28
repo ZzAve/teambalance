@@ -30,8 +30,8 @@ const texts: EventsTexts = {
 const getText = (eventsType: EventType, name: keyof EventsTexts) =>
   texts[name][eventsType] || name;
 
-// 1st of August, 02:00 (UTC, or 0:00 in GMT +2)
-const startOfSeason = new Date(2022, 7, 1, 2);
+// 15th of August, 02:00 (UTC, or 0:00 in GMT +2)
+const startOfSeason = new Date(2023, 7, 15, 2);
 
 const Events = (props: {
   eventType: EventType;

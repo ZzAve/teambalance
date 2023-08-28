@@ -63,3 +63,19 @@ export interface EventsResponse<T> {
   size: number;
   events: T[];
 }
+
+/**
+ * Sum all elements of a record that holds numbers for each T
+ * It excluded the entries defined in exclusions
+ */
+export const sumRecord = <T extends string | number | symbol>(
+  record: Record<T, number>,
+  exclusions: Array<T>
+) => {
+  return Object.entries(record).reduce((cur, arr) => {
+    const numberOfPlayers = exclusions.includes(arr[0] as T)
+      ? 0
+      : (arr[1] as number);
+    return cur + numberOfPlayers;
+  }, 0);
+};

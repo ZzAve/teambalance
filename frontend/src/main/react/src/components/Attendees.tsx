@@ -1,17 +1,26 @@
 import { SpinnerWithText } from "./SpinnerWithText";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import HelpIcon from "@mui/icons-material/Help";
-import { withLoading } from "../utils/util";
+import { sumRecord, withLoading } from "../utils/util";
 import { attendeesApiClient } from "../utils/AttendeesApiClient";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { EventType } from "./events/utils";
-import { Attendee as AttendeeType, Availability, Role } from "../utils/domain";
+import {
+  Attendee,
+  Availability,
+  excludedPlayerRoles,
+  Role,
+} from "../utils/domain";
 import { useAlerts } from "../hooks/alertsHook";
+import { IconButton } from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import Conditional from "./Conditional";
 
 const colorMap: Record<Availability, ButtonColorValue> = {
   PRESENT: "success",
@@ -81,21 +90,37 @@ const buttonColor: (state: Availability) => ButtonColorValue = (
  * Function Attendees component
  */
 const Attendees = (props: {
-  attendees: AttendeeType[];
+  attendees: Attendee[];
   onUpdate: () => void;
   readOnly?: boolean;
   size?: "small" | "medium" | "large";
   showSummary?: boolean;
+  initiallyExpandedSummary?: boolean;
+  showExpand: boolean;
+  initiallyExpanded?: boolean;
 }) => {
-  const { readOnly = false, size = "medium", showSummary = false } = props;
+  const {
+    readOnly = false,
+    size = "medium",
+    showSummary = false,
+    initiallyExpandedSummary = false,
+    showExpand,
+    initiallyExpanded = !showExpand,
+  } = props;
   const [selectedAttendee, setSelectedAttendee] = useState<
-    AttendeeType | undefined
+    Attendee | undefined
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
-  const [withAttendeeSummaryDetail, setAttendeeSummaryDetail] = useState(false);
+  const [withAttendeeSummaryDetail, setAttendeeSummaryDetail] = useState(
+    initiallyExpandedSummary
+  );
   const { addAlert } = useAlerts();
+  const [isExpanded, setExpanded] = useState(initiallyExpanded);
 
-  const handleAttendeeClick = (attendee: AttendeeType) => {
+  useEffect(() => {
+    setExpanded(initiallyExpanded);
+  }, [initiallyExpanded]);
+  const handleAttendeeClick = (attendee: Attendee) => {
     setSelectedAttendee(attendee);
   };
 
@@ -115,42 +140,11 @@ const Attendees = (props: {
   if (props.attendees == null) return <>NO ATTENDEES</>;
   if (isLoading) return <SpinnerWithText text="Verwerken update" size={"sm"} />;
 
-  const getAttendeesSummary = (attendees: AttendeeType[]) => {
-    const allPresent = attendees.filter((x) => x.state === "PRESENT");
-    const excludedPlayerRoles: Role[] = ["TRAINER", "COACH"];
-    const coach = allPresent.filter((x) =>
-      excludedPlayerRoles.includes(x.user.role)
-    ).length;
-    const allPlayers = allPresent.length - coach;
-
-    let detail = "";
-    const numberOfAttendeesFor = (role: Role) => {
-      return allPresent.filter((x) => x.user.role === role).length;
-    };
-
-    if (withAttendeeSummaryDetail) {
-      const sv = numberOfAttendeesFor("SETTER");
-      const pl = numberOfAttendeesFor("PASSER");
-      const mid = numberOfAttendeesFor("MID");
-      const dia = numberOfAttendeesFor("DIAGONAL");
-      const tl = numberOfAttendeesFor("OTHER");
-      detail = `SPEL: ${sv}, P/L: ${pl}, MID: ${mid}, DIA: ${dia}, TL: ${tl}, `;
-    }
-
-    // TODO: Coach detail is temporarily disabled, enable when team has coach again
-    const coachDetail = <></>; //<>COACH: {coach > 0 ? " ✅" : " ❌"}</>;
-    return (
-      <em>
-        Σ {allPlayers} {detail} {coachDetail}
-      </em>
-    );
-  };
-
   const attendeeOverview = () => (
     <>
       {props.attendees.map((it) => (
         <Grid key={it.id} item>
-          <Attendee
+          <AttendeeButton
             size={size}
             attendee={it}
             disabled={readOnly}
@@ -158,7 +152,7 @@ const Attendees = (props: {
           />
         </Grid>
       ))}
-      {showSummary ? (
+      <Conditional condition={showSummary}>
         <Grid key={"total"} item>
           <Button
             size={size}
@@ -168,35 +162,44 @@ const Attendees = (props: {
               setAttendeeSummaryDetail((x) => !x);
             }}
           >
-            {getAttendeesSummary(props.attendees)}
+            {getAttendeesSummary(props.attendees, withAttendeeSummaryDetail)}
           </Button>
         </Grid>
-      ) : (
-        ""
-      )}
+      </Conditional>
     </>
   );
 
+  const showAttendee = () =>
+    !selectedAttendee ? (
+      attendeeOverview()
+    ) : (
+      <AttendeeRefinement
+        size={size}
+        attendee={selectedAttendee}
+        onSuccess={onRefinementSuccess}
+        onFailure={onRefinementFailure}
+        onBack={onRefinementBack}
+      />
+    );
+
   return (
     <Grid container spacing={1}>
-      {!selectedAttendee ? (
-        attendeeOverview()
-      ) : (
-        <AttendeeRefinement
-          size={size}
-          attendee={selectedAttendee}
-          onSuccess={onRefinementSuccess}
-          onFailure={onRefinementFailure}
-          onBack={onRefinementBack}
-        />
-      )}
+      <Conditional condition={showExpand}>
+        <Grid key={"expand"} item>
+          <IconButton onClick={() => setExpanded((x) => !x)}>
+            {isExpanded ? <VisibilityOffIcon /> : <VisibilityIcon />}
+          </IconButton>
+        </Grid>
+        <Grid></Grid>
+      </Conditional>
+      <Conditional condition={isExpanded}>{showAttendee()}</Conditional>
     </Grid>
   );
 };
 
-export const Attendee = (props: {
-  onSelection: (selectedAttendee: AttendeeType) => void;
-  attendee: AttendeeType;
+export const AttendeeButton = (props: {
+  onSelection: (selectedAttendee: Attendee) => void;
+  attendee: Attendee;
   size?: "small" | "medium" | "large";
   disabled?: boolean;
 }) => {
@@ -217,7 +220,7 @@ export const Attendee = (props: {
 };
 
 const AttendeeRefinement = (props: {
-  attendee: AttendeeType;
+  attendee: Attendee;
   size: "small" | "medium" | "large";
   onSuccess: () => void;
   onFailure: () => void;
@@ -300,3 +303,72 @@ const AttendeeRefinement = (props: {
 };
 
 export default Attendees;
+
+const NO_ATTENDEES: Record<Role, number> = {
+  COACH: 0,
+  DIAGONAL: 0,
+  LIBERO: 0,
+  MID: 0,
+  OTHER: 0,
+  PASSER: 0,
+  SETTER: 0,
+  TRAINER: 0,
+};
+
+export const presentAttendeesPerRole: (
+  attendees: Array<Attendee>
+) => Record<Role, number> = (attendees: Array<Attendee>) => {
+  const attendeesPerRole: Record<Role, number> = attendees
+    .filter((a) => a.state === "PRESENT")
+    .reduce(
+      (acc, cur) => ({
+        ...acc,
+        [cur.user.role]: acc[cur.user.role] + 1,
+      }),
+      NO_ATTENDEES
+    );
+  return attendeesPerRole;
+};
+
+/**
+ * Returns the sum of the values in the records,
+ * excluding the values of the keys in `excludedPlayerRoles`
+ * @param attendeesPerRole
+ */
+export const totalNumberOfPlayingRoles = (
+  attendeesPerRole: Record<Role, number>
+) => {
+  return sumRecord(attendeesPerRole, excludedPlayerRoles);
+};
+
+export const getAttendeesSummary = (
+  attendees: Array<Attendee>,
+  withAttendeeSummaryDetail: boolean
+) => {
+  const allPresent = attendees.filter((x) => x.state === "PRESENT");
+  const excludedPlayerRoles: Role[] = ["TRAINER", "COACH"];
+  const coach = allPresent.filter((x) =>
+    excludedPlayerRoles.includes(x.user.role)
+  ).length;
+  const allPlayers = allPresent.length - coach;
+
+  let detail = "";
+  if (withAttendeeSummaryDetail) {
+    const presentAttendeesPerRole1 = presentAttendeesPerRole(attendees);
+    const sv = presentAttendeesPerRole1["SETTER"];
+    const pl = presentAttendeesPerRole1["PASSER"];
+    const mid = presentAttendeesPerRole1["MID"];
+    const dia = presentAttendeesPerRole1["DIAGONAL"];
+    const lib = presentAttendeesPerRole1["LIBERO"];
+    const tl = presentAttendeesPerRole1["OTHER"];
+    detail = `SPEL: ${sv}, P/L: ${pl}, MID: ${mid}, DIA: ${dia}, LIB: ${lib}, TL: ${tl}, `;
+  }
+
+  // TODO: Coach detail is temporarily disabled, enable when team has coach again
+  const coachDetail = <></>; //<>COACH: {coach > 0 ? " ✅" : " ❌"}</>;
+  return (
+    <em>
+      Σ {allPlayers} {detail} {coachDetail}
+    </em>
+  );
+};

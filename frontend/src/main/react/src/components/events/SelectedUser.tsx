@@ -10,7 +10,7 @@ import {
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import Typography from "@mui/material/Typography";
-import { Attendee } from "../Attendees";
+import { AttendeeButton } from "../Attendees";
 import { useAlerts } from "../../hooks/alertsHook";
 import { Attendee as AttendeeType, User } from "../../utils/domain";
 
@@ -26,7 +26,7 @@ const externalize = (id: number) => (id === noUser ? noUserExternal : id);
  *
  * Has 2 UI states:
  * <ul>
- *     <li>Showing a single user, as an {@link Attendee}. This is the initialUser initially; the selected users after changing the user</li>
+ *     <li>Showing a single user, as an {@link AttendeeButton}. This is the initialUser initially; the selected users after changing the user</li>
  *     <li>Showing a dropdown with a list of users (/attendees)</li>
  * </ul>
  *
@@ -78,14 +78,14 @@ export const SelectedUser = (props: {
 
   const showSelectedUser = (attendee?: AttendeeType) =>
     attendee ? (
-      <Attendee
+      <AttendeeButton
         key={attendee.state}
         disabled={false}
         attendee={attendee}
         onSelection={() => {}}
-      ></Attendee>
+      ></AttendeeButton>
     ) : (
-      <Attendee
+      <AttendeeButton
         key="empty"
         disabled={true}
         attendee={{
@@ -95,7 +95,7 @@ export const SelectedUser = (props: {
           eventId: -1,
         }}
         onSelection={() => {}}
-      ></Attendee>
+      ></AttendeeButton>
     );
 
   const attendee = props.attendees.find((it) => it.user.id === selectedUser);

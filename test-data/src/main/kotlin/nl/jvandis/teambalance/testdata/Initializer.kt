@@ -27,8 +27,12 @@ import nl.jvandis.teambalance.testdata.domain.MiscEvent
 import nl.jvandis.teambalance.testdata.domain.Place
 import nl.jvandis.teambalance.testdata.domain.Role.COACH
 import nl.jvandis.teambalance.testdata.domain.Role.DIAGONAL
+import nl.jvandis.teambalance.testdata.domain.Role.LIBERO
 import nl.jvandis.teambalance.testdata.domain.Role.MID
+import nl.jvandis.teambalance.testdata.domain.Role.OTHER
 import nl.jvandis.teambalance.testdata.domain.Role.PASSER
+import nl.jvandis.teambalance.testdata.domain.Role.SETTER
+import nl.jvandis.teambalance.testdata.domain.Role.TRAINER
 import nl.jvandis.teambalance.testdata.domain.Training
 import nl.jvandis.teambalance.testdata.domain.User
 import nl.jvandis.teambalance.testdata.domain.Users
@@ -218,12 +222,20 @@ class Initializer(
     private fun createUsers() {
         val users = mutableListOf<User>()
         val usersToCreate = listOf(
-            CreateUser("Julius", DIAGONAL),
             CreateUser("Maurice", COACH),
-            CreateUser("Bocaj", MID),
+            CreateUser("Pardoes", TRAINER),
+            CreateUser("Julius", SETTER),
             CreateUser("Joep", PASSER),
             CreateUser("Roger", PASSER),
-            CreateUser("Pardoes", COACH)
+            CreateUser("JanPL", PASSER),
+            CreateUser("PietPl", PASSER),
+            CreateUser("Bocaj", MID),
+            CreateUser("HenkMid", MID),
+            CreateUser("KeesMid", MID),
+            CreateUser("FlipLib", LIBERO),
+            CreateUser("MaartenDia", DIAGONAL),
+            CreateUser("DriesDia", DIAGONAL),
+            CreateUser("Tjapko", OTHER),
         )
 
         usersToCreate.forEach {

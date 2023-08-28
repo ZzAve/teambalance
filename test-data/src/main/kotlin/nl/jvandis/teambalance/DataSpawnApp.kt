@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
 
     log.info("Running SpawnData ...")
     val measureTime = measureTime {
-        Initializer(apiKey, "http://4.teambalance.local:8080").spawnData(config)
+        Initializer(apiKey, "http://localhost:8080").spawnData(config)
     }
 
     log.info("Finished running SpawnData of $config in $measureTime...")

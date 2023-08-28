@@ -65,7 +65,7 @@ const internalize = (
     selectedDays: selectedDays,
   };
 };
-const NO_DAYS = {
+const NO_DAYS: Record<Day, boolean> = {
   MONDAY: false,
   TUESDAY: false,
   WEDNESDAY: false,

@@ -49,8 +49,10 @@ export type Role =
   | "MID"
   | "DIAGONAL"
   | "PASSER"
+  | "LIBERO"
   | "OTHER";
 
+export const excludedPlayerRoles: Array<Role> = ["COACH", "TRAINER"];
 export const roleMapper: Record<Role, string> = {
   COACH: "Coach",
   DIAGONAL: "Dia",
@@ -58,6 +60,7 @@ export const roleMapper: Record<Role, string> = {
   OTHER: "Trainingslid/vrije vogel",
   PASSER: "Passer/loper",
   SETTER: "Set-upper",
+  LIBERO: "Libero",
   TRAINER: "Trainer",
 };
 export type Place = "HOME" | "AWAY";
