@@ -235,7 +235,7 @@ class Initializer(
             CreateUser("FlipLib", LIBERO),
             CreateUser("MaartenDia", DIAGONAL),
             CreateUser("DriesDia", DIAGONAL),
-            CreateUser("Tjapko", OTHER),
+            CreateUser("Tjapko", OTHER)
         )
 
         usersToCreate.forEach {

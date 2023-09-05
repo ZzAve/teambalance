@@ -79,3 +79,27 @@ export const sumRecord = <T extends string | number | symbol>(
     return cur + numberOfPlayers;
   }, 0);
 };
+
+/**
+ * Given an array of items of type T, group them based on some property of T
+ * @param items
+ * @param keyFn function to find the key to group by for a given item
+ * @return an object where each item is now list in the grouped and distinct sublist, split by keyFn.
+ */
+export const groupBy = <T extends object>(
+  items: T[],
+  keyFn: (item: T) => string
+): { [x: string]: T[] } => {
+  return items.reduce((acc: { [x: string]: T[] }, item: T) => {
+    // Group initialization
+    const key: string = keyFn(item);
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+
+    // Grouping
+    acc[key].push(item);
+
+    return acc;
+  }, {});
+};

@@ -6,21 +6,21 @@ import Button from "@mui/material/Button";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import HelpIcon from "@mui/icons-material/Help";
-import { sumRecord, withLoading } from "../utils/util";
+import { groupBy, sumRecord, withLoading } from "../utils/util";
 import { attendeesApiClient } from "../utils/AttendeesApiClient";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { EventType } from "./events/utils";
 import {
   Attendee,
   Availability,
-  excludedPlayerRoles,
+  COACH_TRAINER_ROLES,
   Role,
 } from "../utils/domain";
 import { useAlerts } from "../hooks/alertsHook";
 import { IconButton } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import Conditional from "./Conditional";
+import { Conditional } from "./Conditional";
 
 const colorMap: Record<Availability, ButtonColorValue> = {
   PRESENT: "success",
@@ -142,18 +142,8 @@ const Attendees = (props: {
 
   const attendeeOverview = () => (
     <>
-      {props.attendees.map((it) => (
-        <Grid key={it.id} item>
-          <AttendeeButton
-            size={size}
-            attendee={it}
-            disabled={readOnly}
-            onSelection={handleAttendeeClick}
-          />
-        </Grid>
-      ))}
       <Conditional condition={showSummary}>
-        <Grid key={"total"} item>
+        <Grid key={"total"} item xs={12}>
           <Button
             size={size}
             variant="outlined"
@@ -166,6 +156,26 @@ const Attendees = (props: {
           </Button>
         </Grid>
       </Conditional>
+      {Object.entries(groupBy(props.attendees, (i) => i.user.role)).map(
+        ([type, attendees]) => {
+          const attendeesOfType = attendees.map((it) => (
+            <Grid key={it.id} item>
+              <AttendeeButton
+                size={size}
+                attendee={it}
+                disabled={readOnly}
+                onSelection={handleAttendeeClick}
+              />
+            </Grid>
+          ));
+          return (
+            <>
+              {attendeesOfType}
+              <Grid item xs={0}></Grid>
+            </>
+          );
+        }
+      )}
     </>
   );
 
@@ -338,7 +348,17 @@ export const presentAttendeesPerRole: (
 export const totalNumberOfPlayingRoles = (
   attendeesPerRole: Record<Role, number>
 ) => {
-  return sumRecord(attendeesPerRole, excludedPlayerRoles);
+  return sumRecord(attendeesPerRole, COACH_TRAINER_ROLES);
+};
+
+/**
+ * Returns the sum of the values in the records
+ * @param attendeesPerRole
+ */
+export const totalNumberOfAttendees = (
+  attendeesPerRole: Record<Role, number>
+) => {
+  return sumRecord(attendeesPerRole, []);
 };
 
 export const getAttendeesSummary = (
@@ -361,11 +381,10 @@ export const getAttendeesSummary = (
     const dia = presentAttendeesPerRole1["DIAGONAL"];
     const lib = presentAttendeesPerRole1["LIBERO"];
     const tl = presentAttendeesPerRole1["OTHER"];
-    detail = `SPEL: ${sv}, P/L: ${pl}, MID: ${mid}, DIA: ${dia}, LIB: ${lib}, TL: ${tl}, `;
+    detail = `SPEL: ${sv}, P/L: ${pl}, MID: ${mid}, DIA: ${dia}, LIB: ${lib}, TL: ${tl}`;
   }
 
-  // TODO: Coach detail is temporarily disabled, enable when team has coach again
-  const coachDetail = <></>; //<>COACH: {coach > 0 ? " ✅" : " ❌"}</>;
+  const coachDetail = <>, COACH: {coach > 0 ? " ✅" : " ❌"}</>;
   return (
     <em>
       Σ {allPlayers} {detail} {coachDetail}

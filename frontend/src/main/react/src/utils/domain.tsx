@@ -52,7 +52,7 @@ export type Role =
   | "LIBERO"
   | "OTHER";
 
-export const excludedPlayerRoles: Array<Role> = ["COACH", "TRAINER"];
+export const COACH_TRAINER_ROLES: Array<Role> = ["COACH", "TRAINER"];
 export const roleMapper: Record<Role, string> = {
   COACH: "Coach",
   DIAGONAL: "Dia",

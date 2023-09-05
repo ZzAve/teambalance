@@ -20,6 +20,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import Attendees, {
   presentAttendeesPerRole,
+  totalNumberOfAttendees,
   totalNumberOfPlayingRoles,
 } from "../Attendees";
 import { formattedDate, formattedTime, withLoading } from "../../utils/util";
@@ -35,7 +36,7 @@ import { AffectedRecurringEvent } from "./RecurringEvent";
 import { useAlerts } from "../../hooks/alertsHook";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import Conditional from "../Conditional";
+import { Conditional } from "../Conditional";
 
 const recurringEventTagline = (
   affectedEvents: "ALL" | "CURRENT_AND_FUTURE" | "CURRENT"
@@ -193,12 +194,14 @@ const EventsTable = (props: {
       <TableCell align="right">Locatie</TableCell>
       <TableCell align="right">Opmerking</TableCell>
       <TableCell align="center">Σ</TableCell>
-      <TableCell align="center">pl</TableCell>
-      <TableCell align="center">mid</TableCell>
-      <TableCell align="center">dia</TableCell>
-      <TableCell align="center">spel</TableCell>
-      <TableCell align="center">libero</TableCell>
-      <TableCell align="center">tl</TableCell>
+      <Conditional condition={["TRAINING", "MATCH"].includes(props.eventType)}>
+        <TableCell align="center">pl</TableCell>
+        <TableCell align="center">mid</TableCell>
+        <TableCell align="center">dia</TableCell>
+        <TableCell align="center">spel</TableCell>
+        <TableCell align="center">libero</TableCell>
+        <TableCell align="center">tl</TableCell>
+      </Conditional>
       <TableCell align="center">
         Deelnemers
         <IconButton onClick={() => setAttendeesExpanded((x) => !x)}>
@@ -308,13 +311,17 @@ const EventsTable = (props: {
         </Conditional>
         <TableCell align="right">{getBodyLocationCell(teamEvent)}</TableCell>
         <TableCell align="right">{teamEvent.comment}</TableCell>
-        {attendanceRow(totalNumberOfPlayingRoles(attendeesPerRole), 6)}
-        {attendanceRow(attendeesPerRole["PASSER"], 3)}
-        {attendanceRow(attendeesPerRole["MID"], 3)}
-        {attendanceRow(attendeesPerRole["DIAGONAL"], 2)}
-        {attendanceRow(attendeesPerRole["SETTER"], 2)}
-        {attendanceRow(attendeesPerRole["LIBERO"], 1)}
-        <TableCell align="center">{attendeesPerRole["OTHER"]}</TableCell>
+        {isMatch(teamEvent) || isTraining(teamEvent)
+          ? attendanceRow(totalNumberOfPlayingRoles(attendeesPerRole), 6)
+          : attendanceRow(totalNumberOfAttendees(attendeesPerRole), 1)}
+        <Conditional condition={isTraining(teamEvent) || isMatch(teamEvent)}>
+          {attendanceRow(attendeesPerRole["PASSER"], 3)}
+          {attendanceRow(attendeesPerRole["MID"], 3)}
+          {attendanceRow(attendeesPerRole["DIAGONAL"], 2)}
+          {attendanceRow(attendeesPerRole["SETTER"], 2)}
+          {attendanceRow(attendeesPerRole["LIBERO"], 1)}
+          <TableCell align="center">{attendeesPerRole["OTHER"]}</TableCell>
+        </Conditional>
         <TableCell sx={{ minWidth: "200px", maxWidth: "500px" }}>
           <Attendees
             size="small"

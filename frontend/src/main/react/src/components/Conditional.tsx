@@ -1,6 +1,6 @@
 import React from "react";
 
-const Conditional: (props: {
+export const Conditional: (props: {
   condition: boolean;
   children: JSX.Element | Array<JSX.Element>;
 }) => JSX.Element = (props: {

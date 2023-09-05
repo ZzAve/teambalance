@@ -42,7 +42,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import Switch from "@mui/material/Switch";
 import { Alert, AlertTitle, Divider, FormControl } from "@mui/material";
-import Conditional from "../Conditional";
+import { Conditional } from "../Conditional";
 import { RecurringEvent } from "./RecurringEvent";
 import { MobileDateTimePicker } from "@mui/x-date-pickers";
 

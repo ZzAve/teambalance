@@ -5,13 +5,19 @@ import Attendees from "../Attendees";
 import { formattedDate, formattedTime } from "../../utils/util";
 import { EventType, isMatch, isMiscEvent, isTraining } from "./utils";
 import { Pagination } from "@mui/material";
-import { SelectedUser } from "./SelectedUser";
+import { SelectedUserOption, SelectUser } from "./SelectUser";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
-import { EditableTextField } from "./EditableTextField";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
 import { useAlerts } from "../../hooks/alertsHook";
-import { Match, Place, TeamEvent, Training } from "../../utils/domain";
-import Conditional from "../Conditional";
+import {
+  COACH_TRAINER_ROLES,
+  Match,
+  MiscEvent,
+  Place,
+  TeamEvent,
+  Training,
+} from "../../utils/domain";
+import { Conditional } from "../Conditional";
 
 export const EventsList = (props: {
   eventType: EventType;
@@ -61,7 +67,7 @@ const formattedHomeVsAway = (event: Match) => (
 );
 
 const eventTypesWithSummary: EventType[] = ["TRAINING", "MATCH"];
-const eventTypesWithSummaryOpen: EventType[] = ["MATCH"];
+const eventTypesWithSummaryOpen: EventType[] = ["TRAINING", "MATCH"];
 
 /**
  * Event has 2 states
@@ -75,21 +81,44 @@ export const EventListItem = (props: {
   allowUpdating?: boolean;
 }) => {
   const { allowUpdating = true } = props;
-  const startDateTime = new Date(props.event.startTime);
-  const titleVariant = !isMiscEvent(props.event) ? "body1" : "h6";
-  const dateTimeVariant = isMiscEvent(props.event) ? "body1" : "h6";
+  const teamEvent = props.event;
+  const startDateTime = new Date(teamEvent.startTime);
+  const dateTimeVariant = isMiscEvent(teamEvent) ? "body1" : "h6";
   const { addAlert } = useAlerts();
-  const handleTrainerSelection = async (userId?: number) => {
-    const userIdString = userId === undefined ? undefined : userId + "";
+
+  const trainerDropDown = () => {
+    const trainerOptions: SelectedUserOption[] = trainerCoachOptions(teamEvent);
+
+    const currentTrainerName = (teamEvent as Training)?.trainer?.name;
+    const currentCoach =
+      (currentTrainerName &&
+        trainerOptions.find((o) => o.name === currentTrainerName)) ||
+      NO_COACH_OPTION;
+    return (
+      <SelectUser
+        label="Trainer"
+        icon="🏐"
+        options={trainerOptions}
+        initialOption={currentCoach}
+        selectedUserCallback={handleTrainerSelection}
+      ></SelectUser>
+    );
+  };
+
+  const handleTrainerSelection = async (
+    selectedUser: SelectedUserOption | undefined
+  ) => {
+    const userIdString = selectedUser ? selectedUser.id + "" : undefined;
     return await trainingsApiClient
-      .updateTrainer({ id: props.event.id, trainerUserId: userIdString })
+      .updateTrainer({ id: teamEvent.id, trainerUserId: userIdString })
       .then((e) => {
         console.debug("Trainer updated. Training:", e);
+        const trainer = `${e.trainer?.name || "Niemand"}`;
         addAlert({
-          message: `${
-            e.trainer?.name || "Niemand"
-          } geeft de training van ${formattedDate(props.event.startTime)}`,
-          level: userId === undefined ? "info" : "success",
+          message: `${trainer} geeft de training van ${formattedDate(
+            teamEvent.startTime
+          )}`,
+          level: selectedUser === undefined ? "info" : "success",
         });
 
         props.onUpdate();
@@ -99,10 +128,9 @@ export const EventListItem = (props: {
         console.error("Updating trainer failed!", e);
         addAlert({
           message: `Trainer '${
-            userId &&
-            props.event.attendees.find((e) => e.user.id === userId)?.user?.name
+            selectedUser?.name
           } mag de training van ${formattedDate(
-            props.event.startTime
+            teamEvent.startTime
           )} niet geven blijkbaar 🤷`,
           level: "error",
         });
@@ -110,21 +138,33 @@ export const EventListItem = (props: {
       });
   };
 
-  const handleCoachSelection = async (coach: string) => {
+  const coachDropdown = () => {
+    const coachOptions = trainerCoachOptions(teamEvent);
+    const currentCoach =
+      coachOptions.find(
+        (o) => o.name === ((teamEvent as Match)?.coach ?? "")
+      ) || NO_COACH_OPTION;
+    return (
+      <SelectUser
+        label="Coach"
+        icon="👮"
+        options={coachOptions}
+        initialOption={currentCoach}
+        selectedUserCallback={handleCoachSelection}
+      ></SelectUser>
+    );
+  };
+
+  const handleCoachSelection = async (
+    coach: SelectedUserOption | undefined
+  ) => {
     return await matchesApiClient
-      .updateCoach({ id: props.event.id, coach: coach })
+      .updateCoach({ id: teamEvent.id, coach: coach?.name ?? "" })
       .then((e) => {
-        console.debug(
-          "Coach update ",
-          coach,
-          " for event",
-          props.event,
-          ":",
-          e
-        );
+        console.debug(`Coach update ${coach} for event ${teamEvent}: `, e);
         addAlert({
-          message: `'${coach}' is de coach voor de wedstrijd tegen ${
-            (props.event as Match).opponent
+          message: `'${coach?.name}' is de coach voor de wedstrijd tegen ${
+            (teamEvent as Match).opponent
           }`,
           level: "success",
         });
@@ -133,25 +173,25 @@ export const EventListItem = (props: {
       })
       .catch((e) => {
         addAlert({
-          message: `'${coach}' mag de wedstrijd tegen ${
-            (props.event as Match).opponent
+          message: `'${coach?.name}' mag de wedstrijd tegen ${
+            (teamEvent as Match).opponent
           } niet coachen blijkbaar 🤷. Error ${e.message}`,
           level: "error",
         });
-        console.error(`Updating coach for event ${props.event} failed!`, e);
+        console.error(`Updating coach for event ${teamEvent} failed!`, e);
         return false;
       });
   };
 
   return (
     <Grid container spacing={1}>
-      <Grid item xs={12}>
-        {isMiscEvent(props.event) ? (
-          <Typography variant={titleVariant}>{props.event.title}</Typography>
-        ) : (
-          ""
-        )}
-      </Grid>
+      <Conditional condition={isMiscEvent(teamEvent)}>
+        <Grid item xs={12}>
+          <Typography variant={"h6"}>
+            {(teamEvent as MiscEvent).title}
+          </Typography>
+        </Grid>
+      </Conditional>
       <Grid item xs={12} sm={6} md={12} lg={4}>
         <Typography variant={dateTimeVariant}>
           📅 {formattedDate(startDateTime)}
@@ -159,37 +199,28 @@ export const EventListItem = (props: {
         <Typography variant="body1">
           ⏰ {formattedTime(startDateTime)}
         </Typography>
-        <Conditional condition={isMatch(props.event)}>
+        <Conditional condition={isMatch(teamEvent)}>
           <Typography variant="body1">
-            👥 {(props.event as Match).opponent} (
-            {formattedHomeVsAway(props.event as Match)})
+            👥 {(teamEvent as Match).opponent} (
+            {formattedHomeVsAway(teamEvent as Match)})
           </Typography>
         </Conditional>
-        <Typography variant="body1">📍 {props.event.location}</Typography>
-        <Conditional condition={!!props.event.comment}>
+        <Typography variant="body1">📍 {teamEvent.location}</Typography>
+        <Conditional condition={!!teamEvent.comment}>
           <Typography variant="body1">
-            📝 <em>{props.event.comment}</em>
+            📝 <em>{teamEvent.comment}</em>
           </Typography>
         </Conditional>
-        <Conditional condition={isMatch(props.event)}>
-          <EditableTextField
-            label="👮‍"
-            initialText={(props.event as Match).coach}
-            updatedTextValueCallback={handleCoachSelection}
-          ></EditableTextField>
+        <Conditional condition={isMatch(teamEvent)}>
+          {coachDropdown()}
         </Conditional>
-        <Conditional condition={isTraining(props.event)}>
-          <SelectedUser
-            label="Trainer"
-            attendees={props.event.attendees}
-            initialUser={(props.event as Training).trainer}
-            selectedUserCallback={handleTrainerSelection}
-          ></SelectedUser>
+        <Conditional condition={isTraining(teamEvent)}>
+          {trainerDropDown()}
         </Conditional>
       </Grid>
       <Grid item xs={12} sm={6} md={12} lg={8}>
         <Attendees
-          attendees={props.event.attendees}
+          attendees={teamEvent.attendees}
           onUpdate={props.onUpdate}
           readOnly={!allowUpdating}
           showSummary={eventTypesWithSummary.includes(props.eventType)}
@@ -202,3 +233,18 @@ export const EventListItem = (props: {
     </Grid>
   );
 };
+
+const NO_COACH_OPTION: SelectedUserOption = {
+  id: -1,
+  name: "",
+  state: "NOT_RESPONDED",
+};
+
+const trainerCoachOptions = (teamEvent: TeamEvent) =>
+  teamEvent.attendees
+    .filter((a) => COACH_TRAINER_ROLES.includes(a.user.role))
+    .map((a) => ({
+      id: a.id,
+      name: a.user.name,
+      state: a.state,
+    }));
