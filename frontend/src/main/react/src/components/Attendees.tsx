@@ -140,26 +140,14 @@ const Attendees = (props: {
   if (props.attendees == null) return <>NO ATTENDEES</>;
   if (isLoading) return <SpinnerWithText text="Verwerken update" size={"sm"} />;
 
-  const attendeeOverview = () => (
-    <>
-      <Conditional condition={showSummary}>
-        <Grid key={"total"} item xs={12}>
-          <Button
-            size={size}
-            variant="outlined"
-            color="primary"
-            onClick={() => {
-              setAttendeeSummaryDetail((x) => !x);
-            }}
-          >
-            {getAttendeesSummary(props.attendees, withAttendeeSummaryDetail)}
-          </Button>
-        </Grid>
-      </Conditional>
-      {Object.entries(groupBy(props.attendees, (i) => i.user.role)).map(
-        ([type, attendees]) => {
-          const attendeesOfType = attendees.map((it) => (
-            <Grid key={it.id} item>
+  const attendeeOverview = () => {
+    const elements: JSX.Element[] = [];
+    Object.entries(groupBy(props.attendees, (i) => i.user.role)).forEach(
+      ([type, attendees]) => {
+        attendees.forEach((it) => {
+          const key = it.id;
+          elements.push(
+            <Grid key={key} item>
               <AttendeeButton
                 size={size}
                 attendee={it}
@@ -167,17 +155,33 @@ const Attendees = (props: {
                 onSelection={handleAttendeeClick}
               />
             </Grid>
-          ));
-          return (
-            <>
-              {attendeesOfType}
-              <Grid item xs={0}></Grid>
-            </>
           );
-        }
-      )}
-    </>
-  );
+        });
+
+        if (attendees.length > 0)
+          elements.push(<Grid key={type} item xs={0}></Grid>);
+      }
+    );
+    return (
+      <>
+        <Conditional condition={showSummary}>
+          <Grid key={"total"} item xs={12}>
+            <Button
+              size={size}
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                setAttendeeSummaryDetail((x) => !x);
+              }}
+            >
+              {getAttendeesSummary(props.attendees, withAttendeeSummaryDetail)}
+            </Button>
+          </Grid>
+        </Conditional>
+        {elements}
+      </>
+    );
+  };
 
   const showAttendee = () =>
     !selectedAttendee ? (
@@ -200,7 +204,7 @@ const Attendees = (props: {
             {isExpanded ? <VisibilityOffIcon /> : <VisibilityIcon />}
           </IconButton>
         </Grid>
-        <Grid></Grid>
+        <Grid item></Grid>
       </Conditional>
       <Conditional condition={isExpanded}>{showAttendee()}</Conditional>
     </Grid>

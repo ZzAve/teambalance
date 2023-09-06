@@ -1,3 +1,5 @@
+import { StorageObject, StorageService } from "./storageService";
+
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export const withLoading = async <T extends any>(
@@ -103,3 +105,22 @@ export const groupBy = <T extends object>(
     return acc;
   }, {});
 };
+
+const storageService = new StorageService("teambalance", localStorage);
+
+export const getStateFromLocalStorageFn = <T extends any>(
+  key: string,
+  typeGuard: (v: StorageObject<unknown>) => boolean,
+  defaultValue: () => T
+) => storageService.get<T>(key, typeGuard) ?? defaultValue();
+
+export const getStateFromLocalStorage = <T extends any>(
+  key: string,
+  typeGuard: (v: StorageObject<unknown>) => boolean,
+  defaultValue: T
+) => {
+  return storageService.get<T>(key, typeGuard) ?? defaultValue;
+};
+
+export const setStateToLocalStorage = <T extends any>(key: string, value: T) =>
+  storageService.store<T>(key, value);

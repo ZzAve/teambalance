@@ -14,7 +14,7 @@ import {
   Routes,
 } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
-import { StyledEngineProvider, Theme, ThemeProvider } from "@mui/material";
+import { StyledEngineProvider, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import {
   getTenantInfo,
@@ -25,6 +25,10 @@ import {
   UNKNOWN_TENANT_CONTEXT,
 } from "./TenantContext";
 import Typography from "@mui/material/Typography";
+import {
+  getTeamBalanceTheme,
+  storeTeamBalanceTheme,
+} from "./utils/preferences";
 
 const Admin = lazy(() => import("./views/Admin"));
 const Login = lazy(() => import("./views/Login"));
@@ -50,9 +54,10 @@ const themeDark = createTheme({
   },
 });
 
+const initialTheme = getTeamBalanceTheme();
 const App = () => {
   const [topBarShouldRefresh, setTopBarShouldRefresh] = useState(false);
-  const [theme, setTheme] = useState<Theme>(themeLight);
+  const [theme, setTheme] = useState<TeamBalanceTheme>(initialTheme);
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [tenant, setTenant] = useState<TenantInfo | TenantError | undefined>(
     undefined
@@ -76,9 +81,8 @@ const App = () => {
   };
 
   const handleSetTheme = (newTheme: TeamBalanceTheme) => {
-    setTimeout(() => {
-      setTheme(newTheme === TeamBalanceTheme.LIGHT ? themeLight : themeDark);
-    });
+    storeTeamBalanceTheme(newTheme);
+    setTheme(newTheme);
   };
 
   console.debug("[App] render");
@@ -194,12 +198,15 @@ const App = () => {
       value={tenant?.type === "tenantInfo" ? tenant : UNKNOWN_TENANT_CONTEXT}
     >
       <StyledEngineProvider injectFirst>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider
+          theme={theme === TeamBalanceTheme.LIGHT ? themeLight : themeDark}
+        >
           <SnackbarProvider maxSnack={5} autoHideDuration={2500}>
             <CssBaseline />
             <TopBar
               handleRefresh={handleRefresh}
               refresh={topBarShouldRefresh}
+              theme={theme}
               setTheme={handleSetTheme}
             />
             <Container maxWidth="xl">{getContent()}</Container>
