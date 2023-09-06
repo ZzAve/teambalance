@@ -84,33 +84,41 @@ const Admin = (props: { refresh: boolean }) => {
         <Typography variant="h6">
           Je begeeft je nu op de 'admin' pagina's. Pas op voor de lactacyd
         </Typography>
-        <Button variant="contained" color="primary" onClick={navigateBack}>
-          <ArrowBackIcon spacing={5} />
-          <Typography
-            variant={"button"}
-            sx={{ display: { sm: "block", xs: "none" } }}
-          >
-            Terug naar de veiligheid
-          </Typography>
-        </Button>
-        <StyleMenuList component="nav" aria-label="Admin menu">
-          <Link to="trainings">
-            <Button variant="outlined" color="primary">
-              Trainingen
-            </Button>
-          </Link>
+        <Grid item container sm={12} md={3}>
+          <StyleMenuList as="nav" aria-label="Admin menu">
+            <Link to="../">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={navigateBack}
+              >
+                <ArrowBackIcon spacing={5} />
+                <Typography
+                  variant={"button"}
+                  sx={{ display: { sm: "block", xs: "none" } }}
+                >
+                  Terug naar de veiligheid
+                </Typography>
+              </Button>
+            </Link>
+            <Link to="trainings">
+              <Button variant="outlined" color="primary">
+                Trainingen
+              </Button>
+            </Link>
 
-          <Link to="matches">
-            <Button variant="outlined" color="primary">
-              Wedstrijden
-            </Button>
-          </Link>
-          <Link to="misc-events">
-            <Button variant="outlined" color="primary">
-              Overige events
-            </Button>
-          </Link>
-        </StyleMenuList>
+            <Link to="matches">
+              <Button variant="outlined" color="primary">
+                Wedstrijden
+              </Button>
+            </Link>
+            <Link to="misc-events">
+              <Button variant="outlined" color="primary">
+                Overige events
+              </Button>
+            </Link>
+          </StyleMenuList>
+        </Grid>
       </PageItem>
 
       <Routes>
@@ -190,14 +198,7 @@ const Admin = (props: { refresh: boolean }) => {
         />
 
         <Route path="loading" element={<Loading />} />
-        <Route
-          path="/"
-          element={
-            <RequireAuth>
-              <HiAdmin />
-            </RequireAuth>
-          }
-        />
+        <Route path="/" element={<Navigate to="trainings" />} />
       </Routes>
     </>
   );

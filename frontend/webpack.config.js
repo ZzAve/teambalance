@@ -104,7 +104,8 @@ module.exports = {
   devServer: {
     historyApiFallback: true,
     allowedHosts: [
-      ".teambalance.local"
+      ".teambalance.local",
+      "localhost"
     ],
     port: 3000,
     proxy: [

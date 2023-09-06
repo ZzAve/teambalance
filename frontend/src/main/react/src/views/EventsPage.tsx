@@ -9,6 +9,11 @@ import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 import { EventType } from "../components/events/utils";
 import CheckBox from "@mui/material/Checkbox";
+import {
+  getViewTypePreference,
+  storeViewTypePreference,
+} from "../utils/preferences";
+import { ViewType } from "../utils/util";
 
 type EventsPageTexts = {
   coming_events: Record<EventType, string>;
@@ -27,11 +32,19 @@ const getText = (eventsType: EventType, name: keyof EventsPageTexts) =>
   texts[name][eventsType] || name;
 
 const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
-  const [showList, setShowList] = useState(true);
+  const [viewType, setViewType] = useState<ViewType>(getViewTypePreference());
   const [includeHistory, setIncludeHistory] = useState(false);
   const navigate = useNavigate();
 
   const title = getText(props.eventType, "coming_events");
+  const toggleViewType: (
+    event: React.ChangeEvent<HTMLInputElement>,
+    checked: boolean
+  ) => void = (event, checked) => {
+    const newViewType: ViewType = checked ? "list" : "table";
+    storeViewTypePreference(newViewType);
+    setViewType(newViewType);
+  };
   return (
     <Grid item container spacing={2}>
       <Grid container item xs={12}>
@@ -67,8 +80,8 @@ const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
               </Grid>
               <Grid item>
                 <Switch
-                  checked={showList}
-                  onChange={(x) => setShowList(x.target.checked)}
+                  checked={viewType === "list"}
+                  onChange={toggleViewType}
                   name="listVsTable"
                 />
               </Grid>
@@ -104,7 +117,7 @@ const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
                 eventType={props.eventType}
                 refresh={props.refresh}
                 includeHistory={includeHistory}
-                view={showList ? "list" : "table"}
+                view={viewType}
                 limit={50}
                 withPagination={true}
               />

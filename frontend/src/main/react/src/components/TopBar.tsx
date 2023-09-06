@@ -12,6 +12,7 @@ import { ThemeToggler } from "./ThemeToggler";
 const TopBar = (props: {
   handleRefresh: () => void;
   refresh: boolean;
+  theme: TeamBalanceTheme;
   setTheme: (theme: TeamBalanceTheme) => void;
 }) => {
   const [isAuth, setIsAuth] = useState(false);
@@ -36,7 +37,7 @@ const TopBar = (props: {
           </Grid>
 
           <Grid item>
-            <ThemeToggler setTheme={props.setTheme} />
+            <ThemeToggler theme={props.theme} setTheme={props.setTheme} />
           </Grid>
           {isAuth ? (
             <>

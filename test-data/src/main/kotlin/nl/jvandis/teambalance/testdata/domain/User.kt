@@ -30,5 +30,6 @@ enum class Role {
     MID,
     DIAGONAL,
     PASSER,
+    LIBERO,
     OTHER
 }

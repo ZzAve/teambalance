@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { eventsApiClient } from "../../utils/MiscEventsApiClient";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
-import { ViewType, ViewTypeOld, withLoading } from "../../utils/util";
+import { ViewType, withLoading } from "../../utils/util";
 import { EventsList } from "./EventsList";
 import EventsTable from "./EventsTable";
 import { EventType } from "./utils";
@@ -30,8 +30,8 @@ const texts: EventsTexts = {
 const getText = (eventsType: EventType, name: keyof EventsTexts) =>
   texts[name][eventsType] || name;
 
-// 1st of August, 02:00 (UTC, or 0:00 in GMT +2)
-const startOfSeason = new Date(2022, 7, 1, 2);
+// 15th of August, 02:00 (UTC, or 0:00 in GMT +2)
+const startOfSeason = new Date(2023, 7, 15, 2);
 
 const Events = (props: {
   eventType: EventType;
@@ -92,7 +92,7 @@ const Events = (props: {
         </Grid>
       </Grid>
     );
-  } else if (props.view === ViewTypeOld.Table) {
+  } else if (props.view === "table") {
     return (
       <Grid item container xs={12} spacing={1}>
         <EventsTable
