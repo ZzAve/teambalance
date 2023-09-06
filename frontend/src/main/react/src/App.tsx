@@ -26,8 +26,8 @@ import {
 } from "./TenantContext";
 import Typography from "@mui/material/Typography";
 import {
-  getTeamBalanceTheme,
-  storeTeamBalanceTheme,
+  getTeamBalanceThemePreference,
+  storeTeamBalanceThemePreference,
 } from "./utils/preferences";
 
 const Admin = lazy(() => import("./views/Admin"));
@@ -54,7 +54,7 @@ const themeDark = createTheme({
   },
 });
 
-const initialTheme = getTeamBalanceTheme();
+const initialTheme = getTeamBalanceThemePreference();
 const App = () => {
   const [topBarShouldRefresh, setTopBarShouldRefresh] = useState(false);
   const [theme, setTheme] = useState<TeamBalanceTheme>(initialTheme);
@@ -81,7 +81,7 @@ const App = () => {
   };
 
   const handleSetTheme = (newTheme: TeamBalanceTheme) => {
-    storeTeamBalanceTheme(newTheme);
+    storeTeamBalanceThemePreference(newTheme);
     setTheme(newTheme);
   };
 

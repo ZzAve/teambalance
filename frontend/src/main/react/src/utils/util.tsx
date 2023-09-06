@@ -47,12 +47,6 @@ export const formattedTime = (
   }).format(dateTime);
 
 export type ViewType = "list" | "table";
-export const ViewTypeOld = {
-  List: "list",
-  Table: "table",
-};
-Object.freeze(ViewTypeOld);
-
 export const toBase64 = (text: string) => {
   const buf = Buffer.from(text, "utf-8");
   return buf.toString("base64");

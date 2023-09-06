@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { eventsApiClient } from "../../utils/MiscEventsApiClient";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
-import { ViewType, ViewTypeOld, withLoading } from "../../utils/util";
+import { ViewType, withLoading } from "../../utils/util";
 import { EventsList } from "./EventsList";
 import EventsTable from "./EventsTable";
 import { EventType } from "./utils";
@@ -92,7 +92,7 @@ const Events = (props: {
         </Grid>
       </Grid>
     );
-  } else if (props.view === ViewTypeOld.Table) {
+  } else if (props.view === "table") {
     return (
       <Grid item container xs={12} spacing={1}>
         <EventsTable

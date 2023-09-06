@@ -21,6 +21,10 @@ import { IconButton } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Conditional } from "./Conditional";
+import {
+  getAttendeeSummaryInitiallyExpanded,
+  storeAttendeeSummaryInitiallyExpanded,
+} from "../utils/preferences";
 
 const colorMap: Record<Availability, ButtonColorValue> = {
   PRESENT: "success",
@@ -86,6 +90,9 @@ type ButtonColorValue =
 const buttonColor: (state: Availability) => ButtonColorValue = (
   state: Availability
 ) => colorMap[state];
+
+const attendeeSummaryInitiallyExpanded = true; // TODO: fix me
+
 /**
  * Function Attendees component
  */
@@ -112,7 +119,7 @@ const Attendees = (props: {
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [withAttendeeSummaryDetail, setAttendeeSummaryDetail] = useState(
-    initiallyExpandedSummary
+    attendeeSummaryInitiallyExpanded
   );
   const { addAlert } = useAlerts();
   const [isExpanded, setExpanded] = useState(initiallyExpanded);
@@ -139,6 +146,12 @@ const Attendees = (props: {
 
   if (props.attendees == null) return <>NO ATTENDEES</>;
   if (isLoading) return <SpinnerWithText text="Verwerken update" size={"sm"} />;
+
+  function toggleSummaryDetail() {
+    const newDetail = !withAttendeeSummaryDetail;
+    storeAttendeeSummaryInitiallyExpanded(newDetail);
+    setAttendeeSummaryDetail(newDetail);
+  }
 
   const attendeeOverview = () => {
     const elements: JSX.Element[] = [];
@@ -170,9 +183,7 @@ const Attendees = (props: {
               size={size}
               variant="outlined"
               color="primary"
-              onClick={() => {
-                setAttendeeSummaryDetail((x) => !x);
-              }}
+              onClick={toggleSummaryDetail}
             >
               {getAttendeesSummary(props.attendees, withAttendeeSummaryDetail)}
             </Button>

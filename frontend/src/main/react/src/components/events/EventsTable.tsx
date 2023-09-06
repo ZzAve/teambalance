@@ -37,6 +37,10 @@ import { useAlerts } from "../../hooks/alertsHook";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Conditional } from "../Conditional";
+import {
+  getAllAttendeesExpandedPreference,
+  storeAllAttendeesExpandedPreference,
+} from "../../utils/preferences";
 
 const recurringEventTagline = (
   affectedEvents: "ALL" | "CURRENT_AND_FUTURE" | "CURRENT"
@@ -52,6 +56,7 @@ const recurringEventTagline = (
   }
 };
 
+const initialAttendeesExpanded = getAllAttendeesExpandedPreference();
 const EventsTable = (props: {
   eventType: EventType;
   events: TeamEvent[];
@@ -66,13 +71,16 @@ const EventsTable = (props: {
     number | undefined
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
   const [affectedEvents, setAffectedEvents] = useState<
     AffectedRecurringEvents | undefined
   >(undefined);
-  const [isAttendeesExpanded, setAttendeesExpanded] = useState(false);
+  const [isAttendeesExpanded, setAttendeesExpanded] = useState(
+    initialAttendeesExpanded
+  );
+
   const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
   const { addAlert } = useAlerts();
+  const navigate = useNavigate();
   const handleChangePage = (
     _: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -183,10 +191,18 @@ const EventsTable = (props: {
     </Grid>
   );
 
+  const toggleAllAttendeesExpanded = () => {
+    const newExpanded = !isAttendeesExpanded;
+    storeAllAttendeesExpandedPreference(newExpanded);
+    setAttendeesExpanded(newExpanded);
+  };
+
   const getTableHead = () => (
     <TableRow>
       <TableCell>Datum</TableCell>
-      <Conditional condition={props.eventType !== "TRAINING"}>
+      <Conditional
+        condition={["MISC", "MATCH", "OTHER"].includes(props.eventType)}
+      >
         <TableCell align="right">
           {props.eventType === "MATCH" ? "Tegenstander" : "Titel"}
         </TableCell>
@@ -204,7 +220,7 @@ const EventsTable = (props: {
       </Conditional>
       <TableCell align="center">
         Deelnemers
-        <IconButton onClick={() => setAttendeesExpanded((x) => !x)}>
+        <IconButton onClick={toggleAllAttendeesExpanded}>
           {isAttendeesExpanded ? <VisibilityOffIcon /> : <VisibilityIcon />}
         </IconButton>
       </TableCell>
