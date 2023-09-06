@@ -87,6 +87,7 @@ export const SelectUser = <T extends SelectedUserOption>(props: {
 
       {isOptionSelectionLocked ? (
         <AttendeeButton
+          size="small"
           key="empty"
           attendee={{
             state: selectedOption?.state || "NOT_RESPONDED",

@@ -192,7 +192,7 @@ export const EventListItem = (props: {
           </Typography>
         </Grid>
       </Conditional>
-      <Grid item xs={12} sm={6} md={12} lg={4}>
+      <Grid item xs={12} sm={6} md={4}>
         <Typography variant={dateTimeVariant}>
           📅 {formattedDate(startDateTime)}
         </Typography>
@@ -218,8 +218,9 @@ export const EventListItem = (props: {
           {trainerDropDown()}
         </Conditional>
       </Grid>
-      <Grid item xs={12} sm={6} md={12} lg={8}>
+      <Grid item xs={12} sm={6} md={8}>
         <Attendees
+          size="small"
           attendees={teamEvent.attendees}
           onUpdate={props.onUpdate}
           readOnly={!allowUpdating}
@@ -241,7 +242,7 @@ const trainerCoachOptions = (teamEvent: TeamEvent) =>
   teamEvent.attendees
     .filter((a) => COACH_TRAINER_ROLES.includes(a.user.role))
     .map((a) => ({
-      id: a.id,
+      id: a.user.id,
       name: a.user.name,
       state: a.state,
     }));
