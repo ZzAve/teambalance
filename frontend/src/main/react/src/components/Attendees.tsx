@@ -1,12 +1,12 @@
 import { SpinnerWithText } from "./SpinnerWithText";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import HelpIcon from "@mui/icons-material/Help";
-import { groupBy, sumRecord, withLoading } from "../utils/util";
+import { formatUnicorn, groupBy, sumRecord, withLoading } from "../utils/util";
 import { attendeesApiClient } from "../utils/AttendeesApiClient";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { EventType } from "./events/utils";
@@ -58,26 +58,6 @@ const getText = (
   return formatUnicorn(texts[name][typpe])(args);
 };
 
-const formatUnicorn = (unicorn: string) => {
-  let str = unicorn;
-  return function (args?: { [p: string]: string }) {
-    if (args !== undefined) {
-      let t = typeof arguments[0];
-      let key;
-      let args =
-        "string" === t || "number" === t
-          ? Array.prototype.slice.call(arguments)
-          : arguments[0];
-
-      for (key in args) {
-        str = str.replace(new RegExp("\\{" + key + "\\}", "gi"), args[key]);
-      }
-    }
-
-    return str;
-  };
-};
-
 type ButtonColorValue =
   | "primary"
   | "secondary"
@@ -91,7 +71,27 @@ const buttonColor: (state: Availability) => ButtonColorValue = (
   state: Availability
 ) => colorMap[state];
 
-const attendeeSummaryInitiallyExpanded = true; // TODO: fix me
+const initiallyExpanded: boolean = getAttendeeSummaryInitiallyExpanded();
+const setStates: React.Dispatch<React.SetStateAction<boolean>>[] = [];
+const useAttendeeSummaryExpansion: () => [boolean, Dispatch<boolean>] = () => {
+  const [isExpanded, setInternalExpanded] =
+    useState<boolean>(initiallyExpanded);
+
+  useEffect(() => {
+    setStates.push(setInternalExpanded);
+
+    return () => {
+      const index = setStates.indexOf(setInternalExpanded);
+      setStates.splice(index, 1);
+    };
+  }, []);
+
+  const setExpanded: Dispatch<boolean> = (value: boolean) => {
+    storeAttendeeSummaryInitiallyExpanded(value);
+    setStates.forEach((it) => it(value));
+  };
+  return [isExpanded, setExpanded];
+};
 
 /**
  * Function Attendees component
@@ -102,7 +102,6 @@ const Attendees = (props: {
   readOnly?: boolean;
   size?: "small" | "medium" | "large";
   showSummary?: boolean;
-  initiallyExpandedSummary?: boolean;
   showExpand: boolean;
   initiallyExpanded?: boolean;
 }) => {
@@ -110,7 +109,6 @@ const Attendees = (props: {
     readOnly = false,
     size = "medium",
     showSummary = false,
-    initiallyExpandedSummary = false,
     showExpand,
     initiallyExpanded = !showExpand,
   } = props;
@@ -118,15 +116,15 @@ const Attendees = (props: {
     Attendee | undefined
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
-  const [withAttendeeSummaryDetail, setAttendeeSummaryDetail] = useState(
-    attendeeSummaryInitiallyExpanded
-  );
+  const [withAttendeeSummaryDetail, setAttendeeSummaryDetail] =
+    useAttendeeSummaryExpansion();
   const { addAlert } = useAlerts();
   const [isExpanded, setExpanded] = useState(initiallyExpanded);
 
   useEffect(() => {
     setExpanded(initiallyExpanded);
   }, [initiallyExpanded]);
+
   const handleAttendeeClick = (attendee: Attendee) => {
     setSelectedAttendee(attendee);
   };
@@ -149,7 +147,6 @@ const Attendees = (props: {
 
   function toggleSummaryDetail() {
     const newDetail = !withAttendeeSummaryDetail;
-    storeAttendeeSummaryInitiallyExpanded(newDetail);
     setAttendeeSummaryDetail(newDetail);
   }
 

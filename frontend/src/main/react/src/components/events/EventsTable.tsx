@@ -56,7 +56,6 @@ const recurringEventTagline = (
   }
 };
 
-const initialAttendeesExpanded = getAllAttendeesExpandedPreference();
 const EventsTable = (props: {
   eventType: EventType;
   events: TeamEvent[];
@@ -75,7 +74,7 @@ const EventsTable = (props: {
     AffectedRecurringEvents | undefined
   >(undefined);
   const [isAttendeesExpanded, setAttendeesExpanded] = useState(
-    initialAttendeesExpanded
+    getAllAttendeesExpandedPreference()
   );
 
   const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));

@@ -31,9 +31,8 @@ const texts: EventsPageTexts = {
 const getText = (eventsType: EventType, name: keyof EventsPageTexts) =>
   texts[name][eventsType] || name;
 
-const initialViewTypePreference = getViewTypePreference();
 const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
-  const [viewType, setViewType] = useState<ViewType>(initialViewTypePreference);
+  const [viewType, setViewType] = useState<ViewType>(getViewTypePreference());
   const [includeHistory, setIncludeHistory] = useState(false);
   const navigate = useNavigate();
 

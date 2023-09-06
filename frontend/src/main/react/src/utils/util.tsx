@@ -118,3 +118,28 @@ export const getStateFromLocalStorage = <T extends any>(
 
 export const setStateToLocalStorage = <T extends any>(key: string, value: T) =>
   storageService.store<T>(key, value);
+
+/**
+ * Tries to do string interpolation a parameters based on named parameters.
+ *
+ * E.g. formatUnicorn("Hello {name}")({name: "Mother", job: "Baker"}) would result in "Hello Mother"
+ */
+export const formatUnicorn = (unicorn: string) => {
+  let str = unicorn;
+  return function (args?: { [p: string]: string }): string {
+    if (args !== undefined) {
+      let t = typeof arguments[0];
+      let key;
+      let args =
+        "string" === t || "number" === t
+          ? Array.prototype.slice.call(arguments)
+          : arguments[0];
+
+      for (key in args) {
+        str = str.replace(new RegExp("\\{" + key + "\\}", "gi"), args[key]);
+      }
+    }
+
+    return str;
+  };
+};

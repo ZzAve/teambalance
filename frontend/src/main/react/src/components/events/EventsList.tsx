@@ -224,9 +224,6 @@ export const EventListItem = (props: {
           onUpdate={props.onUpdate}
           readOnly={!allowUpdating}
           showSummary={eventTypesWithSummary.includes(props.eventType)}
-          initiallyExpandedSummary={eventTypesWithSummaryOpen.includes(
-            props.eventType
-          )}
           showExpand={false}
         />
       </Grid>

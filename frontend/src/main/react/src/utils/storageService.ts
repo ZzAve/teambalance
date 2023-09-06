@@ -73,18 +73,15 @@ export class StorageService {
         isValueType<ValueType>(storageObject, typeGuard)
       ) {
         return storageObject.value;
-      } else {
-        console.error(
-          "Someone is trying to corrupt the localstorage... I'm watching you!"
-        );
-        return undefined;
       }
     } catch (e) {
-      console.error(
-        "Someone is trying to corrupt the localstorage... I'm watching you!"
-      );
-      return undefined;
+      console.warn(`Couldn't parse stored object by key ${key}`, value);
     }
+    console.error(
+      "Someone is trying to corrupt the localstorage... I'm watching you!"
+    );
+    this.storage.removeItem(this.concatKeyWithPrefix(key));
+    return undefined;
   }
 
   clear(): void {
