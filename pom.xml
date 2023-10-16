@@ -33,7 +33,7 @@
         <verification.skip>false</verification.skip>
 
         <jib-maven-plugin.version>3.3.1</jib-maven-plugin.version>
-        <ktlint.version>0.47.1</ktlint.version>
+        <ktlint.version>0.51.0-FINAL</ktlint.version>
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M9</maven-surefire-plugin.version>
         <mockito-kotlin.version>4.0.0</mockito-kotlin.version>
