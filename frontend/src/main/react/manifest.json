@@ -4,27 +4,27 @@
   "description": "For your sv Tovo '67 team, this is the place too keep attendance of beer consumption, and events like trainings or matches",
   "icons": [
     {
-      "src": "images/favicon.ico",
+      "src": "favicon.ico",
       "sizes": "16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "images/favicon-16x16.png",
+      "src": "favicon-16x16.png",
       "sizes": "16x16",
       "type": "image/png"
     },
     {
-      "src": "images/favicon-32x32.png",
+      "src": "favicon-32x32.png",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "images/logo192.png",
+      "src": "logo192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "images/logo512.png",
+      "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
