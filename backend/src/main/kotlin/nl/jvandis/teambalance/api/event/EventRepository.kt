@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class EventRepository(
-    private val context: MultiTenantDslContext
+    private val context: MultiTenantDslContext,
 ) {
     /**
      * Returns whether an event with id {@code eventId} exists
@@ -26,26 +26,27 @@ class EventRepository(
 
 fun MultiTenantDslContext.insertRecurringEventPropertyRecord(event: Event): RecurringEventProperties {
     val er = event.recurringEventProperties!!
-    val insertRecurringEventPropertiesResult = insertInto(
-        RECURRING_EVENT_PROPERTIES,
-        RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID,
-        RECURRING_EVENT_PROPERTIES.INTERVAL_AMOUNT,
-        RECURRING_EVENT_PROPERTIES.INTERVAL_TIME_UNIT,
-        RECURRING_EVENT_PROPERTIES.AMOUNT_LIMIT,
-        RECURRING_EVENT_PROPERTIES.DATE_LIMIT,
-        RECURRING_EVENT_PROPERTIES.SELECTED_DAYS
-    )
-        .values(
-            er.teamBalanceId.value,
-            er.intervalAmount,
-            er.intervalTimeUnit,
-            er.amountLimit,
-            er.dateLimit,
-            er.selectedDays.toTypedArray()
+    val insertRecurringEventPropertiesResult =
+        insertInto(
+            RECURRING_EVENT_PROPERTIES,
+            RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID,
+            RECURRING_EVENT_PROPERTIES.INTERVAL_AMOUNT,
+            RECURRING_EVENT_PROPERTIES.INTERVAL_TIME_UNIT,
+            RECURRING_EVENT_PROPERTIES.AMOUNT_LIMIT,
+            RECURRING_EVENT_PROPERTIES.DATE_LIMIT,
+            RECURRING_EVENT_PROPERTIES.SELECTED_DAYS,
         )
-        .returningResult(RECURRING_EVENT_PROPERTIES.fields().toList())
-        .fetchOne()
-        ?: throw DataAccessException("Couldn't persist RECURRING_EVENT_PROPERTIES for $event")
+            .values(
+                er.teamBalanceId.value,
+                er.intervalAmount,
+                er.intervalTimeUnit,
+                er.amountLimit,
+                er.dateLimit,
+                er.selectedDays.toTypedArray(),
+            )
+            .returningResult(RECURRING_EVENT_PROPERTIES.fields().toList())
+            .fetchOne()
+            ?: throw DataAccessException("Couldn't persist RECURRING_EVENT_PROPERTIES for $event")
 
     return insertRecurringEventPropertiesResult
         .into(RecurringEventPropertiesRecord::class.java)

@@ -5,12 +5,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateUser(
     val name: String,
-    val role: Role
+    val role: Role,
 )
 
 @Serializable
 data class Users(
-    val users: List<User>
+    val users: List<User>,
 )
 
 @Serializable
@@ -19,7 +19,7 @@ data class User(
     val role: Role,
     val id: Long,
     val isActive: Boolean,
-    val jerseyNumber: Int? = null
+    val jerseyNumber: Int? = null,
 )
 
 @Serializable
@@ -31,5 +31,5 @@ enum class Role {
     DIAGONAL,
     PASSER,
     LIBERO,
-    OTHER
+    OTHER,
 }

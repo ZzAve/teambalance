@@ -14,20 +14,19 @@ fun <T : Event> getEventsAndAttendees(
     eventsRepository: TeamEventsRepository<T>,
     page: Int,
     limit: Int,
-    since: LocalDateTime
+    since: LocalDateTime,
 ): Page<T> {
     val pageRequest = PageRequest.of(page - 1, limit, Sort.by("startTime").ascending())
 
     return eventsRepository.findAllWithStartTimeAfter(since, pageRequest)
 }
 
-fun CreateRecurringEventPropertiesRequest.getRecurringEventDates(
-    startTime: LocalDateTime
-): List<LocalDateTime> {
-    val interval = when (intervalTimeUnit) {
-        RecurringEventProperties.TimeUnit.WEEK -> Period.ofWeeks(intervalAmount)
-        RecurringEventProperties.TimeUnit.MONTH -> Period.ofMonths(intervalAmount)
-    }
+fun CreateRecurringEventPropertiesRequest.getRecurringEventDates(startTime: LocalDateTime): List<LocalDateTime> {
+    val interval =
+        when (intervalTimeUnit) {
+            RecurringEventProperties.TimeUnit.WEEK -> Period.ofWeeks(intervalAmount)
+            RecurringEventProperties.TimeUnit.MONTH -> Period.ofMonths(intervalAmount)
+        }
 
     val internalSelectedDays = selectedDays
     require(internalSelectedDays.contains(startTime.dayOfWeek)) {
@@ -37,9 +36,10 @@ fun CreateRecurringEventPropertiesRequest.getRecurringEventDates(
 
     val eventDates: List<LocalDateTime>
     if (amountLimit != null) {
-        eventDates = (1 until amountLimit).runningFold(startTime) { acc, _ ->
-            nextEventDate(acc, interval, internalSelectedDays)
-        }
+        eventDates =
+            (1 until amountLimit).runningFold(startTime) { acc, _ ->
+                nextEventDate(acc, interval, internalSelectedDays)
+            }
     } else if (dateLimit != null) {
         require(dateLimit >= startTime.toLocalDate()) {
             "The dateLimit property should be later than the startTime for an event to be recurring."
@@ -60,7 +60,11 @@ fun CreateRecurringEventPropertiesRequest.getRecurringEventDates(
     return eventDates
 }
 
-fun nextEventDate(lastEventDate: LocalDateTime, interval: Period, daysOfWeek: List<DayOfWeek>): LocalDateTime {
+fun nextEventDate(
+    lastEventDate: LocalDateTime,
+    interval: Period,
+    daysOfWeek: List<DayOfWeek>,
+): LocalDateTime {
     val nextWeekDayInRecurringEvent =
         daysOfWeek
             .filter { it.value > lastEventDate.dayOfWeek.value }

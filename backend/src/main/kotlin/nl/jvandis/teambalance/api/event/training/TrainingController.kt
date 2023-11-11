@@ -43,7 +43,7 @@ class TrainingController(
     private val trainingService: TrainingService,
     private val eventRepository: TrainingRepository,
     private val userRepository: UserRepository,
-    private val attendeeRepository: AttendeeRepository
+    private val attendeeRepository: AttendeeRepository,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -55,7 +55,7 @@ class TrainingController(
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         since: LocalDateTime,
         @RequestParam(value = "limit", defaultValue = "10") limit: Int,
-        @RequestParam(value = "page", defaultValue = "1") page: Int
+        @RequestParam(value = "page", defaultValue = "1") page: Int,
     ): EventsResponse<TrainingResponse> {
         log.debug("GetAllTrainings")
         // In case of testing performance again :)
@@ -74,23 +74,24 @@ class TrainingController(
             eventsRepository = eventRepository,
             page = page,
             limit = limit,
-            since = since
+            since = since,
         ).expose(includeInactiveUsers)
     }
 
-    private fun Page<Training>.expose(includeInactiveUsers: Boolean) = EventsResponse(
-        totalPages = totalPages,
-        totalSize = totalElements,
-        page = number + 1,
-        size = min(size, content.size),
-        events = content.map { it.expose(includeInactiveUsers) }
-    )
+    private fun Page<Training>.expose(includeInactiveUsers: Boolean) =
+        EventsResponse(
+            totalPages = totalPages,
+            totalSize = totalElements,
+            page = number + 1,
+            size = min(size, content.size),
+            events = content.map { it.expose(includeInactiveUsers) },
+        )
 
     @GetMapping("/{training-id}")
     fun getTraining(
         @PathVariable("training-id") trainingId: Long,
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
-        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
+        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
     ): TrainingResponse {
         log.debug("Get training $trainingId")
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
@@ -109,17 +110,18 @@ class TrainingController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun createTraining(
-        @RequestBody potentialEvent: PotentialTraining
+        @RequestBody potentialEvent: PotentialTraining,
     ): EventsResponse<TrainingResponse> {
         log.debug("postTraining {}", potentialEvent)
         val allUsers = userRepository.findAll()
         val events = potentialEvent.internalize()
         log.info("Requested to create trainings events: $events")
 
-        val requestedUsersToAdd = allUsers.filter { user ->
-            potentialEvent.userIds?.any { it == user.id }
-                ?: true
-        }
+        val requestedUsersToAdd =
+            allUsers.filter { user ->
+                potentialEvent.userIds?.any { it == user.id }
+                    ?: true
+            }
         log.info("Users to add to training events: $requestedUsersToAdd")
 
         if (potentialEvent.userIds != null &&
@@ -127,7 +129,7 @@ class TrainingController(
         ) {
             throw CreateEventException(
                 "Not all requested userIds exists unfortunately ${potentialEvent.userIds}." +
-                    " Please verify your userIds"
+                    " Please verify your userIds",
             )
         }
 
@@ -152,12 +154,12 @@ class TrainingController(
             .also {
                 log.info(
                     "Created ${it.totalSize} training events with recurringEventId: ${events.firstOrNull()?.recurringEventProperties}. " +
-                        "First event date: ${it.events.firstOrNull()?.startTime}, last event date: ${it.events.lastOrNull()?.startTime} "
+                        "First event date: ${it.events.firstOrNull()?.startTime}, last event date: ${it.events.lastOrNull()?.startTime} ",
                 )
 
                 it.events.forEach { e ->
                     log.info(
-                        "Created event as part of '${events.firstOrNull()?.recurringEventProperties}': $e"
+                        "Created event as part of '${events.firstOrNull()?.recurringEventProperties}': $e",
                     )
                 }
             }
@@ -168,18 +170,19 @@ class TrainingController(
     fun addAttendee(
         @PathVariable(value = "training-id") trainingId: Long,
         @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,
-        @RequestBody user: UserAddRequest
+        @RequestBody user: UserAddRequest,
     ): List<AttendeeResponse> {
         log.info("Adding: $user (or all: $addAll) to training $trainingId")
         val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
-        val users = if (addAll) {
-            userRepository.findAll()
-        } else {
-            userRepository
-                .findByIdOrNull(user.userId)
-                ?.let(::listOf)
-                ?: throw InvalidUserException(user.userId)
-        }
+        val users =
+            if (addAll) {
+                userRepository.findAll()
+            } else {
+                userRepository
+                    .findByIdOrNull(user.userId)
+                    ?.let(::listOf)
+                    ?: throw InvalidUserException(user.userId)
+            }
 
         return users.map { u ->
             attendeeRepository.insert(u.toNewAttendee(training)).expose()
@@ -190,7 +193,7 @@ class TrainingController(
     fun updateTraining(
         @PathVariable(value = "training-id") trainingId: Long,
         @RequestParam(value = "affected-recurring-events") affectedRecurringEvents: AffectedRecurringEvents?,
-        @RequestBody updateTrainingRequest: UpdateTrainingRequest
+        @RequestBody updateTrainingRequest: UpdateTrainingRequest,
     ): EventsResponse<TrainingResponse> {
         log.info("Updating training $trainingId with $updateTrainingRequest")
         return trainingService.updateTraining(trainingId, affectedRecurringEvents, updateTrainingRequest)
@@ -202,15 +205,16 @@ class TrainingController(
     @PutMapping("/{training-id}/trainer")
     fun updateTrainer(
         @PathVariable(value = "training-id") trainingId: Long,
-        @RequestBody updateTrainerRequest: UpdateTrainerRequest
+        @RequestBody updateTrainerRequest: UpdateTrainerRequest,
     ): TrainingResponse {
         return eventRepository
             .findByIdOrNull(trainingId)
             ?.let {
                 val potentialTrainer = getPotentialTrainer(updateTrainerRequest)
-                val updatedTraining = it.copy(
-                    trainer = potentialTrainer
-                )
+                val updatedTraining =
+                    it.copy(
+                        trainer = potentialTrainer,
+                    )
                 eventRepository.updateSingleEvent(updatedTraining)
             }
             ?.expose(emptyList())
@@ -234,7 +238,7 @@ class TrainingController(
     fun deleteTraining(
         @PathVariable(value = "training-id") trainingId: Long,
         @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean,
-        @RequestParam(value = "affected-recurring-events") affectedRecurringEvents: AffectedRecurringEvents?
+        @RequestParam(value = "affected-recurring-events") affectedRecurringEvents: AffectedRecurringEvents?,
     ): DeletedEventsResponse {
         log.info("Deleting training: $trainingId")
         if (deleteAttendees) {
@@ -246,7 +250,9 @@ class TrainingController(
             return eventRepository.deleteById(trainingId, affectedRecurringEvents)
                 .let(::DeletedEventsResponse)
         } catch (e: DataIntegrityViolationException) {
-            throw DataConstraintViolationException("Training $trainingId could not be deleted. There are still attendees bound to this training")
+            throw DataConstraintViolationException(
+                "Training $trainingId could not be deleted. There are still attendees bound to this training",
+            )
         }
     }
 }

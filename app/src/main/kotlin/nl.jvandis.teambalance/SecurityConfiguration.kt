@@ -11,14 +11,6 @@ import org.springframework.security.web.SecurityFilterChain
 @EnableWebSecurity
 @EnableMethodSecurity
 class SecurityConfiguration {
-
-//    @Throws(Exception::class)
-//    override fun configure(web: WebSecurity) {
-//        web
-//                .ignoring()
-//                .antMatchers("/resources/**")
-//    }
-
     @Bean
     @Throws(Exception::class)
     fun filterChain(http: HttpSecurity): SecurityFilterChain {

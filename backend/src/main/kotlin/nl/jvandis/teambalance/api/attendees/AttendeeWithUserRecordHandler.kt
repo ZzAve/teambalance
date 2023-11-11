@@ -26,16 +26,18 @@ class AttendeeWithUserRecordHandler : TeamBalanceRecordHandler<Attendee> {
             return
         }
 
-        val attendee = attendees.computeIfAbsent(attendeeId) {
-            // mapping via AttendeeRecords works better with column name clashes (like `id`)
-            record.into(AttendeeRecord::class.java)
-                .into(Attendee.Builder::class.java)
-        }
+        val attendee =
+            attendees.computeIfAbsent(attendeeId) {
+                // mapping via AttendeeRecords works better with column name clashes (like `id`)
+                record.into(AttendeeRecord::class.java)
+                    .into(Attendee.Builder::class.java)
+            }
 
-        val user = users.computeIfAbsent(userId) {
-            record.into(UzerRecord::class.java)
-                .into(User::class.java)
-        }
+        val user =
+            users.computeIfAbsent(userId) {
+                record.into(UzerRecord::class.java)
+                    .into(User::class.java)
+            }
 
         attendee.user = user
     }
@@ -49,7 +51,7 @@ class AttendeeWithUserRecordHandler : TeamBalanceRecordHandler<Attendee> {
             Nr of records handled: $recordsHandled. 
             Nr of attendeesCreated: ${attendees.size}. 
             Nr of users created: ${users.size}"
-        """.trimIndent()
+            """.trimIndent()
     }
 
     override fun build(): List<Attendee> {

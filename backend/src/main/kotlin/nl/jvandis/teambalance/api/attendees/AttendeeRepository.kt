@@ -25,13 +25,13 @@ import java.time.LocalDateTime
 
 @Repository
 class AttendeeRepository(
-    private val context: MultiTenantDslContext
+    private val context: MultiTenantDslContext,
 ) {
     private val log = LoggerFactory.getLogger(AttendeeRepository::class.java)
 
     fun findAllByEventIdIn(
         eventIds: List<Long>,
-        sort: Sort = Sort.by("user.role", "user.name")
+        sort: Sort = Sort.by("user.role", "user.name"),
     ): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
         context.select()
@@ -51,28 +51,31 @@ class AttendeeRepository(
     @Transactional
     fun findAllAttendeesBelongingToEvent(
         eventId: Long,
-        affectedRecurringEvents: AffectedRecurringEvents?
+        affectedRecurringEvents: AffectedRecurringEvents?,
     ): List<Attendee> {
         var deleteBasedOnCurrentEvent = EVENT.ID.eq(eventId)
         var recurringEventIdCondition = noCondition()
         var recurringEventInFutureCondition = noCondition()
         if (listOf(CURRENT_AND_FUTURE, ALL).contains(affectedRecurringEvents)) {
-            val fetchOne = context.select(EVENT.RECURRING_EVENT_ID, EVENT.START_TIME)
-                .from(EVENT)
-                .where(EVENT.ID.eq(eventId))
-                .fetchOne()
+            val fetchOne =
+                context.select(EVENT.RECURRING_EVENT_ID, EVENT.START_TIME)
+                    .from(EVENT)
+                    .where(EVENT.ID.eq(eventId))
+                    .fetchOne()
             val recurringEventId: Long? = fetchOne?.getField(EVENT.RECURRING_EVENT_ID)
             deleteBasedOnCurrentEvent = noCondition()
             recurringEventIdCondition = EVENT.RECURRING_EVENT_ID.eq(recurringEventId)
             if (affectedRecurringEvents == CURRENT_AND_FUTURE) {
-                recurringEventInFutureCondition = EVENT.START_TIME.greaterOrEqual(
-                    fetchOne?.getFieldOrThrow(EVENT.START_TIME) ?: LocalDateTime.MIN
-                )
+                recurringEventInFutureCondition =
+                    EVENT.START_TIME.greaterOrEqual(
+                        fetchOne?.getFieldOrThrow(EVENT.START_TIME) ?: LocalDateTime.MIN,
+                    )
             }
         }
-        val eventsToDeleteCondition = deleteBasedOnCurrentEvent
-            .and(recurringEventIdCondition)
-            .and(recurringEventInFutureCondition)
+        val eventsToDeleteCondition =
+            deleteBasedOnCurrentEvent
+                .and(recurringEventIdCondition)
+                .and(recurringEventInFutureCondition)
 
         val recordHandler = AttendeeWithUserRecordHandler()
         context.select()
@@ -96,9 +99,10 @@ class AttendeeRepository(
             return emptyList()
         }
 
-        val insertResult = context.insertInto(ATTENDEE, ATTENDEE.AVAILABILITY, ATTENDEE.EVENT_ID, ATTENDEE.USER_ID)
-            .valuesFrom(attendees, { it.availability }, { it.eventId }, { it.user.id })
-            .returningResult(ATTENDEE.ID).fetch()
+        val insertResult =
+            context.insertInto(ATTENDEE, ATTENDEE.AVAILABILITY, ATTENDEE.EVENT_ID, ATTENDEE.USER_ID)
+                .valuesFrom(attendees, { it.availability }, { it.eventId }, { it.user.id })
+                .returningResult(ATTENDEE.ID).fetch()
 
         val recordHandler = AttendeeWithUserRecordHandler()
         context.select()
@@ -119,22 +123,24 @@ class AttendeeRepository(
     }
 
     fun insert(attendee: Attendee): Attendee {
-        val attendeeRecord = context
-            .insertInto(ATTENDEE, ATTENDEE.AVAILABILITY, ATTENDEE.EVENT_ID, ATTENDEE.USER_ID)
-            .values(attendee.availability, attendee.eventId, attendee.user.id)
-            .returning(ATTENDEE.ID, ATTENDEE.AVAILABILITY, ATTENDEE.EVENT_ID, ATTENDEE.USER_ID)
-            .fetchOne()
-            ?: throw DataAccessException("Could not insert Attendee $attendee")
+        val attendeeRecord =
+            context
+                .insertInto(ATTENDEE, ATTENDEE.AVAILABILITY, ATTENDEE.EVENT_ID, ATTENDEE.USER_ID)
+                .values(attendee.availability, attendee.eventId, attendee.user.id)
+                .returning(ATTENDEE.ID, ATTENDEE.AVAILABILITY, ATTENDEE.EVENT_ID, ATTENDEE.USER_ID)
+                .fetchOne()
+                ?: throw DataAccessException("Could not insert Attendee $attendee")
 
-        val user = context.select()
-            .from(UZER)
-            .where(UZER.ID.eq(attendeeRecord.userId))
-            .fetchOne()
-            ?.run {
-                into(UzerRecord::class.java)
-                    .into(User::class.java)
-            }
-            ?: throw DataAccessException("User with id ${attendeeRecord.userId} doesn't exist. ")
+        val user =
+            context.select()
+                .from(UZER)
+                .where(UZER.ID.eq(attendeeRecord.userId))
+                .fetchOne()
+                ?.run {
+                    into(UzerRecord::class.java)
+                        .into(User::class.java)
+                }
+                ?: throw DataAccessException("User with id ${attendeeRecord.userId} doesn't exist. ")
 
         return attendeeRecord
             .into(Attendee.Builder::class.java)
@@ -142,11 +148,12 @@ class AttendeeRepository(
             .build()
     }
 
-    fun deleteAll(attendees: List<Attendee>): Int = context
-        .also { log.info("Deleting attendees: $attendees") }
-        .deleteFrom(ATTENDEE)
-        .where(ATTENDEE.ID.`in`(attendees.map { it.id }))
-        .execute()
+    fun deleteAll(attendees: List<Attendee>): Int =
+        context
+            .also { log.info("Deleting attendees: $attendees") }
+            .deleteFrom(ATTENDEE)
+            .where(ATTENDEE.ID.`in`(attendees.map { it.id }))
+            .execute()
 
     fun findAll(): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
@@ -162,7 +169,10 @@ class AttendeeRepository(
         return recordHandler.build()
     }
 
-    fun findALlByEventIdInAndUserIdIn(eventIds: List<Long>, userIds: List<Long>): List<Attendee> {
+    fun findALlByEventIdInAndUserIdIn(
+        eventIds: List<Long>,
+        userIds: List<Long>,
+    ): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
         context.select()
             .from(ATTENDEE)
@@ -208,7 +218,10 @@ class AttendeeRepository(
                     .first()
             }
 
-    fun findByUserIdAndEventId(userId: Long, eventId: Long): List<Attendee> {
+    fun findByUserIdAndEventId(
+        userId: Long,
+        eventId: Long,
+    ): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
         context.select()
             .from(ATTENDEE)
@@ -232,7 +245,7 @@ class AttendeeRepository(
             throw IllegalStateException(
                 "Attendee with 'special' id $NO_ID can not be deleted. " +
                     "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back"
+                    "from records to entities and back",
             )
         }
         val execute = context.delete(ATTENDEE).where(ATTENDEE.ID.eq(id)).execute()
@@ -241,12 +254,15 @@ class AttendeeRepository(
         }
     }
 
-    fun deleteById(id: Long, affectedRecurringEvents: AffectedRecurringEvents?) {
+    fun deleteById(
+        id: Long,
+        affectedRecurringEvents: AffectedRecurringEvents?,
+    ) {
         if (id == NO_ID) {
             throw IllegalStateException(
                 "Attendee with 'special' id $NO_ID can not be deleted. " +
                     "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back"
+                    "from records to entities and back",
             )
         }
         val execute = context.delete(ATTENDEE).where(ATTENDEE.ID.eq(id)).execute()
@@ -255,9 +271,13 @@ class AttendeeRepository(
         }
     }
 
-    fun updateAvailability(attendeeId: Long, availability: Availability): Boolean = context
-        .update(ATTENDEE)
-        .set(ATTENDEE.AVAILABILITY, availability)
-        .where(ATTENDEE.ID.eq(attendeeId))
-        .execute() == 1
+    fun updateAvailability(
+        attendeeId: Long,
+        availability: Availability,
+    ): Boolean =
+        context
+            .update(ATTENDEE)
+            .set(ATTENDEE.AVAILABILITY, availability)
+            .where(ATTENDEE.ID.eq(attendeeId))
+            .execute() == 1
 }

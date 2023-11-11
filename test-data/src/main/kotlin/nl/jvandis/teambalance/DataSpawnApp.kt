@@ -18,16 +18,18 @@ fun main(args: Array<String>) {
 
     val apiKey = args[0]
 
-    val config = SpawnDataConfig(
-        amountOfTrainings = 5,
-        amountOfMatches = 5,
-        amountOfEvents = 0
-    )
+    val config =
+        SpawnDataConfig(
+            amountOfTrainings = 5,
+            amountOfMatches = 5,
+            amountOfEvents = 0,
+        )
 
     log.info("Running SpawnData ...")
-    val measureTime = measureTime {
-        Initializer(apiKey, "http://localhost:8080").spawnData(config)
-    }
+    val measureTime =
+        measureTime {
+            Initializer(apiKey, "http://localhost:8080").spawnData(config)
+        }
 
     log.info("Finished running SpawnData of $config in $measureTime...")
 }

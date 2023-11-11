@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class ConfigurationRepository(private val context: MultiTenantDslContext) {
-
     fun getConfig(key: String): String? {
         return context.select(CONFIG.VALUE)
             .from(CONFIG)

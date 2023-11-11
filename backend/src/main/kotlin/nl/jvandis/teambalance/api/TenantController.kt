@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "tenants")
 @RequestMapping(path = ["/api/tenants"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class TenantController(
-    private val tenantsConfig: TenantsConfig
+    private val tenantsConfig: TenantsConfig,
 ) {
-
     @GetMapping("/me")
     fun getCurrentTenant(): TenantResponse {
         val currentTenant = MultiTenantContext.getCurrentTenant()
@@ -29,6 +28,5 @@ class TenantController(
 data class TenantResponse(
     val domain: String,
     val title: String,
-    val bunqMeBaseUrl: String
-
+    val bunqMeBaseUrl: String,
 )

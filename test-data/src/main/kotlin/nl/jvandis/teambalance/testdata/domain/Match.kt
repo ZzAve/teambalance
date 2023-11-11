@@ -10,13 +10,13 @@ data class CreateMatch(
     val opponent: String,
     val homeAway: Place,
     val comment: String?,
-    val userIds: List<Long>? = emptyList()
+    val userIds: List<Long>? = emptyList(),
 )
 
 @Serializable
 enum class Place {
     HOME,
-    AWAY
+    AWAY,
 }
 
 @Serializable
@@ -28,5 +28,5 @@ data class Match(
     val attendees: List<Attendee>,
     val opponent: String,
     val homeAway: Place,
-    val coach: String?
+    val coach: String?,
 )

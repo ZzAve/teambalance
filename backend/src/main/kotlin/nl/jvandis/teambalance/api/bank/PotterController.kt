@@ -26,9 +26,8 @@ import java.time.ZonedDateTime
 @Tags(value = [Tag(name = "aliases"), Tag(name = "bank")])
 @RequestMapping(path = ["/api/bank"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class PotterController(
-    private val potterService: PotterService
+    private val potterService: PotterService,
 ) {
-
     @GetMapping("/potters")
     fun getPotters(
         @RequestParam(value = "limit", defaultValue = "3")
@@ -39,7 +38,7 @@ class PotterController(
         @RequestParam(value = "since", defaultValue = START_OF_SEASON_RAW)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         sinceInput: LocalDateTime,
-        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
+        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
     ): PottersResponse {
         val pottersFullPeriod = potterService.getPotters(sinceInput.toZonedDateTime(), includeInactiveUsers)
         val now = ZonedDateTime.now()
@@ -54,22 +53,24 @@ class PotterController(
         return pottersFullPeriod.toPottersResponse(limit, pottersLastMonthResponse)
     }
 
-    private fun Potters.toPottersResponse(limit: Int, pottersLastMonthResponse: PottersResponse? = null) =
-        PottersResponse(
-            toppers = potters.map { it.toPotterResponse(currency) }.sortedByDescending { it.amount }.take(limit),
-            floppers = potters.map { it.toPotterResponse(currency) }.sortedBy { it.amount }.take(limit),
-            amountOfConsideredTransactions = amountOfTransactions,
-            from = from,
-            until = until,
-            subPeriod = pottersLastMonthResponse
-        )
+    private fun Potters.toPottersResponse(
+        limit: Int,
+        pottersLastMonthResponse: PottersResponse? = null,
+    ) = PottersResponse(
+        toppers = potters.map { it.toPotterResponse(currency) }.sortedByDescending { it.amount }.take(limit),
+        floppers = potters.map { it.toPotterResponse(currency) }.sortedBy { it.amount }.take(limit),
+        amountOfConsideredTransactions = amountOfTransactions,
+        from = from,
+        until = until,
+        subPeriod = pottersLastMonthResponse,
+    )
 
     private fun Potter.toPotterResponse(currency: String): PotterResponse {
         val cumulativeAmount = transactions.fold(0.0) { acc, cur -> acc + cur.amount.toDouble() }
         return PotterResponse(
             name = name,
             currency = currency,
-            amount = cumulativeAmount
+            amount = cumulativeAmount,
         )
     }
 
@@ -79,7 +80,7 @@ class PotterController(
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = e.message ?: "Bad request"
-                )
+                    reason = e.message ?: "Bad request",
+                ),
             )
 }

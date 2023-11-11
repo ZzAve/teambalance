@@ -8,5 +8,5 @@ data class EventResponse<T>(
     val totalPages: Int,
     val page: Int,
     val size: Int,
-    val events: List<T>
+    val events: List<T>,
 )

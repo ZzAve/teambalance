@@ -9,7 +9,7 @@ data class Attendee(
     val id: Long = NO_ID,
     val user: User,
     val availability: Availability,
-    val eventId: Long
+    val eventId: Long,
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(Attendee::class.java)
@@ -18,7 +18,7 @@ data class Attendee(
     constructor(user: User, eventId: Long) : this(
         user = user,
         eventId = eventId,
-        availability = Availability.NOT_RESPONDED
+        availability = Availability.NOT_RESPONDED,
     )
 
     data class Builder(
@@ -26,14 +26,15 @@ data class Attendee(
         val userId: Long,
         val eventId: Long,
         val availability: Availability,
-        var user: User? = null
+        var user: User? = null,
     ) : TeamBalanceEntityBuilder<Attendee> {
-        override fun build() = Attendee(
-            id = id,
-            user = checkNotNull(user) { "User has not been set." },
-            availability = availability,
-            eventId = eventId
-        )
+        override fun build() =
+            Attendee(
+                id = id,
+                user = checkNotNull(user) { "User has not been set." },
+                availability = availability,
+                eventId = eventId,
+            )
     }
 }
 
@@ -41,5 +42,5 @@ enum class Availability {
     PRESENT,
     ABSENT,
     UNCERTAIN,
-    NOT_RESPONDED
+    NOT_RESPONDED,
 }

@@ -16,15 +16,14 @@ data class Training(
     override val comment: String? = null,
     override val recurringEventProperties: RecurringEventProperties?,
     val trainer: User? = null,
-    val attendees: List<Attendee>? = null
-
+    val attendees: List<Attendee>? = null,
 ) : Event(id, startTime, location, comment, recurringEventProperties) {
     internal constructor(
         startTime: LocalDateTime,
         location: String,
         comment: String? = null,
         trainer: User? = null,
-        recurringEventProperties: RecurringEventProperties? = null
+        recurringEventProperties: RecurringEventProperties? = null,
     ) :
         this(
             id = NO_ID,
@@ -32,7 +31,7 @@ data class Training(
             location = location,
             comment = comment,
             trainer = trainer,
-            recurringEventProperties = recurringEventProperties
+            recurringEventProperties = recurringEventProperties,
         )
 
     data class Builder(
@@ -40,7 +39,7 @@ data class Training(
         val trainerUserId: Long?,
         var event: Event.Builder? = null,
         var trainer: User? = null,
-        var attendees: List<Attendee.Builder>? = null
+        var attendees: List<Attendee.Builder>? = null,
     ) : TeamBalanceEntityBuilder<Training> {
         override fun build(): Training {
             val event = checkNotNull(event) { "Event was not set" }
@@ -58,7 +57,7 @@ data class Training(
                 comment = event.comment,
                 trainer = trainer,
                 attendees = attendees?.build(),
-                recurringEventProperties = event.recurringEventProperties
+                recurringEventProperties = event.recurringEventProperties,
             )
         }
     }

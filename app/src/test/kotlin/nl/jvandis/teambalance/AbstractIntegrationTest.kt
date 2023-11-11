@@ -29,7 +29,6 @@ import java.sql.DriverManager
 @ContextConfiguration(initializers = [AbstractIntegrationTest.Initializer::class])
 @AutoConfigureMockMvc
 class AbstractIntegrationTest {
-
     internal class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
         override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
             // detect running db
@@ -42,16 +41,17 @@ class AbstractIntegrationTest {
             TestPropertyValues.of(
                 "spring.datasource.username=${postgresqlContainer.username}",
                 "spring.datasource.password=${postgresqlContainer.password}",
-                "spring.datasource.url=${postgresqlContainer.jdbcUrl}"
+                "spring.datasource.url=${postgresqlContainer.jdbcUrl}",
             ).applyTo(configurableApplicationContext.environment)
         }
 
         private fun runLiquibaseMigrations() {
-            connection = DriverManager.getConnection(
-                postgresqlContainer.jdbcUrl,
-                postgresqlContainer.username,
-                postgresqlContainer.password
-            )
+            connection =
+                DriverManager.getConnection(
+                    postgresqlContainer.jdbcUrl,
+                    postgresqlContainer.username,
+                    postgresqlContainer.password,
+                )
 
             // Note: naive way of creating a DSLContext that is NOT tenant / schema aware.
             // FIXME
@@ -70,8 +70,13 @@ class AbstractIntegrationTest {
                 LiquibaseSupport.migrate(
                     connection,
                     "db.changelog-master.xml",
-                    "${System.getProperty("user.dir")}/../backend/src/main/resources/db/changelog/", // TODO: change me to classpath resource
-                    tenant.name.lowercase()
+                    // TODO: change me to classpath resource
+                    "${
+                        System.getProperty(
+                            "user.dir",
+                        )
+                    }/../backend/src/main/resources/db/changelog/",
+                    tenant.name.lowercase(),
                 )
                 log.info("Finished setup")
             }
@@ -89,7 +94,6 @@ class AbstractIntegrationTest {
     }
 
     companion object {
-
         private var log = loggerFor()
         lateinit var connection: Connection
 
@@ -99,15 +103,16 @@ class AbstractIntegrationTest {
         lateinit var context: DSLContext
 
         @Container
-        val postgresqlContainer = PostgreSQLContainer("postgres:11.18-bullseye").apply {
-            withDatabaseName("teambalance")
-            withUsername("teambalance")
-            withPassword("teambalance")
-            withUrlParam("loggerLevel", "DEBUG")
-            waitingFor(
-                Wait.forLogMessage(".*ready to accept connections.*\\n", 1)
-            ).withConnectTimeoutSeconds(20)
-        }
+        val postgresqlContainer =
+            PostgreSQLContainer("postgres:11.18-bullseye").apply {
+                withDatabaseName("teambalance")
+                withUsername("teambalance")
+                withPassword("teambalance")
+                withUrlParam("loggerLevel", "DEBUG")
+                waitingFor(
+                    Wait.forLogMessage(".*ready to accept connections.*\\n", 1),
+                ).withConnectTimeoutSeconds(20)
+            }
 
         @JvmStatic
         @BeforeAll

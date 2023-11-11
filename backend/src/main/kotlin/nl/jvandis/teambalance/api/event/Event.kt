@@ -9,16 +9,15 @@ abstract class Event(
     open val startTime: LocalDateTime,
     open val location: String,
     open val comment: String?,
-    open val recurringEventProperties: RecurringEventProperties?
+    open val recurringEventProperties: RecurringEventProperties?,
 ) {
-
     data class Builder(
         val id: Long,
         val startTime: LocalDateTime,
         val location: String,
         val comment: String?,
         val recurringEventId: Long?,
-        var recurringEventProperties: RecurringEventProperties?
+        var recurringEventProperties: RecurringEventProperties?,
     ) {
         fun validate() {
             recurringEventId?.let {
@@ -26,7 +25,8 @@ abstract class Event(
                     "recurringEventProperties was not set even though `recurringEventId` was  "
                 }
                 check(it == recurringEventProperties?.id) {
-                    "recurringEventProperties.id ${recurringEventProperties?.id} was expected to be the same as reccuringEventId $recurringEventId"
+                    "recurringEventProperties.id ${recurringEventProperties?.id} was expected to be " +
+                        "the same as reccuringEventId $recurringEventId"
                 }
             }
         }
@@ -40,17 +40,16 @@ data class RecurringEventProperties(
     val intervalTimeUnit: TimeUnit,
     val amountLimit: Int?,
     val dateLimit: LocalDate?,
-    val selectedDays: List<Int>
+    val selectedDays: List<Int>,
 ) {
-
     enum class TimeUnit {
         WEEK,
-        MONTH
+        MONTH,
     }
 }
 
 enum class AffectedRecurringEvents {
     ALL,
     CURRENT_AND_FUTURE,
-    CURRENT
+    CURRENT,
 }

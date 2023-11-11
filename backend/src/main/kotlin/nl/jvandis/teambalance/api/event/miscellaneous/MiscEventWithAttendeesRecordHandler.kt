@@ -34,23 +34,26 @@ class MiscEventWithAttendeesRecordHandler : TeamBalanceRecordHandler<Miscellaneo
         // handle attendee
         attendeeRecordHandler.accept(record)
 
-        val event = events.computeIfAbsent(eventId) {
-            // mapping via EventRecord works better with column name clashes (like `id`)
-            record.into(EventRecord::class.java)
-                .into(Event.Builder::class.java)
-        }
-        val recurringEventProperties = recurringEventId?.let {
-            recurringEventsPropertiesMap.computeIfAbsent(it) {
-                record.into(RecurringEventPropertiesRecord::class.java)
-                    .into(RecurringEventProperties::class.java)
+        val event =
+            events.computeIfAbsent(eventId) {
+                // mapping via EventRecord works better with column name clashes (like `id`)
+                record.into(EventRecord::class.java)
+                    .into(Event.Builder::class.java)
             }
-        }
+        val recurringEventProperties =
+            recurringEventId?.let {
+                recurringEventsPropertiesMap.computeIfAbsent(it) {
+                    record.into(RecurringEventPropertiesRecord::class.java)
+                        .into(RecurringEventProperties::class.java)
+                }
+            }
 
-        val miscEvent = miscEvent.computeIfAbsent(miscEventId) {
-            // mapping via MiscellaneousEventRecord works better with column name clashes (like `id`)
-            record.into(MiscellaneousEventRecord::class.java) //
-                .into(MiscellaneousEvent.Builder::class.java)
-        }
+        val miscEvent =
+            miscEvent.computeIfAbsent(miscEventId) {
+                // mapping via MiscellaneousEventRecord works better with column name clashes (like `id`)
+                record.into(MiscellaneousEventRecord::class.java) //
+                    .into(MiscellaneousEvent.Builder::class.java)
+            }
 
         event.recurringEventProperties = recurringEventProperties
         miscEvent.event = event
@@ -63,17 +66,19 @@ class MiscEventWithAttendeesRecordHandler : TeamBalanceRecordHandler<Miscellaneo
             Nr of subEvents: ${miscEvent.size}. 
             -- Attendees:
             ${attendeeRecordHandler.stats()}
-        """.trimIndent()
+            """.trimIndent()
     }
 
-    override fun build(): List<MiscellaneousEvent> = result ?: run {
-        val jooqAttendees = attendeeRecordHandler.getAttendees()
-        val buildResult = miscEvent.values.map { builder ->
-            val eventAttendees = jooqAttendees.filter { it.eventId == builder.id }
-            builder.attendees = eventAttendees
-            builder.build()
+    override fun build(): List<MiscellaneousEvent> =
+        result ?: run {
+            val jooqAttendees = attendeeRecordHandler.getAttendees()
+            val buildResult =
+                miscEvent.values.map { builder ->
+                    val eventAttendees = jooqAttendees.filter { it.eventId == builder.id }
+                    builder.attendees = eventAttendees
+                    builder.build()
+                }
+            result = buildResult
+            buildResult
         }
-        result = buildResult
-        buildResult
-    }
 }

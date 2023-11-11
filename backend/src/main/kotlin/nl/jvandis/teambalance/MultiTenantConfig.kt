@@ -12,20 +12,20 @@ import javax.sql.DataSource
 @Configuration
 @EnableConfigurationProperties(LiquibaseProperties::class)
 class MultiTenantConfig {
-
     /**
      * Programmatically disable the 'single tenant' liquibase flow.
      */
     @Bean
-    fun liquibase() = SpringLiquibase().apply {
-        setShouldRun(false)
-    }
+    fun liquibase() =
+        SpringLiquibase().apply {
+            setShouldRun(false)
+        }
 
     @Bean
     @ConditionalOnProperty(prefix = "spring.liquibase", name = ["enabled"])
     fun liquibaseMt(
         sqlDataSource: DataSource,
-        liquibaseProperties: LiquibaseProperties
+        liquibaseProperties: LiquibaseProperties,
     ) = MultiTenantSpringLiquibase().apply {
         changeLog = liquibaseProperties.changeLog
         defaultSchema = "public"

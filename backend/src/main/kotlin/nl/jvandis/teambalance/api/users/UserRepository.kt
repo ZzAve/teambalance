@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class UserRepository(
-    val context: MultiTenantDslContext
+    val context: MultiTenantDslContext,
 ) {
     fun findByIdOrNull(userId: Long): User? =
         context.select()
@@ -32,27 +32,28 @@ class UserRepository(
         if (users.isEmpty()) {
             return emptyList()
         }
-        val usersResult = context.insertInto(
-            UZER,
-            UZER.ROLE,
-            UZER.NAME,
-            UZER.IS_ACTIVE,
-            UZER.SHOW_FOR_MATCHES,
-            UZER.SHOW_FOR_TRAININGS,
-            UZER.JERSEY_NUMBER
-        )
-            .valuesFrom(
-                users,
-                { it.role },
-                { it.name },
-                { it.isActive },
-                { it.showForMatches },
-                { it.showForTrainings },
-                { it.jerseyNumber }
+        val usersResult =
+            context.insertInto(
+                UZER,
+                UZER.ROLE,
+                UZER.NAME,
+                UZER.IS_ACTIVE,
+                UZER.SHOW_FOR_MATCHES,
+                UZER.SHOW_FOR_TRAININGS,
+                UZER.JERSEY_NUMBER,
             )
-            .returningResult(UZER.fields().toList())
-            .fetch()
-            .into(User::class.java)
+                .valuesFrom(
+                    users,
+                    { it.role },
+                    { it.name },
+                    { it.isActive },
+                    { it.showForMatches },
+                    { it.showForTrainings },
+                    { it.jerseyNumber },
+                )
+                .returningResult(UZER.fields().toList())
+                .fetch()
+                .into(User::class.java)
 
         return if (usersResult.size == users.size) {
             usersResult
@@ -66,12 +67,13 @@ class UserRepository(
             throw IllegalStateException(
                 "User with 'special' id $NO_ID can not be deleted. " +
                     "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back"
+                    "from records to entities and back",
             )
         }
-        val execute = context.deleteFrom(UZER)
-            .where(UZER.ID.eq(userId))
-            .execute()
+        val execute =
+            context.deleteFrom(UZER)
+                .where(UZER.ID.eq(userId))
+                .execute()
         if (execute != 1) {
             throw DataAccessException("Removed $execute users, expected to remove only 1")
         }
@@ -82,7 +84,7 @@ class UserRepository(
             throw IllegalStateException(
                 "User with 'special' id $NO_ID can not be deleted. " +
                     "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back"
+                    "from records to entities and back",
             )
         }
         return context
@@ -101,7 +103,7 @@ class UserRepository(
                 UZER.IS_ACTIVE,
                 UZER.SHOW_FOR_MATCHES,
                 UZER.SHOW_FOR_TRAININGS,
-                UZER.JERSEY_NUMBER
+                UZER.JERSEY_NUMBER,
             )
             .fetchOne()
             ?.into(User::class.java)

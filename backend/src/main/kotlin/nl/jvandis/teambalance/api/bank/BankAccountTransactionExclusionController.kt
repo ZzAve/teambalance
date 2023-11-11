@@ -24,9 +24,8 @@ import java.time.LocalDate
 @RequestMapping(path = ["/api/transaction-exclusions"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class BankAccountTransactionExclusionController(
     private val transactionExclusionRepository: BankAccountTransactionExclusionRepository,
-    private val secretService: SecretService
+    private val secretService: SecretService,
 ) {
-
     private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
@@ -38,7 +37,7 @@ class BankAccountTransactionExclusionController(
 
     @GetMapping("/{id}")
     fun getTransactionExclusion(
-        @PathVariable(value = "id") transactionExclusionId: Long
+        @PathVariable(value = "id") transactionExclusionId: Long,
     ): TransactionExclusion {
         log.debug("getTransactionExclusion $transactionExclusionId")
 
@@ -48,7 +47,7 @@ class BankAccountTransactionExclusionController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun postTransactionExclusion(
-        @RequestBody potentialTransactionExclusion: PotentialTransactionExclusion
+        @RequestBody potentialTransactionExclusion: PotentialTransactionExclusion,
     ) {
         log.debug("postTransactionExclusion $potentialTransactionExclusion")
 
@@ -59,7 +58,7 @@ class BankAccountTransactionExclusionController(
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun deleteTransactionExclusion(
-        @PathVariable(value = "id") transactionExclusionId: Long
+        @PathVariable(value = "id") transactionExclusionId: Long,
     ) {
         log.debug("deleting transactionExclusion: $transactionExclusionId")
 
@@ -75,7 +74,7 @@ class BankAccountTransactionExclusionController(
             date = date,
             transactionId = transactionId,
             counterParty = counterParty,
-            description = description
+            description = description,
         )
     }
 }
@@ -84,5 +83,5 @@ data class PotentialTransactionExclusion(
     val transactionId: Int?,
     val date: LocalDate?,
     val counterParty: String?,
-    val description: String?
+    val description: String?,
 )

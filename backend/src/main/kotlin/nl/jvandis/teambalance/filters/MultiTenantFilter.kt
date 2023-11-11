@@ -15,7 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 @ConfigurationProperties("app.multi-tenancy")
 data class TenantsConfig(
-    val tenants: List<TenantConfig>
+    val tenants: List<TenantConfig>,
 ) {
     init {
         val domains = tenants.map { it.domain }
@@ -29,7 +29,7 @@ data class TenantsConfig(
         val tenant: Tenant,
         val bunqMeBaseUrl: String,
         val secret: Secret,
-        val title: String
+        val title: String,
     ) {
         /**
          * Specific constructor for configuration binding by spring. Highly unideal,
@@ -41,7 +41,7 @@ data class TenantsConfig(
             domain: String,
             bunqMeBaseUrl: String,
             secret: String,
-            title: String
+            title: String,
         ) : this(domain, tenant, bunqMeBaseUrl, Secret(secret), title)
     }
 
@@ -54,7 +54,7 @@ data class TenantsConfig(
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class MultiTenantFilter(
-    private val tenantsConfig: TenantsConfig
+    private val tenantsConfig: TenantsConfig,
 ) : OncePerRequestFilter() {
     companion object {
         private val LOG = loggerFor()
@@ -63,11 +63,12 @@ class MultiTenantFilter(
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        filterChain: FilterChain
+        filterChain: FilterChain,
     ) {
         val host = request.getHeader("Host")
-        val tenant = tenantsConfig.tenants
-            .firstOrNull { it.domain == host }
+        val tenant =
+            tenantsConfig.tenants
+                .firstOrNull { it.domain == host }
 
         if (tenant == null) {
             LOG.warn("Received a request from an unknown host $host")

@@ -40,14 +40,15 @@ class BankAccountAliasWithUserRecordHandler : TeamBalanceRecordHandler<BankAccou
             Nr of records handled: $recordsHandled. 
             Nr of bankAccountAliases Created: ${bankAccountAliasRecords.size}. 
             Nr of users created: ${userRecords.size}"
-        """.trimIndent()
+            """.trimIndent()
     }
 
     override fun build(): List<BankAccountAlias> {
         return result ?: run {
-            val buildResult = bankAccountAliasRecords.values.map {
-                it.toBankAccountAlias(userRecords[it.userId!!]!!) // FIXME
-            }
+            val buildResult =
+                bankAccountAliasRecords.values.map {
+                    it.toBankAccountAlias(userRecords[it.userId!!]!!) // FIXME
+                }
             result = buildResult
             buildResult
         }
@@ -59,6 +60,6 @@ fun BankAccountAliasRecord.toBankAccountAlias(uzerRecord: UzerRecord): BankAccou
     return BankAccountAlias(
         id = getFieldOrThrow(BANK_ACCOUNT_ALIAS.ID),
         alias = getFieldOrThrow(BANK_ACCOUNT_ALIAS.ALIAS),
-        user = uzerRecord.into(User::class.java)
+        user = uzerRecord.into(User::class.java),
     )
 }

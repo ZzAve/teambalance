@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "bank")
 @RequestMapping(path = ["/api/bank"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class BankController(
-    private val bankService: BankService
+    private val bankService: BankService,
 ) {
     private val log = loggerFor()
 
@@ -35,11 +35,10 @@ class BankController(
         @Max(50)
         @Min(1)
         limit: Int,
-
         @RequestParam(value = "offset", defaultValue = "0")
         @Max(1000)
         @Min(0)
-        offset: Int
+        offset: Int,
     ): TransactionsResponse {
         return bankService.getTransactions(limit, offset).let {
             val transactionResponses = it.transactions.toResponse()
@@ -49,15 +48,17 @@ class BankController(
 
     private fun String.toResponse() = BalanceResponse(this)
 
-    private fun List<Transaction>.toResponse() = map {
-        TransactionResponse(
-            id = it.id,
-            type = it.type,
-            amount = "${it.currency}\u00A0${it.amount}", // non breakable whitespace
-            counterParty = it.user?.name ?: it.counterParty,
-            timestamp = it.date.toEpochSecond()
-        )
-    }
+    private fun List<Transaction>.toResponse() =
+        map {
+            TransactionResponse(
+                id = it.id,
+                type = it.type,
+                // non breakable whitespace
+                amount = "${it.currency}\u00A0${it.amount}",
+                counterParty = it.user?.name ?: it.counterParty,
+                timestamp = it.date.toEpochSecond(),
+            )
+        }
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleSecretExceptions(e: IllegalArgumentException) =
@@ -65,7 +66,7 @@ class BankController(
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = e.message ?: "Bad request"
-                )
+                    reason = e.message ?: "Bad request",
+                ),
             )
 }

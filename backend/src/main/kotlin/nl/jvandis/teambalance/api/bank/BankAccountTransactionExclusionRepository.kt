@@ -31,23 +31,24 @@ class BankAccountTransactionExclusionRepository(private val context: MultiTenant
         if (transactionExclusions.isEmpty()) {
             return emptyList()
         }
-        val transactionExclusionsResult = context.insertInto(
-            TRANSACTION_EXCLUSION,
-            TRANSACTION_EXCLUSION.DATE,
-            TRANSACTION_EXCLUSION.TRANSACTION_ID,
-            TRANSACTION_EXCLUSION.COUNTER_PARTY,
-            TRANSACTION_EXCLUSION.DESCRIPTION
-        )
-            .valuesFrom(
-                transactionExclusions,
-                { it.date },
-                { it.transactionId },
-                { it.counterParty },
-                { it.description }
+        val transactionExclusionsResult =
+            context.insertInto(
+                TRANSACTION_EXCLUSION,
+                TRANSACTION_EXCLUSION.DATE,
+                TRANSACTION_EXCLUSION.TRANSACTION_ID,
+                TRANSACTION_EXCLUSION.COUNTER_PARTY,
+                TRANSACTION_EXCLUSION.DESCRIPTION,
             )
-            .returningResult(TRANSACTION_EXCLUSION.fields().toList())
-            .fetch()
-            .into(TransactionExclusion::class.java)
+                .valuesFrom(
+                    transactionExclusions,
+                    { it.date },
+                    { it.transactionId },
+                    { it.counterParty },
+                    { it.description },
+                )
+                .returningResult(TRANSACTION_EXCLUSION.fields().toList())
+                .fetch()
+                .into(TransactionExclusion::class.java)
 
         return if (transactionExclusionsResult.size == transactionExclusions.size) {
             transactionExclusionsResult
@@ -65,12 +66,13 @@ class BankAccountTransactionExclusionRepository(private val context: MultiTenant
             throw IllegalStateException(
                 "TransactionExclusion with 'special' id $NO_ID can not be deleted. " +
                     "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back"
+                    "from records to entities and back",
             )
         }
-        val execute = context.deleteFrom(TRANSACTION_EXCLUSION)
-            .where(TRANSACTION_EXCLUSION.ID.eq(transactionExclusionId))
-            .execute()
+        val execute =
+            context.deleteFrom(TRANSACTION_EXCLUSION)
+                .where(TRANSACTION_EXCLUSION.ID.eq(transactionExclusionId))
+                .execute()
         if (execute != 1) {
             throw DataAccessException("Removed $execute bankAccountAliases, expected to remove only 1")
         }

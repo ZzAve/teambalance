@@ -15,8 +15,11 @@ import java.util.function.Consumer
  */
 interface TeamBalanceRecordHandler<OUT> : Consumer<Record> {
     fun acceptOneOrNull(record: Record?): OUT? = record?.let { acceptOne(it) }
+
     fun acceptOne(record: Record): OUT = apply { accept(record) }.build().first()
+
     override fun accept(record: Record)
+
     fun build(): List<OUT>
 }
 

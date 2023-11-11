@@ -9,28 +9,32 @@ import java.time.ZonedDateTime
 @Service
 class PotterService(
     private val bankService: BankService,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) {
-
-    fun getPotters(since: ZonedDateTime, includeInactiveUsers: Boolean): Potters {
+    fun getPotters(
+        since: ZonedDateTime,
+        includeInactiveUsers: Boolean,
+    ): Potters {
         val relevantTransactions = getRelevantTransactions(since)
-        val groupedTransactions: Map<User, List<Transaction>> = relevantTransactions
-            .groupBy { x -> x.user!! }
+        val groupedTransactions: Map<User, List<Transaction>> =
+            relevantTransactions
+                .groupBy { x -> x.user!! }
 
-        val potters: List<Potter> = userRepository.findAll()
-            .filter { !irrelevantTeamRoles.contains(it.role) }
-            .filter { includeInactiveUsers || it.isActive }
-            .map {
-                val transactions = groupedTransactions[it] ?: emptyList()
-                Potter(it.name, transactions)
-            }
+        val potters: List<Potter> =
+            userRepository.findAll()
+                .filter { !irrelevantTeamRoles.contains(it.role) }
+                .filter { includeInactiveUsers || it.isActive }
+                .map {
+                    val transactions = groupedTransactions[it] ?: emptyList()
+                    Potter(it.name, transactions)
+                }
 
         return Potters(
             potters = potters,
             currency = "€",
             amountOfTransactions = relevantTransactions.size,
             from = since,
-            until = if (relevantTransactions.isNotEmpty()) relevantTransactions.last().date else since
+            until = if (relevantTransactions.isNotEmpty()) relevantTransactions.last().date else since,
         )
     }
 

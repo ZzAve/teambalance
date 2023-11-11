@@ -15,14 +15,13 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "authentication")
 @RequestMapping(path = ["api/authentication"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class AuthenticationController() {
-
     @GetMapping
     fun authenticate(): Success {
         return Success()
     }
 
     data class Success(
-        val message: String = "You have managed to get access. Well done"
+        val message: String = "You have managed to get access. Well done",
     )
 
     @ExceptionHandler(InvalidSecretException::class)
@@ -31,7 +30,7 @@ class AuthenticationController() {
             .body(
                 Error(
                     status = HttpStatus.UNAUTHORIZED,
-                    reason = e.message ?: "Unauthorized"
-                )
+                    reason = e.message ?: "Unauthorized",
+                ),
             )
 }

@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Lazy
 @Lazy
 @Configuration
 class BunqConfiguration(
-    private val bankConfig: BankConfig
+    private val bankConfig: BankConfig,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -35,7 +35,7 @@ class BunqConfiguration(
         } catch (t: Throwable) {
             throw IllegalStateException(
                 "Could not create bunqRepository for production setup (apiKey: $obfuscatedApiKey, accountId: ${bunqConfig.bankAccountId})",
-                t
+                t,
             )
         }
     }

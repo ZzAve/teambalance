@@ -34,23 +34,26 @@ class MatchWithAttendeesRecordHandler : TeamBalanceRecordHandler<Match> {
         // handle attendee
         attendeeRecordHandler.accept(record)
 
-        val event = events.computeIfAbsent(eventId) {
-            // mapping via EventRecord works better with column name clashes (like `id`)
-            record.into(EventRecord::class.java)
-                .into(Event.Builder::class.java)
-        }
-        val recurringEventProperties = recurringEventId?.let {
-            recurringEventsPropertiesMap.computeIfAbsent(it) {
-                record.into(RecurringEventPropertiesRecord::class.java)
-                    .into(RecurringEventProperties::class.java)
+        val event =
+            events.computeIfAbsent(eventId) {
+                // mapping via EventRecord works better with column name clashes (like `id`)
+                record.into(EventRecord::class.java)
+                    .into(Event.Builder::class.java)
             }
-        }
+        val recurringEventProperties =
+            recurringEventId?.let {
+                recurringEventsPropertiesMap.computeIfAbsent(it) {
+                    record.into(RecurringEventPropertiesRecord::class.java)
+                        .into(RecurringEventProperties::class.java)
+                }
+            }
 
-        val match = matches.computeIfAbsent(matchId) {
-            // mapping via MatchRecord works better with column name clashes (like `id`)
-            record.into(MatchRecord::class.java) //
-                .into(Match.Builder::class.java)
-        }
+        val match =
+            matches.computeIfAbsent(matchId) {
+                // mapping via MatchRecord works better with column name clashes (like `id`)
+                record.into(MatchRecord::class.java) //
+                    .into(Match.Builder::class.java)
+            }
 
         event.recurringEventProperties = recurringEventProperties
         match.event = event
@@ -63,17 +66,19 @@ class MatchWithAttendeesRecordHandler : TeamBalanceRecordHandler<Match> {
             Nr of subEvents: ${matches.size}. 
             -- Attendees:
             ${attendeeRecordHandler.stats()}
-        """.trimIndent()
+            """.trimIndent()
     }
 
-    override fun build(): List<Match> = result ?: run {
-        val jooqAttendees = attendeeRecordHandler.getAttendees()
-        val buildResult = matches.values.map { builder ->
-            val eventAttendees = jooqAttendees.filter { it.eventId == builder.id }
-            builder.attendees = eventAttendees
-            builder.build()
+    override fun build(): List<Match> =
+        result ?: run {
+            val jooqAttendees = attendeeRecordHandler.getAttendees()
+            val buildResult =
+                matches.values.map { builder ->
+                    val eventAttendees = jooqAttendees.filter { it.eventId == builder.id }
+                    builder.attendees = eventAttendees
+                    builder.build()
+                }
+            result = buildResult
+            buildResult
         }
-        result = buildResult
-        buildResult
-    }
 }

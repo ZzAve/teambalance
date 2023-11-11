@@ -12,18 +12,18 @@ const val SECRET_HEADER = "X-Secret"
 @Configuration
 class SecretFilter(
     private val secretService: SecretService,
-    private val handlerExceptionResolver: HandlerExceptionResolver
+    private val handlerExceptionResolver: HandlerExceptionResolver,
 ) : OncePerRequestFilter() {
-
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
         return !request.requestURI.startsWith("/api") || request.requestURI == "/api/tenants/me"
     }
 
     override fun destroy() {}
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        filterChain: FilterChain
+        filterChain: FilterChain,
     ) {
         try {
             request.getHeader(SECRET_HEADER)

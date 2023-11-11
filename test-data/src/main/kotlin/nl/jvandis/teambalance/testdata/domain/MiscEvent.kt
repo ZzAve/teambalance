@@ -9,7 +9,7 @@ data class CreateMiscEvent(
     val title: String?,
     val location: String,
     val comment: String?,
-    val userIds: List<Long>? = emptyList()
+    val userIds: List<Long>? = emptyList(),
 )
 
 @Serializable
@@ -19,5 +19,5 @@ data class MiscEvent(
     val title: String,
     val location: String,
     val comment: String?,
-    val attendees: List<Attendee>
+    val attendees: List<Attendee>,
 )

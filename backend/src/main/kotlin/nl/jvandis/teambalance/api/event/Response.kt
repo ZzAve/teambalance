@@ -10,7 +10,7 @@ data class EventsResponse<T>(
     val totalPages: Int,
     val page: Int,
     val size: Int,
-    val events: List<T>
+    val events: List<T>,
 )
 
 data class RecurringEventPropertiesRequest(
@@ -19,13 +19,13 @@ data class RecurringEventPropertiesRequest(
     val intervalTimeUnit: RecurringEventProperties.TimeUnit,
     val amountLimit: Int?,
     val dateLimit: LocalDate?,
-    val selectedDays: List<DayOfWeek>
+    val selectedDays: List<DayOfWeek>,
 ) {
     init {
         if ((amountLimit == null) == (dateLimit == null)) {
             error(
                 "Exactly one of `amountLimit` or `dateLimit` should be provided, " +
-                    "was amountLimit=$amountLimit, dateLimit=$dateLimit"
+                    "was amountLimit=$amountLimit, dateLimit=$dateLimit",
             )
         }
 
@@ -42,7 +42,7 @@ data class RecurringEventPropertiesRequest(
             intervalTimeUnit = intervalTimeUnit,
             amountLimit = amountLimit,
             dateLimit = dateLimit,
-            selectedDays = selectedDays.map(DayOfWeek::getValue)
+            selectedDays = selectedDays.map(DayOfWeek::getValue),
         )
     }
 }
@@ -52,13 +52,13 @@ data class CreateRecurringEventPropertiesRequest(
     val intervalTimeUnit: RecurringEventProperties.TimeUnit,
     val amountLimit: Int?,
     val dateLimit: LocalDate?,
-    val selectedDays: List<DayOfWeek>
+    val selectedDays: List<DayOfWeek>,
 ) {
     init {
         if ((amountLimit == null) == (dateLimit == null)) {
             error(
                 "Exactly one of `amountLimit` or `dateLimit` should be provided, " +
-                    "was amountLimit=$amountLimit, dateLimit=$dateLimit"
+                    "was amountLimit=$amountLimit, dateLimit=$dateLimit",
             )
         }
 
@@ -75,7 +75,7 @@ data class CreateRecurringEventPropertiesRequest(
             intervalTimeUnit = intervalTimeUnit,
             amountLimit = amountLimit,
             dateLimit = dateLimit,
-            selectedDays = selectedDays.map(DayOfWeek::getValue)
+            selectedDays = selectedDays.map(DayOfWeek::getValue),
         )
     }
 }
@@ -86,14 +86,15 @@ data class RecurringEventPropertiesResponse(
     val intervalTimeUnit: RecurringEventProperties.TimeUnit,
     val amountLimit: Int?,
     val dateLimit: LocalDate?,
-    val selectedDays: List<DayOfWeek>
+    val selectedDays: List<DayOfWeek>,
 )
 
-fun RecurringEventProperties.expose() = RecurringEventPropertiesResponse(
-    teamBalanceId = teamBalanceId,
-    intervalAmount = intervalAmount,
-    intervalTimeUnit = intervalTimeUnit,
-    amountLimit = amountLimit,
-    dateLimit = dateLimit,
-    selectedDays = selectedDays.map(DayOfWeek::of)
-)
+fun RecurringEventProperties.expose() =
+    RecurringEventPropertiesResponse(
+        teamBalanceId = teamBalanceId,
+        intervalAmount = intervalAmount,
+        intervalTimeUnit = intervalTimeUnit,
+        amountLimit = amountLimit,
+        dateLimit = dateLimit,
+        selectedDays = selectedDays.map(DayOfWeek::of),
+    )

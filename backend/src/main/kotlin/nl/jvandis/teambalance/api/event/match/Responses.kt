@@ -16,11 +16,11 @@ data class UpdateMatchRequest(
     val opponent: String?,
     val homeAway: Place?,
     val comment: String?,
-    val recurringEventProperties: RecurringEventPropertiesRequest?
+    val recurringEventProperties: RecurringEventPropertiesRequest?,
 )
 
 data class UpdateCoachRequest(
-    val coach: String
+    val coach: String,
 )
 
 data class PotentialMatch(
@@ -30,32 +30,33 @@ data class PotentialMatch(
     val homeAway: Place,
     val comment: String?,
     val userIds: List<Long>? = null,
-    val recurringEventProperties: CreateRecurringEventPropertiesRequest? = null
+    val recurringEventProperties: CreateRecurringEventPropertiesRequest? = null,
 ) {
-    fun internalize(): List<Match> = recurringEventProperties?.let {
-        val recurringEventProperties = it.internalize()
-        it
-            .getRecurringEventDates(startTime)
-            .map { e ->
-                Match(
-                    startTime = e,
-                    location = location,
-                    opponent = opponent,
-                    homeAway = homeAway,
-                    comment = comment,
-                    recurringEventProperties = recurringEventProperties
-                )
-            }
-    } ?: listOf(
-        Match(
-            startTime = startTime,
-            location = location,
-            opponent = opponent,
-            homeAway = homeAway,
-            comment = comment,
-            recurringEventProperties = null
+    fun internalize(): List<Match> =
+        recurringEventProperties?.let {
+            val recurringEventProperties = it.internalize()
+            it
+                .getRecurringEventDates(startTime)
+                .map { e ->
+                    Match(
+                        startTime = e,
+                        location = location,
+                        opponent = opponent,
+                        homeAway = homeAway,
+                        comment = comment,
+                        recurringEventProperties = recurringEventProperties,
+                    )
+                }
+        } ?: listOf(
+            Match(
+                startTime = startTime,
+                location = location,
+                opponent = opponent,
+                homeAway = homeAway,
+                comment = comment,
+                recurringEventProperties = null,
+            ),
         )
-    )
 }
 
 data class MatchResponse(
@@ -67,26 +68,29 @@ data class MatchResponse(
     val opponent: String,
     val homeAway: Place,
     val coach: String?,
-    val recurringEventProperties: RecurringEventPropertiesResponse?
+    val recurringEventProperties: RecurringEventPropertiesResponse?,
 )
 
 fun Match.expose() = expose(attendees ?: emptyList())
-fun Match.expose(includeInactiveUsers: Boolean) = expose(
-    attendees
-        ?.filter { a -> includeInactiveUsers || a.user.isActive }
-        ?: emptyList()
-)
+
+fun Match.expose(includeInactiveUsers: Boolean) =
+    expose(
+        attendees
+            ?.filter { a -> includeInactiveUsers || a.user.isActive }
+            ?: emptyList(),
+    )
 
 fun List<Match>.expose(attendees: List<Attendee>) = map { it.expose(attendees) }
-fun Match.expose(attendees: List<Attendee>) = MatchResponse(
-    id = id,
-    comment = comment,
-    location = location,
-    startTime = startTime,
-    attendees = attendees.map(Attendee::expose),
-    coach = coach,
-    opponent = opponent,
-    homeAway = homeAway,
-    recurringEventProperties = recurringEventProperties?.expose()
 
-)
+fun Match.expose(attendees: List<Attendee>) =
+    MatchResponse(
+        id = id,
+        comment = comment,
+        location = location,
+        startTime = startTime,
+        attendees = attendees.map(Attendee::expose),
+        coach = coach,
+        opponent = opponent,
+        homeAway = homeAway,
+        recurringEventProperties = recurringEventProperties?.expose(),
+    )

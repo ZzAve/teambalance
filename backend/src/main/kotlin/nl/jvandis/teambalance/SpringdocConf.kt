@@ -45,21 +45,22 @@ import java.lang.reflect.Method
  */
 @Configuration
 class SpringdocConf {
-
     @Bean
-    fun customOpenAPI(@Value("\${app.version}") appVersion: String): OpenAPI {
+    fun customOpenAPI(
+        @Value("\${app.version}") appVersion: String,
+    ): OpenAPI {
         return OpenAPI()
             .components(
                 Components().addSecuritySchemes(
                     "basicScheme",
-                    SecurityScheme().type(SecurityScheme.Type.APIKEY).`in`(SecurityScheme.In.HEADER).name("X-Secret")
-                )
+                    SecurityScheme().type(SecurityScheme.Type.APIKEY).`in`(SecurityScheme.In.HEADER).name("X-Secret"),
+                ),
             )
             .security(listOf(SecurityRequirement().addList("basicScheme")))
             .info(
                 Info()
                     .title("Teambalance API")
-                    .version(appVersion)
+                    .version(appVersion),
             )
     }
 
@@ -82,6 +83,7 @@ class SpringdocConf {
     }
 
     private fun isPublicMethod(method: Method) = !isAdminMethod(method)
+
     private fun isAdminMethod(method: Method) = !isExplicitlyPublic(method) && isMethodMarkedAsAdmin(method)
 
     private fun isMethodMarkedAsAdmin(method: Method): Boolean {
