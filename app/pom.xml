@@ -16,7 +16,7 @@
 
     <properties>
         <maven-dependency-plugin.version>3.4.0</maven-dependency-plugin.version>
-        <spring-cloud-gcp-dependencies.version>4.1.0</spring-cloud-gcp-dependencies.version>
+        <spring-cloud-gcp-dependencies.version>4.8.4</spring-cloud-gcp-dependencies.version>
     </properties>
 
 
