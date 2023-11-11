@@ -1,6 +1,6 @@
 spring:
   datasource:
-    username: ${sm://DB_USERNAME_DEV}
-    password: ${sm://DB_PASSWORD_DEV}
-    url: ${sm://DB_URL_DEV}
+    username: ${DB_USERNAME_DEV}
+    password: ${DB_PASSWORD_DEV}
+    url: ${DB_URL_DEV}
 

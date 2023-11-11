@@ -22,7 +22,7 @@ const Balance = (props: { refresh: boolean }) => {
 
   const calculateBeers = (balance: string) => {
     const cents = +balance.replace(/\D/g, "") / 100.0;
-    return Math.round(cents / 2.67);
+    return Math.round(cents / 3.67);
   };
 
   return (
