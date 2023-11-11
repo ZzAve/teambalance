@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
 private fun warmUp(applicationContext: ConfigurableApplicationContext) {
     val log = loggerFor("nl.jvandis.teambalance.TeamBalanceApplication")
 
-    Tenant.values().forEach {
+    Tenant.entries.forEach {
         log.info("Retrieving balance and transactions for $it")
         MultiTenantContext.setCurrentTenant(it)
         applicationContext.getBean(BankService::class.java).getBalance()

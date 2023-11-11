@@ -4,7 +4,7 @@ app:
   version: "@project.version@-@git.commit.id.describe@"
   bank:
     bunq:
-      api-key: ${sm://BUNQ_APIKEY}
+      api-key: ${BUNQ_APIKEY}
       environment: PRODUCTION
     transaction-limit: 200 # up this when pagination is built (max is 200 from bunq)
     cache:
@@ -24,11 +24,6 @@ server:
   forward-headers-strategy: NATIVE
   shutdown: graceful
 spring:
-  config:
-    import: "sm://"
-  cloud:
-    gcp:
-      project-id: ${sm://GCP_PROJECT_ID}
   devtools:
     add-properties: false
   datasource:
@@ -47,8 +42,8 @@ spring:
     enabled: true
   security:
     user:
-      password: ${sm://ADMIN_PASSWORD}
-      name: ${sm://ADMIN_USERNAME}
+      password: ${ADMIN_PASSWORD}
+      name: ${ADMIN_USERNAME}
       roles:
         - admin
         - user

@@ -5,19 +5,19 @@ app:
   multi-tenancy:
     tenants:
       - domain: 4.teambalance.local:8080
-        secret: ${sm://API_SECRET_TOVO_HEREN_4}
-        bunq-me-base-url: ${sm://TOVO_HEREN_4_BUNQ_ME}
+        secret: ${API_SECRET_TOVO_HEREN_4}
+        bunq-me-base-url: ${TOVO_HEREN_4_BUNQ_ME}
         tenant: tovo_heren_4
         title: "Tovo Heren 4"
       - domain: 5.teambalance.local:8080
-        secret: ${sm://API_SECRET_TOVO_HEREN_5}
-        bunq-me-base-url: ${sm://TOVO_HEREN_5_BUNQ_ME}
+        secret: ${API_SECRET_TOVO_HEREN_5}
+        bunq-me-base-url: ${TOVO_HEREN_5_BUNQ_ME}
         tenant: tovo_heren_5
         title: "Tovo Heren 5"
 spring:
   datasource:
-    username: ${sm://DB_USERNAME_DEV}
-    password: ${sm://DB_PASSWORD_DEV}
-    url: ${sm://DB_URL_DEV}
+    username: ${DB_USERNAME_DEV}
+    password: ${DB_PASSWORD_DEV}
+    url: ${DB_URL_DEV}
   devtools:
     add-properties: true

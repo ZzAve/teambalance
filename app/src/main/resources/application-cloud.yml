@@ -3,31 +3,26 @@ server:
 
 spring:
   datasource:
-    username: ${sm://DB_USERNAME}
-    password: ${sm://DB_PASSWORD}
-    url: ${sm://DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    url: ${DB_URL}
 
 app:
   multi-tenancy:
     tenants:
-      - domain: heren4.tovoheren5.nl # temporary setup
-        secret: ${sm://API_SECRET_TOVO_HEREN_4}
-        bunq-me-base-url: ${sm://TOVO_HEREN_4_BUNQ_ME}
-        tenant: tovo_heren_4
-        title: "Tovo Heren 4"
       - domain: h4.tovo.nl
-        secret: ${sm://API_SECRET_TOVO_HEREN_4}
-        bunq-me-base-url: ${sm://TOVO_HEREN_4_BUNQ_ME}
+        secret: ${API_SECRET_TOVO_HEREN_4}
+        bunq-me-base-url: ${TOVO_HEREN_4_BUNQ_ME}
         tenant: tovo_heren_4
         title: "Tovo Heren 4"
 
       - domain: tovoheren5.nl #deprecated
-        secret: ${sm://API_SECRET_TOVO_HEREN_5}
-        bunq-me-base-url: ${sm://TOVO_HEREN_5_BUNQ_ME}
+        secret: ${API_SECRET_TOVO_HEREN_5}
+        bunq-me-base-url: ${TOVO_HEREN_5_BUNQ_ME}
         tenant: tovo_heren_5
         title: "Tovo Heren 5"
       - domain: h5.tovo.nl
-        secret: ${sm://API_SECRET_TOVO_HEREN_5}
-        bunq-me-base-url: ${sm://TOVO_HEREN_5_BUNQ_ME}
+        secret: ${API_SECRET_TOVO_HEREN_5}
+        bunq-me-base-url: ${TOVO_HEREN_5_BUNQ_ME}
         tenant: tovo_heren_5
         title: "Tovo Heren 5"
