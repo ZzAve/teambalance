@@ -6,7 +6,6 @@ import TopBar from "./components/TopBar";
 import CssBaseline from "@mui/material/CssBaseline";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import EventsPage from "./views/EventsPage";
 import {
   BrowserRouter as Router,
   Navigate,
@@ -30,6 +29,7 @@ import {
   storeTeamBalanceThemePreference,
 } from "./utils/preferences";
 
+const EventsPage = lazy(() => import("./views/EventsPage"));
 const Admin = lazy(() => import("./views/Admin"));
 const Login = lazy(() => import("./views/Login"));
 const Overview = lazy(() => import("./views/Overview"));
