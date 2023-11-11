@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional
 @Disabled
 // Disables because it clashes with integration tests derived from AbstractIntegrationTest.
 internal class ApplicationTest {
-
     @Test
     fun contextLoads() {
     }

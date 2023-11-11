@@ -4,14 +4,15 @@ import org.springframework.core.convert.converter.Converter
 
 enum class Sort {
     DESC,
-    ASC;
+    ASC,
+    ;
 
     companion object {
         fun fromValue(value: String): Sort {
             return values()
                 .firstOrNull { it.name.equals(value, ignoreCase = true) }
                 ?: throw IllegalArgumentException(
-                    "Unknown sort type " + value + ", Allowed values are " + values().contentToString()
+                    "Unknown sort type " + value + ", Allowed values are " + values().contentToString(),
                 )
         }
     }

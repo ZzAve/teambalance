@@ -13,14 +13,13 @@ import java.time.Period
 import java.util.stream.Stream
 
 class UtilsKtTest {
-
     @ParameterizedTest
     @MethodSource("expectedNextDates")
     fun `Should return expectedNextDate for the given inputs`(
         previousDateTime: LocalDateTime,
         interval: Period,
         daysOfWeek: List<DayOfWeek>,
-        expectedNextDate: LocalDateTime
+        expectedNextDate: LocalDateTime,
     ) {
         // Selecting Friday
         assertEquals(
@@ -28,8 +27,8 @@ class UtilsKtTest {
             nextEventDate(
                 previousDateTime,
                 interval,
-                daysOfWeek
-            )
+                daysOfWeek,
+            ),
         )
     }
 
@@ -45,10 +44,10 @@ class UtilsKtTest {
                 listOf(
                     DayOfWeek.MONDAY,
                     DayOfWeek.TUESDAY,
-                    DayOfWeek.FRIDAY
-                )
+                    DayOfWeek.FRIDAY,
+                ),
             ).getRecurringEventDates(
-                GOOD_FRIDAY.minusDays(1)
+                GOOD_FRIDAY.minusDays(1),
             )
         }
     }
@@ -63,39 +62,38 @@ class UtilsKtTest {
                     GOOD_FRIDAY,
                     Period.ofWeeks(1),
                     listOf(DayOfWeek.FRIDAY),
-                    GOOD_FRIDAY.plusDays(7)
+                    GOOD_FRIDAY.plusDays(7),
                 ),
                 arguments(
                     GOOD_FRIDAY,
                     Period.ofWeeks(3),
                     listOf(DayOfWeek.FRIDAY),
-                    GOOD_FRIDAY.plusDays(21)
+                    GOOD_FRIDAY.plusDays(21),
                 ),
                 arguments(
                     GOOD_FRIDAY.minusDays(4),
                     Period.ofWeeks(1),
                     listOf(DayOfWeek.MONDAY, DayOfWeek.FRIDAY),
-                    GOOD_FRIDAY
+                    GOOD_FRIDAY,
                 ),
                 arguments(
                     GOOD_FRIDAY,
                     Period.ofWeeks(1),
                     listOf(DayOfWeek.MONDAY, DayOfWeek.FRIDAY),
-                    GOOD_FRIDAY.plusDays(3)
+                    GOOD_FRIDAY.plusDays(3),
                 ),
                 arguments(
                     GOOD_FRIDAY,
                     Period.ofWeeks(3),
                     listOf(DayOfWeek.MONDAY, DayOfWeek.FRIDAY),
-                    GOOD_FRIDAY.plusDays(3).plusDays(14)
+                    GOOD_FRIDAY.plusDays(3).plusDays(14),
                 ),
                 arguments(
                     GOOD_FRIDAY.minusDays(1).minusDays(7),
                     Period.ofMonths(3),
                     listOf(DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY),
-                    GOOD_FRIDAY.minusDays(2).minusDays(7).plusMonths(3)
-                )
-
+                    GOOD_FRIDAY.minusDays(2).minusDays(7).plusMonths(3),
+                ),
             )
         }
     }

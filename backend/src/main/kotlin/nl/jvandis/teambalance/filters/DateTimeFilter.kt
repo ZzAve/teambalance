@@ -13,14 +13,14 @@ import java.time.format.DateTimeFormatter
 
 @Configuration
 class DateTimeFilter(
-    private val handlerExceptionResolver: HandlerExceptionResolver
+    private val handlerExceptionResolver: HandlerExceptionResolver,
 ) : OncePerRequestFilter() {
-
     override fun destroy() {}
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        filterChain: FilterChain
+        filterChain: FilterChain,
     ) {
         try {
             request.getParameter("since")

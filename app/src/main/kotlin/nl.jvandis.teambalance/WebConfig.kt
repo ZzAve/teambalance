@@ -20,16 +20,21 @@ class WebConfig : WebMvcConfigurer {
         registry.addResourceHandler("/**")
             .addResourceLocations("classpath:/static/")
             .resourceChain(true)
-            .addResolver(object : PathResourceResolver() {
-                @Throws(IOException::class)
-                override fun getResource(resourcePath: String, location: Resource): Resource {
-                    val requestedResource = location.createRelative(resourcePath)
-                    return if (requestedResource.exists() && requestedResource.isReadable) {
-                        requestedResource
-                    } else {
-                        ClassPathResource("/static/index.html")
+            .addResolver(
+                object : PathResourceResolver() {
+                    @Throws(IOException::class)
+                    override fun getResource(
+                        resourcePath: String,
+                        location: Resource,
+                    ): Resource {
+                        val requestedResource = location.createRelative(resourcePath)
+                        return if (requestedResource.exists() && requestedResource.isReadable) {
+                            requestedResource
+                        } else {
+                            ClassPathResource("/static/index.html")
+                        }
                     }
-                }
-            })
+                },
+            )
     }
 }

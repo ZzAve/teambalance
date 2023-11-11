@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.post
 
 @ExtendWith(MockitoExtension::class)
 class TrainingIntegrationTest : AbstractIntegrationTest() {
-
     @Autowired
     private lateinit var mockMvc: MockMvc
 

@@ -24,8 +24,8 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.FORBIDDEN,
-                    reason = e.message ?: "Forbidden"
-                )
+                    reason = e.message ?: "Forbidden",
+                ),
             )
 
     @ExceptionHandler(InvalidDateTimeException::class)
@@ -35,8 +35,8 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = e.message ?: "Bad request"
-                )
+                    reason = e.message ?: "Bad request",
+                ),
             )
 
     @ExceptionHandler(ConstraintViolationException::class)
@@ -50,8 +50,8 @@ class GlobalExceptionHandler {
                     HttpStatus.BAD_REQUEST,
                     exception.constraintViolations
                         .map { it.message }
-                        .toString()
-                )
+                        .toString(),
+                ),
             )
     }
 
@@ -64,8 +64,8 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = "Please verify your input arguments"
-                )
+                    reason = "Please verify your input arguments",
+                ),
             )
     }
 
@@ -78,8 +78,8 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = "Please verify your input arguments"
-                )
+                    reason = "Please verify your input arguments",
+                ),
             )
     }
 
@@ -92,8 +92,8 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = "Please verify your input arguments"
-                )
+                    reason = "Please verify your input arguments",
+                ),
             )
     }
 
@@ -105,8 +105,8 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.NOT_FOUND,
-                    reason = "Could not find ${e.type} item with Id ${e.id} "
-                )
+                    reason = "Could not find ${e.type} item with Id ${e.id} ",
+                ),
             )
     }
 
@@ -118,8 +118,8 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = e.message
-                )
+                    reason = e.message,
+                ),
             )
     }
 
@@ -129,8 +129,8 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = e.message
-                )
+                    reason = e.message,
+                ),
             )
 
     @ExceptionHandler(IllegalArgumentException::class)
@@ -139,8 +139,8 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = e.message ?: "An illegal argument was provided, somewhere, somehow...."
-                )
+                    reason = e.message ?: "An illegal argument was provided, somewhere, somehow....",
+                ),
             )
 
     @ExceptionHandler(AccessDeniedException::class)
@@ -150,8 +150,8 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.FORBIDDEN,
-                    reason = "Access to resource is denied."
-                )
+                    reason = "Access to resource is denied.",
+                ),
             )
 
     @ExceptionHandler(Throwable::class)
@@ -163,8 +163,8 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.INTERNAL_SERVER_ERROR,
-                    reason = "Something went wrong. Please try again later"
-                )
+                    reason = "Something went wrong. Please try again later",
+                ),
             )
     }
 }

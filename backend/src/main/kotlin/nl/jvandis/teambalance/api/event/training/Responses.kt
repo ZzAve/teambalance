@@ -12,18 +12,18 @@ import nl.jvandis.teambalance.api.users.User
 import java.time.LocalDateTime
 
 data class UserAddRequest(
-    val userId: Long
+    val userId: Long,
 )
 
 data class UpdateTrainerRequest(
-    val userId: Long?
+    val userId: Long?,
 )
 
 data class UpdateTrainingRequest(
     val startTime: LocalDateTime?,
     val location: String?,
     val comment: String?,
-    val recurringEventProperties: RecurringEventPropertiesRequest?
+    val recurringEventProperties: RecurringEventPropertiesRequest?,
 )
 
 data class PotentialTraining(
@@ -31,28 +31,29 @@ data class PotentialTraining(
     val location: String,
     val comment: String?,
     val userIds: List<Long>? = null,
-    val recurringEventProperties: CreateRecurringEventPropertiesRequest? = null
+    val recurringEventProperties: CreateRecurringEventPropertiesRequest? = null,
 ) {
-    fun internalize(): List<Training> = recurringEventProperties?.let {
-        val recurringEventProperties = it.internalize()
-        it
-            .getRecurringEventDates(startTime)
-            .map { e ->
-                Training(
-                    startTime = e,
-                    comment = comment,
-                    location = location,
-                    recurringEventProperties = recurringEventProperties
-                )
-            }
-    } ?: listOf(
-        Training(
-            startTime = startTime,
-            comment = comment,
-            location = location,
-            recurringEventProperties = null
+    fun internalize(): List<Training> =
+        recurringEventProperties?.let {
+            val recurringEventProperties = it.internalize()
+            it
+                .getRecurringEventDates(startTime)
+                .map { e ->
+                    Training(
+                        startTime = e,
+                        comment = comment,
+                        location = location,
+                        recurringEventProperties = recurringEventProperties,
+                    )
+                }
+        } ?: listOf(
+            Training(
+                startTime = startTime,
+                comment = comment,
+                location = location,
+                recurringEventProperties = null,
+            ),
         )
-    )
 }
 
 data class TrainingResponse(
@@ -62,22 +63,25 @@ data class TrainingResponse(
     val comment: String?,
     val attendees: List<AttendeeResponse>,
     val trainer: User?,
-    val recurringEventProperties: RecurringEventPropertiesResponse?
+    val recurringEventProperties: RecurringEventPropertiesResponse?,
 )
 
-fun Training.expose(includeInactiveUsers: Boolean) = expose(
-    attendees
-        ?.filter { a -> includeInactiveUsers || a.user.isActive }
-        ?: emptyList()
-)
+fun Training.expose(includeInactiveUsers: Boolean) =
+    expose(
+        attendees
+            ?.filter { a -> includeInactiveUsers || a.user.isActive }
+            ?: emptyList(),
+    )
 
 fun List<Training>.expose(attendees: List<Attendee>) = map { it.expose(attendees) }
-fun Training.expose(attendees: List<Attendee>) = TrainingResponse(
-    id = id,
-    comment = comment,
-    location = location,
-    startTime = startTime,
-    attendees = attendees.map(Attendee::expose),
-    trainer = trainer,
-    recurringEventProperties = recurringEventProperties?.expose()
-)
+
+fun Training.expose(attendees: List<Attendee>) =
+    TrainingResponse(
+        id = id,
+        comment = comment,
+        location = location,
+        startTime = startTime,
+        attendees = attendees.map(Attendee::expose),
+        trainer = trainer,
+        recurringEventProperties = recurringEventProperties?.expose(),
+    )

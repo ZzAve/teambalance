@@ -27,27 +27,27 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "users")
 @RequestMapping(path = ["/api/users"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class UserController(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) {
-
     private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
     fun getUsers(
-        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean
+        @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
     ): ExternalUsers {
         log.debug("getUsers")
 
         return Users(
-            users = userRepository.findAll(Sort.by("name"))
-                .filter { includeInactiveUsers || it.isActive }
-                .filterNotNull()
+            users =
+                userRepository.findAll(Sort.by("name"))
+                    .filter { includeInactiveUsers || it.isActive }
+                    .filterNotNull(),
         ).expose()
     }
 
     @GetMapping("/{id}")
     fun getUser(
-        @PathVariable(value = "id") userId: Long
+        @PathVariable(value = "id") userId: Long,
     ): ExternalUser {
         log.debug("getUser $userId")
 
@@ -57,7 +57,7 @@ class UserController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun postUser(
-        @RequestBody potentialUser: PotentialUser
+        @RequestBody potentialUser: PotentialUser,
     ) {
         log.debug("postUser $potentialUser")
 
@@ -70,8 +70,7 @@ class UserController(
     @PutMapping("/{id}")
     fun updateUser(
         @PathVariable(value = "id") userId: Long,
-        @RequestBody potentialUserUpdate: PotentialUserUpdate
-
+        @RequestBody potentialUserUpdate: PotentialUserUpdate,
     ): ExternalUser {
         log.debug("updatingUser: $potentialUserUpdate")
 
@@ -84,14 +83,15 @@ class UserController(
 
     private fun User.updateUser(
         potentialUserUpdate: PotentialUserUpdate,
-        userId: Long
+        userId: Long,
     ): User {
-        val updatedUser = copy(
-            name = potentialUserUpdate.name ?: name,
-            role = potentialUserUpdate.role ?: role,
-            isActive = potentialUserUpdate.isActive ?: isActive,
-            jerseyNumber = potentialUserUpdate.jerseyNumber ?: jerseyNumber
-        )
+        val updatedUser =
+            copy(
+                name = potentialUserUpdate.name ?: name,
+                role = potentialUserUpdate.role ?: role,
+                isActive = potentialUserUpdate.isActive ?: isActive,
+                jerseyNumber = potentialUserUpdate.jerseyNumber ?: jerseyNumber,
+            )
 
         return try {
             userRepository.update(updatedUser)
@@ -104,7 +104,7 @@ class UserController(
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun updateUser(
-        @PathVariable(value = "id") userId: Long
+        @PathVariable(value = "id") userId: Long,
     ) {
         log.debug("deletingUser: $userId")
 
@@ -118,9 +118,8 @@ class UserController(
 
 data class PotentialUser(
     val name: String,
-    val role: Role
+    val role: Role,
 ) {
-
     fun internalize() = User(name, role)
 
     fun internalize(id: Long) = User(id = id, name = name, role = role)
@@ -130,5 +129,5 @@ data class PotentialUserUpdate(
     val name: String?,
     val role: Role?,
     val isActive: Boolean?,
-    val jerseyNumber: Int?
+    val jerseyNumber: Int?,
 )

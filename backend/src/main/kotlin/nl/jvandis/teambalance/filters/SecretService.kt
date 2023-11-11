@@ -8,7 +8,7 @@ import java.util.Base64
 
 @Service
 class SecretService(
-    private val tenantsConfig: TenantsConfig
+    private val tenantsConfig: TenantsConfig,
 ) {
     private val log = loggerFor()
 
@@ -21,13 +21,14 @@ class SecretService(
         }
     }
 
-    private fun decodeSecret(secret: String?): String? = secret?.let {
-        try {
-            val decoded = Base64.getDecoder().decode(it)
-            String(decoded, Charsets.UTF_8)
-        } catch (t: Throwable) {
-            log.error("Could not parse secret because of encoding issue ($secret)", t)
-            null
+    private fun decodeSecret(secret: String?): String? =
+        secret?.let {
+            try {
+                val decoded = Base64.getDecoder().decode(it)
+                String(decoded, Charsets.UTF_8)
+            } catch (t: Throwable) {
+                log.error("Could not parse secret because of encoding issue ($secret)", t)
+                null
+            }
         }
-    }
 }

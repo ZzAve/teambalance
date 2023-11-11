@@ -4,12 +4,12 @@ import nl.jvandis.teambalance.api.users.User
 import java.time.ZonedDateTime
 
 data class BalanceResponse(
-    val balance: String
+    val balance: String,
 )
 
 data class Transactions(
     val transactions: List<Transaction>,
-    val limit: Int
+    val limit: Int,
 )
 
 data class Transaction(
@@ -19,16 +19,16 @@ data class Transaction(
     val amount: String,
     val counterParty: String,
     val user: User?,
-    val date: ZonedDateTime
+    val date: ZonedDateTime,
 )
 
 enum class TransactionType {
     DEBIT,
-    CREDIT
+    CREDIT,
 }
 
 data class TransactionsResponse(
-    val transactions: List<TransactionResponse>
+    val transactions: List<TransactionResponse>,
 )
 
 data class TransactionResponse(
@@ -36,7 +36,7 @@ data class TransactionResponse(
     val type: TransactionType,
     val amount: String,
     val counterParty: String,
-    val timestamp: Long
+    val timestamp: Long,
 )
 
 data class Potters(
@@ -44,12 +44,12 @@ data class Potters(
     val amountOfTransactions: Int,
     val from: ZonedDateTime,
     val until: ZonedDateTime,
-    val currency: String
+    val currency: String,
 )
 
 data class Potter(
     val name: String,
-    val transactions: List<Transaction>
+    val transactions: List<Transaction>,
 )
 
 data class PottersResponse(
@@ -58,11 +58,11 @@ data class PottersResponse(
     val amountOfConsideredTransactions: Int,
     val from: ZonedDateTime,
     val until: ZonedDateTime,
-    val subPeriod: PottersResponse?
+    val subPeriod: PottersResponse?,
 )
 
 data class PotterResponse(
     val name: String,
     val currency: String,
-    val amount: Double
+    val amount: Double,
 )

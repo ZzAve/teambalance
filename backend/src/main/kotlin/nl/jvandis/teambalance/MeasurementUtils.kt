@@ -10,13 +10,14 @@ private val log = loggerFor(" nl.jvandis.teambalance.MeasurementUtils")
 
 fun measureTiming(
     repetitions: Int = 50,
-    func: () -> Unit
+    func: () -> Unit,
 ) {
     val timings = mutableListOf<Long>()
     repeat(repetitions) {
-        val measureTimeMillis = measureTimeMillis {
-            func()
-        }
+        val measureTimeMillis =
+            measureTimeMillis {
+                func()
+            }
         timings.add(measureTimeMillis)
 
         if (it % ((repetitions / 10.0).roundToInt()) == 0) {
@@ -44,6 +45,6 @@ Processing times:
 | mean μ:       |  $mean ms|
 | std δ:        |  ${round(standardDeviation)} ms|
                         """
-            .trimMargin()
+            .trimMargin(),
     )
 }

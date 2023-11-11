@@ -8,7 +8,7 @@ data class CreateTraining(
     val startTime: LocalDateTime,
     val location: String,
     val comment: String?,
-    val userIds: List<Long>? = emptyList()
+    val userIds: List<Long>? = emptyList(),
 )
 
 @Serializable
@@ -18,5 +18,5 @@ data class Training(
     val location: String,
     val comment: String?,
     val userIds: List<Long>? = null,
-    val trainer: User? = null
+    val trainer: User? = null,
 )

@@ -15,14 +15,14 @@ data class MiscellaneousEvent(
     override val comment: String? = null,
     override val recurringEventProperties: RecurringEventProperties?,
     val title: String? = null,
-    val attendees: List<Attendee>? = null
+    val attendees: List<Attendee>? = null,
 ) : Event(id, startTime, location, comment, recurringEventProperties) {
     constructor(
         startTime: LocalDateTime,
         location: String,
         comment: String?,
         title: String?,
-        recurringEventProperties: RecurringEventProperties?
+        recurringEventProperties: RecurringEventProperties?,
     ) :
         this(
             id = NO_ID,
@@ -30,21 +30,22 @@ data class MiscellaneousEvent(
             location = location,
             comment = comment,
             title = title,
-            recurringEventProperties = recurringEventProperties
+            recurringEventProperties = recurringEventProperties,
         )
 
-    fun createUpdatedEvent(updateEventRequest: UpdateMiscellaneousEventRequest) = copy(
-        startTime = updateEventRequest.startTime ?: startTime,
-        comment = updateEventRequest.comment ?: comment,
-        location = updateEventRequest.location ?: location,
-        title = updateEventRequest.title ?: title
-    )
+    fun createUpdatedEvent(updateEventRequest: UpdateMiscellaneousEventRequest) =
+        copy(
+            startTime = updateEventRequest.startTime ?: startTime,
+            comment = updateEventRequest.comment ?: comment,
+            location = updateEventRequest.location ?: location,
+            title = updateEventRequest.title ?: title,
+        )
 
     data class Builder(
         val id: Long,
         val title: String?,
         var event: Event.Builder?,
-        var attendees: List<Attendee.Builder>?
+        var attendees: List<Attendee.Builder>?,
     ) : TeamBalanceEntityBuilder<MiscellaneousEvent> {
         override fun build(): MiscellaneousEvent {
             val event = checkNotNull(event) { "Event was not set" }
@@ -58,7 +59,7 @@ data class MiscellaneousEvent(
                 comment = event.comment,
                 title = title,
                 attendees = attendees?.build(),
-                recurringEventProperties = event.recurringEventProperties
+                recurringEventProperties = event.recurringEventProperties,
             )
         }
     }

@@ -33,8 +33,7 @@ import java.time.LocalDateTime
 class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<Training>(context) {
     override val log = loggerFor()
 
-    override fun findAll(): List<Training> =
-        findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
+    override fun findAll(): List<Training> = findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
 
     private fun findAllByIds(eventIds: List<Long>): List<Training> {
         val recordHandler = TrainingWithAttendeesRecordHandler()
@@ -54,7 +53,7 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
                 EVENT.START_TIME,
                 UZER.ROLE,
                 UZER.NAME,
-                EVENT.ID.desc()
+                EVENT.ID.desc(),
             )
             .fetch()
             .handleWith(recordHandler)
@@ -63,13 +62,13 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
     override fun findAllWithStartTimeAfter(
         since: LocalDateTime,
         pageable: Pageable,
-        withAttendees: Boolean
+        withAttendees: Boolean,
     ): Page<Training> =
         findAllWithStartTimeAfterImpl(
             context,
             since,
             pageable,
-            TeamEventTableAndRecordHandler(TRAINING, TRAINING.ID) { TrainingWithAttendeesRecordHandler() }
+            TeamEventTableAndRecordHandler(TRAINING, TRAINING.ID) { TrainingWithAttendeesRecordHandler() },
         )
 
     override fun findByIdOrNull(eventId: Long): Training? {
@@ -92,23 +91,28 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
     }
 
     @Transactional
-    override fun deleteById(eventId: Long, affectedRecurringEvents: AffectedRecurringEvents?): Int {
+    override fun deleteById(
+        eventId: Long,
+        affectedRecurringEvents: AffectedRecurringEvents?,
+    ): Int {
         val allEventsToDeleteConditions: Condition = allEventsToDeleteCondition(eventId, affectedRecurringEvents)
 
-        val deletedTrainingRecords = context.deleteFrom(TRAINING)
-            .using(EVENT)
-            .where(allEventsToDeleteConditions)
-            .and(EVENT.ID.eq(TRAINING.ID))
-            .execute()
+        val deletedTrainingRecords =
+            context.deleteFrom(TRAINING)
+                .using(EVENT)
+                .where(allEventsToDeleteConditions)
+                .and(EVENT.ID.eq(TRAINING.ID))
+                .execute()
 
-        val deletedEventRecords = context.delete(EVENT)
-            .where(allEventsToDeleteConditions)
-            .execute()
+        val deletedEventRecords =
+            context.delete(EVENT)
+                .where(allEventsToDeleteConditions)
+                .execute()
 
         if (deletedTrainingRecords != deletedEventRecords) {
             throw DataAccessException(
                 "Tried to delete a different amount of trainings ($deletedTrainingRecords) " +
-                    "from events ($deletedEventRecords)."
+                    "from events ($deletedEventRecords).",
             )
         }
 
@@ -125,12 +129,13 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
             "recurringEventProperties is expected to be null when inserting a single event"
         }
 
-        val eventRecord = context
-            .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
-            .values(event.comment, event.location, event.startTime, null)
-            .returningResult(EVENT.ID, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
-            .fetchOne()
-            ?: throw DataAccessException("Could not insert Training")
+        val eventRecord =
+            context
+                .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
+                .values(event.comment, event.location, event.startTime, null)
+                .returningResult(EVENT.ID, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
+                .fetchOne()
+                ?: throw DataAccessException("Could not insert Training")
 
         return context
             .insertInto(TRAINING, TRAINING.TRAINER_USER_ID, TRAINING.ID)
@@ -143,8 +148,9 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
                     startTime = eventRecord.getFieldOrThrow(EVENT.START_TIME),
                     location = eventRecord.getFieldOrThrow(EVENT.LOCATION),
                     comment = eventRecord.getField(EVENT.COMMENT),
-                    trainer = event.trainer, // do better, pretty
-                    recurringEventProperties = null
+                    // do better, pretty
+                    trainer = event.trainer,
+                    recurringEventProperties = null,
                 )
             }
             ?: throw DataAccessException("Could not insert Match")
@@ -156,39 +162,42 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
         }
         val e = events.first()
         require(
-            events.all { it.recurringEventProperties == e.recurringEventProperties }
+            events.all { it.recurringEventProperties == e.recurringEventProperties },
         ) {
             "All recurringEventProperties are expected to be the same when creating a recurring event"
         }
         val recurringEventProperties = context.insertRecurringEventPropertyRecord(e)
 
-        val insertEventRecordResult = context
-            .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
-            .valuesFrom(events, { it.comment }, { it.location }, { it.startTime }, { recurringEventProperties.id })
-            .returningResult(EVENT.fields().toList())
-            .fetch()
-            .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
+        val insertEventRecordResult =
+            context
+                .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
+                .valuesFrom(events, { it.comment }, { it.location }, { it.startTime }, { recurringEventProperties.id })
+                .returningResult(EVENT.fields().toList())
+                .fetch()
+                .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
 
         return context
             .insertInto(TRAINING, TRAINING.TRAINER_USER_ID, TRAINING.ID)
             .valuesFrom(
                 events,
                 { it.trainer?.id },
-                { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] }
+                { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] },
             )
             .returningResult(TRAINING.ID, TRAINING.TRAINER_USER_ID)
             .fetch()
             .map { trainingRecord ->
-                val eventRecord = insertEventRecordResult.first { a ->
-                    a.getFieldOrThrow(EVENT.ID) == trainingRecord.getFieldOrThrow(TRAINING.ID)
-                }
+                val eventRecord =
+                    insertEventRecordResult.first { a ->
+                        a.getFieldOrThrow(EVENT.ID) == trainingRecord.getFieldOrThrow(TRAINING.ID)
+                    }
                 Training(
                     id = trainingRecord.getFieldOrThrow(TRAINING.ID),
                     startTime = eventRecord.getFieldOrThrow(EVENT.START_TIME),
                     location = eventRecord.getFieldOrThrow(EVENT.LOCATION),
                     comment = eventRecord.getField(EVENT.COMMENT),
-                    trainer = events.first { it.startTime == eventRecord.getFieldOrThrow(EVENT.START_TIME) }.trainer, // do better, pretty
-                    recurringEventProperties = recurringEventProperties
+                    // do better, pretty
+                    trainer = events.first { it.startTime == eventRecord.getFieldOrThrow(EVENT.START_TIME) }.trainer,
+                    recurringEventProperties = recurringEventProperties,
                 )
             }
             .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
@@ -198,25 +207,29 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
     override fun updateAllFromRecurringEvent(
         recurringEventId: RecurringEventPropertiesId,
         examplarUpdatedEvent: Training,
-        durationToAddToEachEvent: Duration
+        durationToAddToEachEvent: Duration,
     ): List<Training> {
-        val updatedEventIds = context.update(EVENT)
-            .set(
-                EVENT.START_TIME,
-                localDateTimeAdd(EVENT.START_TIME, durationToAddToEachEvent.toSeconds(), DatePart.SECOND)
-            )
-            .set(EVENT.COMMENT, examplarUpdatedEvent.comment)
-            .set(EVENT.LOCATION, examplarUpdatedEvent.location)
-            .from(RECURRING_EVENT_PROPERTIES)
-            .where(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
-            .and(RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID.eq(recurringEventId.value))
-            .returningResult(EVENT.ID)
-            .fetch()
+        val updatedEventIds =
+            context.update(EVENT)
+                .set(
+                    EVENT.START_TIME,
+                    localDateTimeAdd(EVENT.START_TIME, durationToAddToEachEvent.toSeconds(), DatePart.SECOND),
+                )
+                .set(EVENT.COMMENT, examplarUpdatedEvent.comment)
+                .set(EVENT.LOCATION, examplarUpdatedEvent.location)
+                .from(RECURRING_EVENT_PROPERTIES)
+                .where(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
+                .and(RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID.eq(recurringEventId.value))
+                .returningResult(EVENT.ID)
+                .fetch()
 
         return findAllByIds(updatedEventIds.map { it.getFieldOrThrow(EVENT.ID) })
     }
 
-    override fun updateSingleEvent(event: Training, removeRecurringEvent: Boolean): Training {
+    override fun updateSingleEvent(
+        event: Training,
+        removeRecurringEvent: Boolean,
+    ): Training {
         context
             .update(EVENT)
             .set(EVENT.COMMENT, event.comment)

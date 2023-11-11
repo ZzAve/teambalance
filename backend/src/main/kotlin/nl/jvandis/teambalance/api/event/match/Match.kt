@@ -17,7 +17,7 @@ data class Match(
     val opponent: String,
     val homeAway: Place,
     val coach: String?,
-    val attendees: List<Attendee>? = null
+    val attendees: List<Attendee>? = null,
 ) : Event(id, startTime, location, comment, recurringEventProperties) {
     constructor(startTime: LocalDateTime, location: String, comment: String?, recurringEventProperties: RecurringEventProperties?) :
         this(
@@ -28,10 +28,17 @@ data class Match(
             opponent = "opponent",
             homeAway = Place.HOME,
             coach = null,
-            recurringEventProperties = recurringEventProperties
+            recurringEventProperties = recurringEventProperties,
         )
 
-    constructor(startTime: LocalDateTime, location: String, comment: String?, opponent: String, homeAway: Place, recurringEventProperties: RecurringEventProperties?) :
+    constructor(
+        startTime: LocalDateTime,
+        location: String,
+        comment: String?,
+        opponent: String,
+        homeAway: Place,
+        recurringEventProperties: RecurringEventProperties?,
+    ) :
         this(
             id = NO_ID,
             startTime = startTime,
@@ -40,7 +47,7 @@ data class Match(
             opponent = opponent,
             homeAway = homeAway,
             coach = null,
-            recurringEventProperties = recurringEventProperties
+            recurringEventProperties = recurringEventProperties,
         )
 
     data class Builder(
@@ -49,7 +56,7 @@ data class Match(
         val homeAway: Place,
         val coach: String?,
         var event: Event.Builder? = null,
-        var attendees: List<Attendee.Builder>? = null
+        var attendees: List<Attendee.Builder>? = null,
     ) : TeamBalanceEntityBuilder<Match> {
         override fun build(): Match {
             val event = checkNotNull(event) { "Event was not set" }
@@ -65,7 +72,7 @@ data class Match(
                 homeAway = homeAway,
                 coach = coach,
                 attendees = attendees?.build(),
-                recurringEventProperties = event.recurringEventProperties
+                recurringEventProperties = event.recurringEventProperties,
             )
         }
     }
@@ -73,5 +80,5 @@ data class Match(
 
 enum class Place {
     HOME,
-    AWAY
+    AWAY,
 }

@@ -3,7 +3,7 @@ package nl.jvandis.teambalance.api.users
 import nl.jvandis.teambalance.data.NO_ID
 
 data class Users(
-    val users: List<User>
+    val users: List<User>,
 )
 
 data class User(
@@ -13,7 +13,7 @@ data class User(
     val isActive: Boolean = true,
     val jerseyNumber: Int? = null,
     val showForTrainings: Boolean = true,
-    val showForMatches: Boolean = true
+    val showForMatches: Boolean = true,
 ) {
     constructor(name: String, role: Role) : this(NO_ID, name, role)
 }
@@ -26,5 +26,5 @@ enum class Role {
     DIAGONAL,
     PASSER,
     LIBERO,
-    OTHER
+    OTHER,
 }

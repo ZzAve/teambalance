@@ -10,9 +10,12 @@ import kotlin.reflect.KClass
 @Service
 class ConfigurationService(
     private val repository: ConfigurationRepository,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) {
-    fun <T : Any> getConfig(key: String, clazz: KClass<T>): T {
+    fun <T : Any> getConfig(
+        key: String,
+        clazz: KClass<T>,
+    ): T {
         return try {
             repository.getConfig(key)
                 ?.let { objectMapper.readValue(it, clazz.java) }
@@ -24,7 +27,11 @@ class ConfigurationService(
         }
     }
 
-    fun <T : Any> getConfig(key: String, clazz: KClass<T>, default: T): T {
+    fun <T : Any> getConfig(
+        key: String,
+        clazz: KClass<T>,
+        default: T,
+    ): T {
         return try {
             getConfig(key, clazz)
         } catch (e: NoConfigFound) {
@@ -40,15 +47,15 @@ class ConfigurationService(
 
 sealed class ConfigurationServiceException(
     message: String,
-    exception: Exception? = null
+    exception: Exception? = null,
 ) : RuntimeException(message, exception)
 
 class NoConfigFound(
     message: String,
-    exception: Exception? = null
+    exception: Exception? = null,
 ) : ConfigurationServiceException(message, exception)
 
 class MalformedConfigFound(
     message: String,
-    exception: Exception? = null
+    exception: Exception? = null,
 ) : ConfigurationServiceException(message, exception)

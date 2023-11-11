@@ -31,7 +31,6 @@ import kotlin.text.Charsets.UTF_8
  */
 class LiquibaseSupport {
     companion object {
-
         private const val SCHEMA_PARAM = "schema"
 
         private const val ROOT_PATH = "rootPath"
@@ -39,12 +38,19 @@ class LiquibaseSupport {
 
         @JvmStatic
         @Throws(SQLException::class)
-        fun migrate(connection: Connection, scripts: String, rootPath: String, schemaName: String) {
-            val liquibase = Liquibase(
-                scripts,
-                DirectoryResourceAccessor(File(rootPath)), // Verify me
-                JdbcConnection(connection)
-            )
+        fun migrate(
+            connection: Connection,
+            scripts: String,
+            rootPath: String,
+            schemaName: String,
+        ) {
+            val liquibase =
+                Liquibase(
+                    scripts,
+                    // TODO: Verify me
+                    DirectoryResourceAccessor(File(rootPath)),
+                    JdbcConnection(connection),
+                )
 
             // FIXME: Dirty hack to bypass the liquibase.secureParsing bug
             System.setProperty("liquibase.secureParsing", "false")
@@ -91,10 +97,13 @@ class LiquibaseSupport {
             }
         }
 
-        private fun getParameterValue(queryParameters: Map<String, String>, name: String): String =
+        private fun getParameterValue(
+            queryParameters: Map<String, String>,
+            name: String,
+        ): String =
             queryParameters[name]
                 ?: throw IllegalArgumentException(
-                    "Connection query parameter '$name' is missing"
+                    "Connection query parameter '$name' is missing",
                 )
 
         private fun String.decode(): String = URLDecoder.decode(this, UTF_8)
