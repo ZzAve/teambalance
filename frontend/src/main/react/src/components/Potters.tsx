@@ -15,9 +15,10 @@ interface SeasonPotters {
 export const Potters = (props: {
   refresh: boolean;
   limit?: number;
+  showSupportRoles?: boolean;
   showFloppers?: boolean;
 }) => {
-  const { limit = 3, showFloppers = true } = props;
+  const { limit = 3, showSupportRoles = false, showFloppers = true } = props;
   const [toppers, setToppers] = useState<SeasonPotters>({ season: [] });
   const [floppers, setFloppers] = useState<SeasonPotters>({ season: [] });
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +26,7 @@ export const Potters = (props: {
 
   useEffect(() => {
     withLoading(setIsLoading, () =>
-      bankApiClient.getPotters(limit).then((it) => {
+      bankApiClient.getPotters(limit, showSupportRoles).then((it) => {
         setFloppers({ season: it.floppers, month: it.subPeriod?.floppers });
         setToppers({ season: it.toppers, month: it.subPeriod?.toppers });
       })

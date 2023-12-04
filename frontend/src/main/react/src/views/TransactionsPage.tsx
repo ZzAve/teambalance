@@ -46,7 +46,7 @@ const TransactionsPage = (props: { refresh: boolean }) => {
         </Grid>
         <Grid container item xs={12}>
           <PageItem title="Potters">
-            <Potters refresh={props.refresh} limit={10} showFloppers={false} />
+            <Potters refresh={props.refresh} limit={20} showFloppers={false} />
           </PageItem>
         </Grid>
       </Grid>
