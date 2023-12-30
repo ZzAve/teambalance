@@ -23,7 +23,7 @@ export interface MiscEvent extends TeamEventInterface {
 export interface Match extends TeamEventInterface {
   homeAway: Place;
   opponent: string;
-  coach?: string;
+  additionalInfo?: string;
 }
 
 export interface Attendee {

@@ -18,13 +18,14 @@ interface MatchResponse {
   attendees: AttendeeResponse[];
   opponent: string;
   homeAway: Place;
-  coach?: string;
+  coach?: string; // this is being rebranded to 'additional info' to allow for a custom editable field
 }
 
 const internalize: (externalMatch: MatchResponse) => Match = (
   externalMatch: MatchResponse
 ) => ({
   ...externalMatch,
+  additionalInfo: externalMatch.coach,
   startTime: new Date(externalMatch.startTime),
   attendees: externalMatch.attendees?.map(internalizeAttendees) || [],
 });
@@ -58,7 +59,7 @@ const getMatch: (
   return internalize(matchResponse);
 };
 
-export type CreateMatch = Omit<Match, "id" | "coach" | "attendees"> & {
+export type CreateMatch = Omit<Match, "id" | "additionalInfo" | "attendees"> & {
   userIds: number[];
 };
 
@@ -110,11 +111,15 @@ const updateMatch: (
   ).events.map(internalize);
 };
 
-const updateCoach = async (props: { id: number; coach: string }) => {
+//TODO: update API to reflect 'coach' is changed into additional info.
+const updateAdditionalInfo = async (props: {
+  id: number;
+  additionalInfo: string;
+}) => {
   const matchResponse = (await matchesClient.callWithBody(
     `matches/${props.id}/coach`,
     {
-      coach: props.coach,
+      coach: props.additionalInfo,
     },
     { method: "PUT" }
   )) as MatchResponse;
@@ -138,6 +143,6 @@ export const matchesApiClient = {
   getMatch,
   createMatch,
   updateMatch,
-  updateCoach,
+  updateAdditionalInfo,
   deleteMatch,
 };
