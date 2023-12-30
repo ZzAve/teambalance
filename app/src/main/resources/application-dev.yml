@@ -9,6 +9,11 @@ app:
         bunq-me-base-url: ${TOVO_HEREN_4_BUNQ_ME}
         tenant: tovo_heren_4
         title: "Tovo Heren 4"
+      - domain: localhost:8080
+        secret: ${API_SECRET_TOVO_HEREN_4}
+        bunq-me-base-url: ${TOVO_HEREN_4_BUNQ_ME}
+        tenant: tovo_heren_4
+        title: "Tovo Heren 4"
       - domain: 5.teambalance.local:8080
         secret: ${API_SECRET_TOVO_HEREN_5}
         bunq-me-base-url: ${TOVO_HEREN_5_BUNQ_ME}

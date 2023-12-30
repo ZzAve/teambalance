@@ -39,13 +39,14 @@ class PotterController(
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         sinceInput: LocalDateTime,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
+        @RequestParam(value = "include-support-roles", defaultValue = "false") includeSupportRoles: Boolean,
     ): PottersResponse {
-        val pottersFullPeriod = potterService.getPotters(sinceInput.toZonedDateTime(), includeInactiveUsers)
+        val pottersFullPeriod = potterService.getPotters(sinceInput.toZonedDateTime(), includeInactiveUsers, includeSupportRoles)
         val now = ZonedDateTime.now()
         val pottersLastMonthResponse: PottersResponse? =
             if (Duration.between(sinceInput, now) > Duration.ofDays(30)) {
                 potterService
-                    .getPotters(now.minusDays(30), includeInactiveUsers)
+                    .getPotters(now.minusDays(30), includeInactiveUsers, includeSupportRoles)
                     .toPottersResponse(limit)
             } else {
                 null
@@ -69,6 +70,7 @@ class PotterController(
         val cumulativeAmount = transactions.fold(0.0) { acc, cur -> acc + cur.amount.toDouble() }
         return PotterResponse(
             name = name,
+            role = role,
             currency = currency,
             amount = cumulativeAmount,
         )

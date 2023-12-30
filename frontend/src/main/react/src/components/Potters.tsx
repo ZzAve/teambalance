@@ -5,7 +5,7 @@ import { withLoading } from "../utils/util";
 import Typography from "@mui/material/Typography";
 import { Grid } from "@mui/material";
 import Switch from "@mui/material/Switch";
-import { Potter } from "../utils/domain";
+import { Potter, roleMapper, SUPPORT_ROLES } from "../utils/domain";
 
 interface SeasonPotters {
   season: Potter[];
@@ -15,9 +15,10 @@ interface SeasonPotters {
 export const Potters = (props: {
   refresh: boolean;
   limit?: number;
+  showSupportRoles?: boolean;
   showFloppers?: boolean;
 }) => {
-  const { limit = 3, showFloppers = true } = props;
+  const { limit = 3, showSupportRoles = false, showFloppers = true } = props;
   const [toppers, setToppers] = useState<SeasonPotters>({ season: [] });
   const [floppers, setFloppers] = useState<SeasonPotters>({ season: [] });
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +26,7 @@ export const Potters = (props: {
 
   useEffect(() => {
     withLoading(setIsLoading, () =>
-      bankApiClient.getPotters(limit).then((it) => {
+      bankApiClient.getPotters(limit, showSupportRoles).then((it) => {
         setFloppers({ season: it.floppers, month: it.subPeriod?.floppers });
         setToppers({ season: it.toppers, month: it.subPeriod?.toppers });
       })
@@ -46,7 +47,14 @@ export const Potters = (props: {
           </Typography>
         </Grid>
         <Grid item xs={6}>
-          <Typography>{item.name}</Typography>
+          <Typography>
+            {item.name}{" "}
+            {SUPPORT_ROLES.includes(item.role) ? (
+              <em>(ℹ️️ {roleMapper[item.role]})</em>
+            ) : (
+              ""
+            )}
+          </Typography>
         </Grid>
       </Grid>
     );
@@ -85,7 +93,7 @@ export const Potters = (props: {
         justifyContent="flex-end"
       >
         <Grid item>
-          <Typography variant="body1"> Month (last 30 days) </Typography>
+          <Typography variant="body1"> Maand (laatste 30 dagen) </Typography>
         </Grid>
         <Grid item>
           <Switch
@@ -95,7 +103,7 @@ export const Potters = (props: {
           />
         </Grid>
         <Grid item>
-          <Typography variant="body1"> Season </Typography>
+          <Typography variant="body1"> Seizoen </Typography>
         </Grid>
       </Grid>
 

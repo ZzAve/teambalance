@@ -53,11 +53,12 @@ export type Role =
   | "OTHER";
 
 export const COACH_TRAINER_ROLES: Array<Role> = ["COACH", "TRAINER"];
+export const SUPPORT_ROLES: Array<Role> = [...COACH_TRAINER_ROLES, "OTHER"];
 export const roleMapper: Record<Role, string> = {
   COACH: "Coach",
   DIAGONAL: "Dia",
   MID: "Midden",
-  OTHER: "Trainingslid/vrije vogel",
+  OTHER: "Trainingslid",
   PASSER: "Passer/loper",
   SETTER: "Set-upper",
   LIBERO: "Libero",
@@ -83,6 +84,7 @@ export interface Potters {
 
 export interface Potter {
   name: string;
+  role: Role;
   currency: string;
   amount: number;
 }

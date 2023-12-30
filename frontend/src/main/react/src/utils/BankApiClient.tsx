@@ -1,5 +1,5 @@
 import { ApiClient } from "./ApiClient";
-import { Potters, Transaction, TransactionType } from "./domain";
+import { Potters, Role, Transaction, TransactionType } from "./domain";
 
 const bankClient = ApiClient();
 
@@ -26,37 +26,46 @@ interface PottersResponse {
 
 interface PotterResponse {
   name: string;
+  role: Role;
   currency: string;
   amount: number;
 }
 
-const getBalance: () => Promise<string> = () => {
-  return bankClient
-    .call(`bank/balance`)
-    .then((data) => (data as any)?.balance || "€ XX,XX");
+const getBalance: () => Promise<string> = async () => {
+  let data = await bankClient.call(`bank/balance`);
+  return (await (data as any)?.balance) || "€ XX,XX";
 };
 
 const getTransactions: (
   limit?: number,
   offset?: number
-) => Promise<Transaction[]> = (limit: number = 20, offset: number = 0) => {
-  return bankClient
-    .call(`bank/transactions?limit=${limit}&offset=${offset}`)
-    .then(
-      (data: object) =>
-        internalize((data as TransactionsResponse).transactions) || []
-    );
+) => Promise<Transaction[]> = async (
+  limit: number = 20,
+  offset: number = 0
+) => {
+  const data = await bankClient.call(
+    `bank/transactions?limit=${limit}&offset=${offset}`
+  );
+  return internalize((data as TransactionsResponse).transactions) || [];
 };
 
-const getPotters: (limit?: number) => Promise<Potters> = (
-  limit: number = 3
+const internalizePotters = (response: PottersResponse) => ({
+  ...response,
+});
+
+const getPotters: (
+  limit?: number,
+  includeSupportRoles?: boolean
+) => Promise<Potters> = async (
+  limit: number = 3,
+  includeSupportRoles: boolean = false
 ) => {
-  return bankClient
-    .call(`bank/potters?limit=${limit}`)
-    .then(
-      (data: object) =>
-        (data as PottersResponse) || { toppers: [], floppers: [] }
-    );
+  let data = await bankClient.call(
+    `bank/potters?limit=${limit}&include-support-roles=${includeSupportRoles}`
+  );
+  return internalizePotters(
+    (data as PottersResponse) || { toppers: [], floppers: [] }
+  );
 };
 
 const internalize: (transactions: TransactionResponse[]) => Transaction[] = (
