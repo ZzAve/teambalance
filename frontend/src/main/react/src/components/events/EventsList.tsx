@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import Attendees from "../Attendees";
 import { formattedDate, formattedTime } from "../../utils/util";
 import { EventType, isMatch, isMiscEvent, isTraining } from "./utils";
-import { Pagination } from "@mui/material";
+import { Pagination, useMediaQuery, useTheme } from "@mui/material";
 import { SelectedUserOption, SelectUser } from "./SelectUser";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
@@ -18,6 +18,7 @@ import {
   Training,
 } from "../../utils/domain";
 import { Conditional } from "../Conditional";
+import { EditableTextArea } from "./EditableTextArea";
 
 export const EventsList = (props: {
   eventType: EventType;
@@ -138,34 +139,16 @@ export const EventListItem = (props: {
       });
   };
 
-  const coachDropdown = () => {
-    const coachOptions = trainerCoachOptions(teamEvent);
-    const currentCoach =
-      coachOptions.find(
-        (o) => o.name === ((teamEvent as Match)?.coach ?? "")
-      ) || NO_COACH_OPTION;
-    return (
-      <SelectUser
-        label="Coach"
-        icon="👮"
-        options={coachOptions}
-        initialOption={currentCoach}
-        selectedUserCallback={handleCoachSelection}
-      ></SelectUser>
-    );
-  };
-
-  const handleCoachSelection = async (
-    coach: SelectedUserOption | undefined
-  ) => {
+  const handleAdditionalInfo = async (additionalInfo: string) => {
     return await matchesApiClient
-      .updateCoach({ id: teamEvent.id, coach: coach?.name ?? "" })
+      .updateAdditionalInfo({
+        id: teamEvent.id,
+        additionalInfo: additionalInfo,
+      })
       .then((e) => {
-        console.debug(`Coach update ${coach} for event ${teamEvent}: `, e);
+        console.debug(`Additional info updated for event ${teamEvent}: `, e);
         addAlert({
-          message: `'${coach?.name}' is de coach voor de wedstrijd tegen ${
-            (teamEvent as Match).opponent
-          }`,
+          message: `Gelukt`,
           level: "success",
         });
         props.onUpdate();
@@ -173,12 +156,13 @@ export const EventListItem = (props: {
       })
       .catch((e) => {
         addAlert({
-          message: `'${coach?.name}' mag de wedstrijd tegen ${
-            (teamEvent as Match).opponent
-          } niet coachen blijkbaar 🤷. Error ${e.message}`,
+          message: `Whoops`,
           level: "error",
         });
-        console.error(`Updating coach for event ${teamEvent} failed!`, e);
+        console.error(
+          `Updating additional info for event ${teamEvent} failed!`,
+          e
+        );
         return false;
       });
   };
@@ -211,14 +195,25 @@ export const EventListItem = (props: {
             📝 <em>{teamEvent.comment}</em>
           </Typography>
         </Conditional>
-        <Conditional condition={isMatch(teamEvent)}>
-          {coachDropdown()}
-        </Conditional>
         <Conditional condition={isTraining(teamEvent)}>
           {trainerDropDown()}
         </Conditional>
       </Grid>
-      <Grid item xs={12} sm={6} md={8}>
+      <Grid
+        item
+        xs={12}
+        order={useMediaQuery(useTheme().breakpoints.up("sm")) ? 5 : 2}
+      >
+        <Conditional condition={isMatch(teamEvent)}>
+          <EditableTextArea
+            label="✏️"
+            placeholder="invallers , coaches, dieetwensen ..."
+            initialText={(props.event as Match).additionalInfo}
+            updatedTextValueCallback={handleAdditionalInfo}
+          ></EditableTextArea>
+        </Conditional>
+      </Grid>
+      <Grid item xs={12} sm={6} md={8} order={3}>
         <Attendees
           size="small"
           attendees={teamEvent.attendees}
@@ -240,7 +235,16 @@ const NO_COACH_OPTION: SelectedUserOption = {
 
 const trainerCoachOptions = (teamEvent: TeamEvent) =>
   teamEvent.attendees
-    .filter((a) => COACH_TRAINER_ROLES.includes(a.user.role))
+    .filter(
+      (a) => COACH_TRAINER_ROLES.includes(a.user.role) || a.state == "PRESENT"
+    )
+    // sort trainers above the rest
+    .sort((a, b) =>
+      COACH_TRAINER_ROLES.includes(a.user.role) &&
+      !COACH_TRAINER_ROLES.includes(b.user.role)
+        ? 1
+        : 0
+    )
     .map((a) => ({
       id: a.user.id,
       name: a.user.name,
