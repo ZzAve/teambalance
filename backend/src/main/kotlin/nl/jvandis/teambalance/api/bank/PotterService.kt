@@ -14,7 +14,7 @@ class PotterService(
     fun getPotters(
         since: ZonedDateTime,
         includeInactiveUsers: Boolean,
-        includeSupportRoles: Boolean
+        includeSupportRoles: Boolean,
     ): Potters {
         val relevantTransactions = getRelevantTransactions(since, includeSupportRoles)
         val groupedTransactions: Map<User, List<Transaction>> =
@@ -39,14 +39,16 @@ class PotterService(
         )
     }
 
-    private fun getRelevantTransactions(since: ZonedDateTime, includeSupportRoles: Boolean) =
-        bankService.getTransactions().transactions
-            .asSequence()
-            .filter { it.date > since }
-            .filter { it.type == TransactionType.DEBIT && it.currency == "€" }
-            .filter { it.user != null }
-            .filter { includeSupportRoles || !SUPPORT_TEAM_ROLES.contains(it.user?.role) }
-            .toList()
+    private fun getRelevantTransactions(
+        since: ZonedDateTime,
+        includeSupportRoles: Boolean,
+    ) = bankService.getTransactions().transactions
+        .asSequence()
+        .filter { it.date > since }
+        .filter { it.type == TransactionType.DEBIT && it.currency == "€" }
+        .filter { it.user != null }
+        .filter { includeSupportRoles || !SUPPORT_TEAM_ROLES.contains(it.user?.role) }
+        .toList()
 
     companion object {
         private val SUPPORT_TEAM_ROLES = setOf(Role.COACH, Role.TRAINER, Role.OTHER)

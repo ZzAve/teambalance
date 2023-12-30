@@ -93,7 +93,7 @@ export const Potters = (props: {
         justifyContent="flex-end"
       >
         <Grid item>
-          <Typography variant="body1"> Month (last 30 days) </Typography>
+          <Typography variant="body1"> Maand (laatste 30 dagen) </Typography>
         </Grid>
         <Grid item>
           <Switch
@@ -103,7 +103,7 @@ export const Potters = (props: {
           />
         </Grid>
         <Grid item>
-          <Typography variant="body1"> Season </Typography>
+          <Typography variant="body1"> Seizoen </Typography>
         </Grid>
       </Grid>
 
