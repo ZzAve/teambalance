@@ -1,5 +1,6 @@
 package nl.jvandis.teambalance.api.bank
 
+import nl.jvandis.teambalance.api.users.Role
 import nl.jvandis.teambalance.api.users.User
 import java.time.ZonedDateTime
 
@@ -49,6 +50,7 @@ data class Potters(
 
 data class Potter(
     val name: String,
+    val role: Role,
     val transactions: List<Transaction>,
 )
 
@@ -63,6 +65,7 @@ data class PottersResponse(
 
 data class PotterResponse(
     val name: String,
+    val role: Role,
     val currency: String,
     val amount: Double,
 )

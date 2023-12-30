@@ -27,7 +27,7 @@ class PotterService(
                 .filter { includeInactiveUsers || it.isActive }
                 .map {
                     val transactions = groupedTransactions[it] ?: emptyList()
-                    Potter(it.name, transactions)
+                    Potter(it.name, it.role, transactions)
                 }
 
         return Potters(

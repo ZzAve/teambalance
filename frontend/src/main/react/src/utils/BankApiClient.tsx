@@ -1,5 +1,5 @@
 import { ApiClient } from "./ApiClient";
-import { Potters, Transaction, TransactionType } from "./domain";
+import { Potters, Role, Transaction, TransactionType } from "./domain";
 
 const bankClient = ApiClient();
 
@@ -26,6 +26,7 @@ interface PottersResponse {
 
 interface PotterResponse {
   name: string;
+  role: Role;
   currency: string;
   amount: number;
 }
@@ -48,6 +49,10 @@ const getTransactions: (
   return internalize((data as TransactionsResponse).transactions) || [];
 };
 
+const internalizePotters = (response: PottersResponse) => ({
+  ...response,
+});
+
 const getPotters: (
   limit?: number,
   includeSupportRoles?: boolean
@@ -58,7 +63,9 @@ const getPotters: (
   let data = await bankClient.call(
     `bank/potters?limit=${limit}&include-support-roles=${includeSupportRoles}`
   );
-  return (data as PottersResponse) || { toppers: [], floppers: [] };
+  return internalizePotters(
+    (data as PottersResponse) || { toppers: [], floppers: [] }
+  );
 };
 
 const internalize: (transactions: TransactionResponse[]) => Transaction[] = (

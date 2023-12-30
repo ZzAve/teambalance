@@ -5,7 +5,7 @@ import { withLoading } from "../utils/util";
 import Typography from "@mui/material/Typography";
 import { Grid } from "@mui/material";
 import Switch from "@mui/material/Switch";
-import { Potter } from "../utils/domain";
+import { Potter, roleMapper, SUPPORT_ROLES } from "../utils/domain";
 
 interface SeasonPotters {
   season: Potter[];
@@ -47,7 +47,14 @@ export const Potters = (props: {
           </Typography>
         </Grid>
         <Grid item xs={6}>
-          <Typography>{item.name}</Typography>
+          <Typography>
+            {item.name}{" "}
+            {SUPPORT_ROLES.includes(item.role) ? (
+              <em>(ℹ️️ {roleMapper[item.role]})</em>
+            ) : (
+              ""
+            )}
+          </Typography>
         </Grid>
       </Grid>
     );

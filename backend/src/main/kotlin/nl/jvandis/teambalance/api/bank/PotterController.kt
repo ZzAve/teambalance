@@ -70,6 +70,7 @@ class PotterController(
         val cumulativeAmount = transactions.fold(0.0) { acc, cur -> acc + cur.amount.toDouble() }
         return PotterResponse(
             name = name,
+            role = role,
             currency = currency,
             amount = cumulativeAmount,
         )
