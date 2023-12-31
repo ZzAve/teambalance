@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance
 
-// TODO: refactor tenant
+import org.slf4j.MDC
+
 enum class Tenant {
     TOVO_HEREN_4,
     TOVO_HEREN_5,
@@ -11,7 +12,13 @@ object MultiTenantContext {
 
     fun getCurrentTenant(): Tenant = currentTenant.get() ?: throw IllegalArgumentException("Unknown tenant")
 
-    fun setCurrentTenant(tenant: Tenant) = currentTenant.set(tenant)
+    fun setCurrentTenant(tenant: Tenant) {
+        currentTenant.set(tenant)
+        MDC.put("tenant", tenant.name)
+    }
 
-    fun clear() = currentTenant.set(null)
+    fun clear() {
+        currentTenant.set(null)
+        MDC.remove("tenant")
+    }
 }

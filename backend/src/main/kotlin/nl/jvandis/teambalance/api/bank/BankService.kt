@@ -34,19 +34,15 @@ class BankService(
 ) {
     private val balanceCache: AsyncLoadingCache<Tenant, String> =
         setupCache(bankConfig.cache.balance) { tenant: Tenant ->
-            MultiTenantContext.setCurrentTenant(tenant)
-            val accountId = getAccountId()
+            val accountId = getAccountId(tenant)
             val updateBalance = updateBalance(accountId)
-            MultiTenantContext.clear()
             updateBalance
         }
 
     private val transactionsCache: AsyncLoadingCache<Tenant, Transactions> =
         setupCache(bankConfig.cache.transactions) { tenant: Tenant ->
-            MultiTenantContext.setCurrentTenant(tenant)
-            val accountId = getAccountId()
+            val accountId = getAccountId(tenant)
             val updatedTransactions = updateTransactions(accountId)
-            MultiTenantContext.clear()
             updatedTransactions
         }
 
@@ -153,8 +149,8 @@ class BankService(
         transactionExclusionRepository
             .findAll()
 
-    private fun getAccountId(): Int {
-        val key = "bunq-account-id.${MultiTenantContext.getCurrentTenant().name.lowercase()}"
+    private fun getAccountId(tenant: Tenant): Int {
+        val key = "bunq-account-id.${tenant.name.lowercase()}"
         return configurationService.getConfig(key, Int::class)
     }
 }

@@ -1,39 +1,36 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Button } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import { TenantContext } from "../TenantContext";
+import { BankApiClient } from "../utils/BankApiClient";
 
+const createTopUpLink = (priceInCents?: number) => () => {
+  BankApiClient.topUp(priceInCents).then((redirectResponse) => {
+    console.log("Opening new window, redirecting user to " + redirectResponse);
+    window.open(redirectResponse.url, "_blank");
+  });
+};
+
+const getTopUpButton = (content: string, amountInCents?: number) => (
+  <Button
+    variant="contained"
+    color="primary"
+    onClick={createTopUpLink(amountInCents)}
+  >
+    {content}
+  </Button>
+);
 const TopUp = () => {
-  const tenantContext = useContext(TenantContext);
-  const createTopUpLink = (price: number) => () => {
-    let url = tenantContext.bunqMeBaseUrl;
-    if (!!price) {
-      url += `/${price}/Meer%20Muntjes%20Meer%20Beter`;
-    }
-    window.open(url, "_blank");
-  };
-
-  const getButton = (clickPrice: number, content: string) => (
-    <Button
-      variant="contained"
-      color="primary"
-      onClick={createTopUpLink(clickPrice)}
-    >
-      {content}
-    </Button>
-  );
-
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <Typography>Spek jij de teamkas vandaag?</Typography>
       </Grid>
       <Grid item container spacing={1}>
-        <Grid item>{getButton(10, "€ 10,-")}</Grid>
-        <Grid item>{getButton(20, "€ 20,-")}</Grid>
-        <Grid item>{getButton(50, "€ 50,-")}</Grid>
-        <Grid item>{getButton(0.0, "Anders ...")}</Grid>
+        <Grid item>{getTopUpButton("€ 10,-", 1000)}</Grid>
+        <Grid item>{getTopUpButton("€ 20,-", 2000)}</Grid>
+        <Grid item>{getTopUpButton("€ 50,-", 5000)}</Grid>
+        <Grid item>{getTopUpButton("Anders ...")}</Grid>
       </Grid>
     </Grid>
   );

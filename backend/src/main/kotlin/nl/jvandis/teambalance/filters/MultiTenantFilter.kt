@@ -79,9 +79,6 @@ class MultiTenantFilter(
         }
 
         filterChain.doFilter(request, response)
-
-        if (tenant != null) {
-            MultiTenantContext.clear()
-        }
+        MultiTenantContext.clear()
     }
 }

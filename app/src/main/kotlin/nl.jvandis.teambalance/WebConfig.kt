@@ -6,6 +6,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 import org.springframework.format.FormatterRegistry
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.resource.PathResourceResolver
 import java.io.IOException
@@ -16,8 +17,15 @@ class WebConfig : WebMvcConfigurer {
         registry.addConverter(StringToEnumConverter())
     }
 
+    override fun addViewControllers(registry: ViewControllerRegistry) {
+        // forward requests to from rootpath to the index.html
+        registry.addViewController("/").setViewName(
+            "forward:/index.html",
+        )
+    }
+
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
-        registry.addResourceHandler("/**")
+        registry.addResourceHandler("/**", "/", "")
             .addResourceLocations("classpath:/static/")
             .resourceChain(true)
             .addResolver(
@@ -27,11 +35,16 @@ class WebConfig : WebMvcConfigurer {
                         resourcePath: String,
                         location: Resource,
                     ): Resource {
-                        val requestedResource = location.createRelative(resourcePath)
+                        val tenant =
+                            when (MultiTenantContext.getCurrentTenant()) {
+                                Tenant.TOVO_HEREN_4 -> "tovoheren4"
+                                Tenant.TOVO_HEREN_5 -> "tovoheren5"
+                            }
+                        val requestedResource = location.createRelative("$tenant/$resourcePath")
                         return if (requestedResource.exists() && requestedResource.isReadable) {
                             requestedResource
                         } else {
-                            ClassPathResource("/static/index.html")
+                            ClassPathResource("/static/$tenant/index.html")
                         }
                     }
                 },
