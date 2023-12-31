@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { authenticationManager } from "../utils/AuthenticationManager";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -6,7 +6,7 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import { Refresh } from "./Refresh";
 import { Logout } from "./Logout";
-import { TeamBalanceTheme, TenantContext } from "../TenantContext";
+import { TeamBalanceTheme, TENANT } from "../TenantContext";
 import { ThemeToggler } from "./ThemeToggler";
 
 const TopBar = (props: {
@@ -16,7 +16,6 @@ const TopBar = (props: {
   setTheme: (theme: TeamBalanceTheme) => void;
 }) => {
   const [isAuth, setIsAuth] = useState(false);
-  const tenantContext = useContext(TenantContext);
 
   useEffect(() => {
     authenticationManager.checkAuthentication().then((it) => {
@@ -31,9 +30,7 @@ const TopBar = (props: {
       <Toolbar>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs>
-            <Typography variant="h6">
-              {tenantContext.title} Team balance
-            </Typography>
+            <Typography variant="h6">{TENANT.title} Team balance</Typography>
           </Grid>
 
           <Grid item>

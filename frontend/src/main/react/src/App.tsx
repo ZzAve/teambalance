@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect, useState } from "react";
+import React, { lazy, Suspense, useState } from "react";
 import "./App.css";
 import Loading from "./views/Loading";
 import { RequireAuth } from "./components/RequireAuth";
@@ -15,15 +15,7 @@ import {
 import { SnackbarProvider } from "notistack";
 import { StyledEngineProvider, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
-import {
-  getTenantInfo,
-  TeamBalanceTheme,
-  TenantContext,
-  TenantError,
-  TenantInfo,
-  UNKNOWN_TENANT_CONTEXT,
-} from "./TenantContext";
-import Typography from "@mui/material/Typography";
+import { TeamBalanceTheme } from "./TenantContext";
 import {
   getTeamBalanceThemePreference,
   storeTeamBalanceThemePreference,
@@ -55,18 +47,11 @@ const themeDark = createTheme({
 });
 
 const initialTheme = getTeamBalanceThemePreference();
+
 const App = () => {
   const [topBarShouldRefresh, setTopBarShouldRefresh] = useState(false);
   const [theme, setTheme] = useState<TeamBalanceTheme>(initialTheme);
   const [shouldRefresh, setShouldRefresh] = useState(false);
-  const [tenant, setTenant] = useState<TenantInfo | TenantError | undefined>(
-    undefined
-  );
-
-  useEffect(() => {
-    //Do something with error handling (!) generic error page be great
-    getTenantInfo().then(setTenant);
-  }, []);
 
   const handleRefresh = () => {
     setTimeout(() => {
@@ -86,24 +71,6 @@ const App = () => {
   };
 
   console.debug("[App] render");
-
-  function getLoadingState() {
-    return (
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12}>
-          <Loading />
-        </Grid>
-      </Grid>
-    );
-  }
-
-  const getUnknownTenantState = () => (
-    <Grid container spacing={2} alignItems="center">
-      <Grid item xs={12}>
-        <Typography variant="h1">Er ging iets goed mis. Paniek 😱🔥</Typography>
-      </Grid>
-    </Grid>
-  );
 
   const getHappyState = () => (
     <Grid container spacing={2} alignItems="flex-start">
@@ -181,39 +148,23 @@ const App = () => {
     </Grid>
   );
 
-  const getContent = (): React.ReactNode => {
-    switch (tenant) {
-    }
-    if (tenant === undefined) {
-      return getLoadingState();
-    } else if (tenant.type === "tenantInfo") {
-      return getHappyState();
-    } else {
-      return getUnknownTenantState();
-    }
-  };
-
   return (
-    <TenantContext.Provider
-      value={tenant?.type === "tenantInfo" ? tenant : UNKNOWN_TENANT_CONTEXT}
-    >
-      <StyledEngineProvider injectFirst>
-        <ThemeProvider
-          theme={theme === TeamBalanceTheme.LIGHT ? themeLight : themeDark}
-        >
-          <SnackbarProvider maxSnack={5} autoHideDuration={2500}>
-            <CssBaseline />
-            <TopBar
-              handleRefresh={handleRefresh}
-              refresh={topBarShouldRefresh}
-              theme={theme}
-              setTheme={handleSetTheme}
-            />
-            <Container maxWidth="xl">{getContent()}</Container>
-          </SnackbarProvider>
-        </ThemeProvider>
-      </StyledEngineProvider>
-    </TenantContext.Provider>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider
+        theme={theme === TeamBalanceTheme.LIGHT ? themeLight : themeDark}
+      >
+        <SnackbarProvider maxSnack={5} autoHideDuration={2500}>
+          <CssBaseline />
+          <TopBar
+            handleRefresh={handleRefresh}
+            refresh={topBarShouldRefresh}
+            theme={theme}
+            setTheme={handleSetTheme}
+          />
+          <Container maxWidth="xl">{getHappyState()}</Container>
+        </SnackbarProvider>
+      </ThemeProvider>
+    </StyledEngineProvider>
   );
 };
 
