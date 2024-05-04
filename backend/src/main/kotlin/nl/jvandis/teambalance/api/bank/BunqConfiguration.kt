@@ -45,8 +45,10 @@ class BunqConfiguration(
             "Bunq environment was not set to PRODUCTION"
         }
         require(bunqConfig.apiKey.isNullOrEmpty()) {
-            "An apikey was set for Bunq while trying to setup SANDBOX environment. " +
-                "This is not allowed, for your protection"
+            """
+            An apikey was set for Bunq while trying to setup SANDBOX environment. \
+            This is not allowed, for your protection\
+            """
         }
 //        require(bunqConfig.bankAccountId == null || bunqConfig.bankAccountId == -1) {
 //            "A bankAccountId was set while trying to setup SANDBOX environment. " +

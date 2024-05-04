@@ -47,6 +47,9 @@ spring:
       roles:
         - admin
         - user
+  threads:
+    virtual:
+      enabled: true
 springdoc:
   model-and-view-allowed: true
   swagger-ui:

@@ -135,7 +135,7 @@ class AttendeeController(
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun deleteAttendee(
-        @PathVariable("id") id: Long,
+        @PathVariable id: Long,
     ) {
         log.debug("Deleting attendee x")
 

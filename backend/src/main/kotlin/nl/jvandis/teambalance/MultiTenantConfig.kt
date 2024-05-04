@@ -5,6 +5,7 @@ import liquibase.integration.spring.SpringLiquibase
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import javax.sql.DataSource
@@ -23,6 +24,7 @@ class MultiTenantConfig {
 
     @Bean
     @ConditionalOnProperty(prefix = "spring.liquibase", name = ["enabled"])
+    @DependsOnDatabaseInitialization
     fun liquibaseMt(
         sqlDataSource: DataSource,
         liquibaseProperties: LiquibaseProperties,

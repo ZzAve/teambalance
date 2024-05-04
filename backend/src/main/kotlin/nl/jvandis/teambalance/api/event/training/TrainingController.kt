@@ -51,11 +51,11 @@ class TrainingController(
     fun getTrainings(
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
-        @RequestParam(value = "since", defaultValue = START_OF_SEASON_RAW)
+        @RequestParam(defaultValue = START_OF_SEASON_RAW)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         since: LocalDateTime,
-        @RequestParam(value = "limit", defaultValue = "10") limit: Int,
-        @RequestParam(value = "page", defaultValue = "1") page: Int,
+        @RequestParam(defaultValue = "10") limit: Int,
+        @RequestParam(defaultValue = "1") page: Int,
     ): EventsResponse<TrainingResponse> {
         log.debug("GetAllTrainings")
         // In case of testing performance again :)

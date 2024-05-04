@@ -55,8 +55,10 @@ class MiscellaneousEventService(
         require(
             updateMiscellaneousEventRequest.recurringEventProperties != null && originalMiscellaneousEvent.recurringEventProperties != null,
         ) {
-            "Recurring MiscellaneousEvents can only be updated if the " +
-                "`recurringEvent` property is set"
+            """
+            Recurring MiscellaneousEvents can only be updated if the \
+            `recurringEvent` property is set\
+            """
         }
         require(
             updateMiscellaneousEventRequest.recurringEventProperties.teamBalanceId ==

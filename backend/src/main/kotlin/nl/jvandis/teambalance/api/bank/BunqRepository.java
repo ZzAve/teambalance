@@ -162,8 +162,10 @@ public class BunqRepository {
         return allAccount.stream()
                 .filter(monetaryAccountBank -> accountId.equals(monetaryAccountBank.getId()))
                 .findFirst().orElseThrow(() -> {
-                    final String error = String.format("There is no account with id %s present " +
-                            "and/or enabled for access with the current API key ", accountId);
+                    final String error = ("""
+                            There is no account with id %s present \
+                            and/or enabled for access with the current API key \
+                            """).formatted(accountId);
                     log.error(error);
                     return new IllegalStateException(error);
                 }).getId();
@@ -343,7 +345,7 @@ public class BunqRepository {
 
                     return SandboxUserPerson.fromJsonReader(new JsonReader(new StringReader(apiKEy.toString())));
                 } else {
-                    throw new BunqException(String.format(ERROR_COULD_NOT_GENERATE_NEW_API_KEY, response.body().string()));
+                    throw new BunqException(ERROR_COULD_NOT_GENERATE_NEW_API_KEY.formatted(response.body().string()));
                 }
             }
         } catch (IOException e) {
