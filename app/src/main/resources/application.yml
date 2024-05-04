@@ -47,6 +47,9 @@ spring:
       roles:
         - admin
         - user
+  threads:
+    virtual:
+      enabled: true
 springdoc:
   model-and-view-allowed: true
   swagger-ui:
@@ -71,4 +74,4 @@ management:
     web:
       base-path: /internal/actuator
       exposure:
-        include: health,info
+        include: health,info,metrics

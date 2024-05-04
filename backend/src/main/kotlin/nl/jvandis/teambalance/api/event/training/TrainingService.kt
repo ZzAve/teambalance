@@ -47,8 +47,10 @@ class TrainingService(
         updateTrainingRequest: UpdateTrainingRequest,
     ): List<Training> {
         require(updateTrainingRequest.recurringEventProperties != null && originalTraining.recurringEventProperties != null) {
-            "RecurringTrainings can only be updated if the " +
-                "`recurringEvent` property is set"
+            """
+            RecurringTrainings can only be updated if the \
+            `recurringEvent` property is set\
+            """
         }
         require(
             updateTrainingRequest.recurringEventProperties.teamBalanceId ==

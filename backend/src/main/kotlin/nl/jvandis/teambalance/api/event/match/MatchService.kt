@@ -46,8 +46,10 @@ class MatchService(
         updateMatchRequest: UpdateMatchRequest,
     ): List<Match> {
         require(updateMatchRequest.recurringEventProperties != null && originalMatch.recurringEventProperties != null) {
-            "RecurringMatchs can only be updated if the " +
-                "`recurringEvent` property is set"
+            """
+            RecurringMatchs can only be updated if the \
+            `recurringEvent` property is set\
+            """
         }
         require(
             updateMatchRequest.recurringEventProperties.teamBalanceId ==

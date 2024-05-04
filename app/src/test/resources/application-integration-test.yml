@@ -6,6 +6,10 @@ spring:
 
   liquibase:
     enabled: false
+  security:
+    user:
+      password: test
+      name: test
 
 app:
   bank:

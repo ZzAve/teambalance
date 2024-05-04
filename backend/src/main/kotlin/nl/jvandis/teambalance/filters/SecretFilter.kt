@@ -15,7 +15,7 @@ class SecretFilter(
     private val handlerExceptionResolver: HandlerExceptionResolver,
 ) : OncePerRequestFilter() {
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-        return !request.requestURI.startsWith("/api") || request.requestURI == "/api/tenants/me"
+        return !request.requestURI.startsWith("/api")
     }
 
     override fun destroy() {}
