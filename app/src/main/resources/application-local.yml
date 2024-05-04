@@ -62,16 +62,8 @@ spring:
       roles:
         - admin
         - user
-  cloud:
-    gcp:
-      project-id: "nope"
-      core:
-        enabled: false
-      secretmanager:
-        enabled: false
   liquibase:
     enabled: true
-
 
 logging:
   level:

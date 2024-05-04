@@ -244,5 +244,9 @@ As with most projects, it's hardly ever considered finished.
 
 Unfortunately, Intellij doesn't understand shaded artifacts ([read up on it here](https://youtrack.jetbrains.com/issue/IDEA-126596))
 
-> A better workaround seems to be: Right-click on shade-bug-repackaged -> pom.xml in the project view in IntelliJ,
-> choose "Maven" -> "Ignore Projects". Then do a "Maven" -> "Reimport" on the top-level pom.xml.
+> A better workaround seems to be: 
+> 
+> - Right-click on shade-bug-repackaged -> pom.xml in the project view in IntelliJ,
+> - choose "Maven" -> "Ignore Projects". 
+> - Then do a "Maven" -> "Reload" on the top-level pom.xml.
+> .

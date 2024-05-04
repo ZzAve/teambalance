@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/default.xml"/>
+
+    <springProfile name="cloud">
+        <appender name="CLOUD" class="com.google.cloud.logging.logback.LoggingAppender">
+            <!-- Optional: filter logs at and above this level -->
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>INFO</level>
+            </filter>
+
+            <flushLevel>WARN</flushLevel>
+            <redirectToStdout>true</redirectToStdout>
+        </appender>
+
+        <root level="info">
+            <appender-ref ref="CLOUD"/>
+        </root>
+    </springProfile>
+
+</configuration>
