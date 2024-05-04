@@ -26,3 +26,6 @@ app:
         bunq-me-base-url: ${TOVO_HEREN_5_BUNQ_ME}
         tenant: tovo_heren_5
         title: "Tovo Heren 5"
+
+logging:
+  config: classpath:logback-cloud.xml

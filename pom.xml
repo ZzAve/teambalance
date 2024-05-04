@@ -38,7 +38,18 @@
         <maven-surefire-plugin.version>3.0.0-M9</maven-surefire-plugin.version>
         <mockito-kotlin.version>4.0.0</mockito-kotlin.version>
         <testcontainers.version>1.18.0</testcontainers.version>
+        <google-cloud-logging-logback.version>0.131.5-alpha</google-cloud-logging-logback.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-logging-logback</artifactId>
+                <version>${google-cloud-logging-logback.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
