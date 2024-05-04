@@ -74,4 +74,4 @@ management:
     web:
       base-path: /internal/actuator
       exposure:
-        include: health,info
+        include: health,info,metrics
