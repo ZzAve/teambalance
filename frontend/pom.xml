@@ -22,8 +22,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- installed node/npm version: lts/carbon -->
-        <node.version>v18.12.1</node.version>
-        <npm.version>8.19.2</npm.version>
+        <node.version>v20.12.2</node.version>
+        <npm.version>10.5.0</npm.version>
 
         <!-- deps -->
         <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
