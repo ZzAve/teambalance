@@ -1,4 +1,4 @@
-import { ApiClient } from "./ApiClient";
+import { ApiClient, RedirectResponse } from "./ApiClient";
 import { Potters, Role, Transaction, TransactionType } from "./domain";
 
 const bankClient = ApiClient();
@@ -30,6 +30,17 @@ interface PotterResponse {
   currency: string;
   amount: number;
 }
+
+const topUp: (price?: number) => Promise<RedirectResponse> = async (
+  price?: number
+) => {
+  let response = await bankClient.callWithBody(
+    `bank/top-up`,
+    { amountInCents: price },
+    { method: "POST", redirect: "manual" }
+  );
+  return response as RedirectResponse;
+};
 
 const getBalance: () => Promise<string> = async () => {
   let data = await bankClient.call(`bank/balance`);
@@ -85,4 +96,5 @@ export const BankApiClient = {
   getBalance,
   getTransactions,
   getPotters,
+  topUp,
 };

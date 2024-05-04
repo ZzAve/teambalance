@@ -1,4 +1,3 @@
-import React from "react";
 import Aes from "crypto-js/aes";
 import Utf8 from "crypto-js/enc-utf8";
 import { authenticationApiClient } from "./AuthenticationApiClient";
@@ -51,11 +50,10 @@ const getSecret = () => _secret;
 const isAuthenticated = () => _authenticated;
 const checkAuthentication: () => Promise<boolean> = () => _authenticationCheck;
 
-const _doAuthenticate = (passphrase: string) => {
+const _doAuthenticate = async (passphrase: string) => {
   setSecret(passphrase);
-  return authenticationApiClient.authenticate(passphrase).then((result) => {
-    console.log(`Successful authentication ${result}`);
-  });
+  const result = await authenticationApiClient.authenticate(passphrase);
+  console.debug(`Successful authentication`, result);
 };
 
 const authenticate = (passphrase: string) => {

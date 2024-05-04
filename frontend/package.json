@@ -53,7 +53,7 @@
   },
   "scripts": {
     "start": "vite serve",
-    "build": "vite build",
+    "build": "vite build --mode tovoheren4 && vite build --mode tovoheren5",
     "preview": "vite preview",
     "lint": "prettier --check './src/main/react/**/*.{ts,tsx}'",
     "lint:fix": "prettier --write './src/main/react/**/*.{ts,tsx}'",

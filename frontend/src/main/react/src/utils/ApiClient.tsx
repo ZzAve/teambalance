@@ -6,6 +6,11 @@ import { InvalidSecretException, TimeoutError } from "./Exceptions";
 const DEFAULT_TIMEOUT = 5000; //ms
 const DEFAULT_MIN_DELAY = 100; //ms
 
+export type RedirectResponse = {
+  url: string;
+  method: "GET" | "POST";
+};
+
 const _mergeFetchOptions = (options: RequestInit, secret?: string) => ({
   ...options,
   headers: {
@@ -25,7 +30,12 @@ const _throwIfNotOk: (path: string, res: Response) => Promise<Response> = (
       resolve(res);
     });
   }
-  //TODO Should be moved to a higher level where AUTH state is reachable
+  if (res.type === "opaqueredirect") {
+    return new Promise((resolve) => {
+      resolve(res);
+    });
+  }
+
   if (res.status === 403) {
     console.log("Status was 403");
     // setAuthenticated(false);
@@ -74,6 +84,13 @@ export const ApiClient = () => {
       .then((res) => {
         if (res.status === 204) {
           return {};
+        }
+        if (res.type === "opaqueredirect") {
+          const response: RedirectResponse = {
+            url: res.url,
+            method: "GET", // FIXME: should be derived from status code and request
+          };
+          return response;
         }
 
         return res.json();
