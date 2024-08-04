@@ -30,11 +30,11 @@ class PotterController(
 ) {
     @GetMapping("/potters")
     fun getPotters(
-        @RequestParam(value = "limit", defaultValue = "3")
+        @RequestParam(defaultValue = "3")
         @Max(200)
         @Min(1)
         limit: Int,
-        @RequestParam(value = "sort", defaultValue = "desc") sort: Sort,
+        @RequestParam(defaultValue = "desc") sort: Sort,
         @RequestParam(value = "since", defaultValue = START_OF_SEASON_RAW)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         sinceInput: LocalDateTime,

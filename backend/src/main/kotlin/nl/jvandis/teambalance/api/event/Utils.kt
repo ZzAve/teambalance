@@ -30,8 +30,10 @@ fun CreateRecurringEventPropertiesRequest.getRecurringEventDates(startTime: Loca
 
     val internalSelectedDays = selectedDays
     require(internalSelectedDays.contains(startTime.dayOfWeek)) {
-        "Start time is not part of the selected days. " +
-            "Please make sure the start time is at one of the selected days."
+        """
+        Start time is not part of the selected days. \
+        Please make sure the start time is at one of the selected days.\
+        """
     }
 
     val eventDates: List<LocalDateTime>
