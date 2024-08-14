@@ -147,6 +147,9 @@
                         <image>eu.gcr.io/tovoheren5/teambalance</image>
                         <tags>${project.version}-${git.commit.id.describe}</tags>
                     </to>
+                        <from>
+                          <image>eclipse-temurin:21-alpine</image>
+                        </from>
                     <skip>false</skip>
                     <container>
                         <mainClass>nl.jvandis.teambalance.ApplicationKt</mainClass>
