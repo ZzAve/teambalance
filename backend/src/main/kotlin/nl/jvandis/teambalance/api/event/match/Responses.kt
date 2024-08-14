@@ -19,8 +19,8 @@ data class UpdateMatchRequest(
     val recurringEventProperties: RecurringEventPropertiesRequest?,
 )
 
-data class UpdateCoachRequest(
-    val coach: String,
+data class UpdateAdditionalInfoRequest(
+    val additionalInfo: String,
 )
 
 data class PotentialMatch(
@@ -29,7 +29,7 @@ data class PotentialMatch(
     val opponent: String,
     val homeAway: Place,
     val comment: String?,
-    val userIds: List<Long>? = null,
+    val userIds: List<String>? = null,
     val recurringEventProperties: CreateRecurringEventPropertiesRequest? = null,
 ) {
     fun internalize(): List<Match> =
@@ -60,14 +60,14 @@ data class PotentialMatch(
 }
 
 data class MatchResponse(
-    val id: Long,
+    val id: String,
     val startTime: LocalDateTime,
     val location: String,
     val comment: String?,
     val attendees: List<AttendeeResponse>,
     val opponent: String,
     val homeAway: Place,
-    val coach: String?,
+    val additionalInfo: String?,
     val recurringEventProperties: RecurringEventPropertiesResponse?,
 )
 
@@ -84,12 +84,12 @@ fun List<Match>.expose(attendees: List<Attendee>) = map { it.expose(attendees) }
 
 fun Match.expose(attendees: List<Attendee>) =
     MatchResponse(
-        id = id,
+        id = teamBalanceId.value,
         comment = comment,
         location = location,
         startTime = startTime,
         attendees = attendees.map(Attendee::expose),
-        coach = coach,
+        additionalInfo = additionalInfo,
         opponent = opponent,
         homeAway = homeAway,
         recurringEventProperties = recurringEventProperties?.expose(),

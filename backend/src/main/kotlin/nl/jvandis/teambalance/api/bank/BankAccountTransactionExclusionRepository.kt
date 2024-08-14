@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.bank
 
 import nl.jvandis.jooq.support.valuesFrom
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.TRANSACTION_EXCLUSION
@@ -16,10 +17,10 @@ class BankAccountTransactionExclusionRepository(private val context: MultiTenant
             .into(TransactionExclusion::class.java)
     }
 
-    fun findByIdOrNull(transactionExclusionId: Long): TransactionExclusion? =
+    fun findByIdOrNull(transactionExclusionId: TeamBalanceId): TransactionExclusion? =
         context.select()
             .from(TRANSACTION_EXCLUSION)
-            .where(TRANSACTION_EXCLUSION.ID.eq(transactionExclusionId))
+            .where(TRANSACTION_EXCLUSION.TEAM_BALANCE_ID.eq(transactionExclusionId.value))
             .fetch()
             .into(TransactionExclusion::class.java)
             .also {

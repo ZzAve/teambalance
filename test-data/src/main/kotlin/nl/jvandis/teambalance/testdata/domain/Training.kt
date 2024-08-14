@@ -13,10 +13,10 @@ data class CreateTraining(
 
 @Serializable
 data class Training(
-    val id: Long,
+    val id: String,
     val startTime: LocalDateTime,
     val location: String,
     val comment: String?,
-    val userIds: List<Long>? = null,
+    val userIds: List<String>? = null,
     val trainer: User? = null,
 )

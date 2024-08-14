@@ -1,5 +1,6 @@
 package nl.jvandis.teambalance.api.bank
 
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.data.NO_ID
 import java.time.LocalDate
 
@@ -9,6 +10,7 @@ data class TransactionExclusions(
 
 data class TransactionExclusion(
     val id: Long = NO_ID,
+    val teamBalanceId: TeamBalanceId,
     val date: LocalDate?,
     val transactionId: Int?,
     val counterParty: String?,
@@ -21,6 +23,7 @@ data class TransactionExclusion(
         description: String? = null,
     ) : this(
         id = NO_ID,
+        teamBalanceId = TeamBalanceId.random(),
         date = date,
         transactionId = transactionId,
         counterParty = counterParty,

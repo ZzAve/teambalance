@@ -74,7 +74,8 @@ class MatchWithAttendeesRecordHandler : TeamBalanceRecordHandler<Match> {
             val jooqAttendees = attendeeRecordHandler.getAttendees()
             val buildResult =
                 matches.values.map { builder ->
-                    val eventAttendees = jooqAttendees.filter { it.eventId == builder.id }
+                    val event = checkNotNull(builder.event) { "Event was not set" }
+                    val eventAttendees = jooqAttendees.filter { it.eventId == event.teamBalanceId }
                     builder.attendees = eventAttendees
                     builder.build()
                 }

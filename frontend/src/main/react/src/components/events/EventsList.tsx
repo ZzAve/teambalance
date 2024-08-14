@@ -88,9 +88,11 @@ export const EventListItem = (props: {
   const { addAlert } = useAlerts();
 
   const trainerDropDown = () => {
-    const trainerOptions: SelectedUserOption[] = trainerCoachOptions(teamEvent);
-
     const currentTrainerName = (teamEvent as Training)?.trainer?.name;
+    const trainerOptions: SelectedUserOption[] = trainerCoachOptions(
+      props.event,
+      currentTrainerName
+    );
     const currentCoach =
       (currentTrainerName &&
         trainerOptions.find((o) => o.name === currentTrainerName)) ||
@@ -228,15 +230,22 @@ export const EventListItem = (props: {
 };
 
 const NO_COACH_OPTION: SelectedUserOption = {
-  id: -1,
+  index: -1,
+  id: "no-user",
   name: "",
   state: "NOT_RESPONDED",
 };
 
-const trainerCoachOptions = (teamEvent: TeamEvent) =>
+const trainerCoachOptions = (
+  teamEvent: TeamEvent,
+  currentCoach?: String
+): SelectedUserOption[] =>
   teamEvent.attendees
     .filter(
-      (a) => COACH_TRAINER_ROLES.includes(a.user.role) || a.state == "PRESENT"
+      (a) =>
+        COACH_TRAINER_ROLES.includes(a.user.role) ||
+        a.state == "PRESENT" ||
+        a.user.name === currentCoach
     )
     // sort trainers above the rest
     .sort((a, b) =>
@@ -245,7 +254,8 @@ const trainerCoachOptions = (teamEvent: TeamEvent) =>
         ? 1
         : 0
     )
-    .map((a) => ({
+    .map((a, idx) => ({
+      index: idx,
       id: a.user.id,
       name: a.user.name,
       state: a.state,

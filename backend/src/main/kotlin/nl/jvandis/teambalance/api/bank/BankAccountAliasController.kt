@@ -1,8 +1,10 @@
 package nl.jvandis.teambalance.api.bank
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.DataConstraintViolationException
+import nl.jvandis.teambalance.api.InvalidAliasException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
@@ -44,13 +46,14 @@ class BankAccountAliasController(
 
     //    @PreAuthorize("hasRole('admin')")
     @GetMapping("/{id}")
-    fun getUser(
-        @PathVariable(value = "id") bankAccountAliasId: Long,
+    fun getAlias(
+        @PathVariable(value = "id") bankAccountAliasId: String,
     ): BankAccountAlias {
-        log.debug("getUser $bankAccountAliasId")
+        val bankAccountAliasTeamBalanceId = TeamBalanceId(bankAccountAliasId)
+        log.debug("getUser $bankAccountAliasTeamBalanceId")
 
-        return bankAccountAliasRepository.findByIdOrNull(bankAccountAliasId) ?: throw InvalidUserException(
-            bankAccountAliasId,
+        return bankAccountAliasRepository.findByIdOrNull(bankAccountAliasTeamBalanceId) ?: throw InvalidAliasException(
+            bankAccountAliasTeamBalanceId,
         )
     }
 
@@ -81,13 +84,13 @@ class BankAccountAliasController(
         }
     }
 
-    private fun PotentialBankAccountAlias.internalize(): BankAccountAlias {
-        val user = userRepository.findByIdOrNull(this.userId) ?: throw InvalidUserException(userId)
-        return BankAccountAlias(name, user)
-    }
+    private fun PotentialBankAccountAlias.internalize(): BankAccountAlias =
+        TeamBalanceId(userId)
+            .let { id -> userRepository.findByIdOrNull(id) ?: throw InvalidUserException(id) }
+            .let { user -> BankAccountAlias(name, user) }
 }
 
 data class PotentialBankAccountAlias(
     val name: String,
-    val userId: Long,
+    val userId: String,
 )

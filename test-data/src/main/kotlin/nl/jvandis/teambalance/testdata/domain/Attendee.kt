@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateAttendee(
-    val eventId: Long,
-    val userId: Long,
+    val eventId: String,
+    val userId: String,
     val availability: Availability? = null,
 )
 

@@ -3,8 +3,8 @@ package nl.jvandis.teambalance.api.event.match
 import nl.jvandis.jooq.support.getField
 import nl.jvandis.jooq.support.getFieldOrThrow
 import nl.jvandis.jooq.support.valuesFrom
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesId
 import nl.jvandis.teambalance.api.event.TeamEventTableAndRecordHandler
 import nl.jvandis.teambalance.api.event.TeamEventsRepository
 import nl.jvandis.teambalance.api.event.deleteStaleRecurringEvent
@@ -17,7 +17,7 @@ import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.MATCH
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.RECURRING_EVENT_PROPERTIES
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
-import nl.jvandis.teambalance.loggerFor
+import nl.jvandis.teambalance.log
 import org.jooq.Condition
 import org.jooq.DatePart
 import org.jooq.exception.DataAccessException
@@ -31,8 +31,6 @@ import java.time.LocalDateTime
 
 @Repository
 class MatchRepository(context: MultiTenantDslContext) : TeamEventsRepository<Match>(context) {
-    override val log = loggerFor()
-
     override fun findAll(): List<Match> = findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
 
     private fun findAllByIds(eventIds: Collection<Long>): List<Match> {
@@ -71,7 +69,7 @@ class MatchRepository(context: MultiTenantDslContext) : TeamEventsRepository<Mat
             TeamEventTableAndRecordHandler(MATCH, MATCH.ID) { MatchWithAttendeesRecordHandler() },
         )
 
-    override fun findByIdOrNull(eventId: Long): Match? {
+    override fun findByIdOrNull(eventId: TeamBalanceId): Match? {
         val recordHandler = MatchWithAttendeesRecordHandler()
         return context
             .select()
@@ -80,7 +78,7 @@ class MatchRepository(context: MultiTenantDslContext) : TeamEventsRepository<Mat
             .on(MATCH.ID.eq(EVENT.ID))
             .leftJoin(RECURRING_EVENT_PROPERTIES)
             .on(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
-            .where(MATCH.ID.eq(eventId))
+            .where(EVENT.TEAM_BALANCE_ID.eq(eventId.value))
             .fetchOne()
             .handleWith(recordHandler)
             .also {
@@ -90,7 +88,7 @@ class MatchRepository(context: MultiTenantDslContext) : TeamEventsRepository<Mat
 
     @Transactional
     override fun deleteById(
-        eventId: Long,
+        eventId: TeamBalanceId,
         affectedRecurringEvents: AffectedRecurringEvents?,
     ): Int {
         val allEventsToDeleteConditions: Condition = allEventsToDeleteCondition(eventId, affectedRecurringEvents)
@@ -129,26 +127,41 @@ class MatchRepository(context: MultiTenantDslContext) : TeamEventsRepository<Mat
 
         val eventRecord =
             context
-                .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
-                .values(event.comment, event.location, event.startTime, null)
-                .returningResult(EVENT.ID, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
+                .insertInto(
+                    EVENT,
+                    EVENT.TEAM_BALANCE_ID,
+                    EVENT.COMMENT,
+                    EVENT.LOCATION,
+                    EVENT.START_TIME,
+                    EVENT.RECURRING_EVENT_ID,
+                )
+                .values(event.teamBalanceId.value, event.comment, event.location, event.startTime, null)
+                .returningResult(
+                    EVENT.ID,
+                    EVENT.TEAM_BALANCE_ID,
+                    EVENT.COMMENT,
+                    EVENT.LOCATION,
+                    EVENT.START_TIME,
+                    EVENT.RECURRING_EVENT_ID,
+                )
                 .fetchOne()
                 ?: throw DataAccessException("Could not insert Match")
 
         return context
-            .insertInto(MATCH, MATCH.COACH, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
-            .values(event.coach, event.homeAway, event.opponent, eventRecord[EVENT.ID])
-            .returningResult(MATCH.COACH, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
+            .insertInto(MATCH, MATCH.ADDITIONAL_INFO, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
+            .values(event.additionalInfo, event.homeAway, event.opponent, eventRecord[EVENT.ID])
+            .returningResult(MATCH.ADDITIONAL_INFO, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
             .fetchOne()
             ?.let { matchRecord ->
                 Match(
                     id = matchRecord.getFieldOrThrow(MATCH.ID),
+                    teamBalanceId = eventRecord.getFieldOrThrow(EVENT.TEAM_BALANCE_ID).let(TeamBalanceId::invoke),
                     startTime = eventRecord.getFieldOrThrow(EVENT.START_TIME),
                     location = eventRecord.getFieldOrThrow(EVENT.LOCATION),
                     comment = eventRecord.getField(EVENT.COMMENT),
                     opponent = matchRecord.getFieldOrThrow(MATCH.OPPONENT),
                     homeAway = matchRecord.getFieldOrThrow(MATCH.HOME_AWAY),
-                    coach = matchRecord.getField(MATCH.COACH),
+                    additionalInfo = matchRecord.getField(MATCH.ADDITIONAL_INFO),
                     recurringEventProperties = null,
                 )
             }
@@ -169,22 +182,36 @@ class MatchRepository(context: MultiTenantDslContext) : TeamEventsRepository<Mat
 
         val insertEventRecordResult =
             context
-                .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
-                .valuesFrom(events, { it.comment }, { it.location }, { it.startTime }, { recurringEventProperties.id })
+                .insertInto(
+                    EVENT,
+                    EVENT.TEAM_BALANCE_ID,
+                    EVENT.COMMENT,
+                    EVENT.LOCATION,
+                    EVENT.START_TIME,
+                    EVENT.RECURRING_EVENT_ID,
+                )
+                .valuesFrom(
+                    events,
+                    { it.teamBalanceId.value },
+                    { it.comment },
+                    { it.location },
+                    { it.startTime },
+                    { recurringEventProperties.id },
+                )
                 .returningResult(EVENT.fields().toList())
                 .fetch()
                 .also { if (it.size != events.size) throw DataAccessException("Could not insert Matches $events. One or more failed") }
 
         return context
-            .insertInto(MATCH, MATCH.COACH, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
+            .insertInto(MATCH, MATCH.ADDITIONAL_INFO, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
             .valuesFrom(
                 events,
-                { it.coach },
+                { it.additionalInfo },
                 { it.homeAway },
                 { it.opponent },
                 { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] },
             )
-            .returningResult(MATCH.COACH, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
+            .returningResult(MATCH.ADDITIONAL_INFO, MATCH.HOME_AWAY, MATCH.OPPONENT, MATCH.ID)
             .fetch()
             .map { matchRecord ->
                 val eventRecord =
@@ -193,12 +220,13 @@ class MatchRepository(context: MultiTenantDslContext) : TeamEventsRepository<Mat
                     }
                 Match(
                     id = matchRecord.getFieldOrThrow(MATCH.ID),
+                    teamBalanceId = eventRecord.getFieldOrThrow(EVENT.TEAM_BALANCE_ID).let(TeamBalanceId::invoke),
                     startTime = eventRecord.getFieldOrThrow(EVENT.START_TIME),
                     location = eventRecord.getFieldOrThrow(EVENT.LOCATION),
                     comment = eventRecord.getField(EVENT.COMMENT),
                     opponent = matchRecord.getFieldOrThrow(MATCH.OPPONENT),
                     homeAway = matchRecord.getFieldOrThrow(MATCH.HOME_AWAY),
-                    coach = matchRecord.getField(MATCH.COACH),
+                    additionalInfo = matchRecord.getField(MATCH.ADDITIONAL_INFO),
                     recurringEventProperties = recurringEventProperties,
                 )
             }
@@ -207,7 +235,7 @@ class MatchRepository(context: MultiTenantDslContext) : TeamEventsRepository<Mat
 
     @Transactional
     override fun updateAllFromRecurringEvent(
-        recurringEventId: RecurringEventPropertiesId,
+        recurringEventId: TeamBalanceId,
         examplarUpdatedEvent: Match,
         durationToAddToEachEvent: Duration,
     ): List<Match> {
@@ -236,7 +264,7 @@ class MatchRepository(context: MultiTenantDslContext) : TeamEventsRepository<Mat
 
         val updatedMatchesIds =
             context.update(MATCH)
-                .set(MATCH.COACH, examplarUpdatedEvent.coach)
+                .set(MATCH.ADDITIONAL_INFO, examplarUpdatedEvent.additionalInfo)
                 .set(MATCH.OPPONENT, examplarUpdatedEvent.opponent)
                 .set(MATCH.HOME_AWAY, examplarUpdatedEvent.homeAway)
                 .from(matchingMatches)
@@ -255,13 +283,13 @@ class MatchRepository(context: MultiTenantDslContext) : TeamEventsRepository<Mat
         return findAllByIds(updatedEventIds)
     }
 
-    fun updateCoach(
+    fun updateAdditionalInfo(
         event: Match,
-        coach: String,
+        newAdditionalInfo: String,
     ) {
         context
             .update(MATCH)
-            .set(MATCH.COACH, coach)
+            .set(MATCH.ADDITIONAL_INFO, newAdditionalInfo)
             .where(MATCH.ID.eq(event.id))
             .execute()
             .also { if (it != 1) throw DataAccessException("Could not update Match. MatchRecord was not updated") }
@@ -287,7 +315,7 @@ class MatchRepository(context: MultiTenantDslContext) : TeamEventsRepository<Mat
 
         context
             .update(MATCH)
-            .set(MATCH.COACH, event.coach)
+            .set(MATCH.ADDITIONAL_INFO, event.additionalInfo)
             .set(MATCH.OPPONENT, event.opponent)
             .set(MATCH.HOME_AWAY, event.homeAway)
             .where(MATCH.ID.eq(event.id))

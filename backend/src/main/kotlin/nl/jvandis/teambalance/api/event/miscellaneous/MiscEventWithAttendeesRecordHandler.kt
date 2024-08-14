@@ -74,7 +74,8 @@ class MiscEventWithAttendeesRecordHandler : TeamBalanceRecordHandler<Miscellaneo
             val jooqAttendees = attendeeRecordHandler.getAttendees()
             val buildResult =
                 miscEvent.values.map { builder ->
-                    val eventAttendees = jooqAttendees.filter { it.eventId == builder.id }
+                    checkNotNull(builder.event) { "Event property is expected to be set for miscEvent" }
+                    val eventAttendees = jooqAttendees.filter { it.eventId == builder.event?.teamBalanceId }
                     builder.attendees = eventAttendees
                     builder.build()
                 }

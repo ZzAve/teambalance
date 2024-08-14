@@ -1,5 +1,6 @@
 package nl.jvandis.teambalance.api
 
+import nl.jvandis.teambalance.TeamBalanceId
 import org.springframework.http.HttpStatus
 
 data class Error(
@@ -7,17 +8,23 @@ data class Error(
     val reason: String,
 )
 
-open class InvalidIdException(val id: Long, val type: String) : RuntimeException()
+open class InvalidIdException(val teamBalanceId: TeamBalanceId, val type: String) : RuntimeException()
 
-class InvalidUserException(id: Long) : InvalidIdException(id, "user")
+class InvalidUserException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "user")
 
-class InvalidTrainingException(id: Long) : InvalidIdException(id, "training")
+class InvalidTransactionException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "transaction")
 
-class InvalidMatchException(id: Long) : InvalidIdException(id, "match")
+class InvalidAliasException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "alias")
 
-class InvalidMiscellaneousEventException(id: Long) : InvalidIdException(id, "miscellaneous-event")
+class InvalidTrainingException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "training")
 
-class InvalidAttendeeException(id: Long) : InvalidIdException(id, "attendee")
+class InvalidMatchException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "match")
+
+class InvalidMiscellaneousEventException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "miscellaneous-event")
+
+class InvalidEventException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "event")
+
+class InvalidAttendeeException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "attendee")
 
 class InvalidSecretException(msg: String) : RuntimeException(msg)
 

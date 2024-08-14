@@ -105,7 +105,7 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.NOT_FOUND,
-                    reason = "Could not find ${e.type} item with Id ${e.id} ",
+                    reason = "Could not find ${e.type} item with Id ${e.teamBalanceId} ",
                 ),
             )
     }

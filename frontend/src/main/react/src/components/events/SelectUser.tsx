@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   FormControl,
@@ -11,11 +11,12 @@ import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import Typography from "@mui/material/Typography";
 import { useAlerts } from "../../hooks/alertsHook";
-import { Availability } from "../../utils/domain";
+import { Availability, TeamBalanceId } from "../../utils/domain";
 import { AttendeeButton } from "../Attendees";
 
 export type SelectedUserOption = {
-  id: number;
+  index: number;
+  id: TeamBalanceId;
   name: string;
   state: Availability;
 };
@@ -30,31 +31,27 @@ export type SelectedUserOption = {
  * </ul>
  *
  */
-export const SelectUser = <T extends SelectedUserOption>(props: {
+export const SelectUser = (props: {
   label: string;
   icon: string;
-  options: T[];
-  initialOption?: T;
-  selectedUserCallback: (selected: T | undefined) => Promise<boolean>;
+  options: SelectedUserOption[];
+  initialOption?: SelectedUserOption;
+  selectedUserCallback: (
+    selected: SelectedUserOption | undefined
+  ) => Promise<boolean>;
 }) => {
   const [isOptionSelectionLocked, setIsOptionSelectionLocked] = useState(true);
-  const [selectedOption, setSelectedOption] = useState<T | undefined>(
-    props.initialOption
-  );
-  const { addAlert } = useAlerts();
+  const [selectedOption, setSelectedOption] = useState<
+    SelectedUserOption | undefined
+  >(props.initialOption);
 
-  const handleOptionSelection = async (event: SelectChangeEvent<number>) => {
-    if (typeof event.target.value !== "number") {
-      console.error("Something is horribly wrong");
-      addAlert({
-        message:
-          "Iets of iemand heeft teambalance kapot gemaakt... Tijd om de hulpdiensten te bellen?",
-        level: "error",
-        canClose: false,
-      });
-      return;
-    }
-    const newOptionId = event.target.value;
+  useEffect(() => {
+    console.log("Updating selectedOption");
+    setSelectedOption(props.options.find((it) => it.id === selectedOption?.id));
+  }, [props.options]);
+
+  const handleOptionSelection = async (event: SelectChangeEvent) => {
+    const newOptionId: string = event.target.value;
     const previousOption = selectedOption;
     let newOption = props.options.find((x) => x.id === newOptionId);
     console.log(
@@ -93,12 +90,12 @@ export const SelectUser = <T extends SelectedUserOption>(props: {
             state: selectedOption?.state || "NOT_RESPONDED",
             user: {
               name: selectedOption?.name || "niemand",
-              id: 0,
+              id: "no-user",
               role: "OTHER",
               isActive: false,
             },
-            id: -1,
-            eventId: -1,
+            id: "no-attendee",
+            eventId: "no-event",
           }}
           onSelection={() => {}}
         ></AttendeeButton>
@@ -107,7 +104,7 @@ export const SelectUser = <T extends SelectedUserOption>(props: {
           <Select
             variant="standard"
             labelId="user-select"
-            value={selectedOption?.id || -1}
+            value={selectedOption?.id || "no-user"}
             onChange={handleOptionSelection}
           >
             <MenuItem key={-1} value={-1}>

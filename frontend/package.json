@@ -28,6 +28,7 @@
     "@types/node": "20.12.2",
     "@types/react": "17.0.53",
     "@types/react-dom": "17.0.18",
+    "@types/react-helmet": "^6.1.11",
     "@vitejs/plugin-react": "^4.1.1",
     "buffer": "^6.0.3",
     "crypto-js": "4.1.1",
@@ -53,7 +54,7 @@
   },
   "scripts": {
     "start": "vite serve",
-    "build": "vite build --mode tovoheren4 && vite build --mode tovoheren5",
+    "build": "tsc && vite build --mode tovoheren4 && vite build --mode tovoheren5",
     "preview": "vite preview",
     "lint": "prettier --check './src/main/react/**/*.{ts,tsx}'",
     "lint:fix": "prettier --write './src/main/react/**/*.{ts,tsx}'",

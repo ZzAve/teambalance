@@ -1,5 +1,7 @@
 package nl.jvandis.teambalance.api.event
 
+import nl.jvandis.jooq.support.getFieldOrThrow
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.RecurringEventPropertiesRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
@@ -15,17 +17,25 @@ class EventRepository(
     /**
      * Returns whether an event with id {@code eventId} exists
      */
-    fun exists(eventId: Long): Boolean =
+    fun exists(eventId: TeamBalanceId): Boolean =
         context.select(count())
             .from(EVENT)
-            .where(EVENT.ID.eq(eventId))
+            .where(EVENT.TEAM_BALANCE_ID.eq(eventId.value))
             .fetchOne()
             ?.let { it.value1() == 1 }
             ?: false
+
+    fun findInternalId(eventId: TeamBalanceId): Long? =
+        context.select()
+            .from(EVENT)
+            .where(EVENT.TEAM_BALANCE_ID.eq(eventId.value))
+            .fetchOne()
+            ?.getFieldOrThrow(EVENT.ID)
 }
 
 fun MultiTenantDslContext.insertRecurringEventPropertyRecord(event: Event): RecurringEventProperties {
-    val er = event.recurringEventProperties!!
+    val recurringEventProperties =
+        checkNotNull(event.recurringEventProperties) { "Expression 'event.recurringEventProperties' must not be null" }
     val insertRecurringEventPropertiesResult =
         insertInto(
             RECURRING_EVENT_PROPERTIES,
@@ -37,12 +47,12 @@ fun MultiTenantDslContext.insertRecurringEventPropertyRecord(event: Event): Recu
             RECURRING_EVENT_PROPERTIES.SELECTED_DAYS,
         )
             .values(
-                er.teamBalanceId.value,
-                er.intervalAmount,
-                er.intervalTimeUnit,
-                er.amountLimit,
-                er.dateLimit,
-                er.selectedDays.toTypedArray(),
+                recurringEventProperties.teamBalanceId.value,
+                recurringEventProperties.intervalAmount,
+                recurringEventProperties.intervalTimeUnit,
+                recurringEventProperties.amountLimit,
+                recurringEventProperties.dateLimit,
+                recurringEventProperties.selectedDays.toTypedArray(),
             )
             .returningResult(RECURRING_EVENT_PROPERTIES.fields().toList())
             .fetchOne()

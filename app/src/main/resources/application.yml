@@ -40,6 +40,8 @@ spring:
   liquibase:
     change-log: "classpath:db/changelog/db.changelog-master.xml"
     enabled: true
+    user: override-me
+    password: override-me
   security:
     user:
       password: ${ADMIN_PASSWORD}

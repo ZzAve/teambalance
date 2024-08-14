@@ -19,12 +19,12 @@ app:
       - domain: localhost:8080
         secret: teambalance
         bunq-me-base-url: https://bunq.com/local
-        tenant: tovo_heren_5
+        tenant: tovo_heren_4
         title: "localhost:8080"
       - domain: localhost:3000
         secret: teambalance
         bunq-me-base-url: https://bunq.com/5
-        tenant: tovo_heren_5
+        tenant: tovo_heren_4
         title: "localhost:3000"
       - domain: 5.teambalance.local:8080
         secret: teambalance
@@ -64,6 +64,9 @@ spring:
         - user
   liquibase:
     enabled: true
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+
 
 logging:
   level:

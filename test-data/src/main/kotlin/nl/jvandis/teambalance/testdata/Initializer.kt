@@ -11,7 +11,6 @@ import io.kotest.property.arbs.stockExchanges
 import io.kotest.property.arbs.travel.airport
 import io.kotest.property.arbs.tube.tubeJourney
 import kotlinx.datetime.toKotlinLocalDateTime
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import nl.jvandis.teambalance.testdata.domain.Attendee
@@ -52,10 +51,6 @@ import java.time.LocalDateTime
 import kotlin.random.Random
 import kotlin.time.measureTime
 
-// Enable me if you want to populate the database on application startup
-// @Configuration
-// @Profile("dev", "local") // don't use class unless 'dev' profile is activated
-
 val jsonFormatter =
     Json {
         encodeDefaults = true
@@ -74,16 +69,16 @@ fun addHeaders(apiKey: String) =
         }
     }
 
+// Enable me if you want to populate the database on application startup
+// @Configuration
+// @Profile("dev", "local") // don't use class unless 'dev' profile is activated
 class Initializer(
     apiKey: String,
     private val host: String = "http://localhost:8080",
+    private val random: Random,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
     private val client: HttpHandler = addHeaders(apiKey)(ApacheClient())
-
-    init {
-        // standard client
-    }
 
     val trainingsLens = Body.auto<EventResponse<Training>>().toLens()
     val aTrainingLens = Body.auto<Training>().toLens()
@@ -93,9 +88,10 @@ class Initializer(
     val anAttendeeLens = Body.auto<Attendee>().toLens()
 
     private fun createUser(user: CreateUser): User {
+        val body = jsonFormatter.encodeToString(user).also(::println)
         val request =
             Request(POST, "$host/api/users")
-                .body(jsonFormatter.encodeToString(user))
+                .body(body)
         val response: Response = client(request)
         if (!response.status.successful) {
             throw IllegalStateException("Something went wrong creating a user: ${response.bodyString()}")
@@ -128,12 +124,12 @@ class Initializer(
     }
 
     private fun addTrainer(
-        id: Long,
-        trainerId: Long?,
+        id: String,
+        trainerId: String?,
     ): Training {
         val request =
             Request(PUT, "$host/api/trainings/$id/trainer")
-                .body("""{ "userId":$trainerId  }""")
+                .body("""{ "userId": "$trainerId"  }""")
 
         val response: Response = client(request)
 
@@ -158,17 +154,17 @@ class Initializer(
     }
 
     private fun addCoach(
-        id: Long,
-        coach: String,
+        id: String,
+        additionalInfo: String,
     ): Match {
         val request =
-            Request(PUT, "$host/api/matches/$id/coach")
-                .body("""{ "coach": "$coach"  }""")
+            Request(PUT, "$host/api/matches/$id/additional-info")
+                .body("""{ "additionalInfo": "$additionalInfo"  }""")
 
         val response: Response = client(request)
 
         if (!response.status.successful) {
-            throw IllegalStateException("Something went wrong adding a coach: [${response.status}] ${response.bodyString()}")
+            throw IllegalStateException("Something went wrong updating additional-info: [${response.status}] ${response.bodyString()}")
         }
 
         return aMatchLens(response)
@@ -308,8 +304,8 @@ class Initializer(
                                 .withMinute(0)
                                 .withSecond(0)
                                 .withNano(0)
-                                .plusDays(Random.nextLong(-dayRange, dayRange))
-                                .plusHours(Random.nextLong(-hourRange, hourRange))
+                                .plusDays(random.nextLong(-dayRange, dayRange))
+                                .plusHours(random.nextLong(-hourRange, hourRange))
                                 .toKotlinLocalDateTime(),
                         location = locations.random(),
                         comment = comments.random(),
@@ -322,7 +318,7 @@ class Initializer(
                 log.info("Added attendees to training with id ${savedTraining.id}: ${addedAttendees.map { it.user.name }}")
 
                 // Add trainer, 50% chance
-                if (Random.nextBoolean()) {
+                if (random.nextBoolean()) {
                     val trainerId =
                         addedAttendees
                             .take(1)
@@ -349,7 +345,7 @@ class Initializer(
         val locations = Arb.airport().take(10).map { "${it.name} - ${it.country}" }.toList()
         val comments = Arb.googleTaxonomy().take(4).map { it.value }.toList() + null
         val opponents = Arb.cluedoSuspects().take(10).map { it.name }.toList()
-        val coaches = Arb.harryPotterCharacter().take(5).map { "${it.firstName} ${it.lastName}" }.toList()
+        val additionalInfo = Arb.harryPotterCharacter().take(5).map { "${it.firstName} ${it.lastName}" }.toList()
         log.info(
             """
             .
@@ -359,7 +355,7 @@ class Initializer(
             Locations to use: $locations
             Comments to use: $comments
             Opponents to use: $opponents
-            Coaches to use: $coaches
+            AddionalInfo to use: $additionalInfo
             Day range: +- 100 days
             Hour range: +- 100 hours
             .
@@ -380,8 +376,8 @@ class Initializer(
                                 .withMinute(0)
                                 .withSecond(0)
                                 .withNano(0)
-                                .plusDays(Random.nextLong(-dayRange, dayRange))
-                                .plusHours(Random.nextLong(-hourRange, hourRange))
+                                .plusDays(random.nextLong(-dayRange, dayRange))
+                                .plusHours(random.nextLong(-hourRange, hourRange))
                                 .toKotlinLocalDateTime(),
                         location = locations.random(),
                         opponent = opponents.random(),
@@ -389,7 +385,7 @@ class Initializer(
                         comment = comments.random(),
                     )
 
-                val savedMatch = createMatch(match).events.first()
+                val savedMatch: Match = createMatch(match).events.first()
                 log.info("Added match with id ${savedMatch.id}: $savedMatch")
 
                 val addedAttendees = addAttendeesToEvent(allUsers, savedMatch.id)
@@ -397,13 +393,13 @@ class Initializer(
                 log.info("Added attendees to match with id ${savedMatch.id}: ${addedAttendees.map { it.user.name }}")
 
                 // Add coach, 50% chance
-                if (Random.nextBoolean()) {
-                    val coachToAdd = coaches.random()
+                if (random.nextBoolean()) {
+                    val coachToAdd = additionalInfo.random()
                     val updatedMatch = addCoach(savedMatch.id, coachToAdd)
 
-                    log.info("Added coach to match with id ${savedMatch.id}: ${updatedMatch.coach}")
+                    log.info("Added additonal info to match with id ${savedMatch.id}: ${updatedMatch.additionalInfo}")
                 } else {
-                    log.info("No coach will be added to match with id ${savedMatch.id}")
+                    log.info("No additionalInfo will be added to match with id ${savedMatch.id}")
                 }
             } catch (e: Exception) {
                 log.warn("Could not add match $i. continuing with the rest", e)
@@ -449,15 +445,15 @@ class Initializer(
                                 .withMinute(0)
                                 .withSecond(0)
                                 .withNano(0)
-                                .plusDays(Random.nextLong(-dayRange, dayRange))
-                                .plusHours(Random.nextLong(-hourRange, hourRange))
+                                .plusDays(random.nextLong(-dayRange, dayRange))
+                                .plusHours(random.nextLong(-hourRange, hourRange))
                                 .toKotlinLocalDateTime(),
                         location = locations.random(),
                         title = titles.random(),
                         comment = comments.random(),
                     )
 
-                val savedMiscEvent = createMiscEvent(miscEvent).events.first()
+                val savedMiscEvent: MiscEvent = createMiscEvent(miscEvent).events.first()
                 log.info("Added misc event with id ${savedMiscEvent.id}: $savedMiscEvent")
 
                 val addedAttendees = addAttendeesToEvent(allUsers, savedMiscEvent.id)
@@ -472,23 +468,29 @@ class Initializer(
 
     private fun addAttendeesToEvent(
         allUsers: List<User>,
-        eventId: Long,
+        eventId: String,
     ): MutableList<Attendee> {
         val addedAttendees = mutableListOf<Attendee>()
         // Add subset of allUsers as attendee
-        allUsers.shuffled().take(Random.nextInt(allUsers.size))
+
+        allUsers.shuffled().take(random.nextInt(allUsers.size))
             .map { user ->
                 CreateAttendee(
                     userId = user.id,
                     eventId = eventId,
-                    availability = Availability.values()[Random.nextInt(Availability.values().size)],
+                    availability = Availability.entries[random.nextInt(Availability.entries.size)],
                 )
             }
             .forEach {
                 val result = kotlin.runCatching { createAttendee(it) }
                 if (result.isSuccess) {
                     val attendee = result.getOrNull() ?: error("Shouldn't be null")
-                    log.debug("Created attendee ${attendee.user.id} [${attendee.state}] for event with id ${attendee.eventId}")
+                    log.debug(
+                        "Created attendee {} [{}] for event with id {}",
+                        attendee.user.id,
+                        attendee.state,
+                        attendee.eventId,
+                    )
                     addedAttendees.add(attendee)
                 } else {
                     log.error("Could not create attendee for userId ${it.userId}", result.exceptionOrNull())

@@ -1,5 +1,6 @@
 package nl.jvandis.teambalance.api.users
 
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.data.NO_ID
 
 data class Users(
@@ -8,6 +9,7 @@ data class Users(
 
 data class User(
     val id: Long,
+    val teamBalanceId: TeamBalanceId,
     val name: String,
     val role: Role,
     val isActive: Boolean = true,
@@ -15,7 +17,12 @@ data class User(
     val showForTrainings: Boolean = true,
     val showForMatches: Boolean = true,
 ) {
-    constructor(name: String, role: Role) : this(NO_ID, name, role)
+    constructor(name: String, role: Role) : this(
+        id = NO_ID,
+        name = name,
+        role = role,
+        teamBalanceId = TeamBalanceId.random(),
+    )
 }
 
 enum class Role {

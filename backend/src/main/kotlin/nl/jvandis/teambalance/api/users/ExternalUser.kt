@@ -5,22 +5,18 @@ data class ExternalUsers(
 )
 
 data class ExternalUser(
-    val id: Long,
+    val id: String,
     val name: String,
     val role: Role,
     val isActive: Boolean,
     val jerseyNumber: Int?,
 )
 
-fun Users.toResponse() = expose()
-
 fun Users.expose() = ExternalUsers(users.map(User::expose))
-
-fun User.toResponse() = expose()
 
 fun User.expose() =
     ExternalUser(
-        id = id,
+        id = teamBalanceId.value,
         name = name,
         role = role,
         jerseyNumber = jerseyNumber,

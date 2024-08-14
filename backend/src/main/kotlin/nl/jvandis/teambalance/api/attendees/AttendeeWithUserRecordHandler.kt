@@ -1,10 +1,13 @@
 package nl.jvandis.teambalance.api.attendees
 
+import nl.jvandis.jooq.support.getFieldOrThrow
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.event.TeamBalanceRecordHandler
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.AttendeeRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.ATTENDEE
+import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
 import org.jooq.Record
 
@@ -31,6 +34,9 @@ class AttendeeWithUserRecordHandler : TeamBalanceRecordHandler<Attendee> {
                 // mapping via AttendeeRecords works better with column name clashes (like `id`)
                 record.into(AttendeeRecord::class.java)
                     .into(Attendee.Builder::class.java)
+                    .apply {
+                        eventId = TeamBalanceId(record.getFieldOrThrow(EVENT.TEAM_BALANCE_ID))
+                    }
             }
 
         val user =

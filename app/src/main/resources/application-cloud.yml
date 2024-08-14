@@ -6,6 +6,9 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     url: ${DB_URL}
+  liquibase:
+    user: ${DB_LIQUIBASE_USER}
+    password: ${DB_LIQUIBASE_PASSWORD}
 
 app:
   multi-tenancy:
@@ -16,11 +19,6 @@ app:
         tenant: tovo_heren_4
         title: "Tovo Heren 4"
 
-      - domain: tovoheren5.nl #deprecated
-        secret: ${API_SECRET_TOVO_HEREN_5}
-        bunq-me-base-url: ${TOVO_HEREN_5_BUNQ_ME}
-        tenant: tovo_heren_5
-        title: "Tovo Heren 5"
       - domain: h5.tovo.nl
         secret: ${API_SECRET_TOVO_HEREN_5}
         bunq-me-base-url: ${TOVO_HEREN_5_BUNQ_ME}

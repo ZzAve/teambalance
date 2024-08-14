@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.bank
 
 import nl.jvandis.jooq.support.valuesFrom
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.attendees.BankAccountAliasWithUserRecordHandler
 import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.NO_ID
@@ -22,13 +23,13 @@ class BankAccountAliasRepository(private val context: MultiTenantDslContext) {
         return recordHandler.build()
     }
 
-    fun findByIdOrNull(aliasId: Long): BankAccountAlias? {
+    fun findByIdOrNull(aliasId: TeamBalanceId): BankAccountAlias? {
         val recordHandler = BankAccountAliasWithUserRecordHandler()
         context.select()
             .from(BANK_ACCOUNT_ALIAS)
             .leftJoin(UZER)
             .on(BANK_ACCOUNT_ALIAS.USER_ID.eq(UZER.ID))
-            .where(BANK_ACCOUNT_ALIAS.ID.eq(aliasId))
+            .where(BANK_ACCOUNT_ALIAS.TEAM_BALANCE_ID.eq(aliasId.value))
             .fetch()
             .forEach(recordHandler)
 

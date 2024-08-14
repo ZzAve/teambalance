@@ -3,13 +3,16 @@ package nl.jvandis.teambalance.api.attendees
 import nl.jvandis.jooq.support.getField
 import nl.jvandis.jooq.support.getFieldOrThrow
 import nl.jvandis.jooq.support.valuesFrom
+import nl.jvandis.teambalance.TeamBalanceId
+import nl.jvandis.teambalance.api.attendees.Availability.NOT_RESPONDED
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents.ALL
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents.CURRENT_AND_FUTURE
+import nl.jvandis.teambalance.api.event.Event
+import nl.jvandis.teambalance.api.event.PotentialAttendee
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.NO_ID
-import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.ATTENDEE
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.EVENT
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.RECURRING_EVENT_PROPERTIES
@@ -30,7 +33,12 @@ class AttendeeRepository(
     private val log = LoggerFactory.getLogger(AttendeeRepository::class.java)
 
     fun findAllByEventIdIn(
-        eventIds: List<Long>,
+        eventId: TeamBalanceId,
+        sort: Sort = Sort.by("user.role", "user.name"),
+    ): List<Attendee> = findAllByEventIdIn(listOf(eventId), sort)
+
+    fun findAllByEventIdIn(
+        eventIds: List<TeamBalanceId>,
         sort: Sort = Sort.by("user.role", "user.name"),
     ): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
@@ -50,17 +58,17 @@ class AttendeeRepository(
 
     @Transactional
     fun findAllAttendeesBelongingToEvent(
-        eventId: Long,
+        eventId: TeamBalanceId,
         affectedRecurringEvents: AffectedRecurringEvents?,
     ): List<Attendee> {
-        var deleteBasedOnCurrentEvent = EVENT.ID.eq(eventId)
+        var deleteBasedOnCurrentEvent = EVENT.TEAM_BALANCE_ID.eq(eventId.value)
         var recurringEventIdCondition = noCondition()
         var recurringEventInFutureCondition = noCondition()
         if (listOf(CURRENT_AND_FUTURE, ALL).contains(affectedRecurringEvents)) {
             val fetchOne =
                 context.select(EVENT.RECURRING_EVENT_ID, EVENT.START_TIME)
                     .from(EVENT)
-                    .where(EVENT.ID.eq(eventId))
+                    .where(EVENT.TEAM_BALANCE_ID.eq(eventId.value))
                     .fetchOne()
             val recurringEventId: Long? = fetchOne?.getField(EVENT.RECURRING_EVENT_ID)
             deleteBasedOnCurrentEvent = noCondition()
@@ -94,14 +102,26 @@ class AttendeeRepository(
         return recordHandler.build()
     }
 
-    fun insertMany(attendees: List<Attendee>): List<Attendee> {
-        if (attendees.isEmpty()) {
+    fun insertMany(potentialAttendees: List<PotentialAttendee>): List<Attendee> {
+        if (potentialAttendees.isEmpty()) {
             return emptyList()
         }
 
         val insertResult =
-            context.insertInto(ATTENDEE, ATTENDEE.AVAILABILITY, ATTENDEE.EVENT_ID, ATTENDEE.USER_ID)
-                .valuesFrom(attendees, { it.availability }, { it.eventId }, { it.user.id })
+            context.insertInto(
+                ATTENDEE,
+                ATTENDEE.TEAM_BALANCE_ID,
+                ATTENDEE.AVAILABILITY,
+                ATTENDEE.EVENT_ID,
+                ATTENDEE.USER_ID,
+            )
+                .valuesFrom(
+                    potentialAttendees,
+                    { TeamBalanceId.random().value },
+                    { it.availability },
+                    { it.internalEventId },
+                    { it.user.id },
+                )
                 .returningResult(ATTENDEE.ID).fetch()
 
         val recordHandler = AttendeeWithUserRecordHandler()
@@ -115,38 +135,50 @@ class AttendeeRepository(
             .fetch()
             .forEach(recordHandler)
 
-        return if (insertResult.size == attendees.size) {
+        return if (insertResult.size == potentialAttendees.size) {
             recordHandler.build()
         } else {
-            throw DataAccessException("Could not insert jooqAttendees $attendees")
+            throw DataAccessException("Could not insert jooqAttendees $potentialAttendees")
         }
     }
 
-    fun insert(attendee: Attendee): Attendee {
-        val attendeeRecord =
-            context
-                .insertInto(ATTENDEE, ATTENDEE.AVAILABILITY, ATTENDEE.EVENT_ID, ATTENDEE.USER_ID)
-                .values(attendee.availability, attendee.eventId, attendee.user.id)
-                .returning(ATTENDEE.ID, ATTENDEE.AVAILABILITY, ATTENDEE.EVENT_ID, ATTENDEE.USER_ID)
-                .fetchOne()
-                ?: throw DataAccessException("Could not insert Attendee $attendee")
+    fun insert(
+        event: Event,
+        user: User,
+        availability: Availability = NOT_RESPONDED,
+    ): Attendee = insert(event.id, user, availability)
 
-        val user =
-            context.select()
-                .from(UZER)
-                .where(UZER.ID.eq(attendeeRecord.userId))
-                .fetchOne()
-                ?.run {
-                    into(UzerRecord::class.java)
-                        .into(User::class.java)
-                }
-                ?: throw DataAccessException("User with id ${attendeeRecord.userId} doesn't exist. ")
-
-        return attendeeRecord
-            .into(Attendee.Builder::class.java)
-            .apply { this.user = user }
-            .build()
-    }
+    fun insert(
+        eventInternalId: Long,
+        user: User,
+        availability: Availability = NOT_RESPONDED,
+    ): Attendee =
+        context
+            .insertInto(
+                ATTENDEE,
+                ATTENDEE.TEAM_BALANCE_ID,
+                ATTENDEE.AVAILABILITY,
+                ATTENDEE.EVENT_ID,
+                ATTENDEE.USER_ID,
+            )
+            .values(
+                TeamBalanceId.random().value,
+                availability,
+                eventInternalId,
+                user.id,
+            )
+            .returning(
+                ATTENDEE.ID,
+                ATTENDEE.TEAM_BALANCE_ID,
+                ATTENDEE.AVAILABILITY,
+                ATTENDEE.EVENT_ID,
+                ATTENDEE.USER_ID,
+            )
+            .fetchOne()
+            ?.into(Attendee.Builder::class.java)
+            ?.apply { this.user = user }
+            ?.build()
+            ?: throw DataAccessException("Could not insert attendee for user ${user.name} (id ${user.teamBalanceId} ")
 
     fun deleteAll(attendees: List<Attendee>): Int =
         context
@@ -170,8 +202,8 @@ class AttendeeRepository(
     }
 
     fun findALlByEventIdInAndUserIdIn(
-        eventIds: List<Long>,
-        userIds: List<Long>,
+        eventIds: List<TeamBalanceId>,
+        userIds: List<TeamBalanceId>,
     ): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
         context.select()
@@ -180,15 +212,15 @@ class AttendeeRepository(
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
             .leftJoin(UZER)
             .on(UZER.ID.eq(ATTENDEE.USER_ID))
-            .where(ATTENDEE.EVENT_ID.`in`(eventIds))
-            .and(ATTENDEE.USER_ID.`in`(userIds))
+            .where(ATTENDEE.EVENT_ID.`in`(eventIds.map(TeamBalanceId::value)))
+            .and(ATTENDEE.USER_ID.`in`(userIds.map(TeamBalanceId::value)))
             .fetch()
             .forEach(recordHandler)
 
         return recordHandler.build()
     }
 
-    fun findAllByUserIdIn(userIds: List<Long>): List<Attendee> {
+    fun findAllByUserIdIn(userIds: List<TeamBalanceId>): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
         context.select()
             .from(ATTENDEE)
@@ -196,20 +228,20 @@ class AttendeeRepository(
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
             .leftJoin(UZER)
             .on(UZER.ID.eq(ATTENDEE.USER_ID))
-            .where(ATTENDEE.USER_ID.`in`(userIds))
+            .where(ATTENDEE.USER_ID.`in`(userIds.map(TeamBalanceId::value)))
             .fetch().forEach(recordHandler)
 
         return recordHandler.build()
     }
 
-    fun findByIdOrNull(attendeeId: Long): Attendee? =
+    fun findByIdOrNull(attendeeId: TeamBalanceId): Attendee? =
         context.select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
             .leftJoin(UZER)
             .on(UZER.ID.eq(ATTENDEE.USER_ID))
-            .where(ATTENDEE.ID.eq(attendeeId))
+            .where(ATTENDEE.TEAM_BALANCE_ID.eq(attendeeId.value))
             .fetchOne()
             ?.let {
                 AttendeeWithUserRecordHandler()
@@ -219,8 +251,8 @@ class AttendeeRepository(
             }
 
     fun findByUserIdAndEventId(
-        userId: Long,
-        eventId: Long,
+        userId: TeamBalanceId,
+        eventId: TeamBalanceId,
     ): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
         context.select()
@@ -229,8 +261,8 @@ class AttendeeRepository(
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
             .leftJoin(UZER)
             .on(UZER.ID.eq(ATTENDEE.USER_ID))
-            .where(ATTENDEE.USER_ID.eq(userId))
-            .and(ATTENDEE.EVENT_ID.eq(eventId))
+            .where(UZER.TEAM_BALANCE_ID.eq(userId.value))
+            .and(EVENT.TEAM_BALANCE_ID.eq(eventId.value))
             .fetch().forEach(recordHandler)
 
         return recordHandler.build()
@@ -272,12 +304,12 @@ class AttendeeRepository(
     }
 
     fun updateAvailability(
-        attendeeId: Long,
+        attendeeId: TeamBalanceId,
         availability: Availability,
     ): Boolean =
         context
             .update(ATTENDEE)
             .set(ATTENDEE.AVAILABILITY, availability)
-            .where(ATTENDEE.ID.eq(attendeeId))
+            .where(ATTENDEE.TEAM_BALANCE_ID.eq(attendeeId.value))
             .execute() == 1
 }

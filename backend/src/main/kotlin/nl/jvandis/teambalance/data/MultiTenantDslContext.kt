@@ -10,6 +10,7 @@ import org.jooq.InsertValuesStep3
 import org.jooq.InsertValuesStep4
 import org.jooq.InsertValuesStep5
 import org.jooq.InsertValuesStep6
+import org.jooq.InsertValuesStep7
 import org.jooq.Record
 import org.jooq.Record1
 import org.jooq.SelectField
@@ -105,6 +106,18 @@ class MultiTenantDslContext(private val context: DSLContext) {
         field5: Field<T5>,
         field6: Field<T6>,
     ): InsertValuesStep6<R, T1, T2, T3, T4, T5, T6> = tenantContext().insertInto(into, field1, field2, field3, field4, field5, field6)
+
+    fun <R : Record, T1, T2, T3, T4, T5, T6, T7> insertInto(
+        into: Table<R>,
+        field1: Field<T1>,
+        field2: Field<T2>,
+        field3: Field<T3>,
+        field4: Field<T4>,
+        field5: Field<T5>,
+        field6: Field<T6>,
+        field7: Field<T7>,
+    ): InsertValuesStep7<R, T1, T2, T3, T4, T5, T6, T7> =
+        tenantContext().insertInto(into, field1, field2, field3, field4, field5, field6, field7)
 
     fun <R : Record> update(table: Table<R>): UpdateSetFirstStep<R> = tenantContext().update(table)
 

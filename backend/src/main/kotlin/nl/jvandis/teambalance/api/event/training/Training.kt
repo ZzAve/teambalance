@@ -1,5 +1,6 @@
 package nl.jvandis.teambalance.api.event.training
 
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.event.Event
 import nl.jvandis.teambalance.api.event.RecurringEventProperties
@@ -11,13 +12,14 @@ import java.time.LocalDateTime
 
 data class Training(
     override val id: Long,
+    override val teamBalanceId: TeamBalanceId,
     override val startTime: LocalDateTime,
     override val location: String,
     override val comment: String? = null,
     override val recurringEventProperties: RecurringEventProperties?,
     val trainer: User? = null,
     val attendees: List<Attendee>? = null,
-) : Event(id, startTime, location, comment, recurringEventProperties) {
+) : Event(id, teamBalanceId, startTime, location, comment, recurringEventProperties) {
     internal constructor(
         startTime: LocalDateTime,
         location: String,
@@ -27,6 +29,7 @@ data class Training(
     ) :
         this(
             id = NO_ID,
+            teamBalanceId = TeamBalanceId.random(),
             startTime = startTime,
             location = location,
             comment = comment,
@@ -52,6 +55,7 @@ data class Training(
 
             return Training(
                 id = event.id,
+                teamBalanceId = event.teamBalanceId,
                 startTime = event.startTime,
                 location = event.location,
                 comment = event.comment,

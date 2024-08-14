@@ -9,7 +9,7 @@ import { EventType } from "./utils";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
 import { eventsApiClient } from "../../utils/MiscEventsApiClient";
 import { useAlerts } from "../../hooks/alertsHook";
-import { TeamEvent, User } from "../../utils/domain";
+import { TeamBalanceId, TeamEvent, User } from "../../utils/domain";
 
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
@@ -29,7 +29,7 @@ const texts: EventsDetailsTexts = {
 const getText = (eventType: EventType, name: keyof EventsDetailsTexts) =>
   texts[name][eventType] || name;
 
-const EventDetails = (props: { eventType: EventType; id?: number }) => {
+const EventDetails = (props: { eventType: EventType; id?: TeamBalanceId }) => {
   const [event, setEvent] = useState<TeamEvent | undefined>(undefined);
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);

@@ -30,6 +30,7 @@ import {
   MiscEvent,
   Place,
   RecurringEventProperties,
+  TeamBalanceId,
   TeamEvent,
   TeamEventInterface,
   Training,
@@ -87,7 +88,7 @@ async function updateEvent(
   recurringEventUpdateType: AffectedRecurringEvents,
   apiArgs: {
     // TODO: consider Partial utility types Partial<Training> | Partial<Match>
-    id: number;
+    id: TeamBalanceId;
     location?: string;
     title?: string;
     startTime?: Date;
@@ -179,12 +180,12 @@ export const EventForm = (props: {
     setIsRecurringEvent(!!recurringEventProperties);
   }, [props.eventType, recurringEventProperties]);
 
-  const isCreateEvent = () => id === undefined;
+  const isCreateEvent = (id?: string): id is undefined => id === undefined;
 
   const save: () => Promise<TeamEvent[]> = async () => {
-    if (isCreateEvent()) {
+    if (isCreateEvent(id)) {
       let addedProps = {};
-      const baseProps: Partial<TeamEventInterface> & { userIds: number[] } = {
+      const baseProps: Partial<TeamEventInterface> & { userIds: string[] } = {
         location: eventLocation as string,
         startTime: selectedDateTime?.toDate() || new Date(), //fixme
         comment: comment,
@@ -193,7 +194,7 @@ export const EventForm = (props: {
           : undefined,
         userIds: Object.entries(userSelection!)
           .filter((it) => it[1])
-          .map((it) => +it[0]),
+          .map((it) => it[0]),
       };
       switch (props.eventType) {
         case "MATCH":
@@ -220,7 +221,7 @@ export const EventForm = (props: {
       return await createEvent(props.eventType, apiArgs);
     } else {
       return await updateEvent(props.eventType, affectedRecurringEvents, {
-        id: id as number,
+        id: id,
         location: eventLocation,
         startTime: selectedDateTime?.toDate(),
         title: title || undefined,
@@ -236,7 +237,7 @@ export const EventForm = (props: {
     let successfulSave = await withLoading(setIsLoading, async () => {
       try {
         const savedEvents = await save();
-        let message: string = "";
+        let message: string;
         if (savedEvents.length === 1) {
           message = `${eventType(savedEvents[0])} event (id ${
             savedEvents[0].id

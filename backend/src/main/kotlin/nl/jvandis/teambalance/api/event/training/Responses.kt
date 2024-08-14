@@ -8,15 +8,12 @@ import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest
 import nl.jvandis.teambalance.api.event.RecurringEventPropertiesResponse
 import nl.jvandis.teambalance.api.event.expose
 import nl.jvandis.teambalance.api.event.getRecurringEventDates
-import nl.jvandis.teambalance.api.users.User
+import nl.jvandis.teambalance.api.users.ExternalUser
+import nl.jvandis.teambalance.api.users.expose
 import java.time.LocalDateTime
 
-data class UserAddRequest(
-    val userId: Long,
-)
-
 data class UpdateTrainerRequest(
-    val userId: Long?,
+    val userId: String?,
 )
 
 data class UpdateTrainingRequest(
@@ -30,7 +27,7 @@ data class PotentialTraining(
     val startTime: LocalDateTime,
     val location: String,
     val comment: String?,
-    val userIds: List<Long>? = null,
+    val userIds: List<String>? = null,
     val recurringEventProperties: CreateRecurringEventPropertiesRequest? = null,
 ) {
     fun internalize(): List<Training> =
@@ -57,12 +54,12 @@ data class PotentialTraining(
 }
 
 data class TrainingResponse(
-    val id: Long,
+    val id: String,
     val startTime: LocalDateTime,
     val location: String,
     val comment: String?,
     val attendees: List<AttendeeResponse>,
-    val trainer: User?,
+    val trainer: ExternalUser?,
     val recurringEventProperties: RecurringEventPropertiesResponse?,
 )
 
@@ -77,11 +74,11 @@ fun List<Training>.expose(attendees: List<Attendee>) = map { it.expose(attendees
 
 fun Training.expose(attendees: List<Attendee>) =
     TrainingResponse(
-        id = id,
+        id = teamBalanceId.value,
         comment = comment,
         location = location,
         startTime = startTime,
         attendees = attendees.map(Attendee::expose),
-        trainer = trainer,
+        trainer = trainer?.expose(),
         recurringEventProperties = recurringEventProperties?.expose(),
     )
