@@ -143,6 +143,9 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>${jib-maven-plugin.version}</version>
                 <configuration>
+                    <from>
+                        <image>eclipse-temurin:21-alpine</image>
+                    </from>
                     <to>
                         <image>eu.gcr.io/tovoheren5/teambalance</image>
                         <tags>${project.version}-${git.commit.id.describe}</tags>
