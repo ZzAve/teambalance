@@ -283,8 +283,8 @@ const ChangeEvent = (props: { eventType: EventType }) => {
   let { id } = useParams();
 
   console.log("ChangeEvent: ", id, props.eventType);
-  if (id === undefined || isNaN(+id)) {
-    let target =
+  if (id === undefined) {
+    const target =
       props.eventType === "TRAINING"
         ? "/admin/trainings"
         : props.eventType === "MATCH"
@@ -292,14 +292,13 @@ const ChangeEvent = (props: { eventType: EventType }) => {
         : props.eventType === "MISC"
         ? "/admin/misc-events"
         : "/admin";
-
     return <Navigate to={target} />;
   }
 
   const title = getText(props.eventType, "edit_event_pageitem_label");
   return (
     <PageItem pageTitle={title} title={title}>
-      <EventDetails eventType={props.eventType} id={+id} />
+      <EventDetails eventType={props.eventType} id={id} />
     </PageItem>
   );
 };

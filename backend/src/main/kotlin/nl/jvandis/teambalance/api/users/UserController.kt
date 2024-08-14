@@ -1,13 +1,13 @@
 package nl.jvandis.teambalance.api.users
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidUserException
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Sort
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType
@@ -40,51 +40,51 @@ class UserController(
         return Users(
             users =
                 userRepository.findAll(Sort.by("name"))
-                    .filter { includeInactiveUsers || it.isActive }
-                    .filterNotNull(),
+                    .filter { includeInactiveUsers || it.isActive },
         ).expose()
     }
 
     @GetMapping("/{id}")
     fun getUser(
-        @PathVariable(value = "id") userId: Long,
+        @PathVariable(value = "id") userId: String,
     ): ExternalUser {
-        log.debug("getUser $userId")
+        val userTeamBalanceId = TeamBalanceId(userId)
+        log.debug("getUser $userTeamBalanceId")
 
-        return userRepository.findByIdOrNull(userId)?.expose() ?: throw InvalidUserException(userId)
+        return userRepository.findByIdOrNull(userTeamBalanceId)?.expose() ?: throw InvalidUserException(
+            userTeamBalanceId,
+        )
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun postUser(
         @RequestBody potentialUser: PotentialUser,
-    ) {
-        log.debug("postUser $potentialUser")
+    ): ExternalUser {
+        log.debug("postUser {}", potentialUser)
 
         val user = potentialUser.internalize()
-        userRepository.insert(user)
+        return userRepository.insert(user).expose()
     }
 
     @Admin
     @PreAuthorize("hasRole('admin')")
     @PutMapping("/{id}")
     fun updateUser(
-        @PathVariable(value = "id") userId: Long,
+        @PathVariable(value = "id") userId: String,
         @RequestBody potentialUserUpdate: PotentialUserUpdate,
     ): ExternalUser {
-        log.debug("updatingUser: $potentialUserUpdate")
+        log.debug("updatingUser: {}", potentialUserUpdate)
 
+        val userTeamBalanceId = TeamBalanceId(userId)
         return userRepository
-            .findByIdOrNull(userId)
-            ?.updateUser(potentialUserUpdate, userId)
+            .findByIdOrNull(userTeamBalanceId)
+            ?.updateUser(potentialUserUpdate)
             ?.expose()
-            ?: throw InvalidUserException(userId)
+            ?: throw InvalidUserException(userTeamBalanceId)
     }
 
-    private fun User.updateUser(
-        potentialUserUpdate: PotentialUserUpdate,
-        userId: Long,
-    ): User {
+    private fun User.updateUser(potentialUserUpdate: PotentialUserUpdate): User {
         val updatedUser =
             copy(
                 name = potentialUserUpdate.name ?: name,
@@ -96,7 +96,7 @@ class UserController(
         return try {
             userRepository.update(updatedUser)
         } catch (e: DataIntegrityViolationException) {
-            throw DataConstraintViolationException("Could not update user $userId to $potentialUserUpdate, name already in use")
+            throw DataConstraintViolationException("Could not update user $teamBalanceId to $potentialUserUpdate, name already in use")
         }
     }
 
@@ -121,8 +121,6 @@ data class PotentialUser(
     val role: Role,
 ) {
     fun internalize() = User(name, role)
-
-    fun internalize(id: Long) = User(id = id, name = name, role = role)
 }
 
 data class PotentialUserUpdate(

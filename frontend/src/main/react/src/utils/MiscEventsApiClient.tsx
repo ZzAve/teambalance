@@ -4,13 +4,14 @@ import {
   AffectedRecurringEvents,
   MiscEvent,
   RecurringEventProperties,
+  TeamBalanceId,
 } from "./domain";
 import { EventsResponse } from "./util";
 
 const eventsClient = ApiClient();
 
 interface MiscellaneousEventResponse {
-  id: number;
+  id: string;
   startTime: string; // iso 8601
   title: string;
   location: string;
@@ -45,10 +46,10 @@ const getEvents: (
 };
 
 const getEvent: (
-  id: number,
+  id: TeamBalanceId,
   includeAttendees?: boolean
 ) => Promise<MiscEvent> = async (
-  id: number,
+  id: TeamBalanceId,
   includeAttendees: boolean = true
 ) => {
   const event = eventsClient.call(
@@ -83,7 +84,7 @@ const createEvent: (props: CreateMiscEvent) => Promise<MiscEvent[]> = async (
 const updateEvent: (
   affectedRecurringEvents: AffectedRecurringEvents,
   eventProps: {
-    id: number;
+    id: TeamBalanceId;
     startTime?: Date;
     location?: string;
     comment?: string;
@@ -109,7 +110,10 @@ const updateEvent: (
   ).events.map(internalize);
 };
 
-const deleteEvent = (id: number, affectedEvents?: AffectedRecurringEvents) => {
+const deleteEvent = (
+  id: TeamBalanceId,
+  affectedEvents?: AffectedRecurringEvents
+) => {
   const deleteAttendees: boolean = true;
   const affectedRecurringEvents = !!affectedEvents
     ? `&affected-recurring-events=${affectedEvents}`

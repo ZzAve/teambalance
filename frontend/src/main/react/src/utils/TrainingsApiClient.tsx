@@ -2,6 +2,7 @@ import { ApiClient } from "./ApiClient";
 import {
   AffectedRecurringEvents,
   RecurringEventProperties,
+  TeamBalanceId,
   Training,
 } from "./domain";
 import {
@@ -14,7 +15,7 @@ import { EventsResponse } from "./util";
 const trainingsClient = ApiClient();
 
 interface TrainingResponse {
-  id: number;
+  id: string;
   startTime: string; // ISO 8601 datetime string,
   location: string;
   comment?: string;
@@ -29,7 +30,7 @@ const internalize: (externalTraining: TrainingResponse) => Training = (
     ...externalTraining,
     startTime: new Date(externalTraining.startTime),
     attendees: externalTraining.attendees?.map(internalizeAttendees) || [],
-  } as Training;
+  };
 };
 
 const getTrainings: (
@@ -50,9 +51,9 @@ const getTrainings: (
 };
 
 const getTraining: (
-  id: number,
+  id: TeamBalanceId,
   includeAttendees?: boolean
-) => Promise<Training> = async (id: number, includeAttendees = true) => {
+) => Promise<Training> = async (id: TeamBalanceId, includeAttendees = true) => {
   const training = trainingsClient.call(
     `trainings/${id}?include-attendees=${includeAttendees}`
   );
@@ -62,7 +63,7 @@ const getTraining: (
 };
 
 export type CreateTraining = Omit<Training, "id" | "trainer" | "attendees"> & {
-  userIds: number[];
+  userIds: string[];
 };
 
 const createTraining: (props: CreateTraining) => Promise<Training[]> = async (
@@ -86,7 +87,7 @@ const createTraining: (props: CreateTraining) => Promise<Training[]> = async (
 const updateTraining: (
   affectedRecurringEvents: AffectedRecurringEvents,
   eventProps: {
-    id: number;
+    id: TeamBalanceId;
     startTime?: Date;
     location?: string;
     comment?: string;
@@ -108,7 +109,7 @@ const updateTraining: (
 };
 
 const updateTrainer: (props: {
-  id: number;
+  id: TeamBalanceId;
   trainerUserId?: string;
 }) => Promise<Training> = async (props) => {
   const trainingResponse = (await trainingsClient.callWithBody(
@@ -122,7 +123,7 @@ const updateTrainer: (props: {
 };
 
 const deleteTraining = (
-  id: number,
+  id: TeamBalanceId,
   affectedEvents?: AffectedRecurringEvents
 ) => {
   const deleteAttendees = true;

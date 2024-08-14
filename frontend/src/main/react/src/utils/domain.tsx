@@ -2,9 +2,10 @@ import { Dayjs } from "dayjs";
 import { isMatch, isTraining } from "../components/events/utils";
 
 export type TeamEvent = Training | Match | MiscEvent;
+export type TeamBalanceId = string;
 
 export interface TeamEventInterface {
-  id: number;
+  id: TeamBalanceId;
   location: string;
   startTime: Date;
   comment?: string;
@@ -27,14 +28,14 @@ export interface Match extends TeamEventInterface {
 }
 
 export interface Attendee {
-  id: number;
-  eventId: number;
+  id: TeamBalanceId;
+  eventId: TeamBalanceId;
   state: Availability;
   user: User;
 }
 
 export interface User {
-  id: number;
+  id: TeamBalanceId;
   name: string;
   role: Role;
   isActive: boolean;

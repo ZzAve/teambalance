@@ -3,7 +3,7 @@ package nl.jvandis.teambalance.api
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
-import nl.jvandis.teambalance.loggerFor
+import nl.jvandis.teambalance.log
 import org.springframework.stereotype.Service
 import kotlin.reflect.KClass
 
@@ -35,13 +35,9 @@ class ConfigurationService(
         return try {
             getConfig(key, clazz)
         } catch (e: NoConfigFound) {
-            LOG.warn("Could not find any config for '$key'. Using fallback  $default")
+            log.warn("Could not find any config for '$key'. Using fallback  $default")
             default
         }
-    }
-
-    companion object {
-        private val LOG = loggerFor()
     }
 }
 

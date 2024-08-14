@@ -21,12 +21,12 @@ enum class Place {
 
 @Serializable
 data class Match(
-    val id: Long,
+    val id: String,
     val startTime: LocalDateTime,
     val location: String,
     val comment: String?,
     val attendees: List<Attendee>,
     val opponent: String,
     val homeAway: Place,
-    val coach: String?,
+    val additionalInfo: String?,
 )

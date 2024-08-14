@@ -1,20 +1,23 @@
 package nl.jvandis.teambalance.api.event.training
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
+import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
 import nl.jvandis.teambalance.api.attendees.expose
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents
 import nl.jvandis.teambalance.api.event.DeletedEventsResponse
 import nl.jvandis.teambalance.api.event.EventsResponse
+import nl.jvandis.teambalance.api.event.UserAddRequest
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.api.users.UserRepository
-import nl.jvandis.teambalance.api.users.toNewAttendee
+import nl.jvandis.teambalance.api.users.toBeInsertedAttendee
 import nl.jvandis.teambalance.filters.START_OF_SEASON_RAW
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
@@ -89,18 +92,22 @@ class TrainingController(
 
     @GetMapping("/{training-id}")
     fun getTraining(
-        @PathVariable("training-id") trainingId: Long,
+        @PathVariable("training-id") trainingId: String,
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
     ): TrainingResponse {
-        log.debug("Get training $trainingId")
-        val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
+        val trainingTeamBalanceId = TeamBalanceId(trainingId)
+        log.debug("Get training $trainingTeamBalanceId")
+        val training =
+            eventRepository.findByIdOrNull(trainingTeamBalanceId) ?: throw InvalidTrainingException(
+                trainingTeamBalanceId,
+            )
         val attendees =
             if (!includeAttendees) {
                 emptyList()
             } else {
                 attendeeRepository
-                    .findAllByEventIdIn(listOf(trainingId))
+                    .findAllByEventIdIn(listOf(trainingTeamBalanceId))
                     .filter { a -> a.user.isActive || includeInactiveUsers }
             }
 
@@ -119,7 +126,7 @@ class TrainingController(
 
         val requestedUsersToAdd =
             allUsers.filter { user ->
-                potentialEvent.userIds?.any { it == user.id }
+                potentialEvent.userIds?.any { it == user.teamBalanceId.value }
                     ?: true
             }
         log.info("Users to add to training events: $requestedUsersToAdd")
@@ -140,16 +147,16 @@ class TrainingController(
                 listOf(eventRepository.insertSingleEvent(events.first()))
             }
 
-        val savedAttendeesByEvent =
+        val savedAttendeesByEvent: Map<TeamBalanceId, List<Attendee>> =
             savedEvents
-                .map { event -> requestedUsersToAdd.map { userToAdd -> userToAdd.toNewAttendee(event) } }
+                .map { event -> requestedUsersToAdd.map { userToAdd -> userToAdd.toBeInsertedAttendee(event) } }
                 .let { attendees ->
                     attendeeRepository
                         .insertMany(attendees.flatten())
                         .groupBy { it.eventId }
                 }
 
-        return savedEvents.map { it.expose(savedAttendeesByEvent[it.id] ?: listOf()) }
+        return savedEvents.map { it.expose(savedAttendeesByEvent[it.teamBalanceId] ?: listOf()) }
             .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
             .also {
                 log.info(
@@ -168,47 +175,54 @@ class TrainingController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{training-id}/attendees")
     fun addAttendee(
-        @PathVariable(value = "training-id") trainingId: Long,
+        @PathVariable(value = "training-id") trainingId: String,
         @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,
         @RequestBody user: UserAddRequest,
     ): List<AttendeeResponse> {
-        log.info("Adding: $user (or all: $addAll) to training $trainingId")
-        val training = eventRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
+        val trainingTeamBalanceId = TeamBalanceId(trainingId)
+        log.info("Adding: $user (or all: $addAll) to training $trainingTeamBalanceId")
+        val training =
+            eventRepository.findByIdOrNull(trainingTeamBalanceId) ?: throw InvalidTrainingException(
+                trainingTeamBalanceId,
+            )
         val users =
             if (addAll) {
                 userRepository.findAll()
             } else {
+                val userTeamBalanceId = TeamBalanceId(user.userId)
                 userRepository
-                    .findByIdOrNull(user.userId)
+                    .findByIdOrNull(userTeamBalanceId)
                     ?.let(::listOf)
-                    ?: throw InvalidUserException(user.userId)
+                    ?: throw InvalidUserException(userTeamBalanceId)
             }
 
         return users.map { u ->
-            attendeeRepository.insert(u.toNewAttendee(training)).expose()
+            attendeeRepository.insert(training, u).expose()
         }
     }
 
     @PutMapping("/{training-id}")
     fun updateTraining(
-        @PathVariable(value = "training-id") trainingId: Long,
+        @PathVariable(value = "training-id") trainingId: String,
         @RequestParam(value = "affected-recurring-events") affectedRecurringEvents: AffectedRecurringEvents?,
         @RequestBody updateTrainingRequest: UpdateTrainingRequest,
     ): EventsResponse<TrainingResponse> {
-        log.info("Updating training $trainingId with $updateTrainingRequest")
-        return trainingService.updateTraining(trainingId, affectedRecurringEvents, updateTrainingRequest)
+        val trainingTeamBalanceId = TeamBalanceId(trainingId)
+        log.info("Updating training $trainingTeamBalanceId with $updateTrainingRequest")
+        return trainingService.updateTraining(trainingTeamBalanceId, affectedRecurringEvents, updateTrainingRequest)
             .expose(attendees = emptyList())
             .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
-            .also { log.info("Updated training $trainingId") }
+            .also { log.info("Updated training $trainingTeamBalanceId") }
     }
 
     @PutMapping("/{training-id}/trainer")
     fun updateTrainer(
-        @PathVariable(value = "training-id") trainingId: Long,
+        @PathVariable(value = "training-id") trainingId: String,
         @RequestBody updateTrainerRequest: UpdateTrainerRequest,
     ): TrainingResponse {
+        val trainingTeamBalanceId = TeamBalanceId(trainingId)
         return eventRepository
-            .findByIdOrNull(trainingId)
+            .findByIdOrNull(trainingTeamBalanceId)
             ?.let {
                 val potentialTrainer = getPotentialTrainer(updateTrainerRequest)
                 val updatedTraining =
@@ -218,17 +232,18 @@ class TrainingController(
                 eventRepository.updateSingleEvent(updatedTraining)
             }
             ?.expose(emptyList())
-            ?.also { log.info("Updated trainer of training $trainingId. New trainer ${it.trainer}") }
-            ?: throw InvalidTrainingException(trainingId)
+            ?.also { log.info("Updated trainer of training $trainingTeamBalanceId. New trainer ${it.trainer}") }
+            ?: throw InvalidTrainingException(trainingTeamBalanceId)
     }
 
     private fun getPotentialTrainer(updateTrainerRequest: UpdateTrainerRequest): User? {
-        return when (updateTrainerRequest.userId) {
+        val userTeamBalanceId = updateTrainerRequest.userId?.let { TeamBalanceId(it) }
+        return when (userTeamBalanceId) {
             null -> null
             else ->
                 userRepository
-                    .findByIdOrNull(updateTrainerRequest.userId)
-                    ?: throw InvalidUserException(updateTrainerRequest.userId)
+                    .findByIdOrNull(userTeamBalanceId)
+                    ?: throw InvalidUserException(userTeamBalanceId)
         }
     }
 
@@ -236,22 +251,23 @@ class TrainingController(
     @DeleteMapping("/{training-id}")
     @Transactional
     fun deleteTraining(
-        @PathVariable(value = "training-id") trainingId: Long,
+        @PathVariable(value = "training-id") trainingId: String,
         @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean,
         @RequestParam(value = "affected-recurring-events") affectedRecurringEvents: AffectedRecurringEvents?,
     ): DeletedEventsResponse {
-        log.info("Deleting training: $trainingId")
+        val trainingTeamBalanceId = TeamBalanceId(trainingId)
+        log.info("Deleting training: $trainingTeamBalanceId")
         if (deleteAttendees) {
-            attendeeRepository.findAllAttendeesBelongingToEvent(trainingId, affectedRecurringEvents)
+            attendeeRepository.findAllAttendeesBelongingToEvent(trainingTeamBalanceId, affectedRecurringEvents)
                 .let { attendeeRepository.deleteAll(it) }
         }
 
         try {
-            return eventRepository.deleteById(trainingId, affectedRecurringEvents)
+            return eventRepository.deleteById(trainingTeamBalanceId, affectedRecurringEvents)
                 .let(::DeletedEventsResponse)
         } catch (e: DataIntegrityViolationException) {
             throw DataConstraintViolationException(
-                "Training $trainingId could not be deleted. There are still attendees bound to this training",
+                "Training $trainingTeamBalanceId could not be deleted. There are still attendees bound to this training",
             )
         }
     }

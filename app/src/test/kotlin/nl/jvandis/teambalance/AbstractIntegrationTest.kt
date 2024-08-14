@@ -94,7 +94,6 @@ class AbstractIntegrationTest {
     }
 
     companion object {
-        private var log = loggerFor()
         lateinit var connection: Connection
 
         /**

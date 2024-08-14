@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import nl.jvandis.teambalance.MultiTenantContext
 import nl.jvandis.teambalance.Tenant
-import nl.jvandis.teambalance.loggerFor
+import nl.jvandis.teambalance.log
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.bind.ConstructorBinding
 import org.springframework.core.Ordered
@@ -57,7 +57,6 @@ class MultiTenantFilter(
     private val tenantsConfig: TenantsConfig,
 ) : OncePerRequestFilter() {
     companion object {
-        private val LOG = loggerFor()
     }
 
     override fun doFilterInternal(
@@ -71,7 +70,7 @@ class MultiTenantFilter(
                 .firstOrNull { it.domain == host }
 
         if (tenant == null) {
-            LOG.warn("Received a request from an unknown host $host")
+            log.warn("Received a request from an unknown host $host")
             response.sendError(401, "Unknown domain. $host doesn't have anything to do with teambalance it seems")
         } else {
             MultiTenantContext.setCurrentTenant(tenant.tenant)

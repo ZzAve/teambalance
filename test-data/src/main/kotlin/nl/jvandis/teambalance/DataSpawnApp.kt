@@ -5,6 +5,7 @@ import nl.jvandis.teambalance.testdata.Initializer
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import kotlin.random.Random
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 import ch.qos.logback.classic.Logger as LogbackLogger
@@ -25,10 +26,16 @@ fun main(args: Array<String>) {
             amountOfEvents = 0,
         )
 
+    // Use a 'controlled' random instance. For reproducibility, use a static seed
+    val seed = Random.nextLong()
+    // val seed = 1L
+    val random = Random(seed)
+    println("Using random with $seed")
+
     log.info("Running SpawnData ...")
     val measureTime =
         measureTime {
-            Initializer(apiKey, "http://localhost:8080").spawnData(config)
+            Initializer(apiKey, "http://localhost:8080", random).spawnData(config)
         }
 
     log.info("Finished running SpawnData of $config in $measureTime...")

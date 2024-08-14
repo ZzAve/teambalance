@@ -1,5 +1,6 @@
 package nl.jvandis.teambalance.api.event.miscellaneous
 
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.event.Event
 import nl.jvandis.teambalance.api.event.RecurringEventProperties
@@ -10,13 +11,14 @@ import java.time.LocalDateTime
 
 data class MiscellaneousEvent(
     override val id: Long,
+    override val teamBalanceId: TeamBalanceId,
     override val startTime: LocalDateTime,
     override val location: String,
     override val comment: String? = null,
     override val recurringEventProperties: RecurringEventProperties?,
     val title: String? = null,
     val attendees: List<Attendee>? = null,
-) : Event(id, startTime, location, comment, recurringEventProperties) {
+) : Event(id, teamBalanceId, startTime, location, comment, recurringEventProperties) {
     constructor(
         startTime: LocalDateTime,
         location: String,
@@ -26,6 +28,7 @@ data class MiscellaneousEvent(
     ) :
         this(
             id = NO_ID,
+            teamBalanceId = TeamBalanceId.random(),
             startTime = startTime,
             location = location,
             comment = comment,
@@ -51,9 +54,9 @@ data class MiscellaneousEvent(
             val event = checkNotNull(event) { "Event was not set" }
             check(id == event.id) { "Event id does not match (`id` != event.id)" }
             event.validate()
-
             return MiscellaneousEvent(
                 id = event.id,
+                teamBalanceId = event.teamBalanceId,
                 startTime = event.startTime,
                 location = event.location,
                 comment = event.comment,

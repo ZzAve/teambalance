@@ -1,9 +1,11 @@
 package nl.jvandis.teambalance.api.attendees
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.InvalidAttendeeException
+import nl.jvandis.teambalance.api.InvalidEventException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.event.EventRepository
@@ -39,22 +41,24 @@ class AttendeeController(
 
     @GetMapping
     fun getAttendees(
-        @RequestParam(value = "event-ids", defaultValue = "") eventIds: List<Long>,
-        @RequestParam(value = "user-ids", defaultValue = "") userIds: List<Long>,
+        @RequestParam(value = "event-ids", defaultValue = "") eventIds: List<String>,
+        @RequestParam(value = "user-ids", defaultValue = "") userIds: List<String>,
     ): AttendeesResponse {
-        log.debug("Get attendees (filter eventIds: $eventIds,userIds: $userIds")
+        val eventTeamBalanceIds = eventIds.map(TeamBalanceId::invoke)
+        val userTeamBalanceIds = userIds.map(TeamBalanceId::invoke)
+        log.debug("Get attendees (filter eventIds: {},userIds: {}", eventTeamBalanceIds, userTeamBalanceIds)
 
         val attendees =
             when {
-                eventIds.isEmpty() && userIds.isEmpty() -> attendeeRepository.findAll()
-                eventIds.isNotEmpty() && userIds.isNotEmpty() ->
+                eventTeamBalanceIds.isEmpty() && userTeamBalanceIds.isEmpty() -> attendeeRepository.findAll()
+                eventTeamBalanceIds.isNotEmpty() && userTeamBalanceIds.isNotEmpty() ->
                     attendeeRepository.findALlByEventIdInAndUserIdIn(
-                        eventIds,
-                        userIds,
+                        eventTeamBalanceIds,
+                        userTeamBalanceIds,
                     )
 
-                eventIds.isNotEmpty() -> attendeeRepository.findAllByEventIdIn(eventIds)
-                else -> attendeeRepository.findAllByUserIdIn(userIds)
+                eventTeamBalanceIds.isNotEmpty() -> attendeeRepository.findAllByEventIdIn(eventTeamBalanceIds)
+                else -> attendeeRepository.findAllByUserIdIn(userTeamBalanceIds)
             }
 
         return attendees
@@ -64,11 +68,15 @@ class AttendeeController(
 
     @GetMapping("/{id}")
     fun getAttendee(
-        @PathVariable(value = "id") attendeeId: Long,
+        @PathVariable(value = "id") attendeeId: String,
     ): AttendeeResponse {
-        log.debug("Get attendees $attendeeId")
+        val attendeeTeamBalanceId = TeamBalanceId(attendeeId)
+        log.debug("Get attendees $attendeeTeamBalanceId")
 
-        val attendee = attendeeRepository.findByIdOrNull(attendeeId) ?: throw InvalidAttendeeException(attendeeId)
+        val attendee =
+            attendeeRepository.findByIdOrNull(attendeeTeamBalanceId) ?: throw InvalidAttendeeException(
+                attendeeTeamBalanceId,
+            )
 
         return attendee.expose()
     }
@@ -78,27 +86,27 @@ class AttendeeController(
     fun addAttendee(
         @RequestBody potentialAttendee: PotentialAttendee,
     ): AttendeeResponse {
-        log.debug("Adding attendee: $potentialAttendee")
+        log.debug("Adding attendee: {}", potentialAttendee)
 
+        val userTeamBalanceId = TeamBalanceId(potentialAttendee.userId)
         val user =
-            userRepository.findByIdOrNull(potentialAttendee.userId)
-                ?: throw InvalidUserException(potentialAttendee.userId)
+            userRepository.findByIdOrNull(userTeamBalanceId)
+                ?: throw InvalidUserException(userTeamBalanceId)
 
-        if (!eventRepository.exists(potentialAttendee.eventId)) {
-            throw InvalidTrainingException(potentialAttendee.eventId)
+        val eventTeamBalanceId = TeamBalanceId(potentialAttendee.eventId)
+        if (!eventRepository.exists(eventTeamBalanceId)) {
+            throw InvalidTrainingException(eventTeamBalanceId)
         }
-
+        val eventInternalId = eventRepository.findInternalId(eventTeamBalanceId) ?: throw InvalidEventException(eventTeamBalanceId)
         return try {
             attendeeRepository.insert(
-                Attendee(
-                    user = user,
-                    eventId = potentialAttendee.eventId,
-                    availability = potentialAttendee.state,
-                ),
+                eventInternalId = eventInternalId,
+                user = user,
+                availability = potentialAttendee.state,
             ).expose()
         } catch (e: DataIntegrityViolationException) {
             throw DataConstraintViolationException(
-                "Could not add user ${potentialAttendee.userId} to training ${potentialAttendee.eventId}. User already added",
+                "Could not add user $userTeamBalanceId to training $eventTeamBalanceId. User already added",
             )
         }
     }
@@ -109,27 +117,26 @@ class AttendeeController(
     )
     @PutMapping("{id}")
     fun updateAttendee(
-        @PathVariable("id") attendeeId: Long,
+        @PathVariable("id") attendeeId: String,
         @RequestBody attendeeStateUpdate: AttendeeStateUpdate,
-    ): AttendeeResponse {
-        return updateAttendeeAvailability(attendeeId, attendeeStateUpdate)
-    }
+    ): AttendeeResponse = updateAttendeeAvailability(attendeeId, attendeeStateUpdate)
 
     @PutMapping("{id}/availability")
     fun updateAttendeeAvailability(
-        @PathVariable("id") attendeeId: Long,
+        @PathVariable("id") attendeeId: String,
         @RequestBody attendeeStateUpdate: AttendeeStateUpdate,
     ): AttendeeResponse {
+        val attendeeTeamBalanceId = TeamBalanceId(attendeeId)
         val success =
             attendeeRepository
-                .updateAvailability(attendeeId, attendeeStateUpdate.availability)
+                .updateAvailability(attendeeTeamBalanceId, attendeeStateUpdate.availability)
 
         if (!success) {
-            throw IllegalStateException("Could not update Attendee state with id $attendeeId.")
+            throw IllegalStateException("Could not update Attendee state with id $attendeeTeamBalanceId.")
         }
-        return attendeeRepository.findByIdOrNull(attendeeId)
+        return attendeeRepository.findByIdOrNull(attendeeTeamBalanceId)
             ?.expose()
-            ?: throw AttendeeNotFoundException(attendeeId, -1L)
+            ?: throw AttendeeNotFoundException(attendeeTeamBalanceId, TeamBalanceId("unknown user"))
     }
 
     @ResponseStatus(NO_CONTENT)
@@ -143,19 +150,20 @@ class AttendeeController(
     }
 
     @ResponseStatus(NO_CONTENT)
-    @DeleteMapping()
+    @DeleteMapping
     fun deleteAttendeeByUserIdAndEventId(
-        @RequestParam("user-id") userId: Long,
-        @RequestParam("event-id") eventId: Long,
+        @RequestParam("user-id") userId: String,
+        @RequestParam("event-id") eventId: String,
     ) {
-        log.debug("Deleting user $userId from training $eventId")
-
-        attendeeRepository.findByUserIdAndEventId(userId, eventId)
+        val userTeamBalanceId = TeamBalanceId(userId)
+        val eventTeamBalanceId = TeamBalanceId(eventId)
+        log.debug("Deleting user $userTeamBalanceId from training $eventTeamBalanceId")
+        attendeeRepository.findByUserIdAndEventId(userTeamBalanceId, eventTeamBalanceId)
             .firstOrNull()
             ?.let {
                 attendeeRepository.delete(it)
             }
-            ?: throw AttendeeNotFoundException(userId, eventId)
+            ?: throw AttendeeNotFoundException(userTeamBalanceId, eventTeamBalanceId)
     }
 
     @ExceptionHandler(AttendeeNotFoundException::class)
@@ -169,11 +177,11 @@ class AttendeeController(
             )
 }
 
-data class AttendeeNotFoundException(val userId: Long, val eventId: Long) : RuntimeException()
+data class AttendeeNotFoundException(val userId: TeamBalanceId, val eventId: TeamBalanceId) : RuntimeException()
 
 data class PotentialAttendee(
-    val eventId: Long,
-    val userId: Long,
+    val eventId: String,
+    val userId: String,
     val state: Availability = Availability.NOT_RESPONDED,
 )
 

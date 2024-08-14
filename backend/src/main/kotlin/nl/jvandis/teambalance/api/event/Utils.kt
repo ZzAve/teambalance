@@ -1,14 +1,12 @@
 package nl.jvandis.teambalance.api.event
 
-import org.slf4j.LoggerFactory
+import nl.jvandis.teambalance.log
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.Period
-
-private val log = LoggerFactory.getLogger("nl.jvandis.teambalance.api.event.EventUtils")
 
 fun <T : Event> getEventsAndAttendees(
     eventsRepository: TeamEventsRepository<T>,
@@ -58,7 +56,7 @@ fun CreateRecurringEventPropertiesRequest.getRecurringEventDates(startTime: Loca
     } else {
         error("One of amountLimit or dateLimit should have been set")
     }
-    log.debug("Derived event dates from $startTime and $this: $eventDates")
+    log.debug("Derived event dates from {} and {}: {}", startTime, this, eventDates)
     return eventDates
 }
 

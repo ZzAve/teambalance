@@ -2,7 +2,7 @@ package nl.jvandis.teambalance.api.bank
 
 import nl.jvandis.teambalance.api.bank.BunqEnvironment.PRODUCTION
 import nl.jvandis.teambalance.api.bank.BunqEnvironment.SANDBOX
-import org.slf4j.LoggerFactory
+import nl.jvandis.teambalance.log
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
@@ -12,8 +12,6 @@ import org.springframework.context.annotation.Lazy
 class BunqConfiguration(
     private val bankConfig: BankConfig,
 ) {
-    private val log = LoggerFactory.getLogger(javaClass)
-
     @Bean
     fun bunqLib(): BunqRepository {
         return when (bankConfig.bunq.environment) {

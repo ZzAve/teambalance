@@ -2,21 +2,23 @@ package nl.jvandis.teambalance.api.event.match
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMatchException
-import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
+import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
+import nl.jvandis.teambalance.api.attendees.Availability
 import nl.jvandis.teambalance.api.attendees.expose
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents
 import nl.jvandis.teambalance.api.event.DeletedEventsResponse
 import nl.jvandis.teambalance.api.event.EventsResponse
+import nl.jvandis.teambalance.api.event.PotentialAttendee
+import nl.jvandis.teambalance.api.event.UserAddRequest
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
-import nl.jvandis.teambalance.api.event.training.UserAddRequest
 import nl.jvandis.teambalance.api.users.UserRepository
-import nl.jvandis.teambalance.api.users.toNewAttendee
 import nl.jvandis.teambalance.filters.START_OF_SEASON_RAW
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
@@ -82,18 +84,19 @@ class MatchController(
 
     @GetMapping("/{match-id}")
     fun getMatch(
-        @PathVariable("match-id") matchId: Long,
+        @PathVariable("match-id") matchId: String,
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
     ): MatchResponse {
         log.debug("Get match $matchId")
-        val match = eventRepository.findByIdOrNull(matchId) ?: throw InvalidMatchException(matchId)
+        val teamBalanceId = TeamBalanceId(matchId)
+        val match = eventRepository.findByIdOrNull(teamBalanceId) ?: throw InvalidMatchException(teamBalanceId)
         val attendees =
             if (!includeAttendees) {
                 emptyList()
             } else {
                 attendeeRepository
-                    .findAllByEventIdIn(listOf(matchId))
+                    .findAllByEventIdIn(teamBalanceId)
                     .filter { a -> a.user.isActive || includeInactiveUsers }
             }
 
@@ -113,7 +116,7 @@ class MatchController(
 
         val requestedUsersToAdd =
             allUsers.filter { user ->
-                potentialEvent.userIds?.any { it == user.id }
+                potentialEvent.userIds?.any { it == user.teamBalanceId.value }
                     ?: true
             }
         log.info("Users to add to match events: $requestedUsersToAdd")
@@ -134,16 +137,24 @@ class MatchController(
                 listOf(eventRepository.insertSingleEvent(events.first()))
             }
 
-        val savedAttendeesByEvent =
+        val savedAttendeesByEvent: Map<TeamBalanceId, List<Attendee>> =
             savedEvents
-                .map { event -> requestedUsersToAdd.map { userToAdd -> userToAdd.toNewAttendee(event) } }
-                .let { attendees ->
+                .flatMap { event ->
+                    requestedUsersToAdd.map { userToAdd ->
+                        PotentialAttendee(
+                            user = userToAdd,
+                            internalEventId = event.id,
+                            availability = Availability.NOT_RESPONDED,
+                        )
+                    }
+                }
+                .let { potentialAttendees ->
                     attendeeRepository
-                        .insertMany(attendees.flatten())
+                        .insertMany(potentialAttendees)
                         .groupBy { it.eventId }
                 }
 
-        return savedEvents.map { it.expose(savedAttendeesByEvent[it.id] ?: listOf()) }
+        return savedEvents.map { it.expose(savedAttendeesByEvent[it.teamBalanceId] ?: listOf()) }
             .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
             .also {
                 log.info(
@@ -162,77 +173,84 @@ class MatchController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{match-id}/attendees")
     fun addAttendee(
-        @PathVariable(value = "match-id") matchId: Long,
+        @PathVariable(value = "match-id") matchId: String,
         @RequestParam(value = "all", required = false, defaultValue = "false") addAll: Boolean,
         @RequestBody user: UserAddRequest,
     ): List<AttendeeResponse> {
-        log.debug("Adding: {} (or all: {}) to match {}", user, addAll, matchId)
-        val match = eventRepository.findByIdOrNull(matchId) ?: throw InvalidMatchException(matchId)
+        val teamBalanceId = TeamBalanceId(matchId)
+        log.debug("Adding: {} (or all: {}) to match {}", user, addAll, teamBalanceId)
+        val match = eventRepository.findByIdOrNull(teamBalanceId) ?: throw InvalidMatchException(teamBalanceId)
         val users =
             if (addAll) {
                 userRepository.findAll()
             } else {
+                val userId = TeamBalanceId(user.userId)
                 userRepository
-                    .findByIdOrNull(user.userId)
+                    .findByIdOrNull(userId)
                     ?.let(::listOf)
-                    ?: throw InvalidUserException(user.userId)
+                    ?: throw InvalidUserException(userId)
             }
 
         return users.map { u ->
-            attendeeRepository.insert(u.toNewAttendee(match)).expose()
+            attendeeRepository.insert(match, u).expose()
         }
     }
 
     @PutMapping("/{match-id}")
     fun updateMatch(
-        @PathVariable(value = "match-id") matchId: Long,
+        @PathVariable(value = "match-id") matchId: String,
         @RequestParam(value = "affected-recurring-events") affectedRecurringEvents: AffectedRecurringEvents?,
         @RequestBody updateMatchRequest: UpdateMatchRequest,
     ): EventsResponse<MatchResponse> {
-        log.info("Updating match $matchId with $updateMatchRequest")
-        return matchService.updateMatch(matchId, affectedRecurringEvents, updateMatchRequest)
+        val matchTeamBalanceId = TeamBalanceId(matchId)
+        log.info("Updating match $matchTeamBalanceId with $updateMatchRequest")
+        return matchService.updateMatch(matchTeamBalanceId, affectedRecurringEvents, updateMatchRequest)
             .expose(attendees = emptyList())
             .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
-            .also { log.info("Updated match $matchId") }
+            .also { log.info("Updated match $matchTeamBalanceId") }
     }
 
-    @PutMapping("/{match-id}/coach")
-    fun updateCoach(
-        @PathVariable(value = "match-id") matchId: Long,
-        @RequestBody updateCoachRequest: UpdateCoachRequest,
+    @PutMapping("/{match-id}/additional-info")
+    fun updateAdditionalInfo(
+        @PathVariable(value = "match-id") matchId: String,
+        @RequestBody updateAdditionalInfoRequest: UpdateAdditionalInfoRequest,
     ): MatchResponse {
+        val teamBalanceId = TeamBalanceId(matchId)
         return eventRepository
-            .findByIdOrNull(matchId)
+            .findByIdOrNull(teamBalanceId)
             ?.let {
-                val potentialCoach = updateCoachRequest.coach
-                eventRepository.updateCoach(it, potentialCoach)
+                val additionalInfo = updateAdditionalInfoRequest.additionalInfo
+                eventRepository.updateAdditionalInfo(it, additionalInfo)
                 it.copy(
-                    coach = potentialCoach,
+                    additionalInfo = additionalInfo,
                 )
             }
             ?.expose(emptyList())
-            ?.also { log.info("Updated trainer of training $matchId. New coach ${it.coach}") }
-            ?: throw InvalidTrainingException(matchId)
+            ?.also { log.info("Updated additional-info of match $teamBalanceId to ${it.additionalInfo}") }
+            ?: throw InvalidMatchException(teamBalanceId)
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{match-id}")
     fun deleteMatch(
-        @PathVariable(value = "match-id") matchId: Long,
+        @PathVariable(value = "match-id") matchId: String,
         @RequestParam(value = "delete-attendees", defaultValue = "false") deleteAttendees: Boolean,
         @RequestParam(value = "affected-recurring-events") affectedRecurringEvents: AffectedRecurringEvents?,
     ): DeletedEventsResponse {
-        log.info("Deleting match: $matchId")
+        val matchTeamBalanceId = TeamBalanceId(matchId)
+        log.info("Deleting match: $matchTeamBalanceId")
         if (deleteAttendees) {
-            attendeeRepository.findAllAttendeesBelongingToEvent(matchId, affectedRecurringEvents)
+            attendeeRepository.findAllAttendeesBelongingToEvent(matchTeamBalanceId, affectedRecurringEvents)
                 .let { attendeeRepository.deleteAll(it) }
         }
 
         try {
-            return eventRepository.deleteById(matchId, affectedRecurringEvents)
+            return eventRepository.deleteById(matchTeamBalanceId, affectedRecurringEvents)
                 .let(::DeletedEventsResponse)
         } catch (e: DataIntegrityViolationException) {
-            throw DataConstraintViolationException("Match $matchId could not be deleted. There are still attendees bound to this match")
+            throw DataConstraintViolationException(
+                "Match $matchTeamBalanceId could not be deleted. There are still attendees bound to this match",
+            )
         }
     }
 }

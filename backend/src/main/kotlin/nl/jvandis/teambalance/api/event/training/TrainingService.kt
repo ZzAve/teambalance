@@ -1,12 +1,12 @@
 package nl.jvandis.teambalance.api.event.training
 
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents.ALL
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents.CURRENT
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents.CURRENT_AND_FUTURE
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesId
-import nl.jvandis.teambalance.loggerFor
+import nl.jvandis.teambalance.log
 import org.springframework.stereotype.Service
 import java.time.Duration
 
@@ -14,15 +14,15 @@ import java.time.Duration
 class TrainingService(
     private val trainingRepository: TrainingRepository,
 ) {
-    private val log = loggerFor()
-
     fun updateTraining(
-        trainingId: Long,
+        trainingId: TeamBalanceId,
         affectedRecurringEvents: AffectedRecurringEvents?,
         updateTrainingRequest: UpdateTrainingRequest,
     ): List<Training> {
         val originalTraining =
-            trainingRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(trainingId)
+            trainingRepository.findByIdOrNull(trainingId) ?: throw InvalidTrainingException(
+                trainingId,
+            )
         require(
             originalTraining.recurringEventProperties?.teamBalanceId?.value ==
                 updateTrainingRequest.recurringEventProperties?.teamBalanceId,
@@ -77,7 +77,7 @@ class TrainingService(
                     trainingRepository.partitionRecurringEvent(
                         currentRecurringEventId = teamBalanceId,
                         startTime = originalTraining.startTime,
-                        newRecurringEventId = RecurringEventPropertiesId.create(),
+                        newRecurringEventId = TeamBalanceId.random(),
                     )
                         ?.also {
                             log.info(
@@ -100,7 +100,7 @@ class TrainingService(
     }
 
     private fun updateAllFromRecurringEvent(
-        recurringEventId: RecurringEventPropertiesId,
+        recurringEventId: TeamBalanceId,
         originalTraining: Training,
         updateTrainingRequest: UpdateTrainingRequest,
     ): List<Training> {

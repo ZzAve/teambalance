@@ -1,12 +1,12 @@
 package nl.jvandis.teambalance.api.event.miscellaneous
 
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.InvalidMiscellaneousEventException
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents.ALL
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents.CURRENT
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents.CURRENT_AND_FUTURE
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesId
-import nl.jvandis.teambalance.loggerFor
+import nl.jvandis.teambalance.log
 import org.springframework.stereotype.Service
 import java.time.Duration
 
@@ -14,10 +14,8 @@ import java.time.Duration
 class MiscellaneousEventService(
     private val miscellaneousEventRepository: MiscellaneousEventRepository,
 ) {
-    private val log = loggerFor()
-
     fun updateMiscellaneousEvent(
-        miscellaneousEventId: Long,
+        miscellaneousEventId: TeamBalanceId,
         affectedRecurringEvents: AffectedRecurringEvents?,
         updateMiscellaneousEventRequest: UpdateMiscellaneousEventRequest,
     ): List<MiscellaneousEvent> {
@@ -92,7 +90,7 @@ class MiscellaneousEventService(
                     miscellaneousEventRepository.partitionRecurringEvent(
                         currentRecurringEventId = teamBalanceId,
                         startTime = originalMiscellaneousEvent.startTime,
-                        newRecurringEventId = RecurringEventPropertiesId.create(),
+                        newRecurringEventId = TeamBalanceId.random(),
                     )
                         ?.also {
                             log.info(
@@ -124,7 +122,7 @@ class MiscellaneousEventService(
     }
 
     private fun updateAllFromRecurringEvent(
-        recurringEventId: RecurringEventPropertiesId,
+        recurringEventId: TeamBalanceId,
         originalMiscellaneousEvent: MiscellaneousEvent,
         updateMiscellaneousEventRequest: UpdateMiscellaneousEventRequest,
     ): List<MiscellaneousEvent> {

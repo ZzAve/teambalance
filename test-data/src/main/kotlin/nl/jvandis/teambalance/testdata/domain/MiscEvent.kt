@@ -14,7 +14,7 @@ data class CreateMiscEvent(
 
 @Serializable
 data class MiscEvent(
-    val id: Long,
+    val id: String,
     val startTime: LocalDateTime,
     val title: String,
     val location: String,

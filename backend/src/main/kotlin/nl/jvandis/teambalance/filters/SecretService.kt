@@ -2,7 +2,7 @@ package nl.jvandis.teambalance.filters
 
 import nl.jvandis.teambalance.MultiTenantContext
 import nl.jvandis.teambalance.api.InvalidSecretException
-import nl.jvandis.teambalance.loggerFor
+import nl.jvandis.teambalance.log
 import org.springframework.stereotype.Service
 import java.util.Base64
 
@@ -10,8 +10,6 @@ import java.util.Base64
 class SecretService(
     private val tenantsConfig: TenantsConfig,
 ) {
-    private val log = loggerFor()
-
     fun ensureSecret(secret: String?) {
         val decodedSecret = decodeSecret(secret)
         val validSecretValue = tenantsConfig.tenants.first { it.tenant == MultiTenantContext.getCurrentTenant() }.secret

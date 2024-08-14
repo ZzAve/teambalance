@@ -1,6 +1,8 @@
 package nl.jvandis.teambalance
 
 import nl.jvandis.teambalance.api.bank.BankService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
@@ -14,15 +16,27 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 @ConfigurationPropertiesScan
 class Application
 
+internal fun interface LoggingContext {
+    fun logger(): Logger
+}
+
+internal inline val <reified T> T.log: Logger
+    get() = LoggerFactory.getLogger(T::class.java)
+
 fun main(args: Array<String>) {
     val applicationContext = SpringApplication.run(Application::class.java, *args)
 
-    warmUp(applicationContext)
+    with(
+        LoggingContext {
+            loggerFor("nl.jvandis.teambalance.init")
+        },
+    ) {
+        warmUp(applicationContext)
+    }
 }
 
+context(LoggingContext)
 private fun warmUp(applicationContext: ConfigurableApplicationContext) {
-    val log = loggerFor("nl.jvandis.teambalance.TeamBalanceApplication")
-
     Tenant.entries.forEach {
         log.info("Retrieving balance and transactions for $it")
         MultiTenantContext.setCurrentTenant(it)

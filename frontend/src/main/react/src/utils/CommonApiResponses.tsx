@@ -1,8 +1,8 @@
-import { Attendee, Availability, Role, User } from "./domain";
+import { Attendee, Availability, Role, TeamBalanceId, User } from "./domain";
 
 export interface AttendeeResponse {
-  id: number;
-  eventId: number;
+  id: TeamBalanceId;
+  eventId: TeamBalanceId;
   state: Availability;
   user: UserResponse;
 }
@@ -11,7 +11,7 @@ export interface UsersResponse {
   users: UserResponse[];
 }
 export interface UserResponse {
-  id: number;
+  id: TeamBalanceId;
   name: string;
   role: Role;
   isActive: boolean;
@@ -26,6 +26,10 @@ export const internalizeAttendees: (value: AttendeeResponse) => Attendee = (
   user: internalizeUser(value.user),
 });
 
-export const internalizeUser: (value: UserResponse) => User = (value) => ({
-  ...value,
+export const internalizeUser: (value: UserResponse) => User = (it) => ({
+  id: it.id,
+  name: it.name,
+  role: it.role,
+  isActive: it.isActive,
+  jerseyNumber: undefined,
 });

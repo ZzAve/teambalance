@@ -3,8 +3,8 @@ package nl.jvandis.teambalance.api.event.miscellaneous
 import nl.jvandis.jooq.support.getField
 import nl.jvandis.jooq.support.getFieldOrThrow
 import nl.jvandis.jooq.support.valuesFrom
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.event.AffectedRecurringEvents
-import nl.jvandis.teambalance.api.event.RecurringEventPropertiesId
 import nl.jvandis.teambalance.api.event.TeamEventTableAndRecordHandler
 import nl.jvandis.teambalance.api.event.TeamEventsRepository
 import nl.jvandis.teambalance.api.event.deleteStaleRecurringEvent
@@ -18,7 +18,7 @@ import nl.jvandis.teambalance.data.jooq.schema.tables.references.MISCELLANEOUS_E
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.RECURRING_EVENT_PROPERTIES
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.TRAINING
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
-import nl.jvandis.teambalance.loggerFor
+import nl.jvandis.teambalance.log
 import org.jooq.Condition
 import org.jooq.DatePart
 import org.jooq.exception.DataAccessException
@@ -32,8 +32,6 @@ import java.time.LocalDateTime
 
 @Repository
 class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsRepository<MiscellaneousEvent>(context) {
-    override val log = loggerFor()
-
     override fun findAll(): List<MiscellaneousEvent> =
         findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
 
@@ -76,7 +74,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
             ) { MiscEventWithAttendeesRecordHandler() },
         )
 
-    override fun findByIdOrNull(eventId: Long): MiscellaneousEvent? {
+    override fun findByIdOrNull(eventId: TeamBalanceId): MiscellaneousEvent? {
         val recordHandler = MiscEventWithAttendeesRecordHandler()
         return context
             .select()
@@ -85,7 +83,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
             .on(MISCELLANEOUS_EVENT.ID.eq(EVENT.ID))
             .leftJoin(RECURRING_EVENT_PROPERTIES)
             .on(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
-            .where(MISCELLANEOUS_EVENT.ID.eq(eventId))
+            .where(EVENT.TEAM_BALANCE_ID.eq(eventId.value))
             .fetchOne()
             .handleWith(recordHandler)
             .also {
@@ -95,7 +93,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
 
     @Transactional
     override fun deleteById(
-        eventId: Long,
+        eventId: TeamBalanceId,
         affectedRecurringEvents: AffectedRecurringEvents?,
     ): Int {
         val allEventsToDeleteConditions: Condition = allEventsToDeleteCondition(eventId, affectedRecurringEvents)
@@ -134,9 +132,23 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
 
         val eventRecord =
             context
-                .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
-                .values(event.comment, event.location, event.startTime, null)
-                .returningResult(EVENT.ID, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
+                .insertInto(
+                    EVENT,
+                    EVENT.TEAM_BALANCE_ID,
+                    EVENT.COMMENT,
+                    EVENT.LOCATION,
+                    EVENT.START_TIME,
+                    EVENT.RECURRING_EVENT_ID,
+                )
+                .values(event.teamBalanceId.value, event.comment, event.location, event.startTime, null)
+                .returningResult(
+                    EVENT.ID,
+                    EVENT.TEAM_BALANCE_ID,
+                    EVENT.COMMENT,
+                    EVENT.LOCATION,
+                    EVENT.START_TIME,
+                    EVENT.RECURRING_EVENT_ID,
+                )
                 .fetchOne()
                 ?: throw DataAccessException("Could not insert Event part of MiscEvent")
 
@@ -148,6 +160,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
             ?.let { matchRecord ->
                 MiscellaneousEvent(
                     id = matchRecord.getFieldOrThrow(MISCELLANEOUS_EVENT.ID),
+                    teamBalanceId = eventRecord.getFieldOrThrow(EVENT.TEAM_BALANCE_ID).let(TeamBalanceId::invoke),
                     startTime = eventRecord.getFieldOrThrow(EVENT.START_TIME),
                     location = eventRecord.getFieldOrThrow(EVENT.LOCATION),
                     comment = eventRecord.getField(EVENT.COMMENT),
@@ -172,8 +185,22 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
 
         val insertEventRecordResult =
             context
-                .insertInto(EVENT, EVENT.COMMENT, EVENT.LOCATION, EVENT.START_TIME, EVENT.RECURRING_EVENT_ID)
-                .valuesFrom(events, { it.comment }, { it.location }, { it.startTime }, { recurringEventProperties.id })
+                .insertInto(
+                    EVENT,
+                    EVENT.TEAM_BALANCE_ID,
+                    EVENT.COMMENT,
+                    EVENT.LOCATION,
+                    EVENT.START_TIME,
+                    EVENT.RECURRING_EVENT_ID,
+                )
+                .valuesFrom(
+                    events,
+                    { it.teamBalanceId.value },
+                    { it.comment },
+                    { it.location },
+                    { it.startTime },
+                    { recurringEventProperties.id },
+                )
                 .returningResult(EVENT.fields().toList())
                 .fetch()
                 .also { if (it.size != events.size) throw DataAccessException("Could not insert Events $events. One or more failed") }
@@ -194,6 +221,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
                     }
                 MiscellaneousEvent(
                     id = matchRecord.getFieldOrThrow(MISCELLANEOUS_EVENT.ID),
+                    teamBalanceId = eventRecord.getFieldOrThrow(EVENT.TEAM_BALANCE_ID).let(TeamBalanceId::invoke),
                     startTime = eventRecord.getFieldOrThrow(EVENT.START_TIME),
                     location = eventRecord.getFieldOrThrow(EVENT.LOCATION),
                     comment = eventRecord.getField(EVENT.COMMENT),
@@ -206,7 +234,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
 
     @Transactional
     override fun updateAllFromRecurringEvent(
-        recurringEventId: RecurringEventPropertiesId,
+        recurringEventId: TeamBalanceId,
         examplarUpdatedEvent: MiscellaneousEvent,
         durationToAddToEachEvent: Duration,
     ): List<MiscellaneousEvent> {

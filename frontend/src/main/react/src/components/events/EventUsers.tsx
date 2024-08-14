@@ -5,7 +5,7 @@ import Switch from "@mui/material/Switch";
 import { attendeesApiClient } from "../../utils/AttendeesApiClient";
 import Checkbox from "@mui/material/Checkbox";
 import { useAlerts } from "../../hooks/alertsHook";
-import { TeamEvent, User } from "../../utils/domain";
+import { TeamBalanceId, TeamEvent, User } from "../../utils/domain";
 import { formattedDate } from "../../utils/util";
 
 export type ControlType = "CHECKBOX" | "SWITCH";
@@ -32,7 +32,7 @@ export const EventUsers = (props: {
         (it) => it.user.id
       );
 
-      const selectedUserMap: { [userId: number]: boolean } = {};
+      const selectedUserMap: { [userId: string]: boolean } = {};
       props.users.forEach((user) => {
         selectedUserMap[user.id] = attendeeUserIds.some((it) => it === user.id);
       });
@@ -64,7 +64,7 @@ export const EventUsers = (props: {
   };
 
   const handleSingleAttendeeChange = async (
-    userId: number,
+    userId: TeamBalanceId,
     checked: boolean
   ) => {
     if (singleUserCheck[userId] === checked) return;
@@ -154,7 +154,7 @@ export const EventUsers = (props: {
                         event: React.ChangeEvent<HTMLInputElement>
                       ) => {
                         await handleSingleAttendeeChange(
-                          +event.target.name,
+                          event.target.name,
                           event.target.checked
                         );
                       }}
@@ -167,7 +167,7 @@ export const EventUsers = (props: {
                         event: React.ChangeEvent<HTMLInputElement>
                       ) => {
                         await handleSingleAttendeeChange(
-                          +event.target.name,
+                          event.target.name,
                           event.target.checked
                         );
                       }}

@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.users
 
 import nl.jvandis.jooq.support.valuesFrom
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
@@ -13,10 +14,10 @@ import org.springframework.stereotype.Repository
 class UserRepository(
     val context: MultiTenantDslContext,
 ) {
-    fun findByIdOrNull(userId: Long): User? =
+    fun findByIdOrNull(userId: TeamBalanceId): User? =
         context.select()
             .from(UZER)
-            .where(UZER.ID.eq(userId))
+            .where(UZER.TEAM_BALANCE_ID.eq(userId.value))
             .fetchOne()
             ?.into(UzerRecord::class.java)
             ?.into(User::class.java)
@@ -35,6 +36,7 @@ class UserRepository(
         val usersResult =
             context.insertInto(
                 UZER,
+                UZER.TEAM_BALANCE_ID,
                 UZER.ROLE,
                 UZER.NAME,
                 UZER.IS_ACTIVE,
@@ -44,6 +46,7 @@ class UserRepository(
             )
                 .valuesFrom(
                     users,
+                    { it.teamBalanceId.value },
                     { it.role },
                     { it.name },
                     { it.isActive },
@@ -96,8 +99,10 @@ class UserRepository(
             .set(UZER.SHOW_FOR_TRAININGS, updatedUser.showForTrainings)
             .set(UZER.JERSEY_NUMBER, updatedUser.jerseyNumber)
             .where(UZER.ID.eq(updatedUser.id))
+            .and(UZER.TEAM_BALANCE_ID.eq(updatedUser.teamBalanceId.value))
             .returning(
                 UZER.ID,
+                UZER.TEAM_BALANCE_ID,
                 UZER.ROLE,
                 UZER.NAME,
                 UZER.IS_ACTIVE,
@@ -106,6 +111,7 @@ class UserRepository(
                 UZER.JERSEY_NUMBER,
             )
             .fetchOne()
+            ?.into(UzerRecord::class.java)
             ?.into(User::class.java)
             ?: throw DataAccessException("Could not update user with id ${updatedUser.id}")
     }

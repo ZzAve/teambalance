@@ -10,10 +10,6 @@ import nl.jvandis.teambalance.api.event.expose
 import nl.jvandis.teambalance.api.event.getRecurringEventDates
 import java.time.LocalDateTime
 
-data class UserAddRequest(
-    val userId: Long,
-)
-
 data class UpdateMiscellaneousEventRequest(
     val startTime: LocalDateTime?,
     val location: String?,
@@ -27,7 +23,7 @@ data class PotentialMiscellaneousEvent(
     val title: String?,
     val location: String,
     val comment: String?,
-    val userIds: List<Long>? = null,
+    val userIds: List<String>? = null,
     val recurringEventProperties: CreateRecurringEventPropertiesRequest? = null,
 ) {
     fun internalize(): List<MiscellaneousEvent> =
@@ -56,7 +52,7 @@ data class PotentialMiscellaneousEvent(
 }
 
 data class MiscellaneousEventResponse(
-    val id: Long,
+    val id: String,
     val startTime: LocalDateTime,
     val title: String,
     val location: String,
@@ -78,7 +74,7 @@ fun List<MiscellaneousEvent>.expose(attendees: List<Attendee>) = map { it.expose
 
 fun MiscellaneousEvent.expose(attendees: List<Attendee>) =
     MiscellaneousEventResponse(
-        id = id,
+        id = teamBalanceId.value,
         comment = comment,
         title = title ?: "Overig event",
         location = location,

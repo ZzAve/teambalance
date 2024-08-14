@@ -73,8 +73,8 @@ class TrainingWithAttendeesRecordHandler : TeamBalanceRecordHandler<Training> {
         result ?: run {
             val jooqAttendees = attendeeRecordHandler.getAttendees()
             val buildResult =
-                trainings.values.map { builder ->
-                    val eventAttendees = jooqAttendees.filter { it.eventId == builder.id }
+                trainings.values.map { builder: Training.Builder ->
+                    val eventAttendees = jooqAttendees.filter { a -> a.eventId == builder.event?.teamBalanceId }
                     builder.attendees = eventAttendees
                     builder.trainer = eventAttendees.firstOrNull { it.user?.id == builder.trainerUserId }?.user
                     builder.build()

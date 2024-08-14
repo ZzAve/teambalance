@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Min
 import nl.jvandis.teambalance.MultiTenantContext
 import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.filters.TenantsConfig
-import nl.jvandis.teambalance.loggerFor
+import nl.jvandis.teambalance.log
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -28,8 +28,6 @@ class BankController(
     private val bankService: BankService,
     private val tenantsConfig: TenantsConfig,
 ) {
-    private val log = loggerFor()
-
     @PostMapping("/top-up")
     fun addMoneyToBankAccount(
         @RequestBody topUpRequestBody: TopUpRequestBody,
@@ -81,7 +79,7 @@ class BankController(
             TransactionResponse(
                 id = it.id,
                 type = it.type,
-                // non breakable whitespace
+                // non-breakable whitespace
                 amount = "${it.currency}\u00A0${it.amount}",
                 counterParty = it.user?.name ?: it.counterParty,
                 timestamp = it.date.toEpochSecond(),

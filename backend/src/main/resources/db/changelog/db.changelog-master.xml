@@ -12,4 +12,5 @@
     <include file="db.changelog.2023-04-27-add-recurring-event-id.xml" relativeToChangelogFile="true"/>
     <include file="db.changelog.2023-07-23-add-configuration-table.xml" relativeToChangelogFile="true"/>
     <include file="db.changelog.2023-08-08-add-libero-role.xml" relativeToChangelogFile="true"/>
+    <include file="db.changelog.2024-08-05-external-ids.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

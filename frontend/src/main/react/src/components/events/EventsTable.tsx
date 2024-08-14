@@ -31,7 +31,11 @@ import { SpinnerWithText } from "../SpinnerWithText";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { eventsApiClient } from "../../utils/MiscEventsApiClient";
 import { matchesApiClient } from "../../utils/MatchesApiClient";
-import { AffectedRecurringEvents, TeamEvent } from "../../utils/domain";
+import {
+  AffectedRecurringEvents,
+  TeamBalanceId,
+  TeamEvent,
+} from "../../utils/domain";
 import { AffectedRecurringEvent } from "./RecurringEvent";
 import { useAlerts } from "../../hooks/alertsHook";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -67,7 +71,7 @@ const EventsTable = (props: {
   const [page, setPage] = useState(0); // get from url?
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openDeleteAlertEventId, setOpenDeleteAlertEventId] = useState<
-    number | undefined
+    TeamBalanceId | undefined
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [affectedEvents, setAffectedEvents] = useState<
@@ -95,7 +99,7 @@ const EventsTable = (props: {
     setPage(0);
   };
 
-  const handleClickEditEvent = (id: number) => {
+  const handleClickEditEvent = (id: TeamBalanceId) => {
     switch (props.eventType) {
       case "TRAINING":
         navigate(`/admin/edit-training/${id}`);
@@ -112,13 +116,13 @@ const EventsTable = (props: {
     }
   };
 
-  const handleDeleteClick = (eventId: number) => {
+  const handleDeleteClick = (eventId: TeamBalanceId) => {
     setOpenDeleteAlertEventId(eventId);
   };
 
   const handleDelete = (
     shouldDelete: boolean,
-    eventId: number,
+    eventId: string,
     affectedEvents?: AffectedRecurringEvents
   ) => {
     setOpenDeleteAlertEventId(undefined);
@@ -167,7 +171,7 @@ const EventsTable = (props: {
     }
   };
 
-  const getUpdateIcons = (props: { id: number }) => (
+  const getUpdateIcons = (props: { id: TeamBalanceId }) => (
     <Grid container spacing={1}>
       <Grid item xs>
         <Button

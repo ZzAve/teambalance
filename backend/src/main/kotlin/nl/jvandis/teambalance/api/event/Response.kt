@@ -1,9 +1,9 @@
 package nl.jvandis.teambalance.api.event
 
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.data.NO_ID
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.util.UUID
 
 data class EventsResponse<T>(
     val totalSize: Long,
@@ -37,7 +37,7 @@ data class RecurringEventPropertiesRequest(
     fun internalize(): RecurringEventProperties? {
         return RecurringEventProperties(
             id = NO_ID,
-            teamBalanceId = RecurringEventPropertiesId(teamBalanceId),
+            teamBalanceId = TeamBalanceId(teamBalanceId),
             intervalAmount = intervalAmount,
             intervalTimeUnit = intervalTimeUnit,
             amountLimit = amountLimit,
@@ -70,7 +70,7 @@ data class CreateRecurringEventPropertiesRequest(
     fun internalize(): RecurringEventProperties? {
         return RecurringEventProperties(
             id = NO_ID,
-            teamBalanceId = RecurringEventPropertiesId(UUID.randomUUID().toString()),
+            teamBalanceId = TeamBalanceId.random(),
             intervalAmount = intervalAmount,
             intervalTimeUnit = intervalTimeUnit,
             amountLimit = amountLimit,
@@ -81,7 +81,7 @@ data class CreateRecurringEventPropertiesRequest(
 }
 
 data class RecurringEventPropertiesResponse(
-    val teamBalanceId: RecurringEventPropertiesId,
+    val id: String,
     val intervalAmount: Int,
     val intervalTimeUnit: RecurringEventProperties.TimeUnit,
     val amountLimit: Int?,
@@ -91,10 +91,14 @@ data class RecurringEventPropertiesResponse(
 
 fun RecurringEventProperties.expose() =
     RecurringEventPropertiesResponse(
-        teamBalanceId = teamBalanceId,
+        id = teamBalanceId.value,
         intervalAmount = intervalAmount,
         intervalTimeUnit = intervalTimeUnit,
         amountLimit = amountLimit,
         dateLimit = dateLimit,
         selectedDays = selectedDays.map(DayOfWeek::of),
     )
+
+data class UserAddRequest(
+    val userId: String,
+)

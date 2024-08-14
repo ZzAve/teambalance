@@ -5,27 +5,28 @@ import {
   Match,
   Place,
   RecurringEventProperties,
+  TeamBalanceId,
 } from "./domain";
 import { EventsResponse } from "./util";
 
 const matchesClient = ApiClient();
 
 interface MatchResponse {
-  id: number;
+  id: TeamBalanceId;
   startTime: string; // ISO 8601 datetime string,
   location: string;
   comment?: string;
   attendees: AttendeeResponse[];
   opponent: string;
   homeAway: Place;
-  coach?: string; // this is being rebranded to 'additional info' to allow for a custom editable field
+  additionalInfo?: string;
 }
 
 const internalize: (externalMatch: MatchResponse) => Match = (
   externalMatch: MatchResponse
 ) => ({
   ...externalMatch,
-  additionalInfo: externalMatch.coach,
+  additionalInfo: externalMatch.additionalInfo,
   startTime: new Date(externalMatch.startTime),
   attendees: externalMatch.attendees?.map(internalizeAttendees) || [],
 });
@@ -48,9 +49,9 @@ const getMatches: (
 };
 
 const getMatch: (
-  id: number,
+  id: TeamBalanceId,
   includeAttendees?: boolean
-) => Promise<Match> = async (id: number, includeAttendees = true) => {
+) => Promise<Match> = async (id: TeamBalanceId, includeAttendees = true) => {
   const match = matchesClient.call(
     `matches/${id}?include-attendees=${includeAttendees}`
   );
@@ -86,7 +87,7 @@ const createMatch: (props: CreateMatch) => Promise<Match[]> = async (
 const updateMatch: (
   affectedRecurringEvents: AffectedRecurringEvents,
   eventProps: {
-    id: number;
+    id: TeamBalanceId;
     startTime?: Date;
     location?: string;
     comment?: string;
@@ -111,22 +112,24 @@ const updateMatch: (
   ).events.map(internalize);
 };
 
-//TODO: update API to reflect 'coach' is changed into additional info.
 const updateAdditionalInfo = async (props: {
-  id: number;
+  id: TeamBalanceId;
   additionalInfo: string;
 }) => {
   const matchResponse = (await matchesClient.callWithBody(
-    `matches/${props.id}/coach`,
+    `matches/${props.id}/additional-info`,
     {
-      coach: props.additionalInfo,
+      additionalInfo: props.additionalInfo,
     },
     { method: "PUT" }
   )) as MatchResponse;
   return internalize(matchResponse);
 };
 
-const deleteMatch = (id: number, affectedEvents?: AffectedRecurringEvents) => {
+const deleteMatch = (
+  id: TeamBalanceId,
+  affectedEvents?: AffectedRecurringEvents
+) => {
   const deleteAttendees = true;
   const affectedRecurringEvents = !!affectedEvents
     ? `&affected-recurring-events=${affectedEvents}`

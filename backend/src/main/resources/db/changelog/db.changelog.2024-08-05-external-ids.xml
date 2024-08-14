@@ -1,0 +1,50 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="julius van dis" id="1722801056497-1">
+        <addColumn tableName="attendee">
+            <column name="team_balance_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="julius van dis" id="1722801056497-2">
+        <addColumn tableName="uzer">
+            <column name="team_balance_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="julius van dis" id="1722801056497-3">
+        <addColumn tableName="event">
+            <column name="team_balance_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="julius van dis" id="1722801056497-4">
+        <addColumn tableName="bank_account_alias">
+            <column name="team_balance_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="julius van dis" id="1722801056497-5">
+        <addColumn tableName="transaction_exclusion">
+            <column name="team_balance_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="julius van dis" id="1722801056497-6">
+        <renameColumn tableName="match" oldColumnName="coach" newColumnName="additional_info" columnDataType="text"/>
+    </changeSet>
+
+
+</databaseChangeLog>

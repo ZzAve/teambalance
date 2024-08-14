@@ -17,7 +17,7 @@ data class Users(
 data class User(
     val name: String,
     val role: Role,
-    val id: Long,
+    val id: String,
     val isActive: Boolean,
     val jerseyNumber: Int? = null,
 )
