@@ -4,7 +4,7 @@ import nl.jvandis.teambalance.api.users.UserResponse
 import nl.jvandis.teambalance.api.users.expose
 
 data class BankAccountAliasesResponse(
-    val bankAccountAliases: List<BankAccountAliasResponse>
+    val bankAccountAliases: List<BankAccountAliasResponse>,
 )
 
 data class BankAccountAliasResponse(
@@ -15,8 +15,9 @@ data class BankAccountAliasResponse(
 
 fun BankAccountAliases.expose() = BankAccountAliasesResponse(bankAccountAliases.map(BankAccountAlias::expose))
 
-fun BankAccountAlias.expose() = BankAccountAliasResponse(
-    id = teamBalanceId.value,
-    alias = alias,
-    user = user.expose()
-)
+fun BankAccountAlias.expose() =
+    BankAccountAliasResponse(
+        id = teamBalanceId.value,
+        alias = alias,
+        user = user.expose(),
+    )

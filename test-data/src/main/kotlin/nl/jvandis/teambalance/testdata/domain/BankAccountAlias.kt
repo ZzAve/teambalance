@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BankAccountAliases(
-    val bankAccountAliases: List<BankAccountAlias>
+    val bankAccountAliases: List<BankAccountAlias>,
 )
 
 @Serializable
@@ -14,11 +14,8 @@ data class BankAccountAlias(
     val user: User,
 )
 
-
 @Serializable
 data class CreateBankAccountAlias(
     val alias: String,
     val userId: String,
 )
-
-

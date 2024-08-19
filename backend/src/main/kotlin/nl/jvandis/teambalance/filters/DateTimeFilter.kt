@@ -15,7 +15,6 @@ import java.time.format.DateTimeFormatter
 class DateTimeFilter(
     private val handlerExceptionResolver: HandlerExceptionResolver,
 ) : OncePerRequestFilter() {
-
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -28,7 +27,7 @@ class DateTimeFilter(
                     if (START_OF_SEASON.isAfter(since)) {
                         throw InvalidDateTimeException(
                             "The date $since is not allowed. " +
-                                    "It's before the start of the season, at $START_OF_SEASON"
+                                "It's before the start of the season, at $START_OF_SEASON",
                         )
                     }
                 }

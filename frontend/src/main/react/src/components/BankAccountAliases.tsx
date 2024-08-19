@@ -11,10 +11,10 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
-import { EditableTextField } from "./BankAlias";
 import Typography from "@mui/material/Typography";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AlertDialog from "./Alert";
+import EditableTextField from "../utils/EditableTextField";
 
 /**
  * Function BankAccountAliases component

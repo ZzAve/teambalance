@@ -15,8 +15,9 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>Team balance - Frontend React App</name>
     <properties>
-        <skip.npm-install>true</skip.npm-install>
-        <skip.npm-ci>false</skip.npm-ci>
+        <npm.install.skip>true</npm.install.skip>
+        <npm.ci.skip>false</npm.ci.skip>
+        <npm.lint.fix.skip>true</npm.lint.fix.skip>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -52,10 +53,10 @@
                         <goals>
                             <goal>npm</goal>
                         </goals>
-                        <phase>generate-resources</phase>
+                        <phase>initialize</phase>
                         <configuration>
                             <arguments>ci</arguments>
-                            <skip>${skip.npm-ci}</skip>
+                            <skip>${npm.ci.skip}</skip>
                         </configuration>
 
                     </execution>
@@ -64,10 +65,10 @@
                         <goals>
                             <goal>npm</goal>
                         </goals>
-                        <phase>generate-resources</phase>
+                        <phase>initialize</phase>
                         <configuration>
                             <arguments>install</arguments>
-                            <skip>${skip.npm-install}</skip>
+                            <skip>${npm.install.skip}</skip>
                         </configuration>
 
                     </execution>
@@ -92,9 +93,29 @@
                             <arguments>run lint</arguments>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>npm lint:fix</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <skip>${npm.lint.fix.skip}</skip>
+                            <arguments>run lint:fix</arguments>
+                        </configuration>
+                    </execution>
+
                 </executions>
             </plugin>
 
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>format</id>
+            <properties>
+                <npm.lint.fix.skip>false</npm.lint.fix.skip>
+            </properties>
+        </profile>
+    </profiles>
 </project>

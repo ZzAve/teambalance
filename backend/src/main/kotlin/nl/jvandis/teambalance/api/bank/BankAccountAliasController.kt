@@ -13,7 +13,6 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -41,7 +40,6 @@ class BankAccountAliasController(
 
         val bankAccountAliases = bankAccountAliasRepository.findAll()
         return BankAccountAliases(bankAccountAliases = bankAccountAliases).expose()
-
     }
 
     //    @PreAuthorize("hasRole('admin')")
@@ -68,10 +66,11 @@ class BankAccountAliasController(
         val bankAccountAlias = potentialBankAccountAlias.internalize()
 
         try {
-
             return bankAccountAliasRepository.insert(bankAccountAlias).expose()
         } catch (e: DataAccessException) {
-            throw DataConstraintViolationException("Alias ${bankAccountAlias.alias} could not be inserted, as it already exists for a(nother) user.")
+            throw DataConstraintViolationException(
+                "Alias ${bankAccountAlias.alias} could not be inserted, as it already exists for a(nother) user.",
+            )
         }
     }
 
@@ -96,7 +95,7 @@ class BankAccountAliasController(
             .let { user ->
                 BankAccountAlias(
                     alias = alias,
-                    user = user
+                    user = user,
                 )
             }
 }

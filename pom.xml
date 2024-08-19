@@ -30,6 +30,7 @@
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <ktlint.format.skip>true</ktlint.format.skip>
         <verification.skip>false</verification.skip>
 
         <jib-maven-plugin.version>3.3.1</jib-maven-plugin.version>
@@ -189,6 +190,7 @@
                         <id>ktlint-format</id>
                         <inherited>false</inherited>
                         <configuration>
+                            <skip>${ktlint.format.skip}</skip>
                             <target name="ktlint">
                                 <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
                                       classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
@@ -197,12 +199,13 @@
                                     <arg value="-F"/>
                                     <arg value="*/src/**/*.kt"/>
                                 </java>
-
                             </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
                         </goals>
+                        <phase>validate</phase>
+
                     </execution>
                 </executions>
                 <dependencies>
@@ -229,6 +232,13 @@
                 </dependency>
             </dependencies>
         </profile>
+            <profile>
+                <id>format</id>
+                <properties>
+                    <ktlint.format.skip>false</ktlint.format.skip>
+                </properties>
+            </profile>
+
     </profiles>
     <repositories>
         <repository>

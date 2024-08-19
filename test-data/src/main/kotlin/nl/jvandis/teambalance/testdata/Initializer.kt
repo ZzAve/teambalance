@@ -133,9 +133,11 @@ class Initializer(
     ): Training {
         val request =
             Request(PUT, "$host/api/trainings/$id/trainer")
-                .body(trainerId
-                    ?.let { """{ "userId": "$it"  }""" }
-                    ?: "")
+                .body(
+                    trainerId
+                        ?.let { """{ "userId": "$it"  }""" }
+                        ?: "",
+                )
 
         val response: Response = client(request)
 
@@ -210,8 +212,6 @@ class Initializer(
         return jsonFormatter.decodeFromString<BankAccountAliases>(response.bodyString()).bankAccountAliases
     }
 
-
-
     private fun createAlias(bankAccountAlias: CreateBankAccountAlias): BankAccountAlias {
         val request =
             Request(POST, "$host/api/aliases")
@@ -224,7 +224,6 @@ class Initializer(
 
         return aBankAccountAliasLens(response)
     }
-
 
     fun spawnData(config: SpawnDataConfig) {
         createUsers()
@@ -241,7 +240,6 @@ class Initializer(
 
         createBankAccountAliases(allUsers)
 
-
 //        bankAccountTransactionExclusionRepository.insertMany(
 //            listOf(
 //                TransactionExclusion(counterParty = "CCV*BUITEN IN DE KUIL")
@@ -250,26 +248,25 @@ class Initializer(
     }
 
     private fun createBankAccountAliases(allUsers: List<User>) {
-        val bankAccountAliases = listOf(
-            CreateBankAccountAlias("Juul", allUsers.first { it.name == "Julius" }.id),
-            CreateBankAccountAlias("J. Post", allUsers.first { it.name == "Bocaj" }.id),
-            CreateBankAccountAlias("de Hond", allUsers.first { it.name == "Maurice" }.id),
-            CreateBankAccountAlias("Lucky Luke", allUsers.first { it.name == "Joep" }.id)
-        )
-            .mapNotNull {
-                try {
-
-                    log.info("Creating BankAccountAlias $it")
-                    createAlias(it)
-                } catch (e: RuntimeException) {
-                    log.error("Could not add bankAccountAlias ${it.alias}", e)
-                    null
+        val bankAccountAliases =
+            listOf(
+                CreateBankAccountAlias("Juul", allUsers.first { it.name == "Julius" }.id),
+                CreateBankAccountAlias("J. Post", allUsers.first { it.name == "Bocaj" }.id),
+                CreateBankAccountAlias("de Hond", allUsers.first { it.name == "Maurice" }.id),
+                CreateBankAccountAlias("Lucky Luke", allUsers.first { it.name == "Joep" }.id),
+            )
+                .mapNotNull {
+                    try {
+                        log.info("Creating BankAccountAlias $it")
+                        createAlias(it)
+                    } catch (e: RuntimeException) {
+                        log.error("Could not add bankAccountAlias ${it.alias}", e)
+                        null
+                    }
                 }
-            }
 
         log.info("All injected aliases: {}", bankAccountAliases)
-        log.info("All aliases: {} ", getAllAliases().map { "Alias '${it.alias}' for user ${it.user.name} (${it.user.id})"})
-
+        log.info("All aliases: {} ", getAllAliases().map { "Alias '${it.alias}' for user ${it.user.name} (${it.user.id})" })
     }
 
     private fun createUsers() {

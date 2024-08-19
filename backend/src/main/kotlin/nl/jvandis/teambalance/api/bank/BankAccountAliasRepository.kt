@@ -4,7 +4,6 @@ import nl.jvandis.jooq.support.valuesFrom
 import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.attendees.BankAccountAliasWithUserRecordHandler
 import nl.jvandis.teambalance.data.MultiTenantDslContext
-import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.BANK_ACCOUNT_ALIAS
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
 import org.jooq.Record1

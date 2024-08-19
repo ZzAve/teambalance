@@ -90,6 +90,14 @@ export interface Potter {
   amount: number;
 }
 
+export interface BankAccountAlias {
+  id: TeamBalanceId;
+  alias: TeamBalanceId;
+  user: User;
+}
+
+export type PotentialBankAccountAlias = Omit<BankAccountAlias, "id">;
+
 export type RecurringInterval = "WEEK" | "MONTH";
 
 export enum Day {
