@@ -237,7 +237,7 @@ class TrainingController(
     }
 
     private fun getPotentialTrainer(updateTrainerRequest: UpdateTrainerRequest): User? {
-        val userTeamBalanceId = updateTrainerRequest.userId?.let { TeamBalanceId(it) }
+        val userTeamBalanceId: TeamBalanceId? = updateTrainerRequest.userId?.let { TeamBalanceId(it) }
         return when (userTeamBalanceId) {
             null -> null
             else ->

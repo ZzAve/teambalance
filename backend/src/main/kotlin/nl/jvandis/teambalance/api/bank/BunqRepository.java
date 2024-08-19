@@ -3,30 +3,14 @@ package nl.jvandis.teambalance.api.bank;
 import com.bunq.sdk.context.ApiContext;
 import com.bunq.sdk.context.ApiEnvironmentType;
 import com.bunq.sdk.context.BunqContext;
+import com.bunq.sdk.exception.ApiException;
 import com.bunq.sdk.exception.BunqException;
-import com.bunq.sdk.exception.ForbiddenException;
-import com.bunq.sdk.http.BunqHeader;
 import com.bunq.sdk.http.Pagination;
 import com.bunq.sdk.model.generated.endpoint.MonetaryAccountBank;
 import com.bunq.sdk.model.generated.endpoint.Payment;
-import com.bunq.sdk.model.generated.endpoint.RequestInquiry;
-import com.bunq.sdk.model.generated.endpoint.SandboxUserPerson;
-import com.bunq.sdk.model.generated.object.Amount;
-import com.bunq.sdk.model.generated.object.Pointer;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
 import jakarta.annotation.Nullable;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
@@ -36,10 +20,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+import static com.bunq.sdk.context.ApiEnvironmentType.PRODUCTION;
+import static com.bunq.sdk.context.ApiEnvironmentType.SANDBOX;
+import static com.bunq.sdk.context.BunqContext.loadApiContext;
+import static nl.jvandis.teambalance.api.bank.BunqSandboxRepositoryHelper.createSandboxApiContext;
+import static nl.jvandis.teambalance.api.bank.BunqSandboxRepositoryHelper.requestSpendingMoneyIfNeeded;
 
 /**
  * This repository translates teambalance's domain into bunq domain, and performs requests to Bunq through its Java SDK.
@@ -50,51 +42,10 @@ public class BunqRepository {
     private static final Logger log = LoggerFactory.getLogger(BunqRepository.class);
 
     /**
-     * Error constants.
-     */
-    private static final String ERROR_COULD_NOT_GENERATE_NEW_API_KEY = "Encountered error while retrieving new sandbox ApiKey.\nError message %s";
-
-    /**
      * FileName constants.
      */
     private static final String FILE_NAME_BUNQ_CONF_PRODUCTION = "bunq-production.conf";
     private static final String FILE_NAME_BUNQ_CONF_SANDBOX = "bunq-sandbox.conf";
-
-    /**
-     * Field constants.
-     */
-    private static final String FIELD_RESPONSE = "Response";
-    private static final String FIELD_API_KEY = "ApiKey";
-
-    /**
-     *
-     */
-    private static final String POINTER_TYPE_EMAIL = "EMAIL";
-    private static final String CURRENCY_EUR = "EUR";
-    private static final String DEVICE_SERVER_DESCRIPTION = "Teambalance SANDBOX app";
-
-    /**
-     * The index of the fist item in an array.
-     */
-    private static final int INDEX_FIRST = 0;
-
-    /**
-     * Http constants.
-     */
-    private static final int HTTP_STATUS_OK = 200;
-
-    /**
-     * Request spending money constants.
-     */
-    private static final String REQUEST_SPENDING_MONEY_AMOUNT = "500.0";
-    private static final String REQUEST_SPENDING_MONEY_RECIPIENT = "sugardaddy@bunq.com";
-    private static final String REQUEST_SPENDING_MONEY_DESCRIPTION = "Requesting some spending money.";
-    private static final int REQUEST_SPENDING_MONEY_WAIT_TIME_MILLISECONDS = 1000;
-
-    /**
-     * Balance constant.
-     */
-    private static final double BALANCE_ZERO = 0.0;
 
     /**
      * Concurrency constants
@@ -113,15 +64,16 @@ public class BunqRepository {
     public BunqRepository(ApiEnvironmentType environmentType,
                           @Nullable String apiKey,
                           Boolean saveSessionToFile) throws UnknownHostException {
-        assert (ApiEnvironmentType.PRODUCTION != environmentType) || (apiKey != null);
+        if (PRODUCTION == environmentType && apiKey == null) {
+            throw new IllegalArgumentException("Apikey is expected for production environment");
+        }
         log.info("Starting BunqRepository of type {}", environmentType);
 
         this.environmentType = environmentType;
         this.apiKey = apiKey;
         this.saveSessionToFile = saveSessionToFile;
 
-        this.setupContext();
-        this.requestSpendingMoneyIfNeeded();
+        setupContext();
     }
 
     public BunqRepository(BankBunqConfig config) throws UnknownHostException {
@@ -134,10 +86,10 @@ public class BunqRepository {
 
     private Integer checkAccountId(Integer accountId) {
         return accountIdsToValidatedAccountIds.computeIfAbsent(accountId, x -> {
-            if (environmentType == ApiEnvironmentType.PRODUCTION) {
-                return this.validateAccountId(accountId);
+            if (environmentType == PRODUCTION) {
+                return validateAccountId(accountId);
             } else {
-                return this.getAccountId();
+                return getAccountId();
             }
         });
     }
@@ -173,8 +125,8 @@ public class BunqRepository {
 
     private static ApiEnvironmentType toApiEnvironmentType(BunqEnvironment environment) {
         return switch (environment) {
-            case PRODUCTION -> ApiEnvironmentType.PRODUCTION;
-            case SANDBOX -> ApiEnvironmentType.SANDBOX;
+            case PRODUCTION -> PRODUCTION;
+            case SANDBOX -> SANDBOX;
         };
     }
 
@@ -214,6 +166,7 @@ public class BunqRepository {
                 throw new RuntimeException("Could not acquire semaphore");
             }
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new IllegalStateException(e);
         } finally {
             if (permit) {
@@ -226,7 +179,7 @@ public class BunqRepository {
         ArrayList<String> permittedIps = new ArrayList<>();
         permittedIps.add("*");
         return ApiContext.create(
-                this.environmentType,
+                environmentType,
                 apiKey,
                 InetAddress.getLocalHost().getHostName(),
                 permittedIps
@@ -237,142 +190,71 @@ public class BunqRepository {
      *
      */
     private void setupContext() throws UnknownHostException {
-        this.setupContext(true);
+        final boolean isSandboxEnvironment = SANDBOX.equals(environmentType);
+        setupContext(isSandboxEnvironment ? 1 : 0);
+
+        if (isSandboxEnvironment) {
+            requestSpendingMoneyIfNeeded();
+        }
     }
 
     /**
      *
      */
-    private void setupContext(boolean resetConfigIfNeeded) throws UnknownHostException {
+    private void setupContext(int retries) throws UnknownHostException {
         ApiContext apiContext;
-        if (new File(this.determineBunqConfigFileName()).exists()) {
-            // Config is already present.
-            apiContext = ApiContext.restore(this.determineBunqConfigFileName());
-        } else if (ApiEnvironmentType.SANDBOX.equals(this.environmentType)) {
-            SandboxUserPerson sandboxUser = generateNewSandboxUser();
-            apiContext = ApiContext.create(ApiEnvironmentType.SANDBOX, sandboxUser.getApiKey(), DEVICE_SERVER_DESCRIPTION);
+        if (new File(determineBunqConfigFileName()).exists()) {
+            log.info("Existing API config found. Restoring API context from file");
+            apiContext = ApiContext.restore(determineBunqConfigFileName());
+        } else if (SANDBOX.equals(environmentType)) {
+            log.info("No API config found. Creating new sandbox API config.");
+            apiContext = createSandboxApiContext();
 
         } else {
-            log.info("No API config found. Creating new API config.");
+            log.info("No API config found. Creating new production API config.");
             apiContext = createApiConfig();
-            log.info("Created new API config.");
+            log.info("Created new production API config.");
         }
 
         try {
             apiContext.ensureSessionActive();
             safeSave(apiContext);
-
-            BunqContext.loadApiContext(apiContext);
-        } catch (ForbiddenException forbiddenException) {
-            if (resetConfigIfNeeded) {
-                this.handleForbiddenException(forbiddenException);
+            loadApiContext(apiContext);
+        } catch (ApiException apiException) {
+            if (retries > 0) {
+                log.warn("Could not create API context. Will retry creating config", apiException);
+                deleteOldConfig();
+                setupContext(retries - 1);
             } else {
-                throw forbiddenException;
+                throw apiException;
             }
         }
     }
 
+
     private void safeSave(ApiContext apiContext) {
         if (saveSessionToFile) {
-            apiContext.save(this.determineBunqConfigFileName());
+            apiContext.save(determineBunqConfigFileName());
         } else {
             log.info("Skipping saving context to file");
         }
     }
 
-    /**
-     * @return String
-     */
     private String determineBunqConfigFileName() {
-        if (ApiEnvironmentType.PRODUCTION.equals(this.environmentType)) {
-            return FILE_NAME_BUNQ_CONF_PRODUCTION;
-        } else {
-            return FILE_NAME_BUNQ_CONF_SANDBOX;
-        }
+        return switch (environmentType) {
+            case PRODUCTION -> FILE_NAME_BUNQ_CONF_PRODUCTION;
+            case SANDBOX -> FILE_NAME_BUNQ_CONF_SANDBOX;
+            case null -> FILE_NAME_BUNQ_CONF_SANDBOX;
+        };
     }
 
-    /**
-     *
-     */
-    private void handleForbiddenException(ForbiddenException forbiddenException) throws UnknownHostException {
-        if (ApiEnvironmentType.SANDBOX.equals(this.environmentType)) {
-            this.deleteOldConfig();
-            this.setupContext(false);
-        } else {
-            throw forbiddenException;
-        }
-    }
-
-    /**
-     *
-     */
     private void deleteOldConfig() {
         try {
-            Files.delete(Paths.get((this.determineBunqConfigFileName())));
+            Files.delete(Paths.get((determineBunqConfigFileName())));
         } catch (IOException e) {
             throw new BunqException(e.getMessage());
         }
     }
 
 
-    private SandboxUserPerson generateNewSandboxUser() {
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url(
-                        "https://" +
-                                ApiEnvironmentType.SANDBOX.getBaseUri() +
-                                "/" +
-                                ApiEnvironmentType.SANDBOX.getApiVersion() +
-                                "/sandbox-user-person"
-                )
-                .post(RequestBody.create(null, new byte[INDEX_FIRST]))
-                .addHeader(BunqHeader.CLIENT_REQUEST_ID.getHeaderName(), UUID.randomUUID().toString())
-                .addHeader(
-                        BunqHeader.CACHE_CONTROL.getHeaderName(), BunqHeader.CACHE_CONTROL.getDefaultValue()
-                )
-                .addHeader(BunqHeader.GEOLOCATION.getHeaderName(), BunqHeader.GEOLOCATION.getDefaultValue())
-                .addHeader(BunqHeader.LANGUAGE.getHeaderName(), BunqHeader.LANGUAGE.getDefaultValue())
-                .addHeader(BunqHeader.REGION.getHeaderName(), BunqHeader.REGION.getDefaultValue())
-                .build();
-
-        try {
-            try (Response response = client.newCall(request).execute()) {
-                if (response.code() == HTTP_STATUS_OK) {
-                    String responseString = response.body().string();
-                    JsonObject jsonObject = new Gson().fromJson(responseString, JsonObject.class);
-                    JsonObject apiKEy = jsonObject.getAsJsonArray(FIELD_RESPONSE).get(INDEX_FIRST).getAsJsonObject().get(FIELD_API_KEY).getAsJsonObject();
-
-                    return SandboxUserPerson.fromJsonReader(new JsonReader(new StringReader(apiKEy.toString())));
-                } else {
-                    throw new BunqException(ERROR_COULD_NOT_GENERATE_NEW_API_KEY.formatted(response.body().string()));
-                }
-            }
-        } catch (IOException e) {
-            throw new BunqException(e.getMessage());
-        }
-    }
-
-    private void requestSpendingMoneyIfNeeded() {
-        if (shouldRequestSpendingMoney()) {
-            RequestInquiry.create(
-                    new Amount(REQUEST_SPENDING_MONEY_AMOUNT, CURRENCY_EUR),
-                    new Pointer(POINTER_TYPE_EMAIL, REQUEST_SPENDING_MONEY_RECIPIENT),
-                    REQUEST_SPENDING_MONEY_DESCRIPTION,
-                    false
-            );
-
-            try {
-                Thread.sleep(REQUEST_SPENDING_MONEY_WAIT_TIME_MILLISECONDS);
-            } catch (InterruptedException exception) {
-                log.warn(exception.getMessage());
-            }
-        }
-    }
-
-    private boolean shouldRequestSpendingMoney() {
-        return ApiEnvironmentType.SANDBOX.equals(environmentType)
-                && (Double.parseDouble(BunqContext.getUserContext().getPrimaryMonetaryAccountBank().getBalance().getValue())
-                <= BALANCE_ZERO);
-    }
 }

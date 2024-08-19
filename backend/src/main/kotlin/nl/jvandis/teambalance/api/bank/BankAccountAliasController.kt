@@ -7,6 +7,7 @@ import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidAliasException
 import nl.jvandis.teambalance.api.InvalidUserException
 import nl.jvandis.teambalance.api.users.UserRepository
+import org.jooq.exception.DataAccessException
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Admin
-@PreAuthorize("hasRole('admin')") // TODO: make me pretty in https://github.com/ZzAve/teambalance/issues/200
 @Tag(name = "aliases")
 @RequestMapping(path = ["/api/aliases"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class BankAccountAliasController(
@@ -33,28 +33,28 @@ class BankAccountAliasController(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    // TODO: make me pretty in https://github.com/ZzAve/teambalance/issues/200
-//    @PreAuthorize("hasRole('admin')")
-//    @PreAuthorize("permitAll()") // to make it public
     @GetMapping
-    fun getAliases(): BankAccountAliases {
+    fun getAliases(): BankAccountAliasesResponse {
         log.debug("getAliases")
 
         // TODO add filter on userId
-        return BankAccountAliases(bankAccountAliases = bankAccountAliasRepository.findAll())
+
+        val bankAccountAliases = bankAccountAliasRepository.findAll()
+        return BankAccountAliases(bankAccountAliases = bankAccountAliases).expose()
+
     }
 
     //    @PreAuthorize("hasRole('admin')")
     @GetMapping("/{id}")
     fun getAlias(
         @PathVariable(value = "id") bankAccountAliasId: String,
-    ): BankAccountAlias {
+    ): BankAccountAliasResponse {
         val bankAccountAliasTeamBalanceId = TeamBalanceId(bankAccountAliasId)
         log.debug("getUser $bankAccountAliasTeamBalanceId")
 
-        return bankAccountAliasRepository.findByIdOrNull(bankAccountAliasTeamBalanceId) ?: throw InvalidAliasException(
-            bankAccountAliasTeamBalanceId,
-        )
+        return bankAccountAliasRepository.findByIdOrNull(bankAccountAliasTeamBalanceId)
+            ?.expose()
+            ?: throw InvalidAliasException(bankAccountAliasTeamBalanceId)
     }
 
     //    @PreAuthorize("hasRole('admin')")
@@ -62,23 +62,29 @@ class BankAccountAliasController(
     @PostMapping
     fun postUser(
         @RequestBody potentialBankAccountAlias: PotentialBankAccountAlias,
-    ) {
-        log.debug("postBankAccountAlias $potentialBankAccountAlias")
+    ): BankAccountAliasResponse {
+        log.debug("postBankAccountAlias {}", potentialBankAccountAlias)
 
         val bankAccountAlias = potentialBankAccountAlias.internalize()
-        bankAccountAliasRepository.insert(bankAccountAlias)
+
+        try {
+
+            return bankAccountAliasRepository.insert(bankAccountAlias).expose()
+        } catch (e: DataAccessException) {
+            throw DataConstraintViolationException("Alias ${bankAccountAlias.alias} could not be inserted, as it already exists for a(nother) user.")
+        }
     }
 
     //    @PreAuthorize("hasRole('admin')")
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun updateUser(
-        @PathVariable(value = "id") bankAccountAliasId: Long,
+        @PathVariable(value = "id") bankAccountAliasId: String,
     ) {
-        log.debug("deleting bankAccountAlias: $bankAccountAliasId")
+        log.debug("Deleting bankAccountAlias: $bankAccountAliasId")
 
         try {
-            bankAccountAliasRepository.deleteById(bankAccountAliasId)
+            bankAccountAliasRepository.deleteById(TeamBalanceId(bankAccountAliasId))
         } catch (e: DataIntegrityViolationException) {
             throw DataConstraintViolationException("User $bankAccountAliasId could not be deleted.")
         }
@@ -87,10 +93,15 @@ class BankAccountAliasController(
     private fun PotentialBankAccountAlias.internalize(): BankAccountAlias =
         TeamBalanceId(userId)
             .let { id -> userRepository.findByIdOrNull(id) ?: throw InvalidUserException(id) }
-            .let { user -> BankAccountAlias(name, user) }
+            .let { user ->
+                BankAccountAlias(
+                    alias = alias,
+                    user = user
+                )
+            }
 }
 
 data class PotentialBankAccountAlias(
-    val name: String,
+    val alias: String,
     val userId: String,
 )

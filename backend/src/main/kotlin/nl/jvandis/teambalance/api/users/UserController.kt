@@ -34,7 +34,7 @@ class UserController(
     @GetMapping
     fun getUsers(
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
-    ): ExternalUsers {
+    ): UserResponses {
         log.debug("getUsers")
 
         return Users(
@@ -47,7 +47,7 @@ class UserController(
     @GetMapping("/{id}")
     fun getUser(
         @PathVariable(value = "id") userId: String,
-    ): ExternalUser {
+    ): UserResponse {
         val userTeamBalanceId = TeamBalanceId(userId)
         log.debug("getUser $userTeamBalanceId")
 
@@ -60,7 +60,7 @@ class UserController(
     @PostMapping
     fun postUser(
         @RequestBody potentialUser: PotentialUser,
-    ): ExternalUser {
+    ): UserResponse {
         log.debug("postUser {}", potentialUser)
 
         val user = potentialUser.internalize()
@@ -73,7 +73,7 @@ class UserController(
     fun updateUser(
         @PathVariable(value = "id") userId: String,
         @RequestBody potentialUserUpdate: PotentialUserUpdate,
-    ): ExternalUser {
+    ): UserResponse {
         log.debug("updatingUser: {}", potentialUserUpdate)
 
         val userTeamBalanceId = TeamBalanceId(userId)

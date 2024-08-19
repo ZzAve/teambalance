@@ -48,11 +48,13 @@ class BankAccountAliasRepository(private val context: MultiTenantDslContext) {
         val insertResult =
             context.insertInto(
                 BANK_ACCOUNT_ALIAS,
+                BANK_ACCOUNT_ALIAS.TEAM_BALANCE_ID,
                 BANK_ACCOUNT_ALIAS.USER_ID,
                 BANK_ACCOUNT_ALIAS.ALIAS,
             )
                 .valuesFrom(
                     aliases,
+                    { it.teamBalanceId.value },
                     { it.user.id },
                     { it.alias },
                 )
@@ -78,17 +80,10 @@ class BankAccountAliasRepository(private val context: MultiTenantDslContext) {
         return insertMany(listOf(bankAccountAlias)).first()
     }
 
-    fun deleteById(bankAccountAliasId: Long) {
-        if (bankAccountAliasId == NO_ID) {
-            throw IllegalStateException(
-                "User with 'special' id $NO_ID can not be deleted. " +
-                    "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back",
-            )
-        }
+    fun deleteById(bankAccountAliasId: TeamBalanceId) {
         val execute =
             context.deleteFrom(BANK_ACCOUNT_ALIAS)
-                .where(BANK_ACCOUNT_ALIAS.ID.eq(bankAccountAliasId))
+                .where(BANK_ACCOUNT_ALIAS.TEAM_BALANCE_ID.eq(bankAccountAliasId.value))
                 .execute()
         if (execute != 1) {
             throw DataAccessException("Removed $execute bankAccountAliases, expected to remove only 1")

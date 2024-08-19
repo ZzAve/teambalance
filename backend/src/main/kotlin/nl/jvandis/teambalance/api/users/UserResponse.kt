@@ -1,10 +1,10 @@
 package nl.jvandis.teambalance.api.users
 
-data class ExternalUsers(
-    val users: List<ExternalUser>,
+data class UserResponses(
+    val users: List<UserResponse>,
 )
 
-data class ExternalUser(
+data class UserResponse(
     val id: String,
     val name: String,
     val role: Role,
@@ -12,10 +12,10 @@ data class ExternalUser(
     val jerseyNumber: Int?,
 )
 
-fun Users.expose() = ExternalUsers(users.map(User::expose))
+fun Users.expose() = UserResponses(users.map(User::expose))
 
 fun User.expose() =
-    ExternalUser(
+    UserResponse(
         id = teamBalanceId.value,
         name = name,
         role = role,

@@ -8,7 +8,7 @@ import nl.jvandis.teambalance.api.event.RecurringEventPropertiesRequest
 import nl.jvandis.teambalance.api.event.RecurringEventPropertiesResponse
 import nl.jvandis.teambalance.api.event.expose
 import nl.jvandis.teambalance.api.event.getRecurringEventDates
-import nl.jvandis.teambalance.api.users.ExternalUser
+import nl.jvandis.teambalance.api.users.UserResponse
 import nl.jvandis.teambalance.api.users.expose
 import java.time.LocalDateTime
 
@@ -59,7 +59,7 @@ data class TrainingResponse(
     val location: String,
     val comment: String?,
     val attendees: List<AttendeeResponse>,
-    val trainer: ExternalUser?,
+    val trainer: UserResponse?,
     val recurringEventProperties: RecurringEventPropertiesResponse?,
 )
 

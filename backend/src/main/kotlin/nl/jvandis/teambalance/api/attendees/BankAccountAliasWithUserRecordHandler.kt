@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.api.attendees
 
 import nl.jvandis.jooq.support.getFieldOrThrow
+import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.bank.BankAccountAlias
 import nl.jvandis.teambalance.api.event.TeamBalanceRecordHandler
 import nl.jvandis.teambalance.api.users.User
@@ -59,6 +60,7 @@ fun BankAccountAliasRecord.toBankAccountAlias(uzerRecord: UzerRecord): BankAccou
     check(this.userId == uzerRecord.id) { "userId does not match uzerRecord id" }
     return BankAccountAlias(
         id = getFieldOrThrow(BANK_ACCOUNT_ALIAS.ID),
+        teamBalanceId = TeamBalanceId(getFieldOrThrow(BANK_ACCOUNT_ALIAS.TEAM_BALANCE_ID)),
         alias = getFieldOrThrow(BANK_ACCOUNT_ALIAS.ALIAS),
         user = uzerRecord.into(User::class.java),
     )
