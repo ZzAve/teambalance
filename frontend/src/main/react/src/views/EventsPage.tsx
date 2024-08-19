@@ -46,8 +46,8 @@ const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
     setViewType(newViewType);
   };
   return (
-    <Grid item container spacing={2}>
-      <Grid container item xs={12}>
+    <Grid item container>
+      <Grid container item>
         <Button
           variant="contained"
           color="primary"
@@ -72,8 +72,7 @@ const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
               alignItems="center"
               spacing={0}
               justifyContent="flex-end"
-              xs={6}
-              sm={12}
+              xs={12}
             >
               <Grid item>
                 <Typography variant="body1"> Table </Typography>
@@ -97,8 +96,7 @@ const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
               alignItems="center"
               spacing={0}
               justifyContent="flex-end"
-              xs={6}
-              sm={12}
+              xs={12}
             >
               <Grid item>
                 <CheckBox

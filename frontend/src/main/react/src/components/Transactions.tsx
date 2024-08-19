@@ -17,6 +17,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { Transaction } from "../utils/domain";
+import Grid from "@mui/material/Grid";
 
 const PREFIX = "Transactions";
 
@@ -91,7 +92,10 @@ export const Transactions = (props: {
           {transactions.map((row) => (
             <TableRow key={row.id}>
               <TableCell component="th" scope="row">
-                {formattedDate(row.date, { year: "numeric", weekday: "short" })}
+                {formattedDate(row.date, {
+                  year: "numeric",
+                  weekday: "short",
+                })}
                 &nbsp;
                 {formattedTime(row.date)}
               </TableCell>

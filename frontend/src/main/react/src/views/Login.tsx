@@ -78,43 +78,39 @@ const Login = (opts: { handleRefresh: () => void }) => {
   }
 
   return (
-    <Grid item xs={12}>
-      <Grid container spacing={2}>
-        <PageItem title="Login" pageTitle="Login">
-          <form onSubmit={handleLogin}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Typography>omdat we niet graag onze namen delen</Typography>
-              </Grid>
-              <Grid item>
-                <TextField
-                  variant="standard"
-                  sx={{ display: "none" }}
-                  type="text"
-                  autoComplete="username"
-                  value="tovo67"
-                />
-                <TextField
-                  variant="standard"
-                  id="secret"
-                  type="password"
-                  autoComplete="password"
-                  value={input}
-                  onChange={handleInput}
-                  placeholder="******"
-                  autoFocus
-                />
-              </Grid>
-              <Grid item>
-                <Button variant="contained" color="primary" type="submit">
-                  <LockOpenIcon /> Login
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </PageItem>
-      </Grid>
-    </Grid>
+    <PageItem xs={12} title="Login" pageTitle="Login">
+      <form onSubmit={handleLogin}>
+        <Grid item container spacing={2}>
+          <Grid item xs={12}>
+            <Typography>omdat we niet graag onze namen delen</Typography>
+          </Grid>
+          <Grid item>
+            <TextField
+              variant="standard"
+              sx={{ display: "none" }}
+              type="text"
+              autoComplete="username"
+              value="tovo67"
+            />
+            <TextField
+              variant="standard"
+              id="secret"
+              type="password"
+              autoComplete="password"
+              value={input}
+              onChange={handleInput}
+              placeholder="******"
+              autoFocus
+            />
+          </Grid>
+          <Grid item>
+            <Button variant="contained" color="primary" type="submit">
+              <LockOpenIcon /> Login
+            </Button>
+          </Grid>
+        </Grid>
+      </form>
+    </PageItem>
   );
 };
 

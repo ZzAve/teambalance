@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid";
 import PageItem from "../components/PageItem";
-import { Button, Card } from "@mui/material";
+import { Button, Card, Hidden } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -23,26 +23,18 @@ const TransactionsPage = (props: { refresh: boolean }) => {
         <Grid container item xs={12}>
           <Button variant="contained" color="primary" onClick={navigateBack}>
             <ArrowBackIcon />
-            <Typography
-              variant={"button"}
-              sx={{ display: { sm: "block", xs: "none" } }}
-            >
-              Terug
-            </Typography>
+            <Hidden smDown>
+              <Typography variant={"button"}>Terug</Typography>
+            </Hidden>
           </Button>
         </Grid>
 
         <Grid item xs={12}>
-          <Card>
-            <Grid container item xs={12}>
-              <Grid item xs={12} sx={{ padding: "16px" }}>
-                <Typography variant="h5">Transacties</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Transactions refresh={props.refresh} withPagination={true} />
-              </Grid>
+          <PageItem title="Transacties">
+            <Grid item xs={12}>
+              <Transactions refresh={props.refresh} withPagination={true} />
             </Grid>
-          </Card>
+          </PageItem>
         </Grid>
         <Grid container item xs={12}>
           <PageItem title="Potters">
