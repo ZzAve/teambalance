@@ -11,8 +11,8 @@ data class CreateAttendee(
 
 @Serializable
 data class Attendee(
-    val id: Long,
-    val eventId: Long,
+    val id: String,
+    val eventId: String,
     val state: Availability,
     val user: User,
 )

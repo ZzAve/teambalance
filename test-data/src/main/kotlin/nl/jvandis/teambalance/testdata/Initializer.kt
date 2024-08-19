@@ -15,7 +15,10 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import nl.jvandis.teambalance.testdata.domain.Attendee
 import nl.jvandis.teambalance.testdata.domain.Availability
+import nl.jvandis.teambalance.testdata.domain.BankAccountAlias
+import nl.jvandis.teambalance.testdata.domain.BankAccountAliases
 import nl.jvandis.teambalance.testdata.domain.CreateAttendee
+import nl.jvandis.teambalance.testdata.domain.CreateBankAccountAlias
 import nl.jvandis.teambalance.testdata.domain.CreateMatch
 import nl.jvandis.teambalance.testdata.domain.CreateMiscEvent
 import nl.jvandis.teambalance.testdata.domain.CreateTraining
@@ -86,6 +89,7 @@ class Initializer(
     val aMatchLens = Body.auto<Match>().toLens()
     val aMiscEvent = Body.auto<EventResponse<MiscEvent>>().toLens()
     val anAttendeeLens = Body.auto<Attendee>().toLens()
+    val aBankAccountAliasLens = Body.auto<BankAccountAlias>().toLens()
 
     private fun createUser(user: CreateUser): User {
         val body = jsonFormatter.encodeToString(user).also(::println)
@@ -93,8 +97,8 @@ class Initializer(
             Request(POST, "$host/api/users")
                 .body(body)
         val response: Response = client(request)
-        if (!response.status.successful) {
-            throw IllegalStateException("Something went wrong creating a user: ${response.bodyString()}")
+        check(response.status.successful) {
+            "Something went wrong creating a user: ${response.bodyString()}"
         }
 
         return jsonFormatter.decodeFromString<User>(response.bodyString())
@@ -103,8 +107,8 @@ class Initializer(
     private fun getAllUsers(): List<User> {
         val request = Request(GET, "$host/api/users")
         val response: Response = client(request)
-        if (!response.status.successful) {
-            throw IllegalStateException("Something went fetching users: ${response.bodyString()}")
+        check(response.status.successful) {
+            "Something went fetching users: ${response.bodyString()}"
         }
 
         return jsonFormatter.decodeFromString<Users>(response.bodyString()).users
@@ -116,8 +120,8 @@ class Initializer(
                 .body(jsonFormatter.encodeToString(training))
         val response: Response = client(request)
 
-        if (!response.status.successful) {
-            throw IllegalStateException("Something went wrong creating a training: [${response.status}] ${response.bodyString()}")
+        check(response.status.successful) {
+            "Something went wrong creating a training: [${response.status}] ${response.bodyString()}"
         }
 
         return trainingsLens(response)
@@ -129,12 +133,14 @@ class Initializer(
     ): Training {
         val request =
             Request(PUT, "$host/api/trainings/$id/trainer")
-                .body("""{ "userId": "$trainerId"  }""")
+                .body(trainerId
+                    ?.let { """{ "userId": "$it"  }""" }
+                    ?: "")
 
         val response: Response = client(request)
 
-        if (!response.status.successful) {
-            throw IllegalStateException("Something went wrong adding a trainer: [${response.status}] ${response.bodyString()}")
+        check(response.status.successful) {
+            "Something went wrong adding a trainer: [${response.status}] ${response.bodyString()}"
         }
 
         return aTrainingLens(response)
@@ -146,8 +152,8 @@ class Initializer(
                 .body(jsonFormatter.encodeToString(match))
         val response: Response = client(request)
 
-        if (!response.status.successful) {
-            throw IllegalStateException("Something went wrong creating a match: [${response.status}] ${response.bodyString()}")
+        check(response.status.successful) {
+            "Something went wrong creating a match: [${response.status}] ${response.bodyString()}"
         }
 
         return matchesLens(response)
@@ -163,10 +169,9 @@ class Initializer(
 
         val response: Response = client(request)
 
-        if (!response.status.successful) {
-            throw IllegalStateException("Something went wrong updating additional-info: [${response.status}] ${response.bodyString()}")
+        check(response.status.successful) {
+            "Something went wrong updating additional-info: [${response.status}] ${response.bodyString()}"
         }
-
         return aMatchLens(response)
     }
 
@@ -176,10 +181,9 @@ class Initializer(
                 .body(jsonFormatter.encodeToString(miscEvent))
         val response: Response = client(request)
 
-        if (!response.status.successful) {
-            throw IllegalStateException("Something went wrong creating a misc event: [${response.status}] ${response.bodyString()}")
+        check(response.status.successful) {
+            "Something went wrong creating a misc event: [${response.status}] ${response.bodyString()}"
         }
-
         return aMiscEvent(response)
     }
 
@@ -189,12 +193,38 @@ class Initializer(
                 .body(jsonFormatter.encodeToString(attendee))
         val response: Response = client(request)
 
-        if (!response.status.successful) {
-            throw IllegalStateException("Something went wrong creating a user: ${response.bodyString()}")
+        check(response.status.successful) {
+            "Something went wrong creating a user: ${response.bodyString()}"
         }
 
         return anAttendeeLens(response)
     }
+
+    private fun getAllAliases(): List<BankAccountAlias> {
+        val request = Request(GET, "$host/api/aliases")
+        val response: Response = client(request)
+        check(response.status.successful) {
+            "Something went fetching aliases: ${response.bodyString()}"
+        }
+
+        return jsonFormatter.decodeFromString<BankAccountAliases>(response.bodyString()).bankAccountAliases
+    }
+
+
+
+    private fun createAlias(bankAccountAlias: CreateBankAccountAlias): BankAccountAlias {
+        val request =
+            Request(POST, "$host/api/aliases")
+                .body(jsonFormatter.encodeToString(bankAccountAlias))
+        val response: Response = client(request)
+
+        check(response.status.successful) {
+            "Something went wrong creating a alias: ${response.bodyString()}"
+        }
+
+        return aBankAccountAliasLens(response)
+    }
+
 
     fun spawnData(config: SpawnDataConfig) {
         createUsers()
@@ -209,24 +239,37 @@ class Initializer(
         measureTime { addEvents(allUsers, config.amountOfEvents) }
             .also { log.info("Created ${config.amountOfEvents} misc events in $it") }
 
-//        bankAccountAliasRepository.insertMany(
-//            listOf(
-//                BankAccountAlias("J. van Dis", allUsers.first { it.name == "Julius" }),
-//                BankAccountAlias("J. Post", allUsers.first { it.name == "Bocaj" }),
-//                BankAccountAlias("Hr E. Fens", allUsers.first { it.name == "Maurice" }),
-//                BankAccountAlias("M.A. Haga", allUsers.first { it.name == "Joep" })
-//            )
-//        )
-//
-//        log.info("After alias injection")
-//        val aliases = bankAccountAliasRepository.findAll()
-//        log.info("All aliases: {}", aliases)
-//
+        createBankAccountAliases(allUsers)
+
+
 //        bankAccountTransactionExclusionRepository.insertMany(
 //            listOf(
 //                TransactionExclusion(counterParty = "CCV*BUITEN IN DE KUIL")
 //            )
 //        )
+    }
+
+    private fun createBankAccountAliases(allUsers: List<User>) {
+        val bankAccountAliases = listOf(
+            CreateBankAccountAlias("Juul", allUsers.first { it.name == "Julius" }.id),
+            CreateBankAccountAlias("J. Post", allUsers.first { it.name == "Bocaj" }.id),
+            CreateBankAccountAlias("de Hond", allUsers.first { it.name == "Maurice" }.id),
+            CreateBankAccountAlias("Lucky Luke", allUsers.first { it.name == "Joep" }.id)
+        )
+            .mapNotNull {
+                try {
+
+                    log.info("Creating BankAccountAlias $it")
+                    createAlias(it)
+                } catch (e: RuntimeException) {
+                    log.error("Could not add bankAccountAlias ${it.alias}", e)
+                    null
+                }
+            }
+
+        log.info("All injected aliases: {}", bankAccountAliases)
+        log.info("All aliases: {} ", getAllAliases().map { "Alias '${it.alias}' for user ${it.user.name} (${it.user.id})"})
+
     }
 
     private fun createUsers() {
