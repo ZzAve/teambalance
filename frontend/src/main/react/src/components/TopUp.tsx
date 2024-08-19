@@ -2,10 +2,10 @@ import React from "react";
 import { Button } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import { BankApiClient } from "../utils/BankApiClient";
+import { bankApiClient } from "../utils/BankApiClient";
 
 const createTopUpLink = (priceInCents?: number) => () => {
-  BankApiClient.topUp(priceInCents).then((redirectResponse) => {
+  bankApiClient.topUp(priceInCents).then((redirectResponse) => {
     console.log("Opening new window, redirecting user to " + redirectResponse);
     window.open(redirectResponse.url, "_blank");
   });

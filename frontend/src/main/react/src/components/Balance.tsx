@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { SpinnerWithText } from "./SpinnerWithText";
-import { BankApiClient as bankApiClient } from "../utils/BankApiClient";
+import { bankApiClient } from "../utils/BankApiClient";
 import { withLoading } from "../utils/util";
 
 const noBalance = "€ XX,XX";

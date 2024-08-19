@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { SpinnerWithText } from "./SpinnerWithText";
-import { BankApiClient as bankApiClient } from "../utils/BankApiClient";
+import { bankApiClient } from "../utils/BankApiClient";
 import { withLoading } from "../utils/util";
 import Typography from "@mui/material/Typography";
 import { Grid } from "@mui/material";

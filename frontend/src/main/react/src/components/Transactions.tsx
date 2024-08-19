@@ -8,7 +8,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { SpinnerWithText } from "./SpinnerWithText";
-import { BankApiClient as bankApiClient } from "../utils/BankApiClient";
+import { bankApiClient } from "../utils/BankApiClient";
 import { formattedDate, formattedTime, withLoading } from "../utils/util";
 import {
   TableFooter,
