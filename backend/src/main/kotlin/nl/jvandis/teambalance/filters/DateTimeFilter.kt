@@ -15,7 +15,6 @@ import java.time.format.DateTimeFormatter
 class DateTimeFilter(
     private val handlerExceptionResolver: HandlerExceptionResolver,
 ) : OncePerRequestFilter() {
-    override fun destroy() {}
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -27,7 +26,10 @@ class DateTimeFilter(
                 ?.also {
                     val since = LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME)
                     if (START_OF_SEASON.isAfter(since)) {
-                        throw InvalidDateTimeException("The date $since is not allowed. It's too early")
+                        throw InvalidDateTimeException(
+                            "The date $since is not allowed. " +
+                                    "It's before the start of the season, at $START_OF_SEASON"
+                        )
                     }
                 }
 
@@ -39,8 +41,8 @@ class DateTimeFilter(
     }
 }
 
-// Limit is bound to the start of the season, which typically starts around the 15th of August
-const val START_OF_SEASON_RAW: String = "2023-08-15T00:00:00"
+// Limit is bound to the start of the season, which typically starts around the 10th of August
+const val START_OF_SEASON_RAW: String = "2024-08-05T00:00:00"
 val START_OF_SEASON: LocalDateTime = LocalDateTime.parse(START_OF_SEASON_RAW)
 val START_OF_SEASON_ZONED: ZonedDateTime = START_OF_SEASON.toZonedDateTime()
 

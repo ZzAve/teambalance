@@ -58,13 +58,13 @@ class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleBadInputArguments(e: MethodArgumentTypeMismatchException): ResponseEntity<Error> {
-        log.info("Invalid request arguments received: ", e)
+        log.warn("Invalid request arguments received: ", e)
         return ResponseEntity
             .badRequest()
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = "Please verify your input arguments",
+                    reason = "Please verify your input arguments. ${e.message}",
                 ),
             )
     }
@@ -78,7 +78,7 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = "Please verify your input arguments",
+                    reason = "Please verify your input arguments. ${e.message}",
                 ),
             )
     }
@@ -92,7 +92,7 @@ class GlobalExceptionHandler {
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
-                    reason = "Please verify your input arguments",
+                    reason = "Please verify your input arguments. ${e.message}",
                 ),
             )
     }
