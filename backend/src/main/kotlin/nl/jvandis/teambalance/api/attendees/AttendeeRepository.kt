@@ -48,7 +48,7 @@ class AttendeeRepository(
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
             .leftJoin(UZER)
             .on(ATTENDEE.USER_ID.eq(UZER.ID))
-            .where(EVENT.ID.`in`(eventIds))
+            .where(EVENT.TEAM_BALANCE_ID.`in`(eventIds.map(TeamBalanceId::value)))
             .orderBy(UZER.ROLE, UZER.NAME).limit(100)
             .fetch()
             .forEach(recordHandler)
