@@ -140,6 +140,8 @@ export const EventForm = (props: {
   };
 
   const [id] = useState(props.event?.id);
+  const isCreateEvent = id === undefined;
+
   const [isRecurringEvent, setIsRecurringEvent] = useState<boolean>(false);
 
   const [recurringEventProperties, setRecurringEventProperties] = useState<
@@ -148,7 +150,6 @@ export const EventForm = (props: {
 
   const [affectedRecurringEvents, setAffectedRecurringEvents] =
     useState<AffectedRecurringEvents>("ALL");
-
   const [eventLocation, setEventLocation] = useState(
     props.event?.location || ""
   );
@@ -158,19 +159,20 @@ export const EventForm = (props: {
   const [opponent, setOpponent] = useState(
     isMatch(props.event) ? props.event.opponent : ""
   );
+
   const [homeAway, setHomeAway] = useState(
     isMatch(props.event) ? props.event.homeAway : "HOME"
   );
-
   const [comment, setComment] = useState(props.event?.comment || "");
   const [title, setTitle] = useState(
     isMiscEvent(props.event) ? props.event.title : ""
   );
+
   const [userSelection, setUserSelection] = useState<
     { [u: string]: boolean } | undefined
   >(undefined);
-
   const [isLoading, setIsLoading] = useState(false);
+
   const [addAnother, setAddAnother] = useState<boolean>(false);
 
   const [done, setDone] = useState(false);
@@ -180,10 +182,8 @@ export const EventForm = (props: {
     setIsRecurringEvent(!!recurringEventProperties);
   }, [props.eventType, recurringEventProperties]);
 
-  const isCreateEvent = (id?: string): id is undefined => id === undefined;
-
   const save: () => Promise<TeamEvent[]> = async () => {
-    if (isCreateEvent(id)) {
+    if (isCreateEvent) {
       let addedProps = {};
       const baseProps: Partial<TeamEventInterface> & { userIds: string[] } = {
         location: eventLocation as string,
@@ -241,7 +241,7 @@ export const EventForm = (props: {
         if (savedEvents.length === 1) {
           message = `${eventType(savedEvents[0])} event (id ${
             savedEvents[0].id
-          }) ${isCreateEvent() ? "aangemaakt" : "geüpdate"} op ${dayjs(
+          }) ${isCreateEvent ? "aangemaakt" : "geüpdate"} op ${dayjs(
             savedEvents[0].startTime,
             { locale: "nl" }
           ).format("DD MMMM")}`;
@@ -249,7 +249,7 @@ export const EventForm = (props: {
           message = `${savedEvents.length} ${eventType(
             savedEvents[0]
           )} events ${
-            isCreateEvent() ? "aangemaakt" : "geüpdate"
+            isCreateEvent ? "aangemaakt" : "geüpdate"
           } op ${savedEvents.map((it) =>
             dayjs(it.startTime, { locale: "nl" }).format("DD MMMM")
           )}`;
@@ -297,7 +297,7 @@ export const EventForm = (props: {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"nl"}>
       <Grid container spacing={3}>
-        <Conditional condition={isCreateEvent()}>
+        <Conditional condition={isCreateEvent}>
           <Grid item xs={12}>
             <Alert severity="info">
               <AlertTitle>Nieuwe functionaliteit</AlertTitle>
@@ -315,14 +315,14 @@ export const EventForm = (props: {
             onChange={setRecurringEventProperties}
             initialAffectedEvents={affectedRecurringEvents}
             onAffectedEventsChange={setAffectedRecurringEvents}
-            readOnly={!isCreateEvent()}
-            isCreateEvent={isCreateEvent()}
+            readOnly={!isCreateEvent}
+            isCreateEvent={isCreateEvent}
           ></RecurringEvent>
           <Grid item xs={12}>
             <Divider variant="fullWidth"></Divider>
           </Grid>
         </Conditional>
-        <Conditional condition={!isCreateEvent()}>
+        <Conditional condition={!isCreateEvent}>
           <Grid item xs={12}>
             <TextField
               variant="standard"
@@ -350,7 +350,7 @@ export const EventForm = (props: {
                 minutesStep={15}
               />
             </Grid>
-            <Conditional condition={isCreateEvent()}>
+            <Conditional condition={isCreateEvent}>
               <Grid item>
                 <FormControl>
                   <FormControlLabel
@@ -451,7 +451,7 @@ export const EventForm = (props: {
           <EventUsers
             users={props.users}
             event={props.event}
-            controlType={isCreateEvent() ? "CHECKBOX" : "SWITCH"}
+            controlType={isCreateEvent ? "CHECKBOX" : "SWITCH"}
             initialValue={userSelection}
             onChange={(x) => {
               setUserSelection(x);

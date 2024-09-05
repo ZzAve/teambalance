@@ -14,8 +14,8 @@ export const EventUsers = (props: {
   event?: TeamEvent;
   users: User[];
   controlType: ControlType;
-  initialValue?: { [p: number]: boolean };
-  onChange: (userSelection: { [p: number]: boolean }) => void;
+  initialValue?: { [p: string]: boolean };
+  onChange: (userSelection: { [p: string]: boolean }) => void;
 }) => {
   const [singleUserCheck, setSingleUserCheck] = useState<{
     [userId: string]: boolean;
@@ -24,6 +24,7 @@ export const EventUsers = (props: {
   const { addAlert } = useAlerts();
 
   useEffect(() => {
+    debugger;
     if (props.initialValue !== undefined) {
       //TODO add validation?
       setSingleUserCheck(props.initialValue);

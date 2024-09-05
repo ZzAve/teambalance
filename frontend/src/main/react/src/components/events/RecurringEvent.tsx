@@ -83,6 +83,7 @@ export const RecurringEvent = (props: {
   readOnly: boolean;
   isCreateEvent: boolean;
 }) => {
+  console.log("Rendering RecurringEvent", props);
   return (
     <>
       {props.isCreateEvent ? (
