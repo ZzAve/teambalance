@@ -22,7 +22,7 @@ class MatchService(
         val originalMatch =
             matchRepository.findByIdOrNull(matchId) ?: throw InvalidMatchException(matchId)
         require(
-            originalMatch.recurringEventProperties?.teamBalanceId?.value == updateMatchRequest.recurringEventProperties?.teamBalanceId,
+            originalMatch.recurringEventProperties?.teamBalanceId?.value == updateMatchRequest.recurringEventProperties?.id,
         ) {
             "A single match can update only a single match, and a recurring event only a recurring one. " +
                 "Current match is ${originalMatch.recurringEventProperties?.teamBalanceId ?: "single"}"
@@ -50,10 +50,10 @@ class MatchService(
             """
         }
         require(
-            updateMatchRequest.recurringEventProperties.teamBalanceId ==
+            updateMatchRequest.recurringEventProperties.id ==
                 originalMatch.recurringEventProperties.teamBalanceId.value,
         ) {
-            "Trying to update a recurring event (${updateMatchRequest.recurringEventProperties.teamBalanceId}) " +
+            "Trying to update a recurring event (${updateMatchRequest.recurringEventProperties.id}) " +
                 "through an event that does not belong to that series " +
                 "(${originalMatch.recurringEventProperties.teamBalanceId})"
         }

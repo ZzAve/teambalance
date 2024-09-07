@@ -4,14 +4,21 @@ import { isMatch, isTraining } from "../components/events/utils";
 export type TeamEvent = Training | Match | MiscEvent;
 export type TeamBalanceId = string;
 
-export interface TeamEventInterface {
+export type CreateTeamEvent = Omit<
+  TeamEventInterface,
+  "id" | "recurringEventProperties" | "attendees"
+> & {
+  recurringEventProperties?: CreateRecurringEventProperties;
+};
+
+export type TeamEventInterface = {
   id: TeamBalanceId;
   location: string;
   startTime: Date;
   comment?: string;
   recurringEventProperties?: RecurringEventProperties;
   attendees: Attendee[];
-}
+};
 
 export interface Training extends TeamEventInterface {
   trainer?: User;
@@ -129,7 +136,7 @@ export const label = (day: keyof typeof Day) => DayLabels[day];
  */
 export interface RecurringEventProperties {
   /* UUID identifying the recurring event's properties. undefined for newly created ones */
-  teamBalanceId?: string;
+  id: string;
   /* to repeat every x amount of time */
   intervalAmount: number;
   /* interval sizing to combine 'every' with */
@@ -147,7 +154,7 @@ export interface RecurringEventProperties {
  */
 export type CreateRecurringEventProperties = Omit<
   RecurringEventProperties,
-  "teamBalanceId"
+  "id"
 >;
 
 export type AffectedRecurringEvents = "ALL" | "CURRENT_AND_FUTURE" | "CURRENT";

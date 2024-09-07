@@ -24,7 +24,6 @@ export const EventUsers = (props: {
   const { addAlert } = useAlerts();
 
   useEffect(() => {
-    debugger;
     if (props.initialValue !== undefined) {
       //TODO add validation?
       setSingleUserCheck(props.initialValue);

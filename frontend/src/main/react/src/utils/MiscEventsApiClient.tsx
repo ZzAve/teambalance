@@ -2,6 +2,7 @@ import { ApiClient } from "./ApiClient";
 import { AttendeeResponse, internalizeAttendees } from "./CommonApiResponses";
 import {
   AffectedRecurringEvents,
+  CreateRecurringEventProperties,
   MiscEvent,
   RecurringEventProperties,
   TeamBalanceId,
@@ -60,7 +61,13 @@ const getEvent: (
   return internalize(eventResponse);
 };
 
-export type CreateMiscEvent = Omit<MiscEvent, "id"> & { userIds: number[] };
+export type CreateMiscEvent = Omit<
+  MiscEvent,
+  "id" | "attendees" | "recurringEventProperties"
+> & {
+  userIds: number[];
+  recurringEventProperties: CreateRecurringEventProperties | undefined;
+};
 
 const createEvent: (props: CreateMiscEvent) => Promise<MiscEvent[]> = async (
   props: CreateMiscEvent
