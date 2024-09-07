@@ -282,7 +282,7 @@ const EventsTable = (props: {
       </>
     );
 
-    const recurringEventTitlePrefix = affectedEvents
+    const recurringEventTitlePrefix = !!affectedEvents
       ? "⚠️ Let op, dit is een herhalend event. "
       : "";
     const recurringEventTitle = `${recurringEventTitlePrefix}Weet je zeker dat je ${props.eventType.toLowerCase()}  

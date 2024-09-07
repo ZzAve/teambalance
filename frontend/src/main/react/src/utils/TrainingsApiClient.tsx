@@ -1,6 +1,7 @@
 import { ApiClient } from "./ApiClient";
 import {
   AffectedRecurringEvents,
+  CreateRecurringEventProperties,
   RecurringEventProperties,
   TeamBalanceId,
   Training,
@@ -62,8 +63,12 @@ const getTraining: (
   return internalize(trainingResponse);
 };
 
-export type CreateTraining = Omit<Training, "id" | "trainer" | "attendees"> & {
+export type CreateTraining = Omit<
+  Training,
+  "id" | "trainer" | "attendees" | "recurringEventProperties"
+> & {
   userIds: string[];
+  recurringEventProperties: CreateRecurringEventProperties | undefined;
 };
 
 const createTraining: (props: CreateTraining) => Promise<Training[]> = async (

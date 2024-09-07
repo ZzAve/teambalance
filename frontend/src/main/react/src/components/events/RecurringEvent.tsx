@@ -1,5 +1,6 @@
 import {
   AffectedRecurringEvents,
+  CreateRecurringEventProperties,
   Day,
   label,
   RecurringEventProperties,
@@ -29,8 +30,8 @@ import Radio from "@mui/material/Radio";
  * until {@code limit} is reached, on {@code selected days}
  */
 interface RecurringEventPropertiesInternal {
-  /* id */
-  teamBalanceId?: string;
+  /* nullable id, null for creation */
+  id?: string;
   /* to repeat every x amount of time */
   intervalAmount: number;
   /* interval sizing to combine 'every' with */
@@ -45,7 +46,7 @@ interface RecurringEventPropertiesInternal {
 
 type RecurringLimitType = "EndDate" | "AmountOfEvents";
 const internalize = (
-  r: RecurringEventProperties | undefined
+  r?: CreateRecurringEventProperties
 ): RecurringEventPropertiesInternal | undefined => {
   if (r === undefined) return undefined;
 
@@ -57,7 +58,7 @@ const internalize = (
     NO_DAYS
   );
   return {
-    teamBalanceId: r.teamBalanceId,
+    id: undefined,
     amountLimit: r.amountLimit || 10,
     dateLimit: r.dateLimit || dayjs(new Date()).add(3, "months"),
     intervalAmount: r.intervalAmount,
@@ -76,8 +77,10 @@ const NO_DAYS: Record<Day, boolean> = {
 };
 
 export const RecurringEvent = (props: {
-  initialValue?: RecurringEventProperties;
-  onChange: (props: RecurringEventProperties) => void;
+  initialValue?: RecurringEventProperties | CreateRecurringEventProperties;
+  onChange: (
+    props: RecurringEventProperties | CreateRecurringEventProperties
+  ) => void;
   initialAffectedEvents: AffectedRecurringEvents;
   onAffectedEventsChange: (props: AffectedRecurringEvents) => void;
   readOnly: boolean;
@@ -103,11 +106,11 @@ export const RecurringEvent = (props: {
 };
 
 export const AffectedRecurringEvent = (props: {
-  initialValue?: AffectedRecurringEvents;
+  initialValue: AffectedRecurringEvents;
   onChange: (props: AffectedRecurringEvents) => void;
 }) => {
   const [affectedRecurringEvents, setAffectedRecurringEvents] =
-    useState<AffectedRecurringEvents>(props.initialValue ?? "ALL");
+    useState<AffectedRecurringEvents>(props.initialValue);
 
   useEffect(() => {
     props.onChange(affectedRecurringEvents);
@@ -152,8 +155,8 @@ export const AffectedRecurringEvent = (props: {
 };
 
 export const CreateRecurringEvent = (props: {
-  initialValue?: RecurringEventProperties;
-  onChange: (props: RecurringEventProperties) => void;
+  initialValue?: CreateRecurringEventProperties;
+  onChange: (props: CreateRecurringEventProperties) => void;
   readOnly: boolean;
 }) => {
   const [recurringLimitType, setRecurringLimitType] =
@@ -168,7 +171,7 @@ export const CreateRecurringEvent = (props: {
       action: Partial<RecurringEventPropertiesInternal>
     ) => ({ ...state, ...action }),
     internalize(props.initialValue) || {
-      teamBalanceId: undefined,
+      id: undefined,
       amountLimit: 10,
       dateLimit: dayjs(new Date()).add(3, "months"),
       intervalAmount: 1,
@@ -178,8 +181,10 @@ export const CreateRecurringEvent = (props: {
   );
 
   useEffect(() => {
-    const recurringEventProperties: RecurringEventProperties = {
-      teamBalanceId: recProps.teamBalanceId,
+    const recurringEventProperties:
+      | RecurringEventProperties
+      | CreateRecurringEventProperties = {
+      id: recProps.id,
       amountLimit: recProps.amountLimit,
       dateLimit: recProps.dateLimit,
       intervalAmount: recProps.intervalAmount,

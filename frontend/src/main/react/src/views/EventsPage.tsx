@@ -46,7 +46,7 @@ const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
     setViewType(newViewType);
   };
   return (
-    <Grid item container>
+    <Grid item container spacing={2}>
       <Grid container item>
         <Button
           variant="contained"

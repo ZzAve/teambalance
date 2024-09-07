@@ -25,7 +25,7 @@ class TrainingService(
             )
         require(
             originalTraining.recurringEventProperties?.teamBalanceId?.value ==
-                updateTrainingRequest.recurringEventProperties?.teamBalanceId,
+                updateTrainingRequest.recurringEventProperties?.id,
         ) {
             "A single training can update only a single training, and a recurring event only a recurring one. " +
                 "Current training is ${originalTraining.recurringEventProperties?.teamBalanceId ?: "single"}"
@@ -53,10 +53,10 @@ class TrainingService(
             """
         }
         require(
-            updateTrainingRequest.recurringEventProperties.teamBalanceId ==
+            updateTrainingRequest.recurringEventProperties.id ==
                 originalTraining.recurringEventProperties.teamBalanceId.value,
         ) {
-            "Trying to update a recurring event (${updateTrainingRequest.recurringEventProperties.teamBalanceId}) " +
+            "Trying to update a recurring event (${updateTrainingRequest.recurringEventProperties.id}) " +
                 "through an event that does not belong to that series " +
                 "(${originalTraining.recurringEventProperties.teamBalanceId})"
         }

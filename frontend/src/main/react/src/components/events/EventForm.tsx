@@ -25,6 +25,8 @@ import { useAlerts } from "../../hooks/alertsHook";
 import { LocationState } from "../utils";
 import {
   AffectedRecurringEvents,
+  CreateRecurringEventProperties,
+  CreateTeamEvent,
   eventType,
   Match,
   MiscEvent,
@@ -142,35 +144,65 @@ export const EventForm = (props: {
   const [id] = useState(props.event?.id);
   const isCreateEvent = id === undefined;
 
+  const isTeamEventInterface = (
+    event: CreateTeamEvent | TeamEventInterface
+  ): event is TeamEventInterface => "id" in event;
+
+  const getTeamEvent: () => CreateTeamEvent | TeamEventInterface = () => {
+    if (isCreateEvent) {
+      const event: CreateTeamEvent = {
+        location: eventLocation as string,
+        startTime: selectedDateTime.toDate(),
+        comment: comment,
+        recurringEventProperties: isRecurringEvent
+          ? recurringEventProperties
+          : undefined,
+      };
+      return event;
+    } else {
+      const event: TeamEventInterface = {
+        id: id,
+        location: eventLocation,
+        startTime: selectedDateTime.toDate(),
+        comment: comment,
+        recurringEventProperties: isRecurringEvent
+          ? (recurringEventProperties as RecurringEventProperties) // FIXME sketchy cast
+          : undefined,
+        attendees: [], // out of scope?
+      };
+      return event;
+    }
+  };
+
   const [isRecurringEvent, setIsRecurringEvent] = useState<boolean>(false);
 
   const [recurringEventProperties, setRecurringEventProperties] = useState<
-    RecurringEventProperties | undefined
+    RecurringEventProperties | CreateRecurringEventProperties | undefined
   >(props.event?.recurringEventProperties);
-
   const [affectedRecurringEvents, setAffectedRecurringEvents] =
     useState<AffectedRecurringEvents>("ALL");
   const [eventLocation, setEventLocation] = useState(
     props.event?.location || ""
   );
-  const [selectedDateTime, setSelectedDateTime] = useState<Dayjs | null>(
+  const [selectedDateTime, setSelectedDateTime] = useState<Dayjs>(
     getInitialSelectedDate(props.event)
   );
+
   const [opponent, setOpponent] = useState(
     isMatch(props.event) ? props.event.opponent : ""
   );
-
   const [homeAway, setHomeAway] = useState(
     isMatch(props.event) ? props.event.homeAway : "HOME"
   );
   const [comment, setComment] = useState(props.event?.comment || "");
+
   const [title, setTitle] = useState(
     isMiscEvent(props.event) ? props.event.title : ""
   );
-
   const [userSelection, setUserSelection] = useState<
     { [u: string]: boolean } | undefined
   >(undefined);
+
   const [isLoading, setIsLoading] = useState(false);
 
   const [addAnother, setAddAnother] = useState<boolean>(false);
@@ -181,17 +213,14 @@ export const EventForm = (props: {
     console.debug(`[EventForm ${props.eventType}] Loaded!`);
     setIsRecurringEvent(!!recurringEventProperties);
   }, [props.eventType, recurringEventProperties]);
-
   const save: () => Promise<TeamEvent[]> = async () => {
-    if (isCreateEvent) {
-      let addedProps = {};
-      const baseProps: Partial<TeamEventInterface> & { userIds: string[] } = {
-        location: eventLocation as string,
-        startTime: selectedDateTime?.toDate() || new Date(), //fixme
-        comment: comment,
-        recurringEventProperties: isRecurringEvent
-          ? recurringEventProperties
-          : undefined,
+    const event = getTeamEvent();
+    if (!isTeamEventInterface(event)) {
+      let addedProps;
+      const baseProps: CreateTeamEvent & {
+        userIds: string[];
+      } = {
+        ...event,
         userIds: Object.entries(userSelection!)
           .filter((it) => it[1])
           .map((it) => it[0]),
@@ -212,7 +241,7 @@ export const EventForm = (props: {
           throw Error("eventType 'other' is not supported (yet)");
       }
 
-      //FIXME
+      // FIXME
       // @ts-ignore
       const apiArgs: CreateTraining | CreateMatch | CreateMiscEvent = {
         ...baseProps,
@@ -221,14 +250,10 @@ export const EventForm = (props: {
       return await createEvent(props.eventType, apiArgs);
     } else {
       return await updateEvent(props.eventType, affectedRecurringEvents, {
-        id: id,
-        location: eventLocation,
-        startTime: selectedDateTime?.toDate(),
-        title: title || undefined,
-        comment: comment,
-        opponent: opponent || undefined,
-        homeAway: homeAway || undefined,
-        recurringEventProperties: recurringEventProperties,
+        ...event,
+        title: title,
+        opponent: opponent,
+        homeAway: homeAway,
       });
     }
   };
@@ -344,7 +369,9 @@ export const EventForm = (props: {
                 label="Datum / tijd"
                 value={selectedDateTime}
                 onChange={(x) => {
-                  setSelectedDateTime(x);
+                  if (x !== null) {
+                    setSelectedDateTime(x);
+                  }
                 }}
                 ampm={false}
                 minutesStep={15}

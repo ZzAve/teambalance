@@ -14,7 +14,7 @@ data class EventsResponse<T>(
 )
 
 data class RecurringEventPropertiesRequest(
-    val teamBalanceId: String,
+    val id: String,
     val intervalAmount: Int,
     val intervalTimeUnit: RecurringEventProperties.TimeUnit,
     val amountLimit: Int?,
@@ -34,17 +34,16 @@ data class RecurringEventPropertiesRequest(
         }
     }
 
-    fun internalize(): RecurringEventProperties? {
-        return RecurringEventProperties(
+    fun internalize() =
+        RecurringEventProperties(
             id = NO_ID,
-            teamBalanceId = TeamBalanceId(teamBalanceId),
+            teamBalanceId = TeamBalanceId(id),
             intervalAmount = intervalAmount,
             intervalTimeUnit = intervalTimeUnit,
             amountLimit = amountLimit,
             dateLimit = dateLimit,
             selectedDays = selectedDays.map(DayOfWeek::getValue),
         )
-    }
 }
 
 data class CreateRecurringEventPropertiesRequest(
@@ -67,8 +66,8 @@ data class CreateRecurringEventPropertiesRequest(
         }
     }
 
-    fun internalize(): RecurringEventProperties? {
-        return RecurringEventProperties(
+    fun internalize() =
+        RecurringEventProperties(
             id = NO_ID,
             teamBalanceId = TeamBalanceId.random(),
             intervalAmount = intervalAmount,
@@ -77,7 +76,6 @@ data class CreateRecurringEventPropertiesRequest(
             dateLimit = dateLimit,
             selectedDays = selectedDays.map(DayOfWeek::getValue),
         )
-    }
 }
 
 data class RecurringEventPropertiesResponse(
