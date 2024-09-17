@@ -11,24 +11,40 @@ import {
   Navigate,
   Route,
   Routes,
+  useLocation,
 } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
-import { StyledEngineProvider, ThemeProvider } from "@mui/material";
+import { Hidden, StyledEngineProvider, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { TeamBalanceTheme } from "./TenantContext";
 import {
   getTeamBalanceThemePreference,
   storeTeamBalanceThemePreference,
 } from "./utils/preferences";
+import { BottomMenu } from "./components/Menu";
 
 const EventsPage = lazy(() => import("./views/EventsPage"));
+const EventsOverview = lazy(() => import("./views/EventsOverview"));
 const Admin = lazy(() => import("./views/Admin"));
 const Login = lazy(() => import("./views/Login"));
 const Overview = lazy(() => import("./views/Overview"));
+const Overview2 = lazy(() => import("./views/Overview2"));
 const Transaction = lazy(() => import("./views/TransactionsPage"));
 const Users = lazy(() => import("./views/UsersPage"));
-
 const themeLight = createTheme({
+  transitions: {
+    easing: {
+      // This is the most common easing curve.
+      easeInOut: "cubic-bezier(0.4, 0, 0.2, 1)",
+      // Objects enter the screen at full velocity from off-screen and
+      // slowly decelerate to a resting point.
+      // easeOut: "cubic-bezier(0.0, 0, 0.2, 1)",
+      // Objects leave the screen at full velocity. They do not decelerate when off-screen.
+      // easeIn: "cubic-bezier(0.4, 0, 1, 1)",
+      // The sharp curve is used by objects that may return to the screen at any time.
+      // sharp: "cubic-bezier(0.4, 0, 0.6, 1)",
+    },
+  },
   palette: {
     mode: "light",
     warning: {
@@ -56,10 +72,10 @@ const App = () => {
   const handleRefresh = () => {
     setTimeout(() => {
       setShouldRefresh(!shouldRefresh);
-    });
+    }, 100);
   };
-
   const refreshTopBar = () => {
+    console.debug("Refreshing top bar");
     setTimeout(() => {
       setTopBarShouldRefresh(!topBarShouldRefresh);
     });
@@ -72,11 +88,17 @@ const App = () => {
 
   console.debug("[App] render");
 
-  const getHappyState = () => (
-    <Grid container spacing={2} alignItems="flex-start">
-      <Grid item xs={12} />
-      <Router>
-        <Suspense fallback={<Loading />}>
+  const appInner = () => {
+    return (
+      <Container maxWidth="xl" sx={{ paddingBottom: "100px" }}>
+        <Grid
+          xs={12}
+          item
+          container
+          marginTop={2}
+          alignItems="flex-start"
+          justifyContent="center"
+        >
           <Routes>
             <Route
               path="authenticate"
@@ -87,6 +109,15 @@ const App = () => {
               element={
                 <RequireAuth>
                   <Admin refresh={shouldRefresh} />
+                </RequireAuth>
+              }
+            />
+
+            <Route
+              path="events/*"
+              element={
+                <RequireAuth>
+                  <EventsOverview refresh={shouldRefresh} />
                 </RequireAuth>
               }
             />
@@ -141,13 +172,20 @@ const App = () => {
                 </RequireAuth>
               }
             />
+            <Route
+              path="overview2"
+              element={
+                <RequireAuth>
+                  <Overview2 refresh={shouldRefresh} />
+                </RequireAuth>
+              }
+            />
             <Route path="/*" element={<Navigate to="/" replace />} />
           </Routes>
-        </Suspense>
-      </Router>
-    </Grid>
-  );
-
+        </Grid>
+      </Container>
+    );
+  };
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider
@@ -155,13 +193,20 @@ const App = () => {
       >
         <SnackbarProvider maxSnack={5} autoHideDuration={2500}>
           <CssBaseline />
-          <TopBar
-            handleRefresh={handleRefresh}
-            refresh={topBarShouldRefresh}
-            theme={theme}
-            setTheme={handleSetTheme}
-          />
-          <Container maxWidth="xl">{getHappyState()}</Container>
+          <Router>
+            <Suspense fallback={<Loading />}>
+              <TopBar
+                handleRefresh={handleRefresh}
+                refresh={topBarShouldRefresh}
+                theme={theme}
+                setTheme={handleSetTheme}
+              />
+              {appInner()}
+              <Hidden mdUp>
+                <BottomMenu />
+              </Hidden>
+            </Suspense>
+          </Router>
         </SnackbarProvider>
       </ThemeProvider>
     </StyledEngineProvider>

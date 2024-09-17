@@ -163,6 +163,16 @@ const Overview = (props: { refresh: boolean }) => {
                   <ArrowForwardIcon spacing={5} />
                 </Button>
               </Grid>
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => navigate("events")}
+                >
+                  Events
+                  <ArrowForwardIcon spacing={5} />
+                </Button>
+              </Grid>
             </Grid>
           </PageItem>
         </Grid>

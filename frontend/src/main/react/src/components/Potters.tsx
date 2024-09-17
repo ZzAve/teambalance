@@ -21,16 +21,26 @@ export const Potters = (props: {
   const { limit = 3, showSupportRoles = false, showFloppers = true } = props;
   const [toppers, setToppers] = useState<SeasonPotters>({ season: [] });
   const [floppers, setFloppers] = useState<SeasonPotters>({ season: [] });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [showSeason, setShowSeason] = useState(true);
 
   useEffect(() => {
-    withLoading(setIsLoading, () =>
-      bankApiClient.getPotters(limit, showSupportRoles).then((it) => {
-        setFloppers({ season: it.floppers, month: it.subPeriod?.floppers });
-        setToppers({ season: it.toppers, month: it.subPeriod?.toppers });
-      })
-    ).then();
+    let isMounted = true;
+    (async () => {
+      withLoading(setIsLoading, () =>
+        bankApiClient.getPotters(limit, showSupportRoles)
+      ).then((it) => {
+        if (isMounted) {
+          setFloppers({ season: it.floppers, month: it.subPeriod?.floppers });
+          setToppers({ season: it.toppers, month: it.subPeriod?.toppers });
+        }
+      });
+    })();
+
+    return () => {
+      console.log("Unmounting");
+      isMounted = false;
+    };
   }, [props.refresh]);
 
   const renderItem = (item: Potter, prefix: string | number, index: number) =>

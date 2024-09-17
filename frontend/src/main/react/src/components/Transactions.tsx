@@ -17,7 +17,6 @@ import {
   useTheme,
 } from "@mui/material";
 import { Transaction } from "../utils/domain";
-import Grid from "@mui/material/Grid";
 
 const PREFIX = "Transactions";
 
@@ -50,11 +49,23 @@ export const Transactions = (props: {
   const smAndUp = useMediaQuery(useTheme().breakpoints.up("sm"));
 
   useEffect(() => {
-    withLoading(setIsLoading, () =>
-      bankApiClient
-        .getTransactions(rowsPerPage, page * rowsPerPage)
-        .then(setTransactions)
-    ).then();
+    let isMounted = true;
+    (async () => {
+      withLoading(setIsLoading, () =>
+        bankApiClient.getTransactions(rowsPerPage, page * rowsPerPage)
+      ).then((t) => {
+        if (isMounted) {
+          console.log("Setting transactions ", t);
+          setTransactions(t);
+        } else {
+          console.debug("Not updating transactions .. unmounted");
+        }
+      });
+    })();
+    return () => {
+      console.debug("Unmounting");
+      isMounted = false;
+    };
   }, [props.refresh, page, rowsPerPage]);
 
   const handleChangePage = (

@@ -1,6 +1,6 @@
 <div align="center">
     <h1>teambalance</h1>
-    <img src="./frontend/src/main/react/images/logo512.png" width="200px" alt="Boy throwing a volleyball"/>
+    <img src="./frontend/src/main/react/public/logo512.png" width="200px" alt="Boy throwing a volleyball"/>
     <p>A pet project to monitor event attendance ✅, and team expenses 💸 on beer 🍻 and borrels 🍸🍟</p>
 </div>
 

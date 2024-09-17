@@ -19,39 +19,52 @@ const Login = (opts: { handleRefresh: () => void }) => {
   const location = useLocation();
 
   useEffect(() => {
+    console.log("Running startup unit");
     //On startup , try with current value in authenticationManager
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       authenticationManager
         .checkAuthentication()
         .then((isAuth) => {
           console.debug(
             `Checked authentiation: user is ${
-              isAuth ? "" : "NOT"
-            } authenticated (${isAuth})`
+              isAuth ? "" : "NOT "
+            }authenticated (${isAuth})`
           );
           setIsLoading(false);
           setIsAuthenticated(isAuth);
         })
         .catch(() => {
           setInput(authenticationManager.get() || "");
+        })
+        .then(() => {
+          console.log("done startup unit");
         });
     });
+
+    return () => {
+      console.log("Unmounting");
+      clearTimeout(timeout);
+    };
   }, []);
 
-  useEffect(() => {
-    console.debug(`Current state:
-            authenticated: ${isAuthenticated}
-            input: ${randomChars(Math.max((input || "").length, 0))}
-            isLoading: ${isLoading}
-      `);
-  }, [input, isAuthenticated, isLoading]);
+  // useEffect(() => {
+  //   console.info("Triggered!");
+  //   console.debug(`Current state:
+  //           authenticated: ${isAuthenticated}
+  //           input: ${randomChars(Math.max((input || "").length, 0))}
+  //           isLoading: ${isLoading}
+  //     `);
+  // }, [input, isAuthenticated, isLoading]);
 
   const authenticate = (passphrase: string) =>
     withLoading(setIsLoading, () =>
       authenticationManager.authenticate(passphrase)
     )
       .then((_) => {
-        setIsAuthenticated(true);
+        setTimeout(() => {
+          debugger;
+          setIsAuthenticated(true);
+        });
       })
       .catch((e) => {
         console.error("Login did not work", e);
@@ -119,7 +132,7 @@ const Login = (opts: { handleRefresh: () => void }) => {
  * @param number
  * @returns {string}
  */
-const randomChars = (number: number) => {
+const randomChars = (number: number): string => {
   let char = () => Math.floor(Math.random() * 36).toString(36);
   let outStr = "";
   while (outStr.length < number) {

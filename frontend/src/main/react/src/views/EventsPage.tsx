@@ -51,7 +51,9 @@ const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => navigate("../")}
+          onClick={() => {
+            navigate("../");
+          }}
         >
           <ArrowBackIcon />
           <Typography

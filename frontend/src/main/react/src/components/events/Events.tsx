@@ -9,7 +9,7 @@ import { ViewType, withLoading } from "../../utils/util";
 import { EventsList } from "./EventsList";
 import EventsTable from "./EventsTable";
 import { EventType } from "./utils";
-import { TeamEvent } from "../../utils/domain";
+import { Match, MiscEvent, TeamEvent, Training } from "../../utils/domain";
 
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
@@ -30,8 +30,8 @@ const texts: EventsTexts = {
 const getText = (eventsType: EventType, name: keyof EventsTexts) =>
   texts[name][eventsType] || name;
 
-// 15th of August, 02:00 (UTC, or 0:00 in GMT +2)
-const startOfSeason = new Date(2023, 7, 15, 2);
+// 1st of August, 02:00 (UTC, or 0:00 in GMT +2)
+const startOfSeason = new Date(2024, 7, 1, 2);
 
 const Events = (props: {
   eventType: EventType;
@@ -52,26 +52,35 @@ const Events = (props: {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
     console.debug(`[Events ${props.eventType}] refresh: ${props.refresh}`);
-    withLoading(setIsLoading, updateEvents).then();
+    (async () => {
+      const events = await withLoading(setIsLoading, updateEvents);
+      if (mounted) setEvents(events);
+    })();
+    return () => {
+      mounted = false;
+    };
   }, [props.refresh, props.eventType, includeHistory]);
 
-  const updateEvents = async () => {
+  const updateEvents2: () => Promise<void> = async () => {
+    const events = await updateEvents();
+    setEvents(events);
+  };
+
+  const updateEvents: () => Promise<
+    Training[] | Match[] | MiscEvent[]
+  > = async () => {
     const startTime = includeHistory ? startOfSeason : nowMinus6Hours;
     if (props.eventType === "TRAINING") {
-      const data = await trainingsApiClient.getTrainings(
-        startTime.toJSON(),
-        limit
-      );
-      setEvents(data || []);
+      return await trainingsApiClient.getTrainings(startTime.toJSON(), limit);
     } else if (props.eventType === "MATCH") {
-      const data = await matchesApiClient.getMatches(startTime.toJSON(), limit);
-      setEvents(data || []);
+      return await matchesApiClient.getMatches(startTime.toJSON(), limit);
     } else if (props.eventType === "MISC") {
-      const data = await eventsApiClient.getEvents(startTime.toJSON(), limit);
-      setEvents(data || []);
+      return await eventsApiClient.getEvents(startTime.toJSON(), limit);
     } else {
       console.warn("NO SUPPORT FOR OTHER EVENTS yet(?)");
+      return [];
     }
   };
 
@@ -86,7 +95,7 @@ const Events = (props: {
           <EventsList
             eventType={props.eventType}
             events={events}
-            updateTrigger={updateEvents}
+            updateTrigger={updateEvents2}
             withPagination={withPagination}
           />
         </Grid>
@@ -98,7 +107,7 @@ const Events = (props: {
         <EventsTable
           eventType={props.eventType}
           events={events}
-          updateTrigger={updateEvents}
+          updateTrigger={updateEvents2}
           allowChanges={allowChanges}
           withPagination={withPagination}
         />

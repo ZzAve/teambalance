@@ -4,13 +4,13 @@ export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export const withLoading = async <T extends any>(
   loadingStateSetter: (x: boolean) => void,
-  func: () => T
+  func: () => Promise<T>
 ) => {
   try {
-    await loadingStateSetter(true);
+    loadingStateSetter(true);
     return await func();
   } finally {
-    await loadingStateSetter(false);
+    loadingStateSetter(false);
   }
 };
 

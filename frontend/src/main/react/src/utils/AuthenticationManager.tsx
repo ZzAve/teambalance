@@ -98,20 +98,20 @@ const recursiveAuth = async (pass: string, number: number = 1) => {
 };
 
 const startupAuth = (passphrase: string) => {
-  _authenticationCheck = new Promise((resolve) => {
-    return recursiveAuth(passphrase)
-      .then((_) => {
-        _authenticated = true;
-        resolve(true);
-      })
-      .catch((_) => {
-        _authenticated = false;
-        resolve(false);
-      });
+  _authenticationCheck = new Promise(async (resolve) => {
+    try {
+      const _ = await recursiveAuth(passphrase);
+      _authenticated = true;
+      resolve(true);
+    } catch (__1) {
+      _authenticated = false;
+      resolve(false);
+    }
   });
 };
 
 setTimeout(() => {
+  console.log("Startup authentication check");
   //on start fetch from localStorage
   _secret = getSecretFromLocalStorage();
 
