@@ -17,7 +17,7 @@ const addAttendee: (props: {
       100
     )
     .then((data) => {
-      // Generated with AI. Conceptually nice -- could use wirespec here, or that other tool
+      // Generated with AI. Conceptually nice -- could use wirespec here, or that other tool, typeIA
       if (
         "id" in data &&
         "eventId" in data &&

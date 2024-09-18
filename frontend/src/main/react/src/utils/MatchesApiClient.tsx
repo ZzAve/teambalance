@@ -2,6 +2,7 @@ import { ApiClient } from "./ApiClient";
 import { AttendeeResponse, internalizeAttendees } from "./CommonApiResponses";
 import {
   AffectedRecurringEvents,
+  CreateRecurringEventProperties,
   Match,
   Place,
   RecurringEventProperties,
@@ -60,8 +61,12 @@ const getMatch: (
   return internalize(matchResponse);
 };
 
-export type CreateMatch = Omit<Match, "id" | "additionalInfo" | "attendees"> & {
+export type CreateMatch = Omit<
+  Match,
+  "id" | "additionalInfo" | "attendees" | "recurringEventProperties"
+> & {
   userIds: number[];
+  recurringEventProperties?: CreateRecurringEventProperties | undefined;
 };
 
 const createMatch: (props: CreateMatch) => Promise<Match[]> = async (

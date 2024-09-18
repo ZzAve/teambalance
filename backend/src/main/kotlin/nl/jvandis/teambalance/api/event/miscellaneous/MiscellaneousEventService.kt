@@ -24,7 +24,7 @@ class MiscellaneousEventService(
                 ?: throw InvalidMiscellaneousEventException(miscellaneousEventId)
         require(
             originalMiscellaneousEvent.recurringEventProperties?.teamBalanceId?.value ==
-                updateMiscellaneousEventRequest.recurringEventProperties?.teamBalanceId,
+                updateMiscellaneousEventRequest.recurringEventProperties?.id,
         ) {
             "A single misc event can update only a single misc event, and a recurring event only a recurring one. " +
                 "Current event is ${originalMiscellaneousEvent.recurringEventProperties?.teamBalanceId ?: "single"}"
@@ -59,10 +59,10 @@ class MiscellaneousEventService(
             """
         }
         require(
-            updateMiscellaneousEventRequest.recurringEventProperties.teamBalanceId ==
+            updateMiscellaneousEventRequest.recurringEventProperties.id ==
                 originalMiscellaneousEvent.recurringEventProperties.teamBalanceId.value,
         ) {
-            "Trying to update a recurring event (${updateMiscellaneousEventRequest.recurringEventProperties.teamBalanceId}) " +
+            "Trying to update a recurring event (${updateMiscellaneousEventRequest.recurringEventProperties.id}) " +
                 "through an event that does not belong to that series " +
                 "(${originalMiscellaneousEvent.recurringEventProperties.teamBalanceId})"
         }
