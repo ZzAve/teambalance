@@ -1,0 +1,35 @@
+{
+  "name": "e2e",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "playwright test",
+    "report": "playwright show-report",
+    "ui": "npm run start -- --ui",
+    "lint": "prettier --check './src/playwright/**/*.{ts,tsx}'",
+    "lint:fix": "prettier --write './src/playwright/**/*.{ts,tsx}'",
+    "lint-staged": "lint-staged"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.47.2",
+    "@types/node": "^22.5.5",
+    "@types/uuid": "^10.0.0",
+    "dotenv": "^16.4.5",
+    "prettier": "^3.3.3",
+    "uuid": "^10.0.0",
+    "lint-staged": "13.1.2"
+  },
+  "lint-staged": {
+    "src/playwright/**/*.{jsx,tsx,ts}": [
+      "prettier --write"
+    ],
+    "*.{yml,json,md,html}": [
+      "prettier --write"
+    ]
+  }
+
+}

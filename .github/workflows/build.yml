@@ -65,4 +65,7 @@ jobs:
         run: mvn antrun:run@ktlint --non-recursive
 
       - name: Build app
-        run: mvn -B -T 2 clean verify
+        run: make ci
+
+      - name: E2E tests
+        run: make e2e

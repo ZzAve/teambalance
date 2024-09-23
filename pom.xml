@@ -16,6 +16,7 @@
     <description>Personal project to monitor team expenses on beer and brown fruit</description>
 
     <modules>
+        <module>e2e</module>
         <module>app</module>
         <module>backend</module>
         <module>frontend</module>
@@ -40,6 +41,20 @@
         <mockito-kotlin.version>4.0.0</mockito-kotlin.version>
         <testcontainers.version>1.18.0</testcontainers.version>
         <google-cloud-logging-logback.version>0.131.5-alpha</google-cloud-logging-logback.version>
+
+        <!-- installed node/npm version: lts/carbon -->
+        <node.version>v20.12.2</node.version>
+        <npm.version>10.5.0</npm.version>
+
+        <!-- deps -->
+        <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- frontend defaults -->
+        <npm.ci.skip>false</npm.ci.skip>
+        <npm.install.skip>true</npm.install.skip>
+        <npm.lint.skip>true</npm.lint.skip>
+        <npm.lint.fix.skip>true</npm.lint.fix.skip>
     </properties>
 
     <dependencyManagement>
