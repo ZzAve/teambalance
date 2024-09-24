@@ -117,7 +117,7 @@ export const Users = (props: { refresh: boolean }) => {
                 {user.name}
               </TableCell>
               <TableCell>{roleMapper[user.role]}</TableCell>
-              <TableCell>{user.jerseyNumber || "-"}</TableCell>
+              <TableCell>{user.jerseyNumber ?? "-"}</TableCell>
               <TableCell sx={{ overflowX: "auto" }}>
                 <BankAccountAliases
                   user={user}

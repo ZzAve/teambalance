@@ -15,6 +15,7 @@ export interface UserResponse {
   name: string;
   role: Role;
   isActive: boolean;
+  jerseyNumber?: number;
 }
 
 export const internalizeAttendees: (value: AttendeeResponse) => Attendee = (
@@ -31,5 +32,5 @@ export const internalizeUser: (value: UserResponse) => User = (it) => ({
   name: it.name,
   role: it.role,
   isActive: it.isActive,
-  jerseyNumber: undefined,
+  jerseyNumber: it.jerseyNumber,
 });
