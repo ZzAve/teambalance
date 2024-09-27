@@ -30,3 +30,6 @@ run-local-frontend: yolo
 
 e2e:
 	./mvnw frontend:npm@start -pl e2e
+
+e2e-report:
+	./e2e/node_modules/.bin/playwright show-report e2e/playwright-report
