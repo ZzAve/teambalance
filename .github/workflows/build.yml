@@ -26,7 +26,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
         # add initialization scripts
         volumes:
-          - ../../docker/postgres:/docker-entrypoint-initdb.d
+          - ./docker/postgres:/docker-entrypoint-initdb.d
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
