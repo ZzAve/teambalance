@@ -8,6 +8,9 @@ build:
 ci:
 	./mvnw clean install
 
+deploy:
+	./mvnw jib:build
+
 format:
 	./mvnw test-compile -Pformat
 
