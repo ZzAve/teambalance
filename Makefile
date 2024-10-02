@@ -22,13 +22,16 @@ yolo:
 
 run-local: run-local-backend run-local-frontend
 
-run-local-backend: yolo
+run-local-backend:
 	./mvnw spring-boot:run -Dspring-boot.run.profiles=local -pl app
 
-run-local-frontend: yolo
+run-local-frontend:
 	./mvnw frontend:npm@start -pl frontend
 
-e2e:
+e2e-prepare:
+	./mvnw frontend:npx@playwright-install -pl e2e
+
+e2e: e2e-prepare
 	./mvnw frontend:npm@start -pl e2e
 
 e2e-report:

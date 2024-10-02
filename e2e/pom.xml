@@ -26,6 +26,17 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>playwright-install</id>
+                        <goals>
+                            <goal>npx</goal>
+                        </goals>
+                        <phase>none</phase>
+                        <configuration>
+                            <arguments>-y playwright install --with-deps</arguments>
+                        </configuration>
+                    </execution>
+
+                    <execution>
                         <id>npm ci</id>
                         <goals>
                             <goal>npm</goal>

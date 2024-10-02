@@ -23,6 +23,7 @@
                 <version>${frontend-maven-plugin.version}</version>
                 <configuration>
                     <installDirectory>${project.parent.basedir}</installDirectory>
+                    <workingDirectory>${project.basedir}</workingDirectory>
                 </configuration>
                 <executions>
                     <execution>
