@@ -189,6 +189,7 @@
                         <phase>initialize</phase>
                         <inherited>false</inherited>
                         <configuration>
+                            <skip>false</skip>
                             <nodeVersion>${node.version}</nodeVersion>
                             <npmVersion>${npm.version}</npmVersion>
                             <installDirectory>${project.basedir}</installDirectory>
