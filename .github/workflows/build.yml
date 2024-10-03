@@ -9,6 +9,7 @@ jobs:
   build:
     # Allow the job to fetch a GitHub ID token
     permissions:
+      pull-requests: write
       id-token: write
       contents: read
 
