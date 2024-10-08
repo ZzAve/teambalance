@@ -47,7 +47,7 @@
         <npm.version>10.5.0</npm.version>
 
         <!-- deps -->
-        <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
+        <frontend-maven-plugin.version>1.15.1</frontend-maven-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- frontend defaults -->
