@@ -30,12 +30,12 @@
         <dependency>
             <groupId>nl.jvandis</groupId>
             <artifactId>shaded-bunq-sdk</artifactId>
-            <version>1.19.11.48</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>nl.jvandis</groupId>
             <artifactId>jooq-support</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

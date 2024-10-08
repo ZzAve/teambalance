@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Authenticate with GCP
         id: "auth"
@@ -56,6 +58,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
       - name: Get npm cache directory
         id: npm-cache-dir
         shell: bash
@@ -70,11 +79,34 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
+      - name: Postgres
+        run: |
+          docker compose up -d
+          sleep 15
+
       - name: Build app
         run: make ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: E2E tests
         run: make e2e
+        env:
+          HOST: http://localhost:3000
+          PASSWORD: teambalance
 
       - name: Deploy
         run: make deploy
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: e2e/playwright-report/
+          retention-days: 30
+
+      - name: Teardown postgres
+        if: always()
+        run: docker compose down
