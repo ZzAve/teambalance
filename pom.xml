@@ -16,6 +16,7 @@
     <description>Personal project to monitor team expenses on beer and brown fruit</description>
 
     <modules>
+        <module>e2e</module>
         <module>app</module>
         <module>backend</module>
         <module>frontend</module>
@@ -40,6 +41,21 @@
         <mockito-kotlin.version>4.0.0</mockito-kotlin.version>
         <testcontainers.version>1.18.0</testcontainers.version>
         <google-cloud-logging-logback.version>0.131.5-alpha</google-cloud-logging-logback.version>
+
+        <!-- installed node/npm version: lts/carbon -->
+        <node.version>v20.12.2</node.version>
+        <npm.version>10.5.0</npm.version>
+
+        <!-- deps -->
+        <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- frontend defaults -->
+        <npm.ci.skip>false</npm.ci.skip>
+        <npm.install.skip>true</npm.install.skip>
+        <npm.lint.skip>true</npm.lint.skip>
+        <npm.lint.fix.skip>true</npm.lint.fix.skip>
+        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -157,8 +173,50 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Dliquibase.secureParsing=false</argLine>
+                    <argLine>@{argLine} -Dliquibase.secureParsing=false</argLine>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>${frontend-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <skip>false</skip>
+                            <nodeVersion>${node.version}</nodeVersion>
+                            <npmVersion>${npm.version}</npmVersion>
+                            <installDirectory>${project.basedir}</installDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>

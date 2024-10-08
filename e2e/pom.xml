@@ -11,9 +11,9 @@
     </parent>
 
     <groupId>nl.jvandis.teambalance</groupId>
-    <artifactId>frontend</artifactId>
+    <artifactId>e2e</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Team balance - Frontend React App</name>
+    <name>Team balance - E2E tests</name>
 
     <build>
         <plugins>
@@ -23,9 +23,19 @@
                 <version>${frontend-maven-plugin.version}</version>
                 <configuration>
                     <installDirectory>${project.parent.basedir}</installDirectory>
-                    <workingDirectory>${project.basedir}</workingDirectory>
                 </configuration>
                 <executions>
+                    <execution>
+                        <id>playwright-install</id>
+                        <goals>
+                            <goal>npx</goal>
+                        </goals>
+                        <phase>none</phase>
+                        <configuration>
+                            <arguments>-y playwright install --with-deps</arguments>
+                        </configuration>
+                    </execution>
+
                     <execution>
                         <id>npm ci</id>
                         <goals>
@@ -49,17 +59,6 @@
                             <skip>${npm.install.skip}</skip>
                         </configuration>
 
-                    </execution>
-
-                    <execution>
-                        <id>npm build</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>prepare-package</phase>
-                        <configuration>
-                            <arguments>run build</arguments>
-                        </configuration>
                     </execution>
 
                     <execution>

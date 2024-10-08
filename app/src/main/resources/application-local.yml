@@ -52,7 +52,7 @@ spring:
   datasource:
     username: teambalance
     password: teambalance
-    url: jdbc:postgresql://localhost:54321/teambalance
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:54321}/teambalance
   devtools:
     add-properties: true
   security:

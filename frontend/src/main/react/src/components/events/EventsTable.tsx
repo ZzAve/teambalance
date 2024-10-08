@@ -146,9 +146,11 @@ const EventsTable = (props: {
             `Deleted event ${eventId} (recurring event series deletion: ${affectedEvents})`
           );
           addAlert({
-            message: `Event #${eventId} ${
-              !!affectedEvents ? recurringEventTagline(affectedEvents) : ""
-            } is verwijderd.`,
+            message: `Event #${eventId}${
+              !!affectedEvents
+                ? " " + recurringEventTagline(affectedEvents) + " "
+                : " "
+            }is verwijderd.`,
             level: "success",
           });
           withLoading(setIsLoading, () => props.updateTrigger()).then();
@@ -175,6 +177,7 @@ const EventsTable = (props: {
     <Grid container spacing={1}>
       <Grid item xs>
         <Button
+          title={`Update event ${props.id}`}
           variant="contained"
           color="primary"
           onClick={() => handleClickEditEvent(props.id)}
@@ -184,6 +187,7 @@ const EventsTable = (props: {
       </Grid>
       <Grid item xs>
         <Button
+          title={`Verwijder event ${props.id}`}
           variant="contained"
           color="secondary"
           onClick={() => handleDeleteClick(props.id)}
