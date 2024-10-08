@@ -55,6 +55,7 @@
         <npm.install.skip>true</npm.install.skip>
         <npm.lint.skip>true</npm.lint.skip>
         <npm.lint.fix.skip>true</npm.lint.fix.skip>
+        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -172,7 +173,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Dliquibase.secureParsing=false</argLine>
+                    <argLine>@{argLine} -Dliquibase.secureParsing=false</argLine>
                 </configuration>
             </plugin>
 
@@ -194,6 +195,26 @@
                             <npmVersion>${npm.version}</npmVersion>
                             <installDirectory>${project.basedir}</installDirectory>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
