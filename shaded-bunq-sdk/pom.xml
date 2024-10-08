@@ -162,7 +162,8 @@
                                 </relocation>
 
                             </relocations>
-                            <dependencyReducedPomLocation>target/reduced-pom.xml</dependencyReducedPomLocation>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+<!--                            <dependencyReducedPomLocation>target/reduced-pom.xml</dependencyReducedPomLocation>-->
                         </configuration>
                     </execution>
                 </executions>

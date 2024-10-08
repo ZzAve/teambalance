@@ -6,7 +6,7 @@ build:
 	./mvnw install -Pformat
 
 ci:
-	./mvnw -B clean install sonar:sonar -Dsonar.projectKey=ZzAve_teambalance
+	./mvnw -B clean install org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ZzAve_teambalance
 
 deploy:
 	./mvnw jib:build
