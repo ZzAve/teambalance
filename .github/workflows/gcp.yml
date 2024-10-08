@@ -56,6 +56,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
       - name: Get npm cache directory
         id: npm-cache-dir
         shell: bash
@@ -72,6 +79,9 @@ jobs:
 
       - name: Build app
         run: make ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: E2E tests
         run: make e2e

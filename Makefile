@@ -6,7 +6,7 @@ build:
 	./mvnw install -Pformat
 
 ci:
-	./mvnw clean install
+	./mvnw -B clean install sonar:sonar -Dsonar.projectKey=ZzAve_teambalance
 
 deploy:
 	./mvnw jib:build
