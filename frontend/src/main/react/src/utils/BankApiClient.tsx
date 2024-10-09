@@ -164,7 +164,7 @@ const getAliases: () => Promise<BankAccountAlias[]> = async () => {
 
 const createNewBankAccountAlias = async (alias: PotentialBankAccountAlias) => {
   const data = await bankClient.callWithBody(
-    "/aliases",
+    "aliases",
     externalizePotentialBankAccountAlias(alias),
     {
       method: "POST",
