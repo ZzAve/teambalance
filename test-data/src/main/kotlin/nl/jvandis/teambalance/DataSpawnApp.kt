@@ -6,11 +6,9 @@ import nl.jvandis.teambalance.testdata.SpawnDataConfig
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import kotlin.random.Random
-import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 import ch.qos.logback.classic.Logger as LogbackLogger
 
-@OptIn(ExperimentalTime::class)
 fun main(args: Array<String>) {
     val rootLogger: LogbackLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as LogbackLogger
     rootLogger.level = (Level.INFO)
