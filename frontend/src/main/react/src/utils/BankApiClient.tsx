@@ -175,7 +175,7 @@ const createNewBankAccountAlias = async (alias: PotentialBankAccountAlias) => {
 
 const updateBankAccountAlias = async (alias: BankAccountAlias) => {
   const data = await bankClient.callWithBody(
-    `/aliases/${alias.id}`,
+    `aliases/${alias.id}`,
     externalizeUpdatedBankAccountAlias(alias),
     {
       method: "PUT",
@@ -185,7 +185,7 @@ const updateBankAccountAlias = async (alias: BankAccountAlias) => {
 };
 
 const deleteBankAccountAlias = async (alias: BankAccountAlias) => {
-  await bankClient.call(`/aliases/${alias.id}`, {
+  await bankClient.call(`aliases/${alias.id}`, {
     method: "DELETE",
   });
 };

@@ -93,8 +93,8 @@ class BankService(
                 (e.counterParty == null || counterpartyAlias.displayName == e.counterParty)
         }
 
-    private fun Payment.toDomain(aliases: Map<String, User>): Transaction {
-        return Transaction(
+    private fun Payment.toDomain(aliases: Map<String, User>) =
+        Transaction(
             id = id,
             type = toTransactionType(),
             currency = amount.parseCurrency(),
@@ -103,13 +103,10 @@ class BankService(
             counterParty = counterpartyAlias.displayName,
             date = created.toZonedDateTime(),
         )
-    }
 
     private fun Payment.toTransactionType() = if (amount.value.startsWith("-")) TransactionType.CREDIT else TransactionType.DEBIT
 
-    private fun Amount.parseCurrency(): String {
-        return if (currency == "EUR") "€" else currency
-    }
+    private fun Amount.parseCurrency() = if (currency == "EUR") "€" else currency
 
     private fun String.toZonedDateTime() = ZonedDateTime.parse(this, FORMATTER).withZoneSameInstant(ZoneId.of("Europe/Paris"))
 
@@ -136,9 +133,7 @@ class BankService(
             .maximumSize(if (config.enabled) Tenant.entries.size.toLong() else 0)
             .buildAsync { key -> loadingFunction(key) }
 
-    private fun String.getAlias(aliases: Map<String, User>): User? {
-        return aliases[this]
-    }
+    private fun String.getAlias(aliases: Map<String, User>): User? = aliases[this]
 
     private fun getAllAliases() =
         bankAccountAliasRepository
