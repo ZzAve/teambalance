@@ -6,7 +6,7 @@ name: Build and deploy a docker container to google cloud registry (gcr)
 on:
   workflow_dispatch: {}
   push:
-    branches: [ master, jib-fix ]
+    branches: [ master, fix-deploy ]
 
 jobs:
   build:
