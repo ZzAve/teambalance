@@ -9,7 +9,7 @@ ci:
 	./mvnw -B clean install org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ZzAve_teambalance
 
 deploy:
-	./mvnw jib:build
+	./mvnw -B clean verify jib:build -DskipTests -Dnpm.lint.skip
 
 format:
 	./mvnw test-compile -Pformat
