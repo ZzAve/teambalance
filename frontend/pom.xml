@@ -48,7 +48,6 @@
                             <arguments>install</arguments>
                             <skip>${npm.install.skip}</skip>
                         </configuration>
-
                     </execution>
 
                     <execution>
@@ -59,17 +58,6 @@
                         <phase>prepare-package</phase>
                         <configuration>
                             <arguments>run build</arguments>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>start</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>none</phase>
-                        <configuration>
-                            <arguments>start</arguments>
                         </configuration>
                     </execution>
 

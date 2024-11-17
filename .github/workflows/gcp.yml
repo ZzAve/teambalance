@@ -79,22 +79,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Postgres
-        run: |
-          docker compose up -d
-          sleep 15
-
       - name: Build app
         run: make ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      - name: API tests
+        run: make test
+
       - name: E2E tests
         run: make e2e
-        env:
-          HOST: http://localhost:3000
-          PASSWORD: teambalance
 
       - name: Deploy
         run: make deploy
@@ -107,6 +102,6 @@ jobs:
           path: e2e/playwright-report/
           retention-days: 30
 
-      - name: Teardown postgres
+      - name: Teardown docker containers
         if: always()
         run: docker compose down
