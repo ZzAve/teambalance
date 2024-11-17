@@ -6,7 +6,6 @@ build:
 	./mvnw install -Pformat
 
 ci:
-	./mvnw -B clean install org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ZzAve_teambalance
 	./mvnw -B \
 		clean install \
 		org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
@@ -15,6 +14,14 @@ ci:
 test: run-local-backend
 	./mvnw spring-boot:run -pl test-data -Dspring-boot.run.arguments="--host=http://localhost:8080 --apiKey=dGVhbWJhbGFuY2U= --strict"
 
+e2e:
+	(rm -rf ./e2e/playwright-report/index.html || true) && \
+		mkdir -p ./e2e/playwright-report && \
+		(echo "E2E tests are running ... " > ./e2e/playwright-report/index.html) && \
+		docker compose up --wait --build && docker compose logs e2e -f
+
+e2e-report:
+	cd e2e && npm run report
 
 deploy:
 	./mvnw -B clean verify jib:build -DskipTests -Dnpm.lint.skip
@@ -40,13 +47,6 @@ run-local-backend:
 	docker compose up --wait backend
 
 run-local-frontend:
-	./mvnw frontend:npm@start -pl frontend
+	docker compose up --wait frontend
+	#cd frontend && npm start
 
-e2e-prepare:
-	./mvnw frontend:npx@playwright-install -pl e2e
-
-e2e: e2e-prepare
-	./mvnw frontend:npm@start -pl e2e
-
-e2e-report:
-	./e2e/node_modules/.bin/playwright show-report e2e/playwright-report

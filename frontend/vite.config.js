@@ -3,11 +3,11 @@ import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv } from "vite";
 import { visualizer } from "rollup-plugin-visualizer";
 
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   const root = "src/main/react";
   console.log("Running in " + mode + " mode");
   const env = loadEnv(mode, process.cwd() + "/" + root, "VITE");
-  console.log("All env vars:", env)
+  console.log("All env vars:", env);
 
   return {
     root: root,
@@ -29,7 +29,7 @@ export default defineConfig(({ command, mode }) => {
       host: "0.0.0.0",
       port: 3000,
       proxy: {
-        "/api": "http://localhost:8080",
+        "/api": `http://${env.VITE_SERVER_BACKEND || "localhost"}:8080`,
       },
     },
     preview: {

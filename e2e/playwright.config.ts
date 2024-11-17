@@ -24,7 +24,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
-    ["html"],
+    ["html", { open: "never" }],
     [process.env.CI ? "github" : "list"],
     ["json", { outputFile: "results.json" }],
   ],
@@ -91,10 +91,10 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: "cd .. && make run-local",
-    url: "http://127.0.0.1:8080",
-    reuseExistingServer: !process.env.CI,
-    stdout: "pipe",
-  },
+  // webServer: {
+  //   command: "cd .. && make run-local",
+  //   url: "http://127.0.0.1:8080",
+  //   reuseExistingServer: !process.env.CI,
+  //   stdout: "pipe",
+  // },
 });
