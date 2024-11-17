@@ -159,14 +159,18 @@ class TrainingController(
         return savedEvents.map { it.expose(savedAttendeesByEvent[it.teamBalanceId] ?: listOf()) }
             .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
             .also {
+                val firstEvent = it.events.firstOrNull()
+                val lastEvent = it.events.lastOrNull()
                 log.info(
-                    "Created ${it.totalSize} training events with recurringEventId: ${events.firstOrNull()?.recurringEventProperties}. " +
-                        "First event date: ${it.events.firstOrNull()?.startTime}, last event date: ${it.events.lastOrNull()?.startTime} ",
+                    "Created ${it.totalSize} training events " +
+                        "with recurringEventId: ${firstEvent?.recurringEventProperties}. " +
+                        "First event date: ${firstEvent?.startTime}, " +
+                        "Last event date: ${lastEvent?.startTime} ",
                 )
 
                 it.events.forEach { e ->
                     log.info(
-                        "Created event as part of '${events.firstOrNull()?.recurringEventProperties}': $e",
+                        "Created event as part of '${firstEvent?.recurringEventProperties}': $e",
                     )
                 }
             }
