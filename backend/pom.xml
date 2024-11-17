@@ -21,7 +21,7 @@
         <jooq.version>3.17.7</jooq.version> <!-- same as from spring-boot-starter-jooq -->
         <postgresql.version>42.7.0</postgresql.version>
         <springdoc-openapi.version>2.0.2</springdoc-openapi.version>
-        <testcontainers.postgresql.version>11.18-alpine</testcontainers.postgresql.version>
+        <testcontainers.postgresql.version>16.5-alpine</testcontainers.postgresql.version>
 
         <kminrandom.version>1.0.4</kminrandom.version>
     </properties>
