@@ -2,6 +2,7 @@ package nl.jvandis.teambalance.testdata
 
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.take
+import io.kotest.property.arbs.firstName
 import io.kotest.property.arbs.games.cluedoLocations
 import io.kotest.property.arbs.games.cluedoSuspects
 import io.kotest.property.arbs.geo.country
@@ -10,6 +11,7 @@ import io.kotest.property.arbs.products.googleTaxonomy
 import io.kotest.property.arbs.stockExchanges
 import io.kotest.property.arbs.travel.airport
 import io.kotest.property.arbs.tube.tubeJourney
+import io.kotest.property.arbs.usernames
 import kotlinx.datetime.toKotlinLocalDateTime
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -17,6 +19,9 @@ import nl.jvandis.teambalance.testdata.domain.Attendee
 import nl.jvandis.teambalance.testdata.domain.Availability
 import nl.jvandis.teambalance.testdata.domain.BankAccountAlias
 import nl.jvandis.teambalance.testdata.domain.BankAccountAliases
+import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException
+import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.AliasCreationException
+import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.EventCreationException
 import nl.jvandis.teambalance.testdata.domain.CreateAttendee
 import nl.jvandis.teambalance.testdata.domain.CreateBankAccountAlias
 import nl.jvandis.teambalance.testdata.domain.CreateMatch
@@ -27,14 +32,7 @@ import nl.jvandis.teambalance.testdata.domain.EventResponse
 import nl.jvandis.teambalance.testdata.domain.Match
 import nl.jvandis.teambalance.testdata.domain.MiscEvent
 import nl.jvandis.teambalance.testdata.domain.Place
-import nl.jvandis.teambalance.testdata.domain.Role.COACH
-import nl.jvandis.teambalance.testdata.domain.Role.DIAGONAL
-import nl.jvandis.teambalance.testdata.domain.Role.LIBERO
-import nl.jvandis.teambalance.testdata.domain.Role.MID
-import nl.jvandis.teambalance.testdata.domain.Role.OTHER
-import nl.jvandis.teambalance.testdata.domain.Role.PASSER
-import nl.jvandis.teambalance.testdata.domain.Role.SETTER
-import nl.jvandis.teambalance.testdata.domain.Role.TRAINER
+import nl.jvandis.teambalance.testdata.domain.Role
 import nl.jvandis.teambalance.testdata.domain.Training
 import nl.jvandis.teambalance.testdata.domain.User
 import nl.jvandis.teambalance.testdata.domain.Users
@@ -72,13 +70,11 @@ fun addHeaders(apiKey: String) =
         }
     }
 
-// Enable me if you want to populate the database on application startup
-// @Configuration
-// @Profile("dev", "local") // don't use class unless 'dev' profile is activated
 class Initializer(
     apiKey: String,
     private val host: String = "http://localhost:8080",
     private val random: Random,
+    private val config: SpawnDataConfig,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
     private val client: HttpHandler = addHeaders(apiKey)(ApacheClient())
@@ -92,7 +88,7 @@ class Initializer(
     val aBankAccountAliasLens = Body.auto<BankAccountAlias>().toLens()
 
     private fun createUser(user: CreateUser): User {
-        val body = jsonFormatter.encodeToString(user).also(::println)
+        val body = jsonFormatter.encodeToString(user)
         val request =
             Request(POST, "$host/api/users")
                 .body(body)
@@ -225,45 +221,42 @@ class Initializer(
         return aBankAccountAliasLens(response)
     }
 
-    fun spawnData(config: SpawnDataConfig) {
-        createUsers()
+    fun spawnData() {
+        measureTime { createUsers() }.also { log.info("Created ${config.amountOfMatches} users in $it") }
         log.info("All users in the system: ")
         val allUsers = getAllUsers()
         log.info("All users: {}", allUsers)
 
-        measureTime { addTrainings(allUsers, config.amountOfTrainings) }
-            .also { log.info("Created ${config.amountOfTrainings} in $it") }
-        measureTime { addMatches(allUsers, config.amountOfMatches) }
+        measureTime {
+            addTrainings(
+                allUsers,
+            )
+        }.also { log.info("Created ${config.amountOfTrainings} trainings in $it") }
+        measureTime { addMatches(allUsers) }
             .also { log.info("Created ${config.amountOfMatches} matches in $it") }
-        measureTime { addEvents(allUsers, config.amountOfEvents) }
+        measureTime { addEvents(allUsers) }
             .also { log.info("Created ${config.amountOfEvents} misc events in $it") }
-
-        createBankAccountAliases(allUsers)
-
-//        bankAccountTransactionExclusionRepository.insertMany(
-//            listOf(
-//                TransactionExclusion(counterParty = "CCV*BUITEN IN DE KUIL")
-//            )
-//        )
+        measureTime { createBankAccountAliases(allUsers) }
+            .also { log.info("Created ${config.amountOfAliases} aliases in $it") }
     }
 
     private fun createBankAccountAliases(allUsers: List<User>) {
-        val bankAccountAliases =
-            listOf(
-                CreateBankAccountAlias("Juul", allUsers.first { it.name == "Julius" }.id),
-                CreateBankAccountAlias("J. Post", allUsers.first { it.name == "Bocaj" }.id),
-                CreateBankAccountAlias("de Hond", allUsers.first { it.name == "Maurice" }.id),
-                CreateBankAccountAlias("Lucky Luke", allUsers.first { it.name == "Joep" }.id),
-            )
+        val bankAccountAliases: List<BankAccountAlias> =
+            Arb.usernames().take(config.amountOfAliases).map {
+                CreateBankAccountAlias(it.value, allUsers.random(random).id)
+            }
                 .mapNotNull {
                     try {
                         log.info("Creating BankAccountAlias $it")
                         createAlias(it)
                     } catch (e: RuntimeException) {
+                        if (config.strictMode) {
+                            throw AliasCreationException("Could not add bankAccountAlias ${it.alias}", e)
+                        }
                         log.error("Could not add bankAccountAlias ${it.alias}", e)
                         null
                     }
-                }
+                }.toList()
 
         log.info("All injected aliases: {}", bankAccountAliases)
         log.info("All aliases: {} ", getAllAliases().map { "Alias '${it.alias}' for user ${it.user.name} (${it.user.id})" })
@@ -272,25 +265,12 @@ class Initializer(
     private fun createUsers() {
         val users = mutableListOf<User>()
         val usersToCreate =
-            listOf(
-                CreateUser("Maurice", COACH),
-                CreateUser("Pardoes", TRAINER),
-                CreateUser("Julius", SETTER),
-                CreateUser("Joep", PASSER),
-                CreateUser("Roger", PASSER),
-                CreateUser("JanPL", PASSER),
-                CreateUser("PietPl", PASSER),
-                CreateUser("Bocaj", MID),
-                CreateUser("HenkMid", MID),
-                CreateUser("KeesMid", MID),
-                CreateUser("FlipLib", LIBERO),
-                CreateUser("MaartenDia", DIAGONAL),
-                CreateUser("DriesDia", DIAGONAL),
-                CreateUser("Tjapko", OTHER),
-            )
+            Arb.firstName().take(config.amountOfUsers).map { it.name }.map {
+                CreateUser(it, Role.entries.random(random))
+            }.toList()
 
         usersToCreate.forEach {
-            log.info("Creating user ${it.name}")
+            log.info("Creating user ${it.name} with role ${it.role}")
             val result: Result<User> =
                 kotlin.runCatching {
                     createUser(it)
@@ -298,21 +278,24 @@ class Initializer(
 
             if (result.isSuccess) {
                 val user = result.getOrNull() ?: error("Shouldn't be null")
-                log.info("Created user ${user.name} [${user.role}] with id ${user.id}")
+                log.info("Created user ${user.name} with role ${user.role}. Id ${user.id}")
                 users.add(user)
             } else {
                 log.error(
                     "Could not create user ${it.name} [${it.role}]: ${result.exceptionOrNull()?.message}",
                     result.exceptionOrNull(),
                 )
+                if (config.strictMode) {
+                    throw CouldNotCreateEntityException.UserCreationException(
+                        "Could not create user ${it.name} [${it.role}]: ${result.exceptionOrNull()?.message}",
+                        result.exceptionOrNull(),
+                    )
+                }
             }
         }
     }
 
-    private fun addTrainings(
-        allUsers: List<User>,
-        amountOfEvents: Int,
-    ) {
+    private fun addTrainings(allUsers: List<User>) {
         val locations = Arb.cluedoLocations().take(10).map { it.name }.toList()
         val comments = Arb.stockExchanges().take(2).map { it.name }.toList() + null
 
@@ -321,7 +304,7 @@ class Initializer(
             .
             .
             .
-            Adding $amountOfEvents trainings to system.
+            Adding ${config.amountOfTrainings} trainings to system.
             Locations to use: $locations
             Comments to use: $comments
             Day range: +- 100 days
@@ -334,7 +317,7 @@ class Initializer(
 
         val dayRange = 100L
         val hourRange = 100L
-        (0..amountOfEvents).forEach { i ->
+        (0..config.amountOfTrainings).forEach { i ->
             try {
                 log.info("Creating Training $i")
                 val training =
@@ -358,7 +341,7 @@ class Initializer(
                 log.info("Added attendees to training with id ${savedTraining.id}: ${addedAttendees.map { it.user.name }}")
 
                 // Add trainer, 50% chance
-                if (random.nextBoolean()) {
+                if (random.nextBoolean() && addedAttendees.isNotEmpty()) {
                     val trainerId =
                         addedAttendees
                             .take(1)
@@ -372,16 +355,16 @@ class Initializer(
                 }
             } catch (e: Exception) {
                 log.warn("Could not add training $i. continuing with the rest", e)
+                if (config.strictMode) {
+                    throw EventCreationException("Could not add training $i", e)
+                }
             }
         }
 
-        log.info("Done adding $amountOfEvents trainings")
+        log.info("Done adding ${config.amountOfTrainings} trainings")
     }
 
-    private fun addMatches(
-        allUsers: List<User>,
-        amountOfEvents: Int,
-    ) {
+    private fun addMatches(allUsers: List<User>) {
         val locations = Arb.airport().take(10).map { "${it.name} - ${it.country}" }.toList()
         val comments = Arb.googleTaxonomy().take(4).map { it.value }.toList() + null
         val opponents = Arb.cluedoSuspects().take(10).map { it.name }.toList()
@@ -391,7 +374,7 @@ class Initializer(
             .
             .
             .
-            Adding $amountOfEvents matches to system.
+            Adding ${config.amountOfMatches} matches to system.
             Locations to use: $locations
             Comments to use: $comments
             Opponents to use: $opponents
@@ -406,7 +389,7 @@ class Initializer(
 
         val dayRange = 100L
         val hourRange = 100L
-        (0..amountOfEvents).forEach { i ->
+        (0..config.amountOfMatches).forEach { i ->
             try {
                 log.info("Creating match $i")
                 val match =
@@ -443,16 +426,16 @@ class Initializer(
                 }
             } catch (e: Exception) {
                 log.warn("Could not add match $i. continuing with the rest", e)
+                if (config.strictMode) {
+                    throw EventCreationException("Could not add match $i", e)
+                }
             }
         }
 
-        log.info("Done adding $amountOfEvents matches")
+        log.info("Done adding ${config.amountOfMatches} matches")
     }
 
-    private fun addEvents(
-        allUsers: List<User>,
-        amountOfEvents: Int,
-    ) {
+    private fun addEvents(allUsers: List<User>) {
         val locations = Arb.country().take(10).map { it.name }.toList()
         val comments = Arb.googleTaxonomy().take(4).map { it.value }.toList() + null
         val titles = Arb.tubeJourney().take(5).map { "Travel from ${it.start.name} tot ${it.end.name}" }.toList()
@@ -461,7 +444,7 @@ class Initializer(
             .
             .
             .
-            Adding $amountOfEvents misc events to system.
+            Adding ${config.amountOfEvents} misc events to system.
                 Locations to use: $locations
                 Comments to use: $comments
                 Titles to use: $titles
@@ -475,7 +458,7 @@ class Initializer(
 
         val dayRange = 100L
         val hourRange = 100L
-        (0..amountOfEvents).forEach { i ->
+        (0..config.amountOfEvents).forEach { i ->
             try {
                 log.info("Creating match $i")
                 val miscEvent =
@@ -500,10 +483,13 @@ class Initializer(
                 log.info("Added attendees to match with id ${savedMiscEvent.id}: ${addedAttendees.map { it.user.name }}")
             } catch (e: Exception) {
                 log.warn("Could not add match $i. continuing with the rest", e)
+                if (config.strictMode) {
+                    throw EventCreationException("Could not add event $i", e)
+                }
             }
         }
 
-        log.info("Done adding $amountOfEvents misc events")
+        log.info("Done adding ${config.amountOfEvents} misc events")
     }
 
     private fun addAttendeesToEvent(
@@ -541,7 +527,10 @@ class Initializer(
 }
 
 data class SpawnDataConfig(
+    val amountOfUsers: Int,
     val amountOfTrainings: Int,
     val amountOfMatches: Int,
     val amountOfEvents: Int,
+    val amountOfAliases: Int,
+    val strictMode: Boolean,
 )
