@@ -103,7 +103,7 @@ class AbstractIntegrationTest {
 
         @Container
         val postgresqlContainer =
-            PostgreSQLContainer("postgres:11.18-bullseye").apply {
+            PostgreSQLContainer("postgres:16.5-alpine").apply {
                 withDatabaseName("teambalance")
                 withUsername("teambalance")
                 withPassword("teambalance")
