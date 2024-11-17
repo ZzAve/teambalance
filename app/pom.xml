@@ -128,6 +128,7 @@
                         </goals>
                         <configuration>
                             <includeGroupIds>nl.jvandis.teambalance</includeGroupIds>
+                            <includeArtifactIds>frontend</includeArtifactIds>
                             <includes>static/**/*.*</includes>
                             <outputDirectory>${project.build.directory}/classes</outputDirectory>
                             <useSubDirectoryPerArtifact>false</useSubDirectoryPerArtifact>

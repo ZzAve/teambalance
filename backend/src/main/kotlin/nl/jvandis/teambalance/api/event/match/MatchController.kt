@@ -158,13 +158,13 @@ class MatchController(
             .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
             .also {
                 log.info(
-                    "Created ${it.totalSize} match events with recurringEventId: ${events.firstOrNull()?.recurringEventProperties}. " +
+                    "Created ${it.totalSize} match events with recurringEventId: ${it.events.firstOrNull()?.recurringEventProperties}. " +
                         "First event date: ${it.events.firstOrNull()?.startTime}, last event date: ${it.events.lastOrNull()?.startTime} ",
                 )
 
                 it.events.forEach { e ->
                     log.info(
-                        "Created event as part of '${events.firstOrNull()?.recurringEventProperties}': $e",
+                        "Created event as part of '${it.events.firstOrNull()?.recurringEventProperties}': $e",
                     )
                 }
             }
