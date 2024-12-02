@@ -36,7 +36,7 @@ update:
 	./mvnw versions:update-parent versions:update-properties versions:use-latest-versions
 
 yolo:
-	./mvnw install -T0.5C -DskipTests -Dnpm.ci.skip -Dnpm.install.skip=false -Dnpm.lint.skip
+	./mvnw install -T0.5C -DskipTests -Dverification.skip -Dnpm.ci.skip -Dnpm.install.skip=false -Dnpm.lint.skip
 
 db:
 	docker compose up --wait postgresql

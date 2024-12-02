@@ -20,6 +20,7 @@ import {
   getTeamBalanceThemePreference,
   storeTeamBalanceThemePreference,
 } from "./utils/preferences";
+import CompetitionPage from "./views/CompetionPage";
 
 const EventsPage = lazy(() => import("./views/EventsPage"));
 const Admin = lazy(() => import("./views/Admin"));
@@ -127,6 +128,14 @@ const App = () => {
               element={
                 <RequireAuth>
                   <Users refresh={shouldRefresh} />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="competition"
+              element={
+                <RequireAuth>
+                  <CompetitionPage refresh={shouldRefresh} />
                 </RequireAuth>
               }
             />

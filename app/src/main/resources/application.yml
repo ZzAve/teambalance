@@ -16,6 +16,12 @@ app:
         enabled: true
         expire-after-write: 60s
         refresh-after-write: 30s
+  competition:
+    cache-config:
+      enabled: true
+      expire-after-write: 1h
+      refresh-after-write: 50m
+
   multi-tenancy:
     tenants:
       # to be filled by a specific profile

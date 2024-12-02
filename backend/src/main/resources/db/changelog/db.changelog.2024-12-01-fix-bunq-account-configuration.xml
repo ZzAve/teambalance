@@ -1,0 +1,29 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="juliusvandis (generated)" id="1698590586114-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM config WHERE key='bunq-account-id';
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="config" >
+            <column name="key" value="bunq-account-id"/>
+            <column name="value" value="-1"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="juliusvandis (generated)" id="1698590586114-2">
+        <delete tableName="config" >
+            <where>key = 'bunq-account-id.tovo_heren_4' AND value = '-1'</where>
+
+        </delete>
+        <delete tableName="config" >
+            <where>key = 'bunq-account-id.tovo_heren_5' AND value = '-1'</where>
+
+        </delete>
+
+    </changeSet>
+
+</databaseChangeLog>

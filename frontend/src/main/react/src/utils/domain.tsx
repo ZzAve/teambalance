@@ -172,3 +172,20 @@ export const eventType = (event: TeamEvent) => {
     return "Misc";
   }
 };
+
+export interface Leaderboard {
+  webUrl: string;
+  lastUpdateTimestamp: Date;
+  entries: LeaderboardEntry[];
+}
+
+export interface LeaderboardEntry {
+  number: number;
+  team: string;
+  matches: number;
+  points: number;
+  setsFor: number;
+  setsAgainst: number;
+  pointsFor: number;
+  pointsAgainst: number;
+}

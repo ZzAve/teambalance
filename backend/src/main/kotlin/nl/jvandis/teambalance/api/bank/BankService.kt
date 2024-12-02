@@ -3,10 +3,10 @@ package nl.jvandis.teambalance.api.bank
 import com.bunq.sdk.model.generated.endpoint.Payment
 import com.bunq.sdk.model.generated.`object`.Amount
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
-import com.github.benmanes.caffeine.cache.Caffeine
 import nl.jvandis.teambalance.MultiTenantContext
 import nl.jvandis.teambalance.Tenant
 import nl.jvandis.teambalance.api.ConfigurationService
+import nl.jvandis.teambalance.api.setupCache
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.filters.START_OF_SEASON_ZONED
 import org.springframework.context.annotation.Lazy
@@ -34,14 +34,12 @@ class BankService(
 ) {
     private val balanceCache: AsyncLoadingCache<Tenant, String> =
         setupCache(bankConfig.cache.balance) { tenant: Tenant ->
-            val accountId = getAccountId(tenant)
-            val updateBalance = updateBalance(accountId)
-            updateBalance
+            updateBalance(getAccountId())
         }
 
     private val transactionsCache: AsyncLoadingCache<Tenant, Transactions> =
         setupCache(bankConfig.cache.transactions) { tenant: Tenant ->
-            val accountId = getAccountId(tenant)
+            val accountId = getAccountId()
             val updatedTransactions = updateTransactions(accountId)
             updatedTransactions
         }
@@ -123,16 +121,6 @@ class BankService(
         )
     }
 
-    private fun <K, V> setupCache(
-        config: CacheConfig,
-        loadingFunction: (K) -> V,
-    ): AsyncLoadingCache<K, V> =
-        Caffeine.newBuilder()
-            .expireAfterWrite(config.expireAfterWrite)
-            .apply { if (config.refreshAfterWrite != null) refreshAfterWrite(config.refreshAfterWrite) }
-            .maximumSize(if (config.enabled) Tenant.entries.size.toLong() else 0)
-            .buildAsync { key -> loadingFunction(key) }
-
     private fun String.getAlias(aliases: Map<String, User>): User? = aliases[this]
 
     private fun getAllAliases() =
@@ -144,8 +132,8 @@ class BankService(
         transactionExclusionRepository
             .findAll()
 
-    private fun getAccountId(tenant: Tenant): Int {
-        val key = "bunq-account-id.${tenant.name.lowercase()}"
+    private fun getAccountId(): Int {
+        val key = "bunq-account-id"
         return configurationService.getConfig(key, Int::class)
     }
 }
