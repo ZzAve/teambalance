@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid";
 import PageItem from "../components/PageItem";
-import { Button, Card, Hidden } from "@mui/material";
+import { Button, Hidden } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -30,14 +30,14 @@ const TransactionsPage = (props: { refresh: boolean }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <PageItem title="Transacties">
+          <PageItem title="Transacties" dataTestId="transactions">
             <Grid item xs={12}>
               <Transactions refresh={props.refresh} withPagination={true} />
             </Grid>
           </PageItem>
         </Grid>
         <Grid container item xs={12}>
-          <PageItem title="Potters">
+          <PageItem title="Potters" dataTestId="potters">
             <Potters
               refresh={props.refresh}
               limit={20}

@@ -78,7 +78,7 @@ const Login = (opts: { handleRefresh: () => void }) => {
   }
 
   return (
-    <PageItem xs={12} title="Login" pageTitle="Login">
+    <PageItem xs={12} title="Login" pageTitle="Login" dataTestId="login">
       <form onSubmit={handleLogin}>
         <Grid item container spacing={2}>
           <Grid item xs={12}>
