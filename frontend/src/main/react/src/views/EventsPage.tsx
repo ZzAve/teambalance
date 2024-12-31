@@ -63,7 +63,7 @@ const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
         </Button>
       </Grid>
       <Grid container item xs={12}>
-        <PageItem pageTitle={title} title={title}>
+        <PageItem pageTitle={title} title={title} dataTestId="events">
           <Grid container spacing={1}>
             <Grid
               component="label"

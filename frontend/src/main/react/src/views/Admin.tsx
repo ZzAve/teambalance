@@ -80,7 +80,7 @@ const Admin = (props: { refresh: boolean }) => {
   // @ts-ignore
   return (
     <>
-      <PageItem title="⚠️ Admin pagina, Let op!" xs={12}>
+      <PageItem title="⚠️ Admin pagina, Let op!" xs={12} dataTestId="admin">
         <Typography variant="h6">
           Je begeeft je nu op de 'admin' pagina's. Pas op voor de lactacyd
         </Typography>
@@ -222,7 +222,7 @@ const EventsOverview = (props: { eventType: EventType; refresh: boolean }) => {
 
   const title = getText(props.eventType, "event_type_name");
   return (
-    <PageItem title={title} pageTitle={title}>
+    <PageItem title={title} pageTitle={title} dataTestId="events-overview">
       <Grid item container spacing={5}>
         <Grid item xs={6}>
           <Button
@@ -297,7 +297,7 @@ const ChangeEvent = (props: { eventType: EventType }) => {
 
   const title = getText(props.eventType, "edit_event_pageitem_label");
   return (
-    <PageItem pageTitle={title} title={title}>
+    <PageItem pageTitle={title} title={title} dataTestId="edit-event">
       <EventDetails eventType={props.eventType} id={id} />
     </PageItem>
   );
@@ -306,7 +306,7 @@ const ChangeEvent = (props: { eventType: EventType }) => {
 const NewEvent = (props: { eventType: EventType; location?: object }) => {
   const title = getText(props.eventType, "new_event_pageitem_label");
   return (
-    <PageItem pageTitle={title} title={title}>
+    <PageItem pageTitle={title} title={title} dataTestId="new-event">
       <EventDetails eventType={props.eventType} id={undefined} />
     </PageItem>
   );
@@ -314,7 +314,7 @@ const NewEvent = (props: { eventType: EventType; location?: object }) => {
 
 const HiAdmin = ({}) => {
   return (
-    <PageItem pageTitle="Admin" title="Admin">
+    <PageItem pageTitle="Admin" title="Admin" dataTestId="admin">
       <Grid container spacing={2} justifyContent="center">
         <img
           alt="Walt from Breaking Bad telling you who's admin"
