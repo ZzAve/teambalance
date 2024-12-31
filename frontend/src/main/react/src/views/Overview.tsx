@@ -19,7 +19,7 @@ const Overview = (props: { refresh: boolean }) => {
       <PageTitle title="Team Balance" withSuffix={false} />
       <Grid container item xs={12} spacing={1} justifyContent="space-between">
         <Grid container item xs={12} md={6} rowSpacing={2}>
-          <PageItem title="Aanstaande trainingen">
+          <PageItem title="Aanstaande trainingen" dataTestId="training-events">
             <Grid item container spacing={2}>
               <Grid item xs={12}>
                 <Typography>
@@ -37,6 +37,7 @@ const Overview = (props: { refresh: boolean }) => {
               </Grid>
               <Grid container item justifyContent="flex-end">
                 <Button
+                  data-testid="more-button"
                   variant="contained"
                   color="primary"
                   onClick={() => navigate("trainings")}
@@ -46,7 +47,7 @@ const Overview = (props: { refresh: boolean }) => {
               </Grid>
             </Grid>
           </PageItem>
-          <PageItem title="Aanstaande wedstrijden">
+          <PageItem title="Aanstaande wedstrijden" dataTestId="match-events">
             <Grid item container spacing={2}>
               <Grid item xs={12}>
                 <Typography>
@@ -64,6 +65,7 @@ const Overview = (props: { refresh: boolean }) => {
               </Grid>
               <Grid container item justifyContent="flex-end">
                 <Button
+                  data-testid="more-button"
                   variant="contained"
                   color="primary"
                   onClick={() => navigate("matches")}
@@ -73,7 +75,10 @@ const Overview = (props: { refresh: boolean }) => {
               </Grid>
             </Grid>
           </PageItem>
-          <PageItem title="Aanstaande andere evenementen en uitjes">
+          <PageItem
+            title="Aanstaande andere evenementen en uitjes"
+            dataTestId="misc-events"
+          >
             <Grid item container spacing={2}>
               <Grid item xs={12}>
                 <Typography>Wanneer moeten we iets anders doen?</Typography>
@@ -89,6 +94,7 @@ const Overview = (props: { refresh: boolean }) => {
               </Grid>
               <Grid container item justifyContent="flex-end">
                 <Button
+                  data-testid="more-button"
                   variant="contained"
                   color="primary"
                   onClick={() => navigate("misc-events")}
@@ -107,7 +113,7 @@ const Overview = (props: { refresh: boolean }) => {
           rowSpacing={2}
           alignContent="flex-start"
         >
-          <PageItem title="De bierstand">
+          <PageItem title="De bierstand" dataTestId="balance">
             <Grid item container spacing={3} xs={12}>
               <Grid item xs={12}>
                 <Balance refresh={props.refresh} />
@@ -125,13 +131,14 @@ const Overview = (props: { refresh: boolean }) => {
               </Grid>
             </Grid>
           </PageItem>
-          <PageItem title="Transacties">
+          <PageItem title="Transacties" dataTestId="transactions">
             <Grid item container spacing={2}>
               <Grid item xs={12}>
                 <Transactions refresh={props.refresh} />
               </Grid>
               <Grid container item justifyContent="flex-end">
                 <Button
+                  data-testid="more-button"
                   variant="contained"
                   color="primary"
                   onClick={() => navigate("transactions")}
@@ -141,7 +148,7 @@ const Overview = (props: { refresh: boolean }) => {
               </Grid>
             </Grid>
           </PageItem>
-          <PageItem title="☣️ Danger zone">
+          <PageItem title="☣️ Danger zone" dataTestId="danger-zone">
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Button

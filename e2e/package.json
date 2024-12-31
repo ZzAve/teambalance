@@ -7,6 +7,7 @@
     "start": "playwright test",
     "report": "playwright show-report",
     "ui": "npm run start -- --ui",
+    "codegen": "playwright codegen",
     "lint": "prettier --check './src/playwright/**/*.{ts,tsx}'",
     "lint:fix": "prettier --write './src/playwright/**/*.{ts,tsx}'",
     "lint-staged": "lint-staged"
