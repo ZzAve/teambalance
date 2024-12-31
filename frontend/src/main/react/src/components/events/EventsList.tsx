@@ -34,24 +34,24 @@ export const EventsList = (props: {
     setPage(page);
   };
   return (
-    <Grid container spacing={5}>
+    <Grid container spacing={5} data-testid="event-list">
       {props.events
         .slice((page - 1) * rowsPerPage, page * rowsPerPage)
         .map((it) => (
-          <Grid key={it.id} item xs={12}>
-            <EventListItem
-              eventType={props.eventType}
-              event={it}
-              onUpdate={props.updateTrigger}
-            />
-          </Grid>
+          <EventListItem
+            key={it.id}
+            eventType={props.eventType}
+            event={it}
+            onUpdate={props.updateTrigger}
+          />
         ))}
       {props.withPagination && (
-        <Grid item xs={12}>
+        <Grid item xs={12} data-testid="event-list-pagination-container">
           <Pagination
             count={Math.ceil(props.events.length / rowsPerPage)}
             page={page}
             onChange={handleChangePage}
+            data-testid="pagination-control"
           />
         </Grid>
       )}
@@ -170,7 +170,7 @@ export const EventListItem = (props: {
   };
 
   return (
-    <Grid container spacing={1}>
+    <Grid container item spacing={1} data-testid="event-list-item">
       <Conditional condition={isMiscEvent(teamEvent)}>
         <Grid item xs={12}>
           <Typography variant={"h6"}>

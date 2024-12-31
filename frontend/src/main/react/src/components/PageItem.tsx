@@ -6,6 +6,7 @@ import PageTitle from "./PageTitle";
 const PageItem = (props: {
   title: string;
   children: any;
+  dataTestId: string;
   xs?: GridSize;
   md?: GridSize;
   pageTitle?: string;
@@ -14,7 +15,7 @@ const PageItem = (props: {
   return (
     <>
       {!!pageTitle && <PageTitle title={pageTitle} />}
-      <Grid item xs={xs} md={md}>
+      <Grid item xs={xs} md={md} data-testid={props.dataTestId}>
         <Card>
           <CardHeader title={title} />
           <CardContent sx={{ width: "100%" }}>{children}</CardContent>
