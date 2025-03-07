@@ -19,7 +19,9 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
     },
     plugins: [
-      visualizer(),
+      visualizer({
+        filename: "target/stats.html",
+      }),
       react({
         // Use React plugin in all *.jsx and *.tsx files
         include: "**/*.{jsx,tsx}",

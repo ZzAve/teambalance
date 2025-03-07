@@ -1,0 +1,990 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build xsi:schemaLocation="http://maven.apache.org/BUILD-CACHE-BUILD/1.0.0 https://maven.apache.org/xsd/build-cache-build-1.0.0.xsd"
+    xmlns="http://maven.apache.org/BUILD-CACHE-BUILD/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <cacheImplementationVersion>v1.1</cacheImplementationVersion>
+  <final>false</final>
+  <hashFunction>XX</hashFunction>
+  <buildTime>2025-02-19T17:22:41.783</buildTime>
+  <buildServer>localhost</buildServer>
+  <scm>
+    <sourceBranch>refs/heads/fix-historic-events</sourceBranch>
+    <revision>f846a277ce4d7ba3e24ca2ff3b917488bd186f83</revision>
+  </scm>
+  <goals>
+    <goal>clean</goal>
+    <goal>install</goal>
+  </goals>
+  <artifact>
+    <groupId>nl.jvandis.teambalance</groupId>
+    <artifactId>app</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <type>jar</type>
+    <fileName>app.jar</fileName>
+    <fileHash>1dbfcec22f84b5d0</fileHash>
+    <fileSize>2138637</fileSize>
+    <filePath>target/app-0.0.1-SNAPSHOT.jar</filePath>
+  </artifact>
+  <attachedArtifacts>
+    <attachedArtifact>
+      <groupId>nl.jvandis.teambalance</groupId>
+      <artifactId>app</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <classifier>mvn-cache-ext-extra-output-20</classifier>
+      <type>zip</type>
+      <fileName>app-mvn-cache-ext-extra-output-20.zip</fileName>
+      <fileHash>9eff36041c4d106e</fileHash>
+      <fileSize>271148</fileSize>
+      <filePath>target</filePath>
+    </attachedArtifact>
+    <attachedArtifact>
+      <groupId>nl.jvandis.teambalance</groupId>
+      <artifactId>app</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <classifier>mvn-cache-ext-extra-output-21</classifier>
+      <type>zip</type>
+      <fileName>app-mvn-cache-ext-extra-output-21.zip</fileName>
+      <fileHash>dc7cdaa1dfc7c9f9</fileHash>
+      <fileSize>2136955</fileSize>
+      <filePath>target/classes</filePath>
+    </attachedArtifact>
+    <attachedArtifact>
+      <groupId>nl.jvandis.teambalance</groupId>
+      <artifactId>app</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <classifier>mvn-cache-ext-extra-output-22</classifier>
+      <type>zip</type>
+      <fileName>app-mvn-cache-ext-extra-output-22.zip</fileName>
+      <fileHash>9ae5ae5846fb296c</fileHash>
+      <fileSize>227723</fileSize>
+      <filePath>target/site/jacoco</filePath>
+    </attachedArtifact>
+    <attachedArtifact>
+      <groupId>nl.jvandis.teambalance</groupId>
+      <artifactId>app</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <classifier>mvn-cache-ext-extra-output-23</classifier>
+      <type>zip</type>
+      <fileName>app-mvn-cache-ext-extra-output-23.zip</fileName>
+      <fileHash>e6dcf9722925dc08</fileHash>
+      <fileSize>15680</fileSize>
+      <filePath>target/surefire-reports</filePath>
+    </attachedArtifact>
+    <attachedArtifact>
+      <groupId>nl.jvandis.teambalance</groupId>
+      <artifactId>app</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <classifier>mvn-cache-ext-extra-output-24</classifier>
+      <type>zip</type>
+      <fileName>app-mvn-cache-ext-extra-output-24.zip</fileName>
+      <fileHash>99dfdfc039ca569d</fileHash>
+      <fileSize>18155</fileSize>
+      <filePath>target/test-classes</filePath>
+    </attachedArtifact>
+  </attachedArtifacts>
+  <executions>
+    <execution>
+      <executionKey>default-clean:clean:clean:maven-clean-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.clean.CleanMojo</mojoClassName>
+      <properties>
+        <property name="excludeDefaultDirectories" tracked="false">false</property>
+        <property name="failOnError" tracked="false">true</property>
+        <property name="fast" tracked="false">false</property>
+        <property name="fastDir" tracked="false">null</property>
+        <property name="fastMode" tracked="false">background</property>
+        <property name="filesets" tracked="false">null</property>
+        <property name="followSymLinks" tracked="false">false</property>
+        <property name="retryOnError" tracked="false">true</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="verbose" tracked="false">null</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default:revision:initialize:git-commit-id-maven-plugin:io.github.git-commit-id</executionKey>
+      <mojoClassName>pl.project13.maven.git.GitCommitIdMojo</mojoClassName>
+      <properties>
+        <property name="abbrevLength" tracked="false">7</property>
+        <property name="commitIdGenerationMode" tracked="false">flat</property>
+        <property name="dateFormat" tracked="false">yyyy-MM-dd'T'HH:mm:ssXXX</property>
+        <property name="dateFormatTimeZone" tracked="false">null</property>
+        <property name="dotGitDirectory" tracked="false">.git</property>
+        <property name="evaluateOnCommit" tracked="false">HEAD</property>
+        <property name="excludeProperties" tracked="false">null</property>
+        <property name="failOnNoGitDirectory" tracked="false">true</property>
+        <property name="failOnUnableToExtractRepoInfo" tracked="false">true</property>
+        <property name="format" tracked="false">properties</property>
+        <property name="generateGitPropertiesFile" tracked="false">true</property>
+        <property name="generateGitPropertiesFileWithEscapedUnicode" tracked="false">true</property>
+        <property name="generateGitPropertiesFilename" tracked="false">target/classes/git.properties</property>
+        <property name="gitDescribe" tracked="false">GitDescribeConfig{skip=false, always=true, dirty='-dirty', match='*', abbrev=7, tags=false, forceLongFormat=false}</property>
+        <property name="includeOnlyProperties" tracked="false">null</property>
+        <property name="injectAllReactorProjects" tracked="false">false</property>
+        <property name="injectIntoSysProperties" tracked="false">true</property>
+        <property name="nativeGitTimeoutInMs" tracked="false">30000</property>
+        <property name="offline" tracked="false">true</property>
+        <property name="prefix" tracked="false">git</property>
+        <property name="projectBuildOutputTimestamp" tracked="false">null</property>
+        <property name="replacementProperties" tracked="false">null</property>
+        <property name="runOnlyOnce" tracked="false">false</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="skipPoms" tracked="false">false</property>
+        <property name="skipViaCommandLine" tracked="false">false</property>
+        <property name="useBranchNameFromBuildEnvironment" tracked="false">true</property>
+        <property name="useNativeGit" tracked="false">false</property>
+        <property name="useNativeGitViaCommandLine" tracked="false">false</property>
+        <property name="verbose" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>prepare-agent:prepare-agent:initialize:jacoco-maven-plugin:org.jacoco</executionKey>
+      <mojoClassName>org.jacoco.maven.AgentMojo</mojoClassName>
+      <properties>
+        <property name="address" tracked="false">null</property>
+        <property name="append" tracked="false">null</property>
+        <property name="classDumpDir" tracked="false">null</property>
+        <property name="destFile" tracked="false">target/jacoco.exec</property>
+        <property name="dumpOnExit" tracked="false">null</property>
+        <property name="exclClassLoaders" tracked="false">null</property>
+        <property name="excludes" tracked="false">null</property>
+        <property name="inclBootstrapClasses" tracked="false">null</property>
+        <property name="inclNoLocationClasses" tracked="false">null</property>
+        <property name="includes" tracked="false">null</property>
+        <property name="jmx" tracked="false">null</property>
+        <property name="output" tracked="false">null</property>
+        <property name="port" tracked="false">null</property>
+        <property name="propertyName" tracked="false">null</property>
+        <property name="sessionId" tracked="false">null</property>
+        <property name="skip" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>repackage:build-info:generate-resources:spring-boot-maven-plugin:org.springframework.boot</executionKey>
+      <mojoClassName>org.springframework.boot.maven.BuildInfoMojo</mojoClassName>
+      <properties>
+        <property name="additionalProperties" tracked="false">{branch=fix-historic-events, description=Fullstack app combining a spring boot backend with a Single Page app frontend, revision=f846a27-dirty, tag=0.0.1-SNAPSHOT.f846a27-dirty}</property>
+        <property name="excludeInfoProperties" tracked="false">null</property>
+        <property name="outputFile" tracked="false">target/classes/META-INF/build-info.properties</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="time" tracked="false">null</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>unpack-dependencies:unpack-dependencies:generate-resources:maven-dependency-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.dependency.fromDependencies.UnpackDependenciesMojo</mojoClassName>
+      <properties>
+        <property name="classifier" tracked="false">null</property>
+        <property name="encoding" tracked="false">null</property>
+        <property name="excludeArtifactIds" tracked="false">null</property>
+        <property name="excludeClassifiers" tracked="false">null</property>
+        <property name="excludeGroupIds" tracked="false">null</property>
+        <property name="excludeScope" tracked="false">null</property>
+        <property name="excludeTransitive" tracked="false">false</property>
+        <property name="excludeTypes" tracked="false">null</property>
+        <property name="excludes" tracked="false">null</property>
+        <property name="failOnMissingClassifierArtifact" tracked="false">false</property>
+        <property name="fileMappers" tracked="false">{}</property>
+        <property name="ignorePermissions" tracked="false">false</property>
+        <property name="includeArtifactIds" tracked="false">frontend</property>
+        <property name="includeClassifiers" tracked="false">null</property>
+        <property name="includeGroupIds" tracked="false">nl.jvandis.teambalance</property>
+        <property name="includeScope" tracked="false">null</property>
+        <property name="includeTypes" tracked="false">null</property>
+        <property name="includes" tracked="false">static/**/*.*</property>
+        <property name="markersDirectory" tracked="false">target/dependency-maven-plugin-markers</property>
+        <property name="outputAbsoluteArtifactFilename" tracked="false">false</property>
+        <property name="outputDirectory" tracked="false">target/classes</property>
+        <property name="overWriteIfNewer" tracked="false">true</property>
+        <property name="overWriteReleases" tracked="false">false</property>
+        <property name="overWriteSnapshots" tracked="false">false</property>
+        <property name="prependGroupId" tracked="false">false</property>
+        <property name="silent" tracked="false">false</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="skipDuringIncrementalBuild" tracked="false">false</property>
+        <property name="stripClassifier" tracked="false">true</property>
+        <property name="stripType" tracked="false">false</property>
+        <property name="stripVersion" tracked="false">true</property>
+        <property name="type" tracked="false">null</property>
+        <property name="useJvmChmod" tracked="false">true</property>
+        <property name="useRepositoryLayout" tracked="false">false</property>
+        <property name="useSubDirectoryPerArtifact" tracked="false">false</property>
+        <property name="useSubDirectoryPerScope" tracked="false">false</property>
+        <property name="useSubDirectoryPerType" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default-resources:resources:process-resources:maven-resources-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.resources.ResourcesMojo</mojoClassName>
+      <properties>
+        <property name="addDefaultExcludes" tracked="false">true</property>
+        <property name="delimiters" tracked="false">[@]</property>
+        <property name="encoding" tracked="false">UTF-8</property>
+        <property name="escapeString" tracked="false">null</property>
+        <property name="escapeWindowsPaths" tracked="false">true</property>
+        <property name="fileNameFiltering" tracked="false">false</property>
+        <property name="filters" tracked="false">null</property>
+        <property name="includeEmptyDirs" tracked="false">false</property>
+        <property name="mavenFilteringHints" tracked="false">null</property>
+        <property name="nonFilteredFileExtensions" tracked="false">null</property>
+        <property name="outputDirectory" tracked="false">target/classes</property>
+        <property name="overwrite" tracked="false">false</property>
+        <property name="propertiesEncoding" tracked="false">UTF-8</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="supportMultiLineFiltering" tracked="false">false</property>
+        <property name="useBuildFilters" tracked="false">true</property>
+        <property name="useDefaultDelimiters" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>compile:compile:compile:kotlin-maven-plugin:org.jetbrains.kotlin</executionKey>
+      <mojoClassName>org.jetbrains.kotlin.maven.K2JVMCompileMojo</mojoClassName>
+      <properties>
+        <property name="apiVersion" tracked="false">null</property>
+        <property name="args" tracked="false">[-Xjsr305=strict, -Xcontext-receivers]</property>
+        <property name="compilerPlugins" tracked="false">[spring, all-open]</property>
+        <property name="experimentalCoroutines" tracked="false">null</property>
+        <property name="incrementalCachesRoot" tracked="false">target/kotlin-ic</property>
+        <property name="javaParameters" tracked="false">true</property>
+        <property name="jdkHome" tracked="false">null</property>
+        <property name="jvmTarget" tracked="false">17</property>
+        <property name="languageVersion" tracked="false">null</property>
+        <property name="multiPlatform" tracked="false">false</property>
+        <property name="myIncremental" tracked="false">false</property>
+        <property name="nowarn" tracked="false">false</property>
+        <property name="pluginOptions" tracked="false">null</property>
+        <property name="scriptTemplates" tracked="false">[]</property>
+        <property name="sourceDirs" tracked="false">null</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default-testResources:testResources:process-test-resources:maven-resources-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.resources.TestResourcesMojo</mojoClassName>
+      <properties>
+        <property name="addDefaultExcludes" tracked="false">true</property>
+        <property name="delimiters" tracked="false">[@]</property>
+        <property name="encoding" tracked="false">UTF-8</property>
+        <property name="escapeString" tracked="false">null</property>
+        <property name="escapeWindowsPaths" tracked="false">true</property>
+        <property name="fileNameFiltering" tracked="false">false</property>
+        <property name="filters" tracked="false">null</property>
+        <property name="includeEmptyDirs" tracked="false">false</property>
+        <property name="mavenFilteringHints" tracked="false">null</property>
+        <property name="nonFilteredFileExtensions" tracked="false">null</property>
+        <property name="outputDirectory" tracked="false">target/test-classes</property>
+        <property name="overwrite" tracked="false">false</property>
+        <property name="propertiesEncoding" tracked="false">UTF-8</property>
+        <property name="resources" tracked="false">[Resource {targetPath: null, filtering: false, FileSet {directory: src/test/resources, PatternSet [includes: {}, excludes: {}]}}]</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="supportMultiLineFiltering" tracked="false">false</property>
+        <property name="useBuildFilters" tracked="false">true</property>
+        <property name="useDefaultDelimiters" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>test-compile:test-compile:test-compile:kotlin-maven-plugin:org.jetbrains.kotlin</executionKey>
+      <mojoClassName>org.jetbrains.kotlin.maven.KotlinTestCompileMojo</mojoClassName>
+      <properties>
+        <property name="apiVersion" tracked="false">null</property>
+        <property name="args" tracked="false">[-Xjsr305=strict, -Xcontext-receivers]</property>
+        <property name="compilerPlugins" tracked="false">[spring, all-open]</property>
+        <property name="defaultSourceDirs" tracked="false">[src/test/kotlin]</property>
+        <property name="experimentalCoroutines" tracked="false">null</property>
+        <property name="incrementalCachesRoot" tracked="false">target/kotlin-ic</property>
+        <property name="javaParameters" tracked="false">true</property>
+        <property name="jdkHome" tracked="false">null</property>
+        <property name="jvmTarget" tracked="false">17</property>
+        <property name="languageVersion" tracked="false">null</property>
+        <property name="multiPlatform" tracked="false">false</property>
+        <property name="myIncremental" tracked="false">false</property>
+        <property name="nowarn" tracked="false">false</property>
+        <property name="pluginOptions" tracked="false">null</property>
+        <property name="scriptTemplates" tracked="false">[]</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="sourceDirs" tracked="false">null</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default-test:test:test:maven-surefire-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugin.surefire.SurefirePlugin</mojoClassName>
+      <properties>
+        <property name="additionalClasspathElements" tracked="false">{}</property>
+        <property name="argLine" tracked="false">@{argLine} -Dliquibase.secureParsing=false</property>
+        <property name="childDelegation" tracked="false">false</property>
+        <property name="classesDirectory" tracked="false">target/classes</property>
+        <property name="classpathDependencyExcludes" tracked="false">{}</property>
+        <property name="classpathDependencyScopeExclude" tracked="false">null</property>
+        <property name="consoleOutputReporter" tracked="false">null</property>
+        <property name="debugForkedProcess" tracked="false">null</property>
+        <property name="dependenciesToScan" tracked="false">{}</property>
+        <property name="disableXmlReport" tracked="false">false</property>
+        <property name="enableAssertions" tracked="false">true</property>
+        <property name="enableProcessChecker" tracked="false">null</property>
+        <property name="encoding" tracked="false">UTF-8</property>
+        <property name="environmentVariables" tracked="false">{}</property>
+        <property name="excludeJUnit5Engines" tracked="false">{}</property>
+        <property name="excludedEnvironmentVariables" tracked="false">{}</property>
+        <property name="excludedGroups" tracked="false">null</property>
+        <property name="excludes" tracked="false">[]</property>
+        <property name="excludesFile" tracked="false">null</property>
+        <property name="failIfNoSpecifiedTests" tracked="false">true</property>
+        <property name="failIfNoTests" tracked="false">false</property>
+        <property name="failOnFlakeCount" tracked="false">0</property>
+        <property name="forkCount" tracked="false">1</property>
+        <property name="forkNode" tracked="false">null</property>
+        <property name="forkedProcessExitTimeoutInSeconds" tracked="false">30</property>
+        <property name="forkedProcessTimeoutInSeconds" tracked="false">0</property>
+        <property name="groups" tracked="false">null</property>
+        <property name="includeJUnit5Engines" tracked="false">{}</property>
+        <property name="includes" tracked="false">[]</property>
+        <property name="includesFile" tracked="false">null</property>
+        <property name="jdkToolchain" tracked="false">null</property>
+        <property name="junitArtifactName" tracked="false">junit:junit</property>
+        <property name="jvm" tracked="false">null</property>
+        <property name="objectFactory" tracked="false">null</property>
+        <property name="parallel" tracked="false">null</property>
+        <property name="parallelOptimized" tracked="false">true</property>
+        <property name="parallelTestsTimeoutForcedInSeconds" tracked="false">0.0</property>
+        <property name="parallelTestsTimeoutInSeconds" tracked="false">0.0</property>
+        <property name="perCoreThreadCount" tracked="false">true</property>
+        <property name="printSummary" tracked="false">true</property>
+        <property name="properties" tracked="false">{}</property>
+        <property name="redirectTestOutputToFile" tracked="false">false</property>
+        <property name="reportFormat" tracked="false">brief</property>
+        <property name="reportNameSuffix" tracked="false">null</property>
+        <property name="reportsDirectory" tracked="false">target/surefire-reports</property>
+        <property name="rerunFailingTestsCount" tracked="false">0</property>
+        <property name="reuseForks" tracked="false">true</property>
+        <property name="runOrder" tracked="false">filesystem</property>
+        <property name="runOrderRandomSeed" tracked="false">null</property>
+        <property name="shutdown" tracked="false">exit</property>
+        <property name="skip" tracked="true">false</property>
+        <property name="skipAfterFailureCount" tracked="false">0</property>
+        <property name="skipExec" tracked="true">false</property>
+        <property name="skipTests" tracked="true">false</property>
+        <property name="statelessTestsetInfoReporter" tracked="false">null</property>
+        <property name="statelessTestsetReporter" tracked="false">null</property>
+        <property name="suiteXmlFiles" tracked="false">{}</property>
+        <property name="systemProperties" tracked="false">null</property>
+        <property name="systemPropertiesFile" tracked="false">null</property>
+        <property name="systemPropertyVariables" tracked="false">null</property>
+        <property name="tempDir" tracked="false">surefire</property>
+        <property name="test" tracked="false">null</property>
+        <property name="testClassesDirectory" tracked="false">target/test-classes</property>
+        <property name="testFailureIgnore" tracked="true">false</property>
+        <property name="testNGArtifactName" tracked="false">org.testng:testng</property>
+        <property name="testSourceDirectory" tracked="false">src/test/kotlin</property>
+        <property name="threadCount" tracked="false">0</property>
+        <property name="threadCountClasses" tracked="false">0</property>
+        <property name="threadCountMethods" tracked="false">0</property>
+        <property name="threadCountSuites" tracked="false">0</property>
+        <property name="trimStackTrace" tracked="false">false</property>
+        <property name="useFile" tracked="false">true</property>
+        <property name="useManifestOnlyJar" tracked="false">true</property>
+        <property name="useModulePath" tracked="false">true</property>
+        <property name="useSystemClassLoader" tracked="false">true</property>
+        <property name="useUnlimitedThreads" tracked="false">false</property>
+        <property name="workingDirectory" tracked="false">/Users/juliusvandis/IdeaProjects/Personal/teambalance/app</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default-jar:jar:package:maven-jar-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.jar.JarMojo</mojoClassName>
+      <properties>
+        <property name="addDefaultExcludes" tracked="false">true</property>
+        <property name="archive" tracked="false">org.apache.maven.archiver.MavenArchiveConfiguration@3b32c4c0</property>
+        <property name="classesDirectory" tracked="false">target/classes</property>
+        <property name="classifier" tracked="false">null</property>
+        <property name="detectMultiReleaseJar" tracked="false">true</property>
+        <property name="excludes" tracked="false">null</property>
+        <property name="forceCreation" tracked="false">false</property>
+        <property name="includes" tracked="false">null</property>
+        <property name="outputDirectory" tracked="false">target</property>
+        <property name="outputTimestamp" tracked="false">null</property>
+        <property name="skipIfEmpty" tracked="false">false</property>
+        <property name="useDefaultManifestFile" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>repackage:repackage:package:spring-boot-maven-plugin:org.springframework.boot</executionKey>
+      <mojoClassName>org.springframework.boot.maven.RepackageMojo</mojoClassName>
+      <properties>
+        <property name="attach" tracked="false">true</property>
+        <property name="classifier" tracked="false">exec</property>
+        <property name="embeddedLaunchScript" tracked="false">null</property>
+        <property name="embeddedLaunchScriptProperties" tracked="false">null</property>
+        <property name="excludeDevtools" tracked="false">true</property>
+        <property name="excludeDockerCompose" tracked="false">true</property>
+        <property name="excludeGroupIds" tracked="false">null</property>
+        <property name="excludes" tracked="false">[]</property>
+        <property name="executable" tracked="false">false</property>
+        <property name="includeSystemScope" tracked="false">false</property>
+        <property name="includeTools" tracked="false">true</property>
+        <property name="includes" tracked="false">[]</property>
+        <property name="layers" tracked="false">org.springframework.boot.maven.Layers@6c58c828</property>
+        <property name="layout" tracked="false">null</property>
+        <property name="layoutFactory" tracked="false">null</property>
+        <property name="loaderImplementation" tracked="false">null</property>
+        <property name="mainClass" tracked="false">nl.jvandis.teambalance.ApplicationKt</property>
+        <property name="outputDirectory" tracked="false">target</property>
+        <property name="outputTimestamp" tracked="false">null</property>
+        <property name="requiresUnpack" tracked="false">null</property>
+        <property name="skip" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>report:report:verify:jacoco-maven-plugin:org.jacoco</executionKey>
+      <mojoClassName>org.jacoco.maven.ReportMojo</mojoClassName>
+      <properties>
+        <property name="dataFile" tracked="false">target/jacoco.exec</property>
+        <property name="excludes" tracked="false">null</property>
+        <property name="footer" tracked="false">null</property>
+        <property name="formats" tracked="false">[HTML, XML, CSV]</property>
+        <property name="includes" tracked="false">null</property>
+        <property name="outputDirectory" tracked="false">target/site/jacoco</property>
+        <property name="outputEncoding" tracked="false">UTF-8</property>
+        <property name="skip" tracked="true">false</property>
+        <property name="sourceEncoding" tracked="false">UTF-8</property>
+        <property name="title" tracked="false">Team balance - app</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default-install:install:install:maven-install-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.install.InstallMojo</mojoClassName>
+      <properties>
+        <property name="allowIncompleteProjects" tracked="false">false</property>
+        <property name="installAtEnd" tracked="false">false</property>
+        <property name="skip" tracked="false">false</property>
+      </properties>
+    </execution>
+  </executions>
+  <projectsInputInfo>
+    <checksum>c12d2516d77deb3d</checksum>
+    <items>
+      <item type="pom" hash="d17d35a90a7642ac">&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  &lt;groupId>nl.jvandis.teambalance&lt;/groupId>
+  &lt;artifactId>app&lt;/artifactId>
+  &lt;version>cache-extension-version&lt;/version>
+  &lt;dependencies>
+    &lt;dependency>
+      &lt;groupId>nl.jvandis.teambalance&lt;/groupId>
+      &lt;artifactId>backend&lt;/artifactId>
+      &lt;version>cache-extension-version&lt;/version>
+      &lt;scope>compile&lt;/scope>
+      &lt;exclusions>
+        &lt;exclusion>
+          &lt;groupId>junit&lt;/groupId>
+          &lt;artifactId>junit&lt;/artifactId>
+        &lt;/exclusion>
+      &lt;/exclusions>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>nl.jvandis.teambalance&lt;/groupId>
+      &lt;artifactId>frontend&lt;/artifactId>
+      &lt;version>cache-extension-version&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>com.google.cloud&lt;/groupId>
+      &lt;artifactId>google-cloud-logging-logback&lt;/artifactId>
+      &lt;version>0.131.5-alpha&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.testcontainers&lt;/groupId>
+      &lt;artifactId>junit-jupiter&lt;/artifactId>
+      &lt;version>1.18.0&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.junit.jupiter&lt;/groupId>
+      &lt;artifactId>junit-jupiter&lt;/artifactId>
+      &lt;version>5.10.3&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.junit.jupiter&lt;/groupId>
+      &lt;artifactId>junit-jupiter-engine&lt;/artifactId>
+      &lt;version>5.10.3&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+      &lt;artifactId>kotlin-stdlib-jdk8&lt;/artifactId>
+      &lt;version>1.9.24&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+      &lt;artifactId>kotlin-test&lt;/artifactId>
+      &lt;version>1.9.24&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.mockito.kotlin&lt;/groupId>
+      &lt;artifactId>mockito-kotlin&lt;/artifactId>
+      &lt;version>4.0.0&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.testcontainers&lt;/groupId>
+      &lt;artifactId>postgresql&lt;/artifactId>
+      &lt;version>1.18.0&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.sonarsource.scanner.maven&lt;/groupId>
+      &lt;artifactId>sonar-maven-plugin&lt;/artifactId>
+      &lt;version>4.0.0.4121&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springframework.boot&lt;/groupId>
+      &lt;artifactId>spring-boot-starter-test&lt;/artifactId>
+      &lt;version>3.3.2&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springframework.security&lt;/groupId>
+      &lt;artifactId>spring-security-test&lt;/artifactId>
+      &lt;version>6.3.1&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+  &lt;/dependencies>
+  &lt;build>
+    &lt;plugins>
+      &lt;plugin>
+        &lt;groupId>io.github.git-commit-id&lt;/groupId>
+        &lt;artifactId>git-commit-id-maven-plugin&lt;/artifactId>
+        &lt;version>8.0.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;phase>initialize&lt;/phase>
+            &lt;goals>
+              &lt;goal>revision&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;verbose>false&lt;/verbose>
+              &lt;generateGitPropertiesFile>true&lt;/generateGitPropertiesFile>
+              &lt;generateGitPropertiesFilename>/target/classes/git.properties&lt;/generateGitPropertiesFilename>
+              &lt;skipPoms>false&lt;/skipPoms>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;verbose>false&lt;/verbose>
+          &lt;generateGitPropertiesFile>true&lt;/generateGitPropertiesFile>
+          &lt;generateGitPropertiesFilename>/target/classes/git.properties&lt;/generateGitPropertiesFilename>
+          &lt;skipPoms>false&lt;/skipPoms>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+        &lt;artifactId>kotlin-maven-plugin&lt;/artifactId>
+        &lt;version>1.9.24&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>compile&lt;/id>
+            &lt;phase>compile&lt;/phase>
+            &lt;goals>
+              &lt;goal>compile&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;args>
+                &lt;arg>-Xjsr305=strict&lt;/arg>
+                &lt;arg>-Xcontext-receivers&lt;/arg>
+              &lt;/args>
+              &lt;compilerPlugins>
+                &lt;plugin>spring&lt;/plugin>
+                &lt;plugin>all-open&lt;/plugin>
+              &lt;/compilerPlugins>
+              &lt;jvmTarget>17&lt;/jvmTarget>
+              &lt;javaParameters>true&lt;/javaParameters>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>test-compile&lt;/id>
+            &lt;phase>test-compile&lt;/phase>
+            &lt;goals>
+              &lt;goal>test-compile&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;args>
+                &lt;arg>-Xjsr305=strict&lt;/arg>
+                &lt;arg>-Xcontext-receivers&lt;/arg>
+              &lt;/args>
+              &lt;compilerPlugins>
+                &lt;plugin>spring&lt;/plugin>
+                &lt;plugin>all-open&lt;/plugin>
+              &lt;/compilerPlugins>
+              &lt;jvmTarget>17&lt;/jvmTarget>
+              &lt;javaParameters>true&lt;/javaParameters>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;dependencies>
+          &lt;dependency>
+            &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+            &lt;artifactId>kotlin-maven-allopen&lt;/artifactId>
+            &lt;version>1.9.24&lt;/version>
+            &lt;scope>compile&lt;/scope>
+          &lt;/dependency>
+        &lt;/dependencies>
+        &lt;configuration>
+          &lt;args>
+            &lt;arg>-Xjsr305=strict&lt;/arg>
+            &lt;arg>-Xcontext-receivers&lt;/arg>
+          &lt;/args>
+          &lt;compilerPlugins>
+            &lt;plugin>spring&lt;/plugin>
+            &lt;plugin>all-open&lt;/plugin>
+          &lt;/compilerPlugins>
+          &lt;jvmTarget>17&lt;/jvmTarget>
+          &lt;javaParameters>true&lt;/javaParameters>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-surefire-plugin&lt;/artifactId>
+        &lt;version>3.1.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-test&lt;/id>
+            &lt;phase>test&lt;/phase>
+            &lt;goals>
+              &lt;goal>test&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;argLine>@{argLine} -Dliquibase.secureParsing=false&lt;/argLine>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;argLine>@{argLine} -Dliquibase.secureParsing=false&lt;/argLine>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;groupId>com.github.eirslett&lt;/groupId>
+        &lt;artifactId>frontend-maven-plugin&lt;/artifactId>
+        &lt;version>1.15.1&lt;/version>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;groupId>org.jacoco&lt;/groupId>
+        &lt;artifactId>jacoco-maven-plugin&lt;/artifactId>
+        &lt;version>0.8.12&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>prepare-agent&lt;/id>
+            &lt;goals>
+              &lt;goal>prepare-agent&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>report&lt;/id>
+            &lt;goals>
+              &lt;goal>report&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-antrun-plugin&lt;/artifactId>
+        &lt;version>3.1.0&lt;/version>
+        &lt;dependencies>
+          &lt;dependency>
+            &lt;groupId>com.pinterest&lt;/groupId>
+            &lt;artifactId>ktlint&lt;/artifactId>
+            &lt;version>0.51.0-FINAL&lt;/version>
+            &lt;scope>compile&lt;/scope>
+          &lt;/dependency>
+        &lt;/dependencies>
+        &lt;configuration>
+          &lt;skip>false&lt;/skip>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-compiler-plugin&lt;/artifactId>
+        &lt;version>3.13.0&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-compile&lt;/id>
+            &lt;phase>none&lt;/phase>
+            &lt;goals>
+              &lt;goal>compile&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;parameters>true&lt;/parameters>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>default-testCompile&lt;/id>
+            &lt;phase>none&lt;/phase>
+            &lt;goals>
+              &lt;goal>testCompile&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;parameters>true&lt;/parameters>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;parameters>true&lt;/parameters>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;groupId>org.springframework.boot&lt;/groupId>
+        &lt;artifactId>spring-boot-maven-plugin&lt;/artifactId>
+        &lt;version>3.3.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>repackage&lt;/id>
+            &lt;goals>
+              &lt;goal>build-info&lt;/goal>
+              &lt;goal>repackage&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;mainClass>nl.jvandis.teambalance.ApplicationKt&lt;/mainClass>
+              &lt;additionalProperties>
+                &lt;branch>${git.branch}&lt;/branch>
+                &lt;description>Fullstack app combining a spring boot backend with a Single Page app frontend&lt;/description>
+                &lt;revision>${git.commit.id.describe}&lt;/revision>
+                &lt;tag>0.0.1-SNAPSHOT.${git.commit.id.describe}&lt;/tag>
+              &lt;/additionalProperties>
+              &lt;classifier>exec&lt;/classifier>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;mainClass>nl.jvandis.teambalance.ApplicationKt&lt;/mainClass>
+          &lt;additionalProperties>
+            &lt;branch>${git.branch}&lt;/branch>
+            &lt;description>Fullstack app combining a spring boot backend with a Single Page app frontend&lt;/description>
+            &lt;revision>${git.commit.id.describe}&lt;/revision>
+            &lt;tag>0.0.1-SNAPSHOT.${git.commit.id.describe}&lt;/tag>
+          &lt;/additionalProperties>
+          &lt;classifier>exec&lt;/classifier>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-dependency-plugin&lt;/artifactId>
+        &lt;version>3.4.0&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>unpack-dependencies&lt;/id>
+            &lt;phase>generate-resources&lt;/phase>
+            &lt;goals>
+              &lt;goal>unpack-dependencies&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;includeGroupIds>nl.jvandis.teambalance&lt;/includeGroupIds>
+              &lt;includeArtifactIds>frontend&lt;/includeArtifactIds>
+              &lt;includes>static/**/*.*&lt;/includes>
+              &lt;outputDirectory>/target/classes&lt;/outputDirectory>
+              &lt;useSubDirectoryPerArtifact>false&lt;/useSubDirectoryPerArtifact>
+              &lt;stripVersion>true&lt;/stripVersion>
+              &lt;stripClassifier>true&lt;/stripClassifier>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;groupId>com.google.cloud.tools&lt;/groupId>
+        &lt;artifactId>jib-maven-plugin&lt;/artifactId>
+        &lt;version>3.4.4&lt;/version>
+        &lt;configuration>
+          &lt;from>
+            &lt;image>eclipse-temurin:21-alpine&lt;/image>
+          &lt;/from>
+          &lt;to>
+            &lt;image>eu.gcr.io/tovoheren5/teambalance&lt;/image>
+            &lt;tags>0.0.1-SNAPSHOT-${git.commit.id.describe}&lt;/tags>
+          &lt;/to>
+          &lt;skip>false&lt;/skip>
+          &lt;container>
+            &lt;mainClass>nl.jvandis.teambalance.ApplicationKt&lt;/mainClass>
+            &lt;jvmFlags>
+              &lt;jvmFlag>-Dliquibase.secureParsing=false&lt;/jvmFlag>
+            &lt;/jvmFlags>
+            &lt;ports>
+              &lt;port>8080&lt;/port>
+            &lt;/ports>
+          &lt;/container>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-clean-plugin&lt;/artifactId>
+        &lt;version>3.3.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-clean&lt;/id>
+            &lt;phase>clean&lt;/phase>
+            &lt;goals>
+              &lt;goal>clean&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-resources-plugin&lt;/artifactId>
+        &lt;version>3.3.1&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-testResources&lt;/id>
+            &lt;phase>process-test-resources&lt;/phase>
+            &lt;goals>
+              &lt;goal>testResources&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;propertiesEncoding>UTF-8&lt;/propertiesEncoding>
+              &lt;delimiters>
+                &lt;delimiter>@&lt;/delimiter>
+              &lt;/delimiters>
+              &lt;useDefaultDelimiters>false&lt;/useDefaultDelimiters>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>default-resources&lt;/id>
+            &lt;phase>process-resources&lt;/phase>
+            &lt;goals>
+              &lt;goal>resources&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;propertiesEncoding>UTF-8&lt;/propertiesEncoding>
+              &lt;delimiters>
+                &lt;delimiter>@&lt;/delimiter>
+              &lt;/delimiters>
+              &lt;useDefaultDelimiters>false&lt;/useDefaultDelimiters>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;propertiesEncoding>UTF-8&lt;/propertiesEncoding>
+          &lt;delimiters>
+            &lt;delimiter>@&lt;/delimiter>
+          &lt;/delimiters>
+          &lt;useDefaultDelimiters>false&lt;/useDefaultDelimiters>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-jar-plugin&lt;/artifactId>
+        &lt;version>3.4.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-jar&lt;/id>
+            &lt;phase>package&lt;/phase>
+            &lt;goals>
+              &lt;goal>jar&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;archive>
+                &lt;manifest>
+                  &lt;mainClass>${start-class}&lt;/mainClass>
+                  &lt;addDefaultImplementationEntries>true&lt;/addDefaultImplementationEntries>
+                &lt;/manifest>
+              &lt;/archive>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;archive>
+            &lt;manifest>
+              &lt;mainClass>${start-class}&lt;/mainClass>
+              &lt;addDefaultImplementationEntries>true&lt;/addDefaultImplementationEntries>
+            &lt;/manifest>
+          &lt;/archive>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-install-plugin&lt;/artifactId>
+        &lt;version>3.1.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-install&lt;/id>
+            &lt;phase>install&lt;/phase>
+            &lt;goals>
+              &lt;goal>install&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-deploy-plugin&lt;/artifactId>
+        &lt;version>3.1.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-deploy&lt;/id>
+            &lt;phase>deploy&lt;/phase>
+            &lt;goals>
+              &lt;goal>deploy&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-site-plugin&lt;/artifactId>
+        &lt;version>3.12.1&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-site&lt;/id>
+            &lt;phase>site&lt;/phase>
+            &lt;goals>
+              &lt;goal>site&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;outputDirectory>/target/site&lt;/outputDirectory>
+              &lt;reportPlugins>
+                &lt;reportPlugin>
+                  &lt;groupId>org.apache.maven.plugins&lt;/groupId>
+                  &lt;artifactId>maven-project-info-reports-plugin&lt;/artifactId>
+                &lt;/reportPlugin>
+              &lt;/reportPlugins>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>default-deploy&lt;/id>
+            &lt;phase>site-deploy&lt;/phase>
+            &lt;goals>
+              &lt;goal>deploy&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;outputDirectory>/target/site&lt;/outputDirectory>
+              &lt;reportPlugins>
+                &lt;reportPlugin>
+                  &lt;groupId>org.apache.maven.plugins&lt;/groupId>
+                  &lt;artifactId>maven-project-info-reports-plugin&lt;/artifactId>
+                &lt;/reportPlugin>
+              &lt;/reportPlugins>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;outputDirectory>/target/site&lt;/outputDirectory>
+          &lt;reportPlugins>
+            &lt;reportPlugin>
+              &lt;groupId>org.apache.maven.plugins&lt;/groupId>
+              &lt;artifactId>maven-project-info-reports-plugin&lt;/artifactId>
+            &lt;/reportPlugin>
+          &lt;/reportPlugins>
+        &lt;/configuration>
+      &lt;/plugin>
+    &lt;/plugins>
+  &lt;/build>
+&lt;/project>
+</item>
+      <item type="file" hash="8cd1c2dbf1d82935" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl.jvandis.teambalance/Application.kt</item>
+      <item type="file" hash="852fcac964f2cd67" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl.jvandis.teambalance/SecurityConfiguration.kt</item>
+      <item type="file" hash="0bb92fdefc23bf24" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl.jvandis.teambalance/WebConfig.kt</item>
+      <item type="file" hash="e6a2e395ffca0bad" content="application/x-yaml" isText="unknown" charset="US-ASCII" eol="LF">src/main/resources/application-cloud.yml</item>
+      <item type="file" hash="cdc96e6beeb961f5" content="application/x-yaml" isText="unknown" charset="US-ASCII" eol="LF">src/main/resources/application-dev.yml</item>
+      <item type="file" hash="97bb3c7927894078" content="application/x-yaml" isText="unknown" charset="US-ASCII" eol="LF">src/main/resources/application-local.yml</item>
+      <item type="file" hash="5dabaa9ed2374b59" content="application/x-yaml" isText="unknown" charset="US-ASCII" eol="LF">src/main/resources/application.yml</item>
+      <item type="file" hash="cf71b3f66e5c4af2" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/main/resources/logback-cloud.xml</item>
+      <item type="file" hash="32f7895ee70d3a72" isText="unknown" charset="US-ASCII" eol="LF">src/test/kotlin/nl/jvandis/teambalance/AbstractIntegrationTest.kt</item>
+      <item type="file" hash="7273912847613b10" isText="unknown" charset="US-ASCII" eol="LF">src/test/kotlin/nl/jvandis/teambalance/api/training/TrainingIntegrationTest.kt</item>
+      <item type="file" hash="dd2d76f2024d5852" content="application/x-yaml" isText="unknown" charset="US-ASCII" eol="LF">src/test/resources/application-integration-test.yml</item>
+      <item type="file" hash="b9ecbad86e44cefb" content="application/x-yaml" isText="unknown" charset="US-ASCII" eol="LF">src/test/resources/application-test.yml</item>
+      <item type="file" hash="b25bce9365c5b295" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/test/resources/logback-test.xml</item>
+      <item type="dependency" hash="09cfa776aa20adf4">nl.jvandis.teambalance:backend:jar</item>
+      <item type="dependency" hash="c65b46569dc09052">nl.jvandis.teambalance:frontend:jar</item>
+    </items>
+  </projectsInputInfo>
+</build>

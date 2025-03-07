@@ -112,6 +112,7 @@
                         <revision>${git.commit.id.describe}</revision>
                         <tag>${project.version}.${git.commit.id.describe}</tag>
                     </additionalProperties>
+                    <classifier>exec</classifier>
                 </configuration>
             </plugin>
 
@@ -154,6 +155,7 @@
                     <skip>false</skip>
                     <container>
                         <mainClass>nl.jvandis.teambalance.ApplicationKt</mainClass>
+
                         <jvmFlags>
                             <jvmFlag>-Dliquibase.secureParsing=false</jvmFlag>
                         </jvmFlags>

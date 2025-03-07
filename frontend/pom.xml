@@ -15,6 +15,14 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>Team balance - Frontend React App</name>
 
+
+    <properties>
+        <jacoco.skip>true</jacoco.skip>
+        <maven.compile.skip>true</maven.compile.skip>
+        <maven.test.skip>true</maven.test.skip>
+        <maven.resources.skip>true</maven.resources.skip>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -77,13 +85,12 @@
                         <goals>
                             <goal>npm</goal>
                         </goals>
-                        <phase>validate</phase>
+                        <phase>process-resources</phase>
                         <configuration>
                             <skip>${npm.lint.fix.skip}</skip>
                             <arguments>run lint:fix</arguments>
                         </configuration>
                     </execution>
-
                 </executions>
             </plugin>
 

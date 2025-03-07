@@ -1,0 +1,1286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build xsi:schemaLocation="http://maven.apache.org/BUILD-CACHE-BUILD/1.0.0 https://maven.apache.org/xsd/build-cache-build-1.0.0.xsd"
+    xmlns="http://maven.apache.org/BUILD-CACHE-BUILD/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <cacheImplementationVersion>v1.1</cacheImplementationVersion>
+  <final>false</final>
+  <hashFunction>XX</hashFunction>
+  <buildTime>2025-02-19T17:22:28.328</buildTime>
+  <buildServer>localhost</buildServer>
+  <scm>
+    <sourceBranch>refs/heads/fix-historic-events</sourceBranch>
+    <revision>f846a277ce4d7ba3e24ca2ff3b917488bd186f83</revision>
+  </scm>
+  <goals>
+    <goal>clean</goal>
+    <goal>install</goal>
+  </goals>
+  <artifact>
+    <groupId>nl.jvandis.teambalance</groupId>
+    <artifactId>backend</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <type>jar</type>
+    <fileName>backend.jar</fileName>
+    <fileHash>8161eaccbe9a430b</fileHash>
+    <fileSize>720409</fileSize>
+    <filePath>target/backend-0.0.1-SNAPSHOT.jar</filePath>
+  </artifact>
+  <attachedArtifacts>
+    <attachedArtifact>
+      <groupId>nl.jvandis.teambalance</groupId>
+      <artifactId>backend</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <classifier>mvn-cache-ext-generated-source-14</classifier>
+      <type>zip</type>
+      <fileName>backend-mvn-cache-ext-generated-source-14.zip</fileName>
+      <fileHash>bf81e39273231ea7</fileHash>
+      <fileSize>45227</fileSize>
+      <filePath>target/generated-sources</filePath>
+    </attachedArtifact>
+    <attachedArtifact>
+      <groupId>nl.jvandis.teambalance</groupId>
+      <artifactId>backend</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <classifier>mvn-cache-ext-extra-output-15</classifier>
+      <type>zip</type>
+      <fileName>backend-mvn-cache-ext-extra-output-15.zip</fileName>
+      <fileHash>4ed1f04d14306e4f</fileHash>
+      <fileSize>9872</fileSize>
+      <filePath>target</filePath>
+    </attachedArtifact>
+    <attachedArtifact>
+      <groupId>nl.jvandis.teambalance</groupId>
+      <artifactId>backend</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <classifier>mvn-cache-ext-extra-output-16</classifier>
+      <type>zip</type>
+      <fileName>backend-mvn-cache-ext-extra-output-16.zip</fileName>
+      <fileHash>ce088ff2101c9f3b</fileHash>
+      <fileSize>718511</fileSize>
+      <filePath>target/classes</filePath>
+    </attachedArtifact>
+    <attachedArtifact>
+      <groupId>nl.jvandis.teambalance</groupId>
+      <artifactId>backend</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <classifier>mvn-cache-ext-extra-output-17</classifier>
+      <type>zip</type>
+      <fileName>backend-mvn-cache-ext-extra-output-17.zip</fileName>
+      <fileHash>89e3336796a8eca1</fileHash>
+      <fileSize>847237</fileSize>
+      <filePath>target/site/jacoco</filePath>
+    </attachedArtifact>
+    <attachedArtifact>
+      <groupId>nl.jvandis.teambalance</groupId>
+      <artifactId>backend</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <classifier>mvn-cache-ext-extra-output-18</classifier>
+      <type>zip</type>
+      <fileName>backend-mvn-cache-ext-extra-output-18.zip</fileName>
+      <fileHash>b62efdf10b25b7fe</fileHash>
+      <fileSize>5904</fileSize>
+      <filePath>target/surefire-reports</filePath>
+    </attachedArtifact>
+    <attachedArtifact>
+      <groupId>nl.jvandis.teambalance</groupId>
+      <artifactId>backend</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <classifier>mvn-cache-ext-extra-output-19</classifier>
+      <type>zip</type>
+      <fileName>backend-mvn-cache-ext-extra-output-19.zip</fileName>
+      <fileHash>e31a6422fd8ebaef</fileHash>
+      <fileSize>4911</fileSize>
+      <filePath>target/test-classes</filePath>
+    </attachedArtifact>
+  </attachedArtifacts>
+  <executions>
+    <execution>
+      <executionKey>default-clean:clean:clean:maven-clean-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.clean.CleanMojo</mojoClassName>
+      <properties>
+        <property name="excludeDefaultDirectories" tracked="false">false</property>
+        <property name="failOnError" tracked="false">true</property>
+        <property name="fast" tracked="false">false</property>
+        <property name="fastDir" tracked="false">null</property>
+        <property name="fastMode" tracked="false">background</property>
+        <property name="filesets" tracked="false">null</property>
+        <property name="followSymLinks" tracked="false">false</property>
+        <property name="retryOnError" tracked="false">true</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="verbose" tracked="false">null</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default:revision:initialize:git-commit-id-maven-plugin:io.github.git-commit-id</executionKey>
+      <mojoClassName>pl.project13.maven.git.GitCommitIdMojo</mojoClassName>
+      <properties>
+        <property name="abbrevLength" tracked="false">7</property>
+        <property name="commitIdGenerationMode" tracked="false">flat</property>
+        <property name="dateFormat" tracked="false">yyyy-MM-dd'T'HH:mm:ssXXX</property>
+        <property name="dateFormatTimeZone" tracked="false">null</property>
+        <property name="dotGitDirectory" tracked="false">.git</property>
+        <property name="evaluateOnCommit" tracked="false">HEAD</property>
+        <property name="excludeProperties" tracked="false">null</property>
+        <property name="failOnNoGitDirectory" tracked="false">true</property>
+        <property name="failOnUnableToExtractRepoInfo" tracked="false">true</property>
+        <property name="format" tracked="false">properties</property>
+        <property name="generateGitPropertiesFile" tracked="false">true</property>
+        <property name="generateGitPropertiesFileWithEscapedUnicode" tracked="false">true</property>
+        <property name="generateGitPropertiesFilename" tracked="false">target/classes/git.properties</property>
+        <property name="gitDescribe" tracked="false">GitDescribeConfig{skip=false, always=true, dirty='-dirty', match='*', abbrev=7, tags=false, forceLongFormat=false}</property>
+        <property name="includeOnlyProperties" tracked="false">null</property>
+        <property name="injectAllReactorProjects" tracked="false">false</property>
+        <property name="injectIntoSysProperties" tracked="false">true</property>
+        <property name="nativeGitTimeoutInMs" tracked="false">30000</property>
+        <property name="offline" tracked="false">true</property>
+        <property name="prefix" tracked="false">git</property>
+        <property name="projectBuildOutputTimestamp" tracked="false">null</property>
+        <property name="replacementProperties" tracked="false">null</property>
+        <property name="runOnlyOnce" tracked="false">false</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="skipPoms" tracked="false">false</property>
+        <property name="skipViaCommandLine" tracked="false">false</property>
+        <property name="useBranchNameFromBuildEnvironment" tracked="false">true</property>
+        <property name="useNativeGit" tracked="false">false</property>
+        <property name="useNativeGitViaCommandLine" tracked="false">false</property>
+        <property name="verbose" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>prepare-agent:prepare-agent:initialize:jacoco-maven-plugin:org.jacoco</executionKey>
+      <mojoClassName>org.jacoco.maven.AgentMojo</mojoClassName>
+      <properties>
+        <property name="address" tracked="false">null</property>
+        <property name="append" tracked="false">null</property>
+        <property name="classDumpDir" tracked="false">null</property>
+        <property name="destFile" tracked="false">target/jacoco.exec</property>
+        <property name="dumpOnExit" tracked="false">null</property>
+        <property name="exclClassLoaders" tracked="false">null</property>
+        <property name="excludes" tracked="false">null</property>
+        <property name="inclBootstrapClasses" tracked="false">null</property>
+        <property name="inclNoLocationClasses" tracked="false">null</property>
+        <property name="includes" tracked="false">null</property>
+        <property name="jmx" tracked="false">null</property>
+        <property name="output" tracked="false">null</property>
+        <property name="port" tracked="false">null</property>
+        <property name="propertyName" tracked="false">null</property>
+        <property name="sessionId" tracked="false">null</property>
+        <property name="skip" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default:generate:generate-sources:jooq-codegen-maven:org.jooq</executionKey>
+      <mojoClassName>org.jooq.codegen.maven.Plugin</mojoClassName>
+      <properties>
+        <property name="basedir" tracked="false">null</property>
+        <property name="configurationFile" tracked="false">null</property>
+        <property name="configurationFiles" tracked="false">[]</property>
+        <property name="generator" tracked="false">&lt;name>org.jooq.codegen.KotlinGenerator&lt;/name>&lt;strategy>&lt;name>org.jooq.codegen.DefaultGeneratorStrategy&lt;/name>&lt;/strategy>&lt;database>&lt;regexFlags>&lt;/regexFlags>&lt;regexMatchesPartialQualification>true&lt;/regexMatchesPartialQualification>&lt;sqlMatchesPartialQualification>true&lt;/sqlMatchesPartialQualification>&lt;includeExcludeColumns>false&lt;/includeExcludeColumns>&lt;includeExcludePackageRoutines>false&lt;/includeExcludePackageRoutines>&lt;includeTables>true&lt;/includeTables>&lt;includeEmbeddables>true&lt;/includeEmbeddables>&lt;includeRoutines>true&lt;/includeRoutines>&lt;includeTriggerRoutines>false&lt;/includeTriggerRoutines>&lt;includePackages>true&lt;/includePackages>&lt;includePackageRoutines>true&lt;/includePackageRoutines>&lt;includePackageUDTs>true&lt;/includePackageUDTs>&lt;includePackageConstants>true&lt;/includePackageConstants>&lt;includeXMLSchemaCollections>true&lt;/includeXMLSchemaCollections>&lt;includeUDTs>true&lt;/includeUDTs>&lt;includeDomains>true&lt;/includeDomains>&lt;includeSequences>true&lt;/includeSequences>&lt;includeIndexes>true&lt;/includeIndexes>&lt;includePrimaryKeys>true&lt;/includePrimaryKeys>&lt;includeUniqueKeys>true&lt;/includeUniqueKeys>&lt;includeForeignKeys>true&lt;/includeForeignKeys>&lt;includeCheckConstraints>true&lt;/includeCheckConstraints>&lt;includeSystemTables>false&lt;/includeSystemTables>&lt;includeSystemIndexes>false&lt;/includeSystemIndexes>&lt;includeSystemCheckConstraints>false&lt;/includeSystemCheckConstraints>&lt;includeSystemSequences>false&lt;/includeSystemSequences>&lt;includeSystemUDTs>false&lt;/includeSystemUDTs>&lt;includeInvisibleColumns>true&lt;/includeInvisibleColumns>&lt;recordVersionFields>&lt;/recordVersionFields>&lt;recordTimestampFields>&lt;/recordTimestampFields>&lt;syntheticIdentities>&lt;/syntheticIdentities>&lt;syntheticPrimaryKeys>&lt;/syntheticPrimaryKeys>&lt;overridePrimaryKeys>&lt;/overridePrimaryKeys>&lt;dateAsTimestamp>false&lt;/dateAsTimestamp>&lt;ignoreProcedureReturnValues>false&lt;/ignoreProcedureReturnValues>&lt;unsignedTypes>true&lt;/unsignedTypes>&lt;integerDisplayWidths>true&lt;/integerDisplayWidths>&lt;inputCatalog>&lt;/inputCatalog>&lt;outputCatalogToDefault>false&lt;/outputCatalogToDefault>&lt;inputSchema>public&lt;/inputSchema>&lt;outputSchemaToDefault>false&lt;/outputSchemaToDefault>&lt;schemaVersionProvider>SELECT id || orderexecuted || databasechangelog.md5sum FROM "databasechangelog" ORDER BY dateexecuted desc limit 1&lt;/schemaVersionProvider>&lt;catalogVersionProvider>SELECT id || orderexecuted || databasechangelog.md5sum FROM "databasechangelog" ORDER BY dateexecuted desc limit 1&lt;/catalogVersionProvider>&lt;orderProvider>&lt;/orderProvider>&lt;readonlyIdentities>false&lt;/readonlyIdentities>&lt;readonlyComputedColumns>true&lt;/readonlyComputedColumns>&lt;readonlyNonUpdatableColumns>true&lt;/readonlyNonUpdatableColumns>&lt;forcedTypesForBuiltinDataTypeExtensions>true&lt;/forcedTypesForBuiltinDataTypeExtensions>&lt;forcedTypesForXMLSchemaCollections>true&lt;/forcedTypesForXMLSchemaCollections>&lt;forceIntegerTypesOnZeroScaleDecimals>true&lt;/forceIntegerTypesOnZeroScaleDecimals>&lt;logSlowQueriesAfterSeconds>5&lt;/logSlowQueriesAfterSeconds>&lt;logSlowResultsAfterSeconds>5&lt;/logSlowResultsAfterSeconds>&lt;properties>&lt;/properties>&lt;comments>&lt;/comments>&lt;catalogs>&lt;catalog>&lt;inputCatalog>&lt;/inputCatalog>&lt;outputCatalog>&lt;/outputCatalog>&lt;outputCatalogToDefault>false&lt;/outputCatalogToDefault>&lt;schemata>&lt;schema>&lt;inputSchema>public&lt;/inputSchema>&lt;outputSchema>public&lt;/outputSchema>&lt;outputSchemaToDefault>false&lt;/outputSchemaToDefault>&lt;/schema>&lt;/schemata>&lt;/catalog>&lt;/catalogs>&lt;schemata>&lt;/schemata>&lt;embeddables>&lt;/embeddables>&lt;customTypes>&lt;/customTypes>&lt;enumTypes>&lt;/enumTypes>&lt;forcedTypes>&lt;forcedType>&lt;priority>0&lt;/priority>&lt;userType>nl.jvandis.teambalance.api.event.match.Place&lt;/userType>&lt;enumConverter>true&lt;/enumConverter>&lt;includeTypes>home_away&lt;/includeTypes>&lt;nullability>ALL&lt;/nullability>&lt;objectType>COLUMN&lt;/objectType>&lt;/forcedType>&lt;forcedType>&lt;priority>0&lt;/priority>&lt;userType>nl.jvandis.teambalance.api.attendees.Availability&lt;/userType>&lt;enumConverter>true&lt;/enumConverter>&lt;includeTypes>availability&lt;/includeTypes>&lt;nullability>ALL&lt;/nullability>&lt;objectType>COLUMN&lt;/objectType>&lt;/forcedType>&lt;forcedType>&lt;priority>0&lt;/priority>&lt;userType>nl.jvandis.teambalance.api.users.Role&lt;/userType>&lt;enumConverter>true&lt;/enumConverter>&lt;includeTypes>role&lt;/includeTypes>&lt;nullability>ALL&lt;/nullability>&lt;objectType>COLUMN&lt;/objectType>&lt;/forcedType>&lt;forcedType>&lt;priority>0&lt;/priority>&lt;userType>nl.jvandis.teambalance.api.event.RecurringEventProperties.TimeUnit&lt;/userType>&lt;enumConverter>true&lt;/enumConverter>&lt;includeTypes>recurring_event_properties_time_unit&lt;/includeTypes>&lt;nullability>ALL&lt;/nullability>&lt;objectType>COLUMN&lt;/objectType>&lt;/forcedType>&lt;/forcedTypes>&lt;/database>&lt;generate>&lt;indexes>true&lt;/indexes>&lt;relations>true&lt;/relations>&lt;sequenceFlags>true&lt;/sequenceFlags>&lt;implicitJoinPathsToOne>true&lt;/implicitJoinPathsToOne>&lt;implicitJoinPathsUseTableNameForUnambiguousFKs>true&lt;/implicitJoinPathsUseTableNameForUnambiguousFKs>&lt;implicitJoinPathsAsKotlinProperties>true&lt;/implicitJoinPathsAsKotlinProperties>&lt;deprecated>true&lt;/deprecated>&lt;deprecationOnUnknownTypes>true&lt;/deprecationOnUnknownTypes>&lt;instanceFields>true&lt;/instanceFields>&lt;visibilityModifier>DEFAULT&lt;/visibilityModifier>&lt;generatedAnnotation>false&lt;/generatedAnnotation>&lt;generatedAnnotationType>DETECT_FROM_JDK&lt;/generatedAnnotationType>&lt;generatedAnnotationDate>false&lt;/generatedAnnotationDate>&lt;nonnullAnnotation>false&lt;/nonnullAnnotation>&lt;nonnullAnnotationType>javax.annotation.Nonnull&lt;/nonnullAnnotationType>&lt;nullableAnnotation>false&lt;/nullableAnnotation>&lt;nullableAnnotationType>javax.annotation.Nullable&lt;/nullableAnnotationType>&lt;constructorPropertiesAnnotation>false&lt;/constructorPropertiesAnnotation>&lt;routines>true&lt;/routines>&lt;sequences>true&lt;/sequences>&lt;udts>true&lt;/udts>&lt;queues>true&lt;/queues>&lt;links>true&lt;/links>&lt;keys>true&lt;/keys>&lt;tables>true&lt;/tables>&lt;embeddables>true&lt;/embeddables>&lt;records>true&lt;/records>&lt;recordsImplementingRecordN>true&lt;/recordsImplementingRecordN>&lt;enumsAsScalaSealedTraits>false&lt;/enumsAsScalaSealedTraits>&lt;pojos>false&lt;/pojos>&lt;pojosEqualsAndHashCode>true&lt;/pojosEqualsAndHashCode>&lt;pojosToString>true&lt;/pojosToString>&lt;pojosAsJavaRecordClasses>false&lt;/pojosAsJavaRecordClasses>&lt;pojosAsScalaCaseClasses>true&lt;/pojosAsScalaCaseClasses>&lt;pojosAsKotlinDataClasses>true&lt;/pojosAsKotlinDataClasses>&lt;immutablePojos>false&lt;/immutablePojos>&lt;serializablePojos>true&lt;/serializablePojos>&lt;interfaces>false&lt;/interfaces>&lt;immutableInterfaces>false&lt;/immutableInterfaces>&lt;serializableInterfaces>true&lt;/serializableInterfaces>&lt;daos>false&lt;/daos>&lt;jooqVersionReference>true&lt;/jooqVersionReference>&lt;jpaAnnotations>false&lt;/jpaAnnotations>&lt;validationAnnotations>false&lt;/validationAnnotations>&lt;springAnnotations>false&lt;/springAnnotations>&lt;springDao>false&lt;/springDao>&lt;kotlinSetterJvmNameAnnotationsOnIsPrefix>true&lt;/kotlinSetterJvmNameAnnotationsOnIsPrefix>&lt;globalObjectReferences>true&lt;/globalObjectReferences>&lt;globalCatalogReferences>true&lt;/globalCatalogReferences>&lt;globalSchemaReferences>true&lt;/globalSchemaReferences>&lt;globalDomainReferences>true&lt;/globalDomainReferences>&lt;globalTableReferences>true&lt;/globalTableReferences>&lt;globalSequenceReferences>true&lt;/globalSequenceReferences>&lt;globalUDTReferences>true&lt;/globalUDTReferences>&lt;globalRoutineReferences>true&lt;/globalRoutineReferences>&lt;globalQueueReferences>true&lt;/globalQueueReferences>&lt;globalLinkReferences>true&lt;/globalLinkReferences>&lt;globalKeyReferences>true&lt;/globalKeyReferences>&lt;globalIndexReferences>true&lt;/globalIndexReferences>&lt;javadoc>true&lt;/javadoc>&lt;comments>true&lt;/comments>&lt;commentsOnCatalogs>true&lt;/commentsOnCatalogs>&lt;commentsOnSchemas>true&lt;/commentsOnSchemas>&lt;commentsOnTables>true&lt;/commentsOnTables>&lt;commentsOnColumns>true&lt;/commentsOnColumns>&lt;commentsOnEmbeddables>true&lt;/commentsOnEmbeddables>&lt;commentsOnUDTs>true&lt;/commentsOnUDTs>&lt;commentsOnAttributes>true&lt;/commentsOnAttributes>&lt;commentsOnPackages>true&lt;/commentsOnPackages>&lt;commentsOnRoutines>true&lt;/commentsOnRoutines>&lt;commentsOnParameters>true&lt;/commentsOnParameters>&lt;commentsOnSequences>true&lt;/commentsOnSequences>&lt;commentsOnLinks>true&lt;/commentsOnLinks>&lt;commentsOnQueues>true&lt;/commentsOnQueues>&lt;commentsOnKeys>true&lt;/commentsOnKeys>&lt;sources>true&lt;/sources>&lt;sourcesOnViews>true&lt;/sourcesOnViews>&lt;fluentSetters>false&lt;/fluentSetters>&lt;javaBeansGettersAndSetters>false&lt;/javaBeansGettersAndSetters>&lt;varargSetters>false&lt;/varargSetters>&lt;generatedSerialVersionUID>CONSTANT&lt;/generatedSerialVersionUID>&lt;maxMembersPerInitialiser>500&lt;/maxMembersPerInitialiser>&lt;fullyQualifiedTypes>&lt;/fullyQualifiedTypes>&lt;emptyCatalogs>false&lt;/emptyCatalogs>&lt;emptySchemas>false&lt;/emptySchemas>&lt;javaTimeTypes>true&lt;/javaTimeTypes>&lt;spatialTypes>true&lt;/spatialTypes>&lt;xmlTypes>true&lt;/xmlTypes>&lt;jsonTypes>true&lt;/jsonTypes>&lt;intervalTypes>true&lt;/intervalTypes>&lt;newline>\n&lt;/newline>&lt;printMarginForBlockComment>80&lt;/printMarginForBlockComment>&lt;textBlocks>DETECT_FROM_JDK&lt;/textBlocks>&lt;/generate>&lt;target>&lt;packageName>nl.jvandis.teambalance.data.jooq.schema&lt;/packageName>&lt;directory>target/generated-sources/jooq&lt;/directory>&lt;encoding>UTF-8&lt;/encoding>&lt;clean>true&lt;/clean>&lt;/target></property>
+        <property name="jdbc" tracked="false">&lt;driver>org.testcontainers.jdbc.ContainerDatabaseDriver&lt;/driver>&lt;url>jdbc:tc:postgresql:16.5-alpine://teambalance?TC_INITFUNCTION=nl.jvandis.jooq.support.migrations.LiquibaseSupport::migrate&amp;amp;schema=public&amp;amp;rootPath=src/main/resources/db/changelog/&amp;amp;scripts=db.changelog-master.xml&amp;amp;TC_INITSCRIPT=file:../docker/postgres/00_init.sql&lt;/url>&lt;user>teambalance&lt;/user>&lt;password>teambalance&lt;/password>&lt;properties>&lt;/properties></property>
+        <property name="logging" tracked="false">INFO</property>
+        <property name="onError" tracked="false">null</property>
+        <property name="onUnused" tracked="false">null</property>
+        <property name="skip" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default-resources:resources:process-resources:maven-resources-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.resources.ResourcesMojo</mojoClassName>
+      <properties>
+        <property name="addDefaultExcludes" tracked="false">true</property>
+        <property name="delimiters" tracked="false">[@]</property>
+        <property name="encoding" tracked="false">UTF-8</property>
+        <property name="escapeString" tracked="false">null</property>
+        <property name="escapeWindowsPaths" tracked="false">true</property>
+        <property name="fileNameFiltering" tracked="false">false</property>
+        <property name="filters" tracked="false">null</property>
+        <property name="includeEmptyDirs" tracked="false">false</property>
+        <property name="mavenFilteringHints" tracked="false">null</property>
+        <property name="nonFilteredFileExtensions" tracked="false">null</property>
+        <property name="outputDirectory" tracked="false">target/classes</property>
+        <property name="overwrite" tracked="false">false</property>
+        <property name="propertiesEncoding" tracked="false">UTF-8</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="supportMultiLineFiltering" tracked="false">false</property>
+        <property name="useBuildFilters" tracked="false">true</property>
+        <property name="useDefaultDelimiters" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>compile:compile:compile:kotlin-maven-plugin:org.jetbrains.kotlin</executionKey>
+      <mojoClassName>org.jetbrains.kotlin.maven.K2JVMCompileMojo</mojoClassName>
+      <properties>
+        <property name="apiVersion" tracked="false">null</property>
+        <property name="args" tracked="false">[-Xjsr305=strict, -Xcontext-receivers]</property>
+        <property name="compilerPlugins" tracked="false">[spring, all-open]</property>
+        <property name="experimentalCoroutines" tracked="false">null</property>
+        <property name="incrementalCachesRoot" tracked="false">target/kotlin-ic</property>
+        <property name="javaParameters" tracked="false">true</property>
+        <property name="jdkHome" tracked="false">null</property>
+        <property name="jvmTarget" tracked="false">17</property>
+        <property name="languageVersion" tracked="false">null</property>
+        <property name="multiPlatform" tracked="false">false</property>
+        <property name="myIncremental" tracked="false">false</property>
+        <property name="nowarn" tracked="false">false</property>
+        <property name="pluginOptions" tracked="false">null</property>
+        <property name="scriptTemplates" tracked="false">[]</property>
+        <property name="sourceDirs" tracked="false">null</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>java-compile:compile:compile:maven-compiler-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugin.compiler.CompilerMojo</mojoClassName>
+      <properties>
+        <property name="annotationProcessorPaths" tracked="false">null</property>
+        <property name="annotationProcessorPathsUseDepMgmt" tracked="false">false</property>
+        <property name="annotationProcessors" tracked="false">null</property>
+        <property name="compileSourceRoots" tracked="false">[src/main/kotlin, target/generated-sources/jooq, target/generated-sources/annotations]</property>
+        <property name="compilerArgs" tracked="false">null</property>
+        <property name="compilerArgument" tracked="false">null</property>
+        <property name="compilerArguments" tracked="false">null</property>
+        <property name="compilerId" tracked="false">javac</property>
+        <property name="compilerReuseStrategy" tracked="false">reuseCreated</property>
+        <property name="compilerVersion" tracked="false">null</property>
+        <property name="createMissingPackageInfoClass" tracked="false">true</property>
+        <property name="debug" tracked="false">true</property>
+        <property name="debugFileName" tracked="false">javac</property>
+        <property name="debuglevel" tracked="false">null</property>
+        <property name="enablePreview" tracked="false">false</property>
+        <property name="encoding" tracked="false">UTF-8</property>
+        <property name="excludes" tracked="false">[]</property>
+        <property name="executable" tracked="false">null</property>
+        <property name="failOnError" tracked="false">true</property>
+        <property name="failOnWarning" tracked="false">false</property>
+        <property name="fileExtensions" tracked="false">[jar, class]</property>
+        <property name="forceJavacCompilerUse" tracked="false">false</property>
+        <property name="forceLegacyJavacApi" tracked="false">false</property>
+        <property name="fork" tracked="false">false</property>
+        <property name="generatedSourcesDirectory" tracked="false">target/generated-sources/annotations</property>
+        <property name="implicit" tracked="false">null</property>
+        <property name="includes" tracked="false">[**/*.java]</property>
+        <property name="incrementalExcludes" tracked="false">[]</property>
+        <property name="jdkToolchain" tracked="false">null</property>
+        <property name="maxmem" tracked="false">null</property>
+        <property name="meminitial" tracked="false">null</property>
+        <property name="multiReleaseOutput" tracked="false">false</property>
+        <property name="optimize" tracked="false">false</property>
+        <property name="outputDirectory" tracked="false">target/classes</property>
+        <property name="outputFileName" tracked="false">null</property>
+        <property name="outputTimestamp" tracked="false">null</property>
+        <property name="parameters" tracked="false">true</property>
+        <property name="proc" tracked="false">null</property>
+        <property name="release" tracked="false">21</property>
+        <property name="showCompilationChanges" tracked="false">false</property>
+        <property name="showDeprecation" tracked="false">false</property>
+        <property name="showWarnings" tracked="false">true</property>
+        <property name="skipMain" tracked="false">false</property>
+        <property name="skipMultiThreadWarning" tracked="false">false</property>
+        <property name="source" tracked="false">1.8</property>
+        <property name="staleMillis" tracked="false">0</property>
+        <property name="target" tracked="false">1.8</property>
+        <property name="useIncrementalCompilation" tracked="false">true</property>
+        <property name="verbose" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default-testResources:testResources:process-test-resources:maven-resources-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.resources.TestResourcesMojo</mojoClassName>
+      <properties>
+        <property name="addDefaultExcludes" tracked="false">true</property>
+        <property name="delimiters" tracked="false">[@]</property>
+        <property name="encoding" tracked="false">UTF-8</property>
+        <property name="escapeString" tracked="false">null</property>
+        <property name="escapeWindowsPaths" tracked="false">true</property>
+        <property name="fileNameFiltering" tracked="false">false</property>
+        <property name="filters" tracked="false">null</property>
+        <property name="includeEmptyDirs" tracked="false">false</property>
+        <property name="mavenFilteringHints" tracked="false">null</property>
+        <property name="nonFilteredFileExtensions" tracked="false">null</property>
+        <property name="outputDirectory" tracked="false">target/test-classes</property>
+        <property name="overwrite" tracked="false">false</property>
+        <property name="propertiesEncoding" tracked="false">UTF-8</property>
+        <property name="resources" tracked="false">[Resource {targetPath: null, filtering: false, FileSet {directory: src/test/resources, PatternSet [includes: {}, excludes: {}]}}]</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="supportMultiLineFiltering" tracked="false">false</property>
+        <property name="useBuildFilters" tracked="false">true</property>
+        <property name="useDefaultDelimiters" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>test-compile:test-compile:test-compile:kotlin-maven-plugin:org.jetbrains.kotlin</executionKey>
+      <mojoClassName>org.jetbrains.kotlin.maven.KotlinTestCompileMojo</mojoClassName>
+      <properties>
+        <property name="apiVersion" tracked="false">null</property>
+        <property name="args" tracked="false">[-Xjsr305=strict, -Xcontext-receivers]</property>
+        <property name="compilerPlugins" tracked="false">[spring, all-open]</property>
+        <property name="defaultSourceDirs" tracked="false">[src/test/kotlin, target/generated-test-sources/test-annotations]</property>
+        <property name="experimentalCoroutines" tracked="false">null</property>
+        <property name="incrementalCachesRoot" tracked="false">target/kotlin-ic</property>
+        <property name="javaParameters" tracked="false">true</property>
+        <property name="jdkHome" tracked="false">null</property>
+        <property name="jvmTarget" tracked="false">17</property>
+        <property name="languageVersion" tracked="false">null</property>
+        <property name="multiPlatform" tracked="false">false</property>
+        <property name="myIncremental" tracked="false">false</property>
+        <property name="nowarn" tracked="false">false</property>
+        <property name="pluginOptions" tracked="false">null</property>
+        <property name="scriptTemplates" tracked="false">[]</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="sourceDirs" tracked="false">null</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>java-test-compile:testCompile:test-compile:maven-compiler-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugin.compiler.TestCompilerMojo</mojoClassName>
+      <properties>
+        <property name="annotationProcessorPaths" tracked="false">null</property>
+        <property name="annotationProcessorPathsUseDepMgmt" tracked="false">false</property>
+        <property name="annotationProcessors" tracked="false">null</property>
+        <property name="compileSourceRoots" tracked="false">[src/test/kotlin, target/generated-test-sources/test-annotations]</property>
+        <property name="compilerArgs" tracked="false">null</property>
+        <property name="compilerArgument" tracked="false">null</property>
+        <property name="compilerArguments" tracked="false">null</property>
+        <property name="compilerId" tracked="false">javac</property>
+        <property name="compilerReuseStrategy" tracked="false">reuseCreated</property>
+        <property name="compilerVersion" tracked="false">null</property>
+        <property name="createMissingPackageInfoClass" tracked="false">true</property>
+        <property name="debug" tracked="false">true</property>
+        <property name="debugFileName" tracked="false">javac-test</property>
+        <property name="debuglevel" tracked="false">null</property>
+        <property name="enablePreview" tracked="false">false</property>
+        <property name="encoding" tracked="false">UTF-8</property>
+        <property name="executable" tracked="false">null</property>
+        <property name="failOnError" tracked="false">true</property>
+        <property name="failOnWarning" tracked="false">false</property>
+        <property name="fileExtensions" tracked="false">[jar, class]</property>
+        <property name="forceJavacCompilerUse" tracked="false">false</property>
+        <property name="forceLegacyJavacApi" tracked="false">false</property>
+        <property name="fork" tracked="false">false</property>
+        <property name="generatedTestSourcesDirectory" tracked="false">target/generated-test-sources/test-annotations</property>
+        <property name="implicit" tracked="false">null</property>
+        <property name="jdkToolchain" tracked="false">null</property>
+        <property name="maxmem" tracked="false">null</property>
+        <property name="meminitial" tracked="false">null</property>
+        <property name="optimize" tracked="false">false</property>
+        <property name="outputDirectory" tracked="false">target/test-classes</property>
+        <property name="outputFileName" tracked="false">null</property>
+        <property name="outputTimestamp" tracked="false">null</property>
+        <property name="parameters" tracked="false">true</property>
+        <property name="proc" tracked="false">null</property>
+        <property name="release" tracked="false">21</property>
+        <property name="showCompilationChanges" tracked="false">false</property>
+        <property name="showDeprecation" tracked="false">false</property>
+        <property name="showWarnings" tracked="false">true</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="skipMultiThreadWarning" tracked="false">false</property>
+        <property name="source" tracked="false">1.8</property>
+        <property name="staleMillis" tracked="false">0</property>
+        <property name="target" tracked="false">1.8</property>
+        <property name="testCompilerArgument" tracked="false">null</property>
+        <property name="testCompilerArguments" tracked="false">null</property>
+        <property name="testExcludes" tracked="false">[]</property>
+        <property name="testIncludes" tracked="false">[**/*.java]</property>
+        <property name="testIncrementalExcludes" tracked="false">[]</property>
+        <property name="testRelease" tracked="false">null</property>
+        <property name="testSource" tracked="false">null</property>
+        <property name="testTarget" tracked="false">null</property>
+        <property name="useIncrementalCompilation" tracked="false">true</property>
+        <property name="useModulePath" tracked="false">true</property>
+        <property name="verbose" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default-test:test:test:maven-surefire-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugin.surefire.SurefirePlugin</mojoClassName>
+      <properties>
+        <property name="additionalClasspathElements" tracked="false">{}</property>
+        <property name="argLine" tracked="false">@{argLine} -Dliquibase.secureParsing=false</property>
+        <property name="childDelegation" tracked="false">false</property>
+        <property name="classesDirectory" tracked="false">target/classes</property>
+        <property name="classpathDependencyExcludes" tracked="false">{}</property>
+        <property name="classpathDependencyScopeExclude" tracked="false">null</property>
+        <property name="consoleOutputReporter" tracked="false">null</property>
+        <property name="debugForkedProcess" tracked="false">null</property>
+        <property name="dependenciesToScan" tracked="false">{}</property>
+        <property name="disableXmlReport" tracked="false">false</property>
+        <property name="enableAssertions" tracked="false">true</property>
+        <property name="enableProcessChecker" tracked="false">null</property>
+        <property name="encoding" tracked="false">UTF-8</property>
+        <property name="environmentVariables" tracked="false">{}</property>
+        <property name="excludeJUnit5Engines" tracked="false">{}</property>
+        <property name="excludedEnvironmentVariables" tracked="false">{}</property>
+        <property name="excludedGroups" tracked="false">null</property>
+        <property name="excludes" tracked="false">[]</property>
+        <property name="excludesFile" tracked="false">null</property>
+        <property name="failIfNoSpecifiedTests" tracked="false">true</property>
+        <property name="failIfNoTests" tracked="false">false</property>
+        <property name="failOnFlakeCount" tracked="false">0</property>
+        <property name="forkCount" tracked="false">1</property>
+        <property name="forkNode" tracked="false">null</property>
+        <property name="forkedProcessExitTimeoutInSeconds" tracked="false">30</property>
+        <property name="forkedProcessTimeoutInSeconds" tracked="false">0</property>
+        <property name="groups" tracked="false">null</property>
+        <property name="includeJUnit5Engines" tracked="false">{}</property>
+        <property name="includes" tracked="false">[]</property>
+        <property name="includesFile" tracked="false">null</property>
+        <property name="jdkToolchain" tracked="false">null</property>
+        <property name="junitArtifactName" tracked="false">junit:junit</property>
+        <property name="jvm" tracked="false">null</property>
+        <property name="objectFactory" tracked="false">null</property>
+        <property name="parallel" tracked="false">null</property>
+        <property name="parallelOptimized" tracked="false">true</property>
+        <property name="parallelTestsTimeoutForcedInSeconds" tracked="false">0.0</property>
+        <property name="parallelTestsTimeoutInSeconds" tracked="false">0.0</property>
+        <property name="perCoreThreadCount" tracked="false">true</property>
+        <property name="printSummary" tracked="false">true</property>
+        <property name="properties" tracked="false">{}</property>
+        <property name="redirectTestOutputToFile" tracked="false">false</property>
+        <property name="reportFormat" tracked="false">brief</property>
+        <property name="reportNameSuffix" tracked="false">null</property>
+        <property name="reportsDirectory" tracked="false">target/surefire-reports</property>
+        <property name="rerunFailingTestsCount" tracked="false">0</property>
+        <property name="reuseForks" tracked="false">true</property>
+        <property name="runOrder" tracked="false">filesystem</property>
+        <property name="runOrderRandomSeed" tracked="false">null</property>
+        <property name="shutdown" tracked="false">exit</property>
+        <property name="skip" tracked="true">false</property>
+        <property name="skipAfterFailureCount" tracked="false">0</property>
+        <property name="skipExec" tracked="true">false</property>
+        <property name="skipTests" tracked="true">false</property>
+        <property name="statelessTestsetInfoReporter" tracked="false">null</property>
+        <property name="statelessTestsetReporter" tracked="false">null</property>
+        <property name="suiteXmlFiles" tracked="false">{}</property>
+        <property name="systemProperties" tracked="false">null</property>
+        <property name="systemPropertiesFile" tracked="false">null</property>
+        <property name="systemPropertyVariables" tracked="false">null</property>
+        <property name="tempDir" tracked="false">surefire</property>
+        <property name="test" tracked="false">null</property>
+        <property name="testClassesDirectory" tracked="false">target/test-classes</property>
+        <property name="testFailureIgnore" tracked="true">false</property>
+        <property name="testNGArtifactName" tracked="false">org.testng:testng</property>
+        <property name="testSourceDirectory" tracked="false">src/test/kotlin</property>
+        <property name="threadCount" tracked="false">0</property>
+        <property name="threadCountClasses" tracked="false">0</property>
+        <property name="threadCountMethods" tracked="false">0</property>
+        <property name="threadCountSuites" tracked="false">0</property>
+        <property name="trimStackTrace" tracked="false">false</property>
+        <property name="useFile" tracked="false">true</property>
+        <property name="useManifestOnlyJar" tracked="false">true</property>
+        <property name="useModulePath" tracked="false">true</property>
+        <property name="useSystemClassLoader" tracked="false">true</property>
+        <property name="useUnlimitedThreads" tracked="false">false</property>
+        <property name="workingDirectory" tracked="false">/Users/juliusvandis/IdeaProjects/Personal/teambalance/backend</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default-jar:jar:package:maven-jar-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.jar.JarMojo</mojoClassName>
+      <properties>
+        <property name="addDefaultExcludes" tracked="false">true</property>
+        <property name="archive" tracked="false">org.apache.maven.archiver.MavenArchiveConfiguration@3da8096c</property>
+        <property name="classesDirectory" tracked="false">target/classes</property>
+        <property name="classifier" tracked="false">null</property>
+        <property name="detectMultiReleaseJar" tracked="false">true</property>
+        <property name="excludes" tracked="false">null</property>
+        <property name="forceCreation" tracked="false">false</property>
+        <property name="includes" tracked="false">null</property>
+        <property name="outputDirectory" tracked="false">target</property>
+        <property name="outputTimestamp" tracked="false">null</property>
+        <property name="skipIfEmpty" tracked="false">false</property>
+        <property name="useDefaultManifestFile" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>report:report:verify:jacoco-maven-plugin:org.jacoco</executionKey>
+      <mojoClassName>org.jacoco.maven.ReportMojo</mojoClassName>
+      <properties>
+        <property name="dataFile" tracked="false">target/jacoco.exec</property>
+        <property name="excludes" tracked="false">null</property>
+        <property name="footer" tracked="false">null</property>
+        <property name="formats" tracked="false">[HTML, XML, CSV]</property>
+        <property name="includes" tracked="false">null</property>
+        <property name="outputDirectory" tracked="false">target/site/jacoco</property>
+        <property name="outputEncoding" tracked="false">UTF-8</property>
+        <property name="skip" tracked="true">false</property>
+        <property name="sourceEncoding" tracked="false">UTF-8</property>
+        <property name="title" tracked="false">Team balance - Spring boot backend</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default-install:install:install:maven-install-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.install.InstallMojo</mojoClassName>
+      <properties>
+        <property name="allowIncompleteProjects" tracked="false">false</property>
+        <property name="installAtEnd" tracked="false">false</property>
+        <property name="skip" tracked="false">false</property>
+      </properties>
+    </execution>
+  </executions>
+  <projectsInputInfo>
+    <checksum>09cfa776aa20adf4</checksum>
+    <items>
+      <item type="pom" hash="ea14a651fd32300b">&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  &lt;groupId>nl.jvandis.teambalance&lt;/groupId>
+  &lt;artifactId>backend&lt;/artifactId>
+  &lt;version>cache-extension-version&lt;/version>
+  &lt;dependencies>
+    &lt;dependency>
+      &lt;groupId>org.assertj&lt;/groupId>
+      &lt;artifactId>assertj-core&lt;/artifactId>
+      &lt;version>3.24.2&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>com.github.ben-manes.caffeine&lt;/groupId>
+      &lt;artifactId>caffeine&lt;/artifactId>
+      &lt;version>3.1.8&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>com.fasterxml.jackson.dataformat&lt;/groupId>
+      &lt;artifactId>jackson-dataformat-xml&lt;/artifactId>
+      &lt;version>2.17.2&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>com.fasterxml.jackson.module&lt;/groupId>
+      &lt;artifactId>jackson-module-kotlin&lt;/artifactId>
+      &lt;version>2.17.2&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.eclipse.jetty&lt;/groupId>
+      &lt;artifactId>jetty-server&lt;/artifactId>
+      &lt;version>12.0.0.beta0&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.jooq&lt;/groupId>
+      &lt;artifactId>jooq-postgres-extensions&lt;/artifactId>
+      &lt;version>3.16.13&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>nl.jvandis&lt;/groupId>
+      &lt;artifactId>jooq-support&lt;/artifactId>
+      &lt;version>cache-extension-version&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>junit&lt;/groupId>
+      &lt;artifactId>junit&lt;/artifactId>
+      &lt;version>4.13.2&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.junit.jupiter&lt;/groupId>
+      &lt;artifactId>junit-jupiter&lt;/artifactId>
+      &lt;version>5.10.3&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.junit.jupiter&lt;/groupId>
+      &lt;artifactId>junit-jupiter-engine&lt;/artifactId>
+      &lt;version>5.10.3&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>nl.wykorijnsburger.kminrandom&lt;/groupId>
+      &lt;artifactId>kminrandom&lt;/artifactId>
+      &lt;version>1.0.4&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+      &lt;artifactId>kotlin-reflect&lt;/artifactId>
+      &lt;version>1.9.24&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+      &lt;artifactId>kotlin-stdlib-jdk8&lt;/artifactId>
+      &lt;version>1.9.24&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+      &lt;artifactId>kotlin-test&lt;/artifactId>
+      &lt;version>1.9.24&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.mockito.kotlin&lt;/groupId>
+      &lt;artifactId>mockito-kotlin&lt;/artifactId>
+      &lt;version>4.0.0&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>com.squareup.okhttp3&lt;/groupId>
+      &lt;artifactId>okhttp&lt;/artifactId>
+      &lt;version>4.12.0&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.postgresql&lt;/groupId>
+      &lt;artifactId>postgresql&lt;/artifactId>
+      &lt;version>42.7.2&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.testcontainers&lt;/groupId>
+      &lt;artifactId>postgresql&lt;/artifactId>
+      &lt;version>1.18.0&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>nl.jvandis&lt;/groupId>
+      &lt;artifactId>shaded-bunq-sdk&lt;/artifactId>
+      &lt;version>cache-extension-version&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.sonarsource.scanner.maven&lt;/groupId>
+      &lt;artifactId>sonar-maven-plugin&lt;/artifactId>
+      &lt;version>4.0.0.4121&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springframework.boot&lt;/groupId>
+      &lt;artifactId>spring-boot-configuration-processor&lt;/artifactId>
+      &lt;version>3.3.2&lt;/version>
+      &lt;scope>compile&lt;/scope>
+      &lt;optional>true&lt;/optional>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springframework.boot&lt;/groupId>
+      &lt;artifactId>spring-boot-starter-actuator&lt;/artifactId>
+      &lt;version>3.3.2&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springframework.boot&lt;/groupId>
+      &lt;artifactId>spring-boot-starter-jetty&lt;/artifactId>
+      &lt;version>3.3.2&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springframework.boot&lt;/groupId>
+      &lt;artifactId>spring-boot-starter-security&lt;/artifactId>
+      &lt;version>3.3.2&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springframework.boot&lt;/groupId>
+      &lt;artifactId>spring-boot-starter-test&lt;/artifactId>
+      &lt;version>3.3.2&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springframework.boot&lt;/groupId>
+      &lt;artifactId>spring-boot-starter-validation&lt;/artifactId>
+      &lt;version>3.3.2&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springframework.boot&lt;/groupId>
+      &lt;artifactId>spring-boot-starter-web&lt;/artifactId>
+      &lt;version>3.3.2&lt;/version>
+      &lt;scope>compile&lt;/scope>
+      &lt;exclusions>
+        &lt;exclusion>
+          &lt;groupId>org.springframework.boot&lt;/groupId>
+          &lt;artifactId>spring-boot-starter-tomcat&lt;/artifactId>
+        &lt;/exclusion>
+      &lt;/exclusions>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springframework&lt;/groupId>
+      &lt;artifactId>spring-context-indexer&lt;/artifactId>
+      &lt;version>6.1.11&lt;/version>
+      &lt;scope>compile&lt;/scope>
+      &lt;optional>true&lt;/optional>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springframework.data&lt;/groupId>
+      &lt;artifactId>spring-data-commons&lt;/artifactId>
+      &lt;version>3.3.2&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springframework.security&lt;/groupId>
+      &lt;artifactId>spring-security-test&lt;/artifactId>
+      &lt;version>6.3.1&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.springdoc&lt;/groupId>
+      &lt;artifactId>springdoc-openapi-starter-webmvc-ui&lt;/artifactId>
+      &lt;version>2.0.2&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+  &lt;/dependencies>
+  &lt;build>
+    &lt;plugins>
+      &lt;plugin>
+        &lt;groupId>io.github.git-commit-id&lt;/groupId>
+        &lt;artifactId>git-commit-id-maven-plugin&lt;/artifactId>
+        &lt;version>8.0.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;phase>initialize&lt;/phase>
+            &lt;goals>
+              &lt;goal>revision&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;verbose>false&lt;/verbose>
+              &lt;generateGitPropertiesFile>true&lt;/generateGitPropertiesFile>
+              &lt;generateGitPropertiesFilename>/target/classes/git.properties&lt;/generateGitPropertiesFilename>
+              &lt;skipPoms>false&lt;/skipPoms>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;verbose>false&lt;/verbose>
+          &lt;generateGitPropertiesFile>true&lt;/generateGitPropertiesFile>
+          &lt;generateGitPropertiesFilename>/target/classes/git.properties&lt;/generateGitPropertiesFilename>
+          &lt;skipPoms>false&lt;/skipPoms>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+        &lt;artifactId>kotlin-maven-plugin&lt;/artifactId>
+        &lt;version>1.9.24&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>compile&lt;/id>
+            &lt;phase>compile&lt;/phase>
+            &lt;goals>
+              &lt;goal>compile&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;args>
+                &lt;arg>-Xjsr305=strict&lt;/arg>
+                &lt;arg>-Xcontext-receivers&lt;/arg>
+              &lt;/args>
+              &lt;compilerPlugins>
+                &lt;plugin>spring&lt;/plugin>
+                &lt;plugin>all-open&lt;/plugin>
+              &lt;/compilerPlugins>
+              &lt;jvmTarget>17&lt;/jvmTarget>
+              &lt;javaParameters>true&lt;/javaParameters>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>test-compile&lt;/id>
+            &lt;phase>test-compile&lt;/phase>
+            &lt;goals>
+              &lt;goal>test-compile&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;args>
+                &lt;arg>-Xjsr305=strict&lt;/arg>
+                &lt;arg>-Xcontext-receivers&lt;/arg>
+              &lt;/args>
+              &lt;compilerPlugins>
+                &lt;plugin>spring&lt;/plugin>
+                &lt;plugin>all-open&lt;/plugin>
+              &lt;/compilerPlugins>
+              &lt;jvmTarget>17&lt;/jvmTarget>
+              &lt;javaParameters>true&lt;/javaParameters>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;dependencies>
+          &lt;dependency>
+            &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+            &lt;artifactId>kotlin-maven-allopen&lt;/artifactId>
+            &lt;version>1.9.24&lt;/version>
+            &lt;scope>compile&lt;/scope>
+          &lt;/dependency>
+        &lt;/dependencies>
+        &lt;configuration>
+          &lt;args>
+            &lt;arg>-Xjsr305=strict&lt;/arg>
+            &lt;arg>-Xcontext-receivers&lt;/arg>
+          &lt;/args>
+          &lt;compilerPlugins>
+            &lt;plugin>spring&lt;/plugin>
+            &lt;plugin>all-open&lt;/plugin>
+          &lt;/compilerPlugins>
+          &lt;jvmTarget>17&lt;/jvmTarget>
+          &lt;javaParameters>true&lt;/javaParameters>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-surefire-plugin&lt;/artifactId>
+        &lt;version>3.1.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-test&lt;/id>
+            &lt;phase>test&lt;/phase>
+            &lt;goals>
+              &lt;goal>test&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;argLine>@{argLine} -Dliquibase.secureParsing=false&lt;/argLine>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;argLine>@{argLine} -Dliquibase.secureParsing=false&lt;/argLine>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;groupId>com.github.eirslett&lt;/groupId>
+        &lt;artifactId>frontend-maven-plugin&lt;/artifactId>
+        &lt;version>1.15.1&lt;/version>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;groupId>org.jacoco&lt;/groupId>
+        &lt;artifactId>jacoco-maven-plugin&lt;/artifactId>
+        &lt;version>0.8.12&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>prepare-agent&lt;/id>
+            &lt;goals>
+              &lt;goal>prepare-agent&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>report&lt;/id>
+            &lt;goals>
+              &lt;goal>report&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-antrun-plugin&lt;/artifactId>
+        &lt;version>3.1.0&lt;/version>
+        &lt;dependencies>
+          &lt;dependency>
+            &lt;groupId>com.pinterest&lt;/groupId>
+            &lt;artifactId>ktlint&lt;/artifactId>
+            &lt;version>0.51.0-FINAL&lt;/version>
+            &lt;scope>compile&lt;/scope>
+          &lt;/dependency>
+        &lt;/dependencies>
+        &lt;configuration>
+          &lt;skip>false&lt;/skip>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-compiler-plugin&lt;/artifactId>
+        &lt;version>3.13.0&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-compile&lt;/id>
+            &lt;phase>none&lt;/phase>
+            &lt;goals>
+              &lt;goal>compile&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;parameters>true&lt;/parameters>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>default-testCompile&lt;/id>
+            &lt;phase>none&lt;/phase>
+            &lt;goals>
+              &lt;goal>testCompile&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;parameters>true&lt;/parameters>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>java-compile&lt;/id>
+            &lt;phase>compile&lt;/phase>
+            &lt;goals>
+              &lt;goal>compile&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;parameters>true&lt;/parameters>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>java-test-compile&lt;/id>
+            &lt;phase>test-compile&lt;/phase>
+            &lt;goals>
+              &lt;goal>testCompile&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;parameters>true&lt;/parameters>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;parameters>true&lt;/parameters>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;groupId>org.jooq&lt;/groupId>
+        &lt;artifactId>jooq-codegen-maven&lt;/artifactId>
+        &lt;version>3.17.7&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;phase>generate-sources&lt;/phase>
+            &lt;goals>
+              &lt;goal>generate&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;logging>INFO&lt;/logging>
+              &lt;jdbc>
+                &lt;driver>org.testcontainers.jdbc.ContainerDatabaseDriver&lt;/driver>
+                &lt;url>jdbc:tc:postgresql:16.5-alpine://teambalance?TC_INITFUNCTION=nl.jvandis.jooq.support.migrations.LiquibaseSupport::migrate&amp;amp;schema=public&amp;amp;rootPath=/src/main/resources/db/changelog/&amp;amp;scripts=db.changelog-master.xml&amp;amp;TC_INITSCRIPT=file:/../docker/postgres/00_init.sql&lt;/url>
+                &lt;user>teambalance&lt;/user>
+                &lt;password>teambalance&lt;/password>
+              &lt;/jdbc>
+              &lt;generator>
+                &lt;name>org.jooq.codegen.KotlinGenerator&lt;/name>
+                &lt;database>
+                  &lt;inputSchema>public&lt;/inputSchema>
+                  &lt;catalogVersionProvider>SELECT id || orderexecuted || databasechangelog.md5sum FROM "databasechangelog" ORDER BY dateexecuted desc limit 1&lt;/catalogVersionProvider>
+                  &lt;schemaVersionProvider>SELECT id || orderexecuted || databasechangelog.md5sum FROM "databasechangelog" ORDER BY dateexecuted desc limit 1&lt;/schemaVersionProvider>
+                  &lt;forcedTypes combine.children="append">
+                    &lt;forcedType>
+                      &lt;userType>nl.jvandis.teambalance.api.event.match.Place&lt;/userType>
+                      &lt;enumConverter>true&lt;/enumConverter>
+                      &lt;objectType>COLUMN&lt;/objectType>
+                      &lt;includeTypes>home_away&lt;/includeTypes>
+                    &lt;/forcedType>
+                    &lt;forcedType>
+                      &lt;userType>nl.jvandis.teambalance.api.attendees.Availability&lt;/userType>
+                      &lt;enumConverter>true&lt;/enumConverter>
+                      &lt;objectType>COLUMN&lt;/objectType>
+                      &lt;includeTypes>availability&lt;/includeTypes>
+                    &lt;/forcedType>
+                    &lt;forcedType>
+                      &lt;userType>nl.jvandis.teambalance.api.users.Role&lt;/userType>
+                      &lt;enumConverter>true&lt;/enumConverter>
+                      &lt;objectType>COLUMN&lt;/objectType>
+                      &lt;includeTypes>role&lt;/includeTypes>
+                    &lt;/forcedType>
+                    &lt;forcedType>
+                      &lt;userType>nl.jvandis.teambalance.api.event.RecurringEventProperties.TimeUnit&lt;/userType>
+                      &lt;enumConverter>true&lt;/enumConverter>
+                      &lt;objectType>COLUMN&lt;/objectType>
+                      &lt;includeTypes>recurring_event_properties_time_unit&lt;/includeTypes>
+                    &lt;/forcedType>
+                  &lt;/forcedTypes>
+                &lt;/database>
+                &lt;target>
+                  &lt;packageName>nl.jvandis.teambalance.data.jooq.schema&lt;/packageName>
+                &lt;/target>
+              &lt;/generator>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;logging>INFO&lt;/logging>
+          &lt;jdbc>
+            &lt;driver>org.testcontainers.jdbc.ContainerDatabaseDriver&lt;/driver>
+            &lt;url>jdbc:tc:postgresql:16.5-alpine://teambalance?TC_INITFUNCTION=nl.jvandis.jooq.support.migrations.LiquibaseSupport::migrate&amp;amp;schema=public&amp;amp;rootPath=/src/main/resources/db/changelog/&amp;amp;scripts=db.changelog-master.xml&amp;amp;TC_INITSCRIPT=file:/../docker/postgres/00_init.sql&lt;/url>
+            &lt;user>teambalance&lt;/user>
+            &lt;password>teambalance&lt;/password>
+          &lt;/jdbc>
+          &lt;generator>
+            &lt;name>org.jooq.codegen.KotlinGenerator&lt;/name>
+            &lt;database>
+              &lt;inputSchema>public&lt;/inputSchema>
+              &lt;catalogVersionProvider>SELECT id || orderexecuted || databasechangelog.md5sum FROM "databasechangelog" ORDER BY dateexecuted desc limit 1&lt;/catalogVersionProvider>
+              &lt;schemaVersionProvider>SELECT id || orderexecuted || databasechangelog.md5sum FROM "databasechangelog" ORDER BY dateexecuted desc limit 1&lt;/schemaVersionProvider>
+              &lt;forcedTypes combine.children="append">
+                &lt;forcedType>
+                  &lt;userType>nl.jvandis.teambalance.api.event.match.Place&lt;/userType>
+                  &lt;enumConverter>true&lt;/enumConverter>
+                  &lt;objectType>COLUMN&lt;/objectType>
+                  &lt;includeTypes>home_away&lt;/includeTypes>
+                &lt;/forcedType>
+                &lt;forcedType>
+                  &lt;userType>nl.jvandis.teambalance.api.attendees.Availability&lt;/userType>
+                  &lt;enumConverter>true&lt;/enumConverter>
+                  &lt;objectType>COLUMN&lt;/objectType>
+                  &lt;includeTypes>availability&lt;/includeTypes>
+                &lt;/forcedType>
+                &lt;forcedType>
+                  &lt;userType>nl.jvandis.teambalance.api.users.Role&lt;/userType>
+                  &lt;enumConverter>true&lt;/enumConverter>
+                  &lt;objectType>COLUMN&lt;/objectType>
+                  &lt;includeTypes>role&lt;/includeTypes>
+                &lt;/forcedType>
+                &lt;forcedType>
+                  &lt;userType>nl.jvandis.teambalance.api.event.RecurringEventProperties.TimeUnit&lt;/userType>
+                  &lt;enumConverter>true&lt;/enumConverter>
+                  &lt;objectType>COLUMN&lt;/objectType>
+                  &lt;includeTypes>recurring_event_properties_time_unit&lt;/includeTypes>
+                &lt;/forcedType>
+              &lt;/forcedTypes>
+            &lt;/database>
+            &lt;target>
+              &lt;packageName>nl.jvandis.teambalance.data.jooq.schema&lt;/packageName>
+            &lt;/target>
+          &lt;/generator>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-clean-plugin&lt;/artifactId>
+        &lt;version>3.3.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-clean&lt;/id>
+            &lt;phase>clean&lt;/phase>
+            &lt;goals>
+              &lt;goal>clean&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-resources-plugin&lt;/artifactId>
+        &lt;version>3.3.1&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-testResources&lt;/id>
+            &lt;phase>process-test-resources&lt;/phase>
+            &lt;goals>
+              &lt;goal>testResources&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;propertiesEncoding>UTF-8&lt;/propertiesEncoding>
+              &lt;delimiters>
+                &lt;delimiter>@&lt;/delimiter>
+              &lt;/delimiters>
+              &lt;useDefaultDelimiters>false&lt;/useDefaultDelimiters>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>default-resources&lt;/id>
+            &lt;phase>process-resources&lt;/phase>
+            &lt;goals>
+              &lt;goal>resources&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;propertiesEncoding>UTF-8&lt;/propertiesEncoding>
+              &lt;delimiters>
+                &lt;delimiter>@&lt;/delimiter>
+              &lt;/delimiters>
+              &lt;useDefaultDelimiters>false&lt;/useDefaultDelimiters>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;propertiesEncoding>UTF-8&lt;/propertiesEncoding>
+          &lt;delimiters>
+            &lt;delimiter>@&lt;/delimiter>
+          &lt;/delimiters>
+          &lt;useDefaultDelimiters>false&lt;/useDefaultDelimiters>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-jar-plugin&lt;/artifactId>
+        &lt;version>3.4.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-jar&lt;/id>
+            &lt;phase>package&lt;/phase>
+            &lt;goals>
+              &lt;goal>jar&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;archive>
+                &lt;manifest>
+                  &lt;mainClass>${start-class}&lt;/mainClass>
+                  &lt;addDefaultImplementationEntries>true&lt;/addDefaultImplementationEntries>
+                &lt;/manifest>
+              &lt;/archive>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;archive>
+            &lt;manifest>
+              &lt;mainClass>${start-class}&lt;/mainClass>
+              &lt;addDefaultImplementationEntries>true&lt;/addDefaultImplementationEntries>
+            &lt;/manifest>
+          &lt;/archive>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-install-plugin&lt;/artifactId>
+        &lt;version>3.1.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-install&lt;/id>
+            &lt;phase>install&lt;/phase>
+            &lt;goals>
+              &lt;goal>install&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-deploy-plugin&lt;/artifactId>
+        &lt;version>3.1.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-deploy&lt;/id>
+            &lt;phase>deploy&lt;/phase>
+            &lt;goals>
+              &lt;goal>deploy&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-site-plugin&lt;/artifactId>
+        &lt;version>3.12.1&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-site&lt;/id>
+            &lt;phase>site&lt;/phase>
+            &lt;goals>
+              &lt;goal>site&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;outputDirectory>/target/site&lt;/outputDirectory>
+              &lt;reportPlugins>
+                &lt;reportPlugin>
+                  &lt;groupId>org.apache.maven.plugins&lt;/groupId>
+                  &lt;artifactId>maven-project-info-reports-plugin&lt;/artifactId>
+                &lt;/reportPlugin>
+              &lt;/reportPlugins>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>default-deploy&lt;/id>
+            &lt;phase>site-deploy&lt;/phase>
+            &lt;goals>
+              &lt;goal>deploy&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;outputDirectory>/target/site&lt;/outputDirectory>
+              &lt;reportPlugins>
+                &lt;reportPlugin>
+                  &lt;groupId>org.apache.maven.plugins&lt;/groupId>
+                  &lt;artifactId>maven-project-info-reports-plugin&lt;/artifactId>
+                &lt;/reportPlugin>
+              &lt;/reportPlugins>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;outputDirectory>/target/site&lt;/outputDirectory>
+          &lt;reportPlugins>
+            &lt;reportPlugin>
+              &lt;groupId>org.apache.maven.plugins&lt;/groupId>
+              &lt;artifactId>maven-project-info-reports-plugin&lt;/artifactId>
+            &lt;/reportPlugin>
+          &lt;/reportPlugins>
+        &lt;/configuration>
+      &lt;/plugin>
+    &lt;/plugins>
+  &lt;/build>
+&lt;/project>
+</item>
+      <item type="file" hash="508187f8e7857cef" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/jooq/support/Utils.kt</item>
+      <item type="file" hash="d81b80ef1419ebf0" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/ApiGroups.kt</item>
+      <item type="file" hash="3838e3406a7a4bfc" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/attendees/Attendee.kt</item>
+      <item type="file" hash="8f241970698720e8" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/attendees/AttendeeController.kt</item>
+      <item type="file" hash="62b829c4977ed92d" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/attendees/AttendeeRepository.kt</item>
+      <item type="file" hash="a7f3530034e17c3e" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/attendees/AttendeeWithUserRecordHandler.kt</item>
+      <item type="file" hash="1515137a1e8dd152" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/attendees/BankAccountAliasWithUserRecordHandler.kt</item>
+      <item type="file" hash="d0518b682f817b2a" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/attendees/Responses.kt</item>
+      <item type="file" hash="37d3eac8d8a50e8d" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/authentication/AuthenticationController.kt</item>
+      <item type="file" hash="0c304a68bd52e3bd" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/BankAccountAlias.kt</item>
+      <item type="file" hash="b8573852ad0eecc2" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/BankAccountAliasController.kt</item>
+      <item type="file" hash="216ac4e6beaf73f2" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/BankAccountAliasRepository.kt</item>
+      <item type="file" hash="8d56c62c3787141b" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/BankAccountTransactionExclusionController.kt</item>
+      <item type="file" hash="85fd61bceb5c1478" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/BankAccountTransactionExclusionRepository.kt</item>
+      <item type="file" hash="14ffeb31f14e8417" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/BankController.kt</item>
+      <item type="file" hash="b1a1f24638e71fe1" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/BankObjects.kt</item>
+      <item type="file" hash="20dde10daa57430f" isText="unknown" charset="UTF-8" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/BankService.kt</item>
+      <item type="file" hash="41755b9dc7bb2e46" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/BunqConfiguration.kt</item>
+      <item type="file" hash="07e23a8d8652767d" content="text/plain" isText="yes" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/BunqRepository.java</item>
+      <item type="file" hash="93cea4cdd32c874f" content="text/plain" isText="yes" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/BunqSandboxRepositoryHelper.java</item>
+      <item type="file" hash="a43eb08aba0ea842" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/Config.kt</item>
+      <item type="file" hash="a1a55ae21851dc98" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/PotterController.kt</item>
+      <item type="file" hash="4f818ba980923d55" isText="unknown" charset="UTF-8" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/PotterService.kt</item>
+      <item type="file" hash="75b56e9436518ec0" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/Responses.kt</item>
+      <item type="file" hash="da05698a15b2acbb" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/Sort.kt</item>
+      <item type="file" hash="372f0f83500d7d78" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/bank/TransactionExclusion.kt</item>
+      <item type="file" hash="11fe85796f976271" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/Cache.kt</item>
+      <item type="file" hash="c4a4a8111fec9323" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/competion/AppConfig.kt</item>
+      <item type="file" hash="1bb679aa2551912f" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/competion/CompetitionController.kt</item>
+      <item type="file" hash="a1e13f8188225fd6" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/competion/CompetitionService.kt</item>
+      <item type="file" hash="42f53a93d0992343" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/competion/LeaderBoard.kt</item>
+      <item type="file" hash="d64055e0202b69d0" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/competion/LeaderBoardDto.kt</item>
+      <item type="file" hash="292ea74bf59b2653" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/competion/NevoboClient.kt</item>
+      <item type="file" hash="0a359ccc2e4acf3e" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/competion/XmlConfiguration.kt</item>
+      <item type="file" hash="72f74326b9b51cd9" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/ConfigurationRepository.kt</item>
+      <item type="file" hash="56c137c5c1fb2181" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/ConfigurationService.kt</item>
+      <item type="file" hash="caa9f5de4195664d" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/Error.kt</item>
+      <item type="file" hash="8c73709702a457b9" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/DeletedEventsResponse.kt</item>
+      <item type="file" hash="c191409a991efbf2" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/Event.kt</item>
+      <item type="file" hash="8055ba1b4dd00895" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/EventRepository.kt</item>
+      <item type="file" hash="c266c90647b43e24" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/LoggingContext.kt</item>
+      <item type="file" hash="352ce15c6feb327a" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/match/Match.kt</item>
+      <item type="file" hash="80a454af5a6b58b7" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/match/MatchController.kt</item>
+      <item type="file" hash="a08435470fb625dd" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/match/MatchRepository.kt</item>
+      <item type="file" hash="5ea0f83f50ac07c1" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/match/MatchService.kt</item>
+      <item type="file" hash="8a28ff69ad3e24f8" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/match/MatchWithAttendeesRecordHandler.kt</item>
+      <item type="file" hash="5cc98867ed3a6b37" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/match/Responses.kt</item>
+      <item type="file" hash="fcf0f655a3230530" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/miscellaneous/MiscellaneousEvent.kt</item>
+      <item type="file" hash="19c9c87a17a93d5d" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/miscellaneous/MiscellaneousEventController.kt</item>
+      <item type="file" hash="99f96b0ff67bac54" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/miscellaneous/MiscellaneousEventRepository.kt</item>
+      <item type="file" hash="d3a9ac2db1657b2f" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/miscellaneous/MiscellaneousEventService.kt</item>
+      <item type="file" hash="5066866792425ee1" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/miscellaneous/MiscEventWithAttendeesRecordHandler.kt</item>
+      <item type="file" hash="708e2e18f11e352f" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/miscellaneous/Responses.kt</item>
+      <item type="file" hash="5d93dbef643b935b" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/PotentialAttendee.kt</item>
+      <item type="file" hash="8ecdf52420ecd2bc" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/Response.kt</item>
+      <item type="file" hash="7a2839925d7e045f" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/TeamBalanceRecordHandler.kt</item>
+      <item type="file" hash="ee5ecbafdbc05d1b" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/TeamEventsRepository.kt</item>
+      <item type="file" hash="d1e6f24a721b552c" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/training/Responses.kt</item>
+      <item type="file" hash="5c58aa5ff5098fab" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/training/Training.kt</item>
+      <item type="file" hash="5a26eaf30df9dce0" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/training/TrainingController.kt</item>
+      <item type="file" hash="f03e12ddff89d6a5" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/training/TrainingRepository.kt</item>
+      <item type="file" hash="d2883bb4b3041646" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/training/TrainingService.kt</item>
+      <item type="file" hash="28d5acbad78f2506" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/training/TrainingWithAttendeesRecordHandler.kt</item>
+      <item type="file" hash="93914c7c2e61ebaa" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/event/Utils.kt</item>
+      <item type="file" hash="780ad735648675a9" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/GlobalExceptionHandler.kt</item>
+      <item type="file" hash="c807a8bb5f9e2393" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/users/User.kt</item>
+      <item type="file" hash="51d1a81b76fce566" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/users/UserController.kt</item>
+      <item type="file" hash="2a793abc261c0c17" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/users/UserRepository.kt</item>
+      <item type="file" hash="c42c91cee82032fe" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/users/UserResponse.kt</item>
+      <item type="file" hash="bae79559a5515862" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/api/users/Utils.kt</item>
+      <item type="file" hash="b8b855405f7d85c4" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/data/MultiTenantDslContext.kt</item>
+      <item type="file" hash="44a12a579b665fb4" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/data/Utils.kt</item>
+      <item type="file" hash="e9c27d799646639d" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/filters/DateTimeFilter.kt</item>
+      <item type="file" hash="e77d806b9449a7b8" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/filters/MultiTenantFilter.kt</item>
+      <item type="file" hash="d65e0fca578e3946" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/filters/SecretFilter.kt</item>
+      <item type="file" hash="8ca4afce561acdd7" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/filters/SecretService.kt</item>
+      <item type="file" hash="6932ff9311e96afa" isText="unknown" charset="UTF-8" eol="LF">src/main/kotlin/nl/jvandis/teambalance/MeasurementUtils.kt</item>
+      <item type="file" hash="30c1e4b2ee4ea1ef" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/MultiTenantConfig.kt</item>
+      <item type="file" hash="2d08a203c0b77f6e" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/MultiTenantContext.kt</item>
+      <item type="file" hash="88a2302843edde83" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/SpringdocConf.kt</item>
+      <item type="file" hash="0bebea7ef0c0f94c" isText="unknown" charset="US-ASCII" eol="LF">src/main/kotlin/nl/jvandis/teambalance/Utils.kt</item>
+      <item type="file" hash="354ac8eb537b840f" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/main/resources/db/changelog/db.changelog-master.xml</item>
+      <item type="file" hash="3331c048fe099696" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/main/resources/db/changelog/db.changelog.2022-12-10-init.xml</item>
+      <item type="file" hash="b069b3383d6cfa29" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/main/resources/db/changelog/db.changelog.2022-12-27-add-jersey-number-to-uzer.xml</item>
+      <item type="file" hash="1f52c79f672f2241" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/main/resources/db/changelog/db.changelog.2023-01-22-home-away-as-enum-type.xml</item>
+      <item type="file" hash="e27ab1367662a715" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/main/resources/db/changelog/db.changelog.2023-02-02-trainer-user-id.xml</item>
+      <item type="file" hash="e4d788acc88d55d4" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/main/resources/db/changelog/db.changelog.2023-02-06-enums-as-enum-type.xml</item>
+      <item type="file" hash="a3154f7d55750599" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/main/resources/db/changelog/db.changelog.2023-04-27-add-recurring-event-id.xml</item>
+      <item type="file" hash="7390ec765d667b52" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/main/resources/db/changelog/db.changelog.2023-07-23-add-configuration-table.xml</item>
+      <item type="file" hash="45a33583e8bdfea3" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/main/resources/db/changelog/db.changelog.2023-08-08-add-libero-role.xml</item>
+      <item type="file" hash="cc07d82f3b321024" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/main/resources/db/changelog/db.changelog.2024-08-05-external-ids.xml</item>
+      <item type="file" hash="2e290596963e4133" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/main/resources/db/changelog/db.changelog.2024-12-01-fix-bunq-account-configuration.xml</item>
+      <item type="file" hash="c7c03735a59d2797" isText="unknown" charset="US-ASCII" eol="LF">src/test/kotlin/nl/jvandis/teambalance/api/event/UtilsKtTest.kt</item>
+      <item type="file" hash="b25bce9365c5b295" content="application/xml" isText="yes" charset="US-ASCII" eol="LF">src/test/resources/logback-test.xml</item>
+      <item type="dependency" hash="5976d9508fda917b">nl.jvandis:jooq-support:jar</item>
+      <item type="dependency" hash="4e992076ce5b02c9">nl.jvandis:shaded-bunq-sdk:jar</item>
+    </items>
+  </projectsInputInfo>
+</build>

@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build xsi:schemaLocation="http://maven.apache.org/BUILD-CACHE-BUILD/1.0.0 https://maven.apache.org/xsd/build-cache-build-1.0.0.xsd"
+    xmlns="http://maven.apache.org/BUILD-CACHE-BUILD/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <cacheImplementationVersion>v1.1</cacheImplementationVersion>
+  <final>false</final>
+  <hashFunction>XX</hashFunction>
+  <buildTime>2025-02-19T17:21:56.426</buildTime>
+  <buildServer>localhost</buildServer>
+  <scm>
+    <sourceBranch>refs/heads/fix-historic-events</sourceBranch>
+    <revision>f846a277ce4d7ba3e24ca2ff3b917488bd186f83</revision>
+  </scm>
+  <goals>
+    <goal>clean</goal>
+    <goal>install</goal>
+  </goals>
+  <executions>
+    <execution>
+      <executionKey>default-clean:clean:clean:maven-clean-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.clean.CleanMojo</mojoClassName>
+      <properties>
+        <property name="excludeDefaultDirectories" tracked="false">false</property>
+        <property name="failOnError" tracked="false">true</property>
+        <property name="fast" tracked="false">false</property>
+        <property name="fastDir" tracked="false">null</property>
+        <property name="fastMode" tracked="false">background</property>
+        <property name="filesets" tracked="false">null</property>
+        <property name="followSymLinks" tracked="false">false</property>
+        <property name="retryOnError" tracked="false">true</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="verbose" tracked="false">null</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>ktlint-format:run:validate:maven-antrun-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.antrun.AntRunMojo</mojoClassName>
+      <properties>
+        <property name="customTaskPrefix" tracked="false">null</property>
+        <property name="exportAntProperties" tracked="false">false</property>
+        <property name="failOnError" tracked="false">true</property>
+        <property name="propertyPrefix" tracked="false">null</property>
+        <property name="skip" tracked="false">true</property>
+        <property name="sourceRoot" tracked="false">null</property>
+        <property name="target" tracked="false">&lt;target name="ktlint">&lt;java fork="true" classname="com.pinterest.ktlint.Main" taskname="ktlint" failonerror="true" dir="/Users/juliusvandis/IdeaProjects/Personal/teambalance" classpathref="maven.plugin.classpath">&lt;jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
+&lt;jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
+&lt;arg value="-F"/>
+&lt;arg value="*/src/**/*.kt"/>
+&lt;/java>
+&lt;/target>
+</property>
+        <property name="tasks" tracked="false">null</property>
+        <property name="testSourceRoot" tracked="false">null</property>
+        <property name="versionsPropertyName" tracked="false">maven.project.dependencies.versions</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default:revision:initialize:git-commit-id-maven-plugin:io.github.git-commit-id</executionKey>
+      <mojoClassName>pl.project13.maven.git.GitCommitIdMojo</mojoClassName>
+      <properties>
+        <property name="abbrevLength" tracked="false">7</property>
+        <property name="commitIdGenerationMode" tracked="false">flat</property>
+        <property name="dateFormat" tracked="false">yyyy-MM-dd'T'HH:mm:ssXXX</property>
+        <property name="dateFormatTimeZone" tracked="false">null</property>
+        <property name="dotGitDirectory" tracked="false">.git</property>
+        <property name="evaluateOnCommit" tracked="false">HEAD</property>
+        <property name="excludeProperties" tracked="false">null</property>
+        <property name="failOnNoGitDirectory" tracked="false">true</property>
+        <property name="failOnUnableToExtractRepoInfo" tracked="false">true</property>
+        <property name="format" tracked="false">properties</property>
+        <property name="generateGitPropertiesFile" tracked="false">true</property>
+        <property name="generateGitPropertiesFileWithEscapedUnicode" tracked="false">true</property>
+        <property name="generateGitPropertiesFilename" tracked="false">target/classes/git.properties</property>
+        <property name="gitDescribe" tracked="false">GitDescribeConfig{skip=false, always=true, dirty='-dirty', match='*', abbrev=7, tags=false, forceLongFormat=false}</property>
+        <property name="includeOnlyProperties" tracked="false">null</property>
+        <property name="injectAllReactorProjects" tracked="false">false</property>
+        <property name="injectIntoSysProperties" tracked="false">true</property>
+        <property name="nativeGitTimeoutInMs" tracked="false">30000</property>
+        <property name="offline" tracked="false">true</property>
+        <property name="prefix" tracked="false">git</property>
+        <property name="projectBuildOutputTimestamp" tracked="false">null</property>
+        <property name="replacementProperties" tracked="false">null</property>
+        <property name="runOnlyOnce" tracked="false">false</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="skipPoms" tracked="false">false</property>
+        <property name="skipViaCommandLine" tracked="false">false</property>
+        <property name="useBranchNameFromBuildEnvironment" tracked="false">true</property>
+        <property name="useNativeGit" tracked="false">false</property>
+        <property name="useNativeGitViaCommandLine" tracked="false">false</property>
+        <property name="verbose" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>install node and npm:install-node-and-npm:initialize:frontend-maven-plugin:com.github.eirslett</executionKey>
+      <mojoClassName>com.github.eirslett.maven.plugins.frontend.mojo.InstallNodeAndNpmMojo</mojoClassName>
+      <properties>
+        <property name="downloadRoot" tracked="false">null</property>
+        <property name="environmentVariables" tracked="false">null</property>
+        <property name="installDirectory" tracked="false">/Users/juliusvandis/IdeaProjects/Personal/teambalance</property>
+        <property name="nodeDownloadRoot" tracked="false">null</property>
+        <property name="nodeVersion" tracked="false">v20.12.2</property>
+        <property name="npmDownloadRoot" tracked="false">https://registry.npmjs.org/npm/-/</property>
+        <property name="npmVersion" tracked="false">10.5.0</property>
+        <property name="serverId" tracked="false">null</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="skipTests" tracked="false">false</property>
+        <property name="testFailureIgnore" tracked="false">false</property>
+        <property name="workingDirectory" tracked="false">/Users/juliusvandis/IdeaProjects/Personal/teambalance</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>prepare-agent:prepare-agent:initialize:jacoco-maven-plugin:org.jacoco</executionKey>
+      <mojoClassName>org.jacoco.maven.AgentMojo</mojoClassName>
+      <properties>
+        <property name="address" tracked="false">null</property>
+        <property name="append" tracked="false">null</property>
+        <property name="classDumpDir" tracked="false">null</property>
+        <property name="destFile" tracked="false">target/jacoco.exec</property>
+        <property name="dumpOnExit" tracked="false">null</property>
+        <property name="exclClassLoaders" tracked="false">null</property>
+        <property name="excludes" tracked="false">null</property>
+        <property name="inclBootstrapClasses" tracked="false">null</property>
+        <property name="inclNoLocationClasses" tracked="false">null</property>
+        <property name="includes" tracked="false">null</property>
+        <property name="jmx" tracked="false">null</property>
+        <property name="output" tracked="false">null</property>
+        <property name="port" tracked="false">null</property>
+        <property name="propertyName" tracked="false">null</property>
+        <property name="sessionId" tracked="false">null</property>
+        <property name="skip" tracked="false">false</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>compile:compile:compile:kotlin-maven-plugin:org.jetbrains.kotlin</executionKey>
+      <mojoClassName>org.jetbrains.kotlin.maven.K2JVMCompileMojo</mojoClassName>
+      <properties>
+        <property name="apiVersion" tracked="false">null</property>
+        <property name="args" tracked="false">[-Xjsr305=strict, -Xcontext-receivers]</property>
+        <property name="compilerPlugins" tracked="false">[spring, all-open]</property>
+        <property name="experimentalCoroutines" tracked="false">null</property>
+        <property name="incrementalCachesRoot" tracked="false">target/kotlin-ic</property>
+        <property name="javaParameters" tracked="false">true</property>
+        <property name="jdkHome" tracked="false">null</property>
+        <property name="jvmTarget" tracked="false">17</property>
+        <property name="languageVersion" tracked="false">null</property>
+        <property name="multiPlatform" tracked="false">false</property>
+        <property name="myIncremental" tracked="false">false</property>
+        <property name="nowarn" tracked="false">false</property>
+        <property name="pluginOptions" tracked="false">null</property>
+        <property name="scriptTemplates" tracked="false">[]</property>
+        <property name="sourceDirs" tracked="false">null</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>test-compile:test-compile:test-compile:kotlin-maven-plugin:org.jetbrains.kotlin</executionKey>
+      <mojoClassName>org.jetbrains.kotlin.maven.KotlinTestCompileMojo</mojoClassName>
+      <properties>
+        <property name="apiVersion" tracked="false">null</property>
+        <property name="args" tracked="false">[-Xjsr305=strict, -Xcontext-receivers]</property>
+        <property name="compilerPlugins" tracked="false">[spring, all-open]</property>
+        <property name="defaultSourceDirs" tracked="false">[src/test/java]</property>
+        <property name="experimentalCoroutines" tracked="false">null</property>
+        <property name="incrementalCachesRoot" tracked="false">target/kotlin-ic</property>
+        <property name="javaParameters" tracked="false">true</property>
+        <property name="jdkHome" tracked="false">null</property>
+        <property name="jvmTarget" tracked="false">17</property>
+        <property name="languageVersion" tracked="false">null</property>
+        <property name="multiPlatform" tracked="false">false</property>
+        <property name="myIncremental" tracked="false">false</property>
+        <property name="nowarn" tracked="false">false</property>
+        <property name="pluginOptions" tracked="false">null</property>
+        <property name="scriptTemplates" tracked="false">[]</property>
+        <property name="skip" tracked="false">false</property>
+        <property name="sourceDirs" tracked="false">null</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>report:report:verify:jacoco-maven-plugin:org.jacoco</executionKey>
+      <mojoClassName>org.jacoco.maven.ReportMojo</mojoClassName>
+      <properties>
+        <property name="dataFile" tracked="false">target/jacoco.exec</property>
+        <property name="excludes" tracked="false">null</property>
+        <property name="footer" tracked="false">null</property>
+        <property name="formats" tracked="false">[HTML, XML, CSV]</property>
+        <property name="includes" tracked="false">null</property>
+        <property name="outputDirectory" tracked="false">target/site/jacoco</property>
+        <property name="outputEncoding" tracked="false">UTF-8</property>
+        <property name="skip" tracked="true">false</property>
+        <property name="sourceEncoding" tracked="false">UTF-8</property>
+        <property name="title" tracked="false">Team balance parent</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>ktlint:run:verify:maven-antrun-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.antrun.AntRunMojo</mojoClassName>
+      <properties>
+        <property name="customTaskPrefix" tracked="false">null</property>
+        <property name="exportAntProperties" tracked="false">false</property>
+        <property name="failOnError" tracked="false">true</property>
+        <property name="propertyPrefix" tracked="false"></property>
+        <property name="skip" tracked="false">false</property>
+        <property name="sourceRoot" tracked="false">null</property>
+        <property name="target" tracked="false">&lt;target name="ktlint">&lt;java fork="true" classname="com.pinterest.ktlint.Main" taskname="ktlint" failonerror="true" dir="/Users/juliusvandis/IdeaProjects/Personal/teambalance" classpathref="maven.plugin.classpath">&lt;jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
+&lt;jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
+&lt;arg value="*/src/**/*.kt"/>
+&lt;/java>
+&lt;/target>
+</property>
+        <property name="tasks" tracked="false">null</property>
+        <property name="testSourceRoot" tracked="false">null</property>
+        <property name="versionsPropertyName" tracked="false">maven.project.dependencies.versions</property>
+      </properties>
+    </execution>
+    <execution>
+      <executionKey>default-install:install:install:maven-install-plugin:org.apache.maven.plugins</executionKey>
+      <mojoClassName>org.apache.maven.plugins.install.InstallMojo</mojoClassName>
+      <properties>
+        <property name="allowIncompleteProjects" tracked="false">false</property>
+        <property name="installAtEnd" tracked="false">false</property>
+        <property name="skip" tracked="false">false</property>
+      </properties>
+    </execution>
+  </executions>
+  <projectsInputInfo>
+    <checksum>5990edd2902a0365</checksum>
+    <items>
+      <item type="pom" hash="0f21dbf0f9ea2776">&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  &lt;groupId>nl.jvandis&lt;/groupId>
+  &lt;artifactId>teambalance&lt;/artifactId>
+  &lt;version>cache-extension-version&lt;/version>
+  &lt;modules>
+    &lt;module>e2e&lt;/module>
+    &lt;module>app&lt;/module>
+    &lt;module>backend&lt;/module>
+    &lt;module>frontend&lt;/module>
+    &lt;module>jooq-support&lt;/module>
+    &lt;module>shaded-bunq-sdk&lt;/module>
+    &lt;module>test-data&lt;/module>
+  &lt;/modules>
+  &lt;dependencies>
+    &lt;dependency>
+      &lt;groupId>org.junit.jupiter&lt;/groupId>
+      &lt;artifactId>junit-jupiter&lt;/artifactId>
+      &lt;version>5.10.3&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.junit.jupiter&lt;/groupId>
+      &lt;artifactId>junit-jupiter-engine&lt;/artifactId>
+      &lt;version>5.10.3&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+      &lt;artifactId>kotlin-stdlib-jdk8&lt;/artifactId>
+      &lt;version>1.9.24&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+      &lt;artifactId>kotlin-test&lt;/artifactId>
+      &lt;version>1.9.24&lt;/version>
+      &lt;scope>test&lt;/scope>
+    &lt;/dependency>
+    &lt;dependency>
+      &lt;groupId>org.sonarsource.scanner.maven&lt;/groupId>
+      &lt;artifactId>sonar-maven-plugin&lt;/artifactId>
+      &lt;version>4.0.0.4121&lt;/version>
+      &lt;scope>compile&lt;/scope>
+    &lt;/dependency>
+  &lt;/dependencies>
+  &lt;build>
+    &lt;plugins>
+      &lt;plugin>
+        &lt;groupId>io.github.git-commit-id&lt;/groupId>
+        &lt;artifactId>git-commit-id-maven-plugin&lt;/artifactId>
+        &lt;version>8.0.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;phase>initialize&lt;/phase>
+            &lt;goals>
+              &lt;goal>revision&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;verbose>false&lt;/verbose>
+              &lt;generateGitPropertiesFile>true&lt;/generateGitPropertiesFile>
+              &lt;generateGitPropertiesFilename>/target/classes/git.properties&lt;/generateGitPropertiesFilename>
+              &lt;skipPoms>false&lt;/skipPoms>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;verbose>false&lt;/verbose>
+          &lt;generateGitPropertiesFile>true&lt;/generateGitPropertiesFile>
+          &lt;generateGitPropertiesFilename>/target/classes/git.properties&lt;/generateGitPropertiesFilename>
+          &lt;skipPoms>false&lt;/skipPoms>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+        &lt;artifactId>kotlin-maven-plugin&lt;/artifactId>
+        &lt;version>1.9.24&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>compile&lt;/id>
+            &lt;phase>compile&lt;/phase>
+            &lt;goals>
+              &lt;goal>compile&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;args>
+                &lt;arg>-Xjsr305=strict&lt;/arg>
+                &lt;arg>-Xcontext-receivers&lt;/arg>
+              &lt;/args>
+              &lt;compilerPlugins>
+                &lt;plugin>spring&lt;/plugin>
+                &lt;plugin>all-open&lt;/plugin>
+              &lt;/compilerPlugins>
+              &lt;jvmTarget>17&lt;/jvmTarget>
+              &lt;javaParameters>true&lt;/javaParameters>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>test-compile&lt;/id>
+            &lt;phase>test-compile&lt;/phase>
+            &lt;goals>
+              &lt;goal>test-compile&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;args>
+                &lt;arg>-Xjsr305=strict&lt;/arg>
+                &lt;arg>-Xcontext-receivers&lt;/arg>
+              &lt;/args>
+              &lt;compilerPlugins>
+                &lt;plugin>spring&lt;/plugin>
+                &lt;plugin>all-open&lt;/plugin>
+              &lt;/compilerPlugins>
+              &lt;jvmTarget>17&lt;/jvmTarget>
+              &lt;javaParameters>true&lt;/javaParameters>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;dependencies>
+          &lt;dependency>
+            &lt;groupId>org.jetbrains.kotlin&lt;/groupId>
+            &lt;artifactId>kotlin-maven-allopen&lt;/artifactId>
+            &lt;version>1.9.24&lt;/version>
+            &lt;scope>compile&lt;/scope>
+          &lt;/dependency>
+        &lt;/dependencies>
+        &lt;configuration>
+          &lt;args>
+            &lt;arg>-Xjsr305=strict&lt;/arg>
+            &lt;arg>-Xcontext-receivers&lt;/arg>
+          &lt;/args>
+          &lt;compilerPlugins>
+            &lt;plugin>spring&lt;/plugin>
+            &lt;plugin>all-open&lt;/plugin>
+          &lt;/compilerPlugins>
+          &lt;jvmTarget>17&lt;/jvmTarget>
+          &lt;javaParameters>true&lt;/javaParameters>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-surefire-plugin&lt;/artifactId>
+        &lt;version>3.1.2&lt;/version>
+        &lt;configuration>
+          &lt;argLine>@{argLine} -Dliquibase.secureParsing=false&lt;/argLine>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;groupId>com.github.eirslett&lt;/groupId>
+        &lt;artifactId>frontend-maven-plugin&lt;/artifactId>
+        &lt;version>1.15.1&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>install node and npm&lt;/id>
+            &lt;phase>initialize&lt;/phase>
+            &lt;goals>
+              &lt;goal>install-node-and-npm&lt;/goal>
+            &lt;/goals>
+            &lt;inherited>false&lt;/inherited>
+            &lt;configuration>
+              &lt;skip>false&lt;/skip>
+              &lt;nodeVersion>v20.12.2&lt;/nodeVersion>
+              &lt;npmVersion>10.5.0&lt;/npmVersion>
+              &lt;installDirectory>&lt;/installDirectory>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;groupId>org.jacoco&lt;/groupId>
+        &lt;artifactId>jacoco-maven-plugin&lt;/artifactId>
+        &lt;version>0.8.12&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>prepare-agent&lt;/id>
+            &lt;goals>
+              &lt;goal>prepare-agent&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>report&lt;/id>
+            &lt;goals>
+              &lt;goal>report&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-antrun-plugin&lt;/artifactId>
+        &lt;version>3.1.0&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>ktlint&lt;/id>
+            &lt;phase>verify&lt;/phase>
+            &lt;goals>
+              &lt;goal>run&lt;/goal>
+            &lt;/goals>
+            &lt;inherited>false&lt;/inherited>
+            &lt;configuration>
+              &lt;target name="ktlint">
+                &lt;java fork="true" classname="com.pinterest.ktlint.Main" taskname="ktlint" failonerror="true" dir="" classpathref="maven.plugin.classpath">
+                  &lt;jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED" />
+                  &lt;jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED" />
+                  &lt;arg value="*/src/**/*.kt" />
+                &lt;/java>
+              &lt;/target>
+              &lt;skip>false&lt;/skip>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>ktlint-format&lt;/id>
+            &lt;phase>validate&lt;/phase>
+            &lt;goals>
+              &lt;goal>run&lt;/goal>
+            &lt;/goals>
+            &lt;inherited>false&lt;/inherited>
+            &lt;configuration>
+              &lt;skip>true&lt;/skip>
+              &lt;target name="ktlint">
+                &lt;java fork="true" classname="com.pinterest.ktlint.Main" taskname="ktlint" failonerror="true" dir="" classpathref="maven.plugin.classpath">
+                  &lt;jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED" />
+                  &lt;jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED" />
+                  &lt;arg value="-F" />
+                  &lt;arg value="*/src/**/*.kt" />
+                &lt;/java>
+              &lt;/target>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;dependencies>
+          &lt;dependency>
+            &lt;groupId>com.pinterest&lt;/groupId>
+            &lt;artifactId>ktlint&lt;/artifactId>
+            &lt;version>0.51.0-FINAL&lt;/version>
+            &lt;scope>compile&lt;/scope>
+          &lt;/dependency>
+        &lt;/dependencies>
+        &lt;configuration>
+          &lt;skip>false&lt;/skip>
+        &lt;/configuration>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-clean-plugin&lt;/artifactId>
+        &lt;version>3.3.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-clean&lt;/id>
+            &lt;phase>clean&lt;/phase>
+            &lt;goals>
+              &lt;goal>clean&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-install-plugin&lt;/artifactId>
+        &lt;version>3.1.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-install&lt;/id>
+            &lt;phase>install&lt;/phase>
+            &lt;goals>
+              &lt;goal>install&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-deploy-plugin&lt;/artifactId>
+        &lt;version>3.1.2&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-deploy&lt;/id>
+            &lt;phase>deploy&lt;/phase>
+            &lt;goals>
+              &lt;goal>deploy&lt;/goal>
+            &lt;/goals>
+          &lt;/execution>
+        &lt;/executions>
+      &lt;/plugin>
+      &lt;plugin>
+        &lt;artifactId>maven-site-plugin&lt;/artifactId>
+        &lt;version>3.12.1&lt;/version>
+        &lt;executions>
+          &lt;execution>
+            &lt;id>default-site&lt;/id>
+            &lt;phase>site&lt;/phase>
+            &lt;goals>
+              &lt;goal>site&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;outputDirectory>/target/site&lt;/outputDirectory>
+              &lt;reportPlugins>
+                &lt;reportPlugin>
+                  &lt;groupId>org.apache.maven.plugins&lt;/groupId>
+                  &lt;artifactId>maven-project-info-reports-plugin&lt;/artifactId>
+                &lt;/reportPlugin>
+              &lt;/reportPlugins>
+            &lt;/configuration>
+          &lt;/execution>
+          &lt;execution>
+            &lt;id>default-deploy&lt;/id>
+            &lt;phase>site-deploy&lt;/phase>
+            &lt;goals>
+              &lt;goal>deploy&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+              &lt;outputDirectory>/target/site&lt;/outputDirectory>
+              &lt;reportPlugins>
+                &lt;reportPlugin>
+                  &lt;groupId>org.apache.maven.plugins&lt;/groupId>
+                  &lt;artifactId>maven-project-info-reports-plugin&lt;/artifactId>
+                &lt;/reportPlugin>
+              &lt;/reportPlugins>
+            &lt;/configuration>
+          &lt;/execution>
+        &lt;/executions>
+        &lt;configuration>
+          &lt;outputDirectory>/target/site&lt;/outputDirectory>
+          &lt;reportPlugins>
+            &lt;reportPlugin>
+              &lt;groupId>org.apache.maven.plugins&lt;/groupId>
+              &lt;artifactId>maven-project-info-reports-plugin&lt;/artifactId>
+            &lt;/reportPlugin>
+          &lt;/reportPlugins>
+        &lt;/configuration>
+      &lt;/plugin>
+    &lt;/plugins>
+  &lt;/build>
+&lt;/project>
+</item>
+    </items>
+  </projectsInputInfo>
+</build>

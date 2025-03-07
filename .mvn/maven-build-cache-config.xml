@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!---
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<cache xmlns="http://maven.apache.org/BUILD-CACHE-CONFIG/1.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://maven.apache.org/BUILD-CACHE-CONFIG/1.2.0 http://maven.apache.org/xsd/build-cache-config-1.2.0.xsd">
+
+    <configuration>
+        <enabled>true</enabled>
+        <hashAlgorithm>XX</hashAlgorithm>
+        <validateXml>true</validateXml>
+        <mandatoryClean>true</mandatoryClean>
+        <remote enabled="false" saveToRemote="true" id="remote-cache">
+            <url>http://localhost:8088</url>
+        </remote>
+        <local>
+            <maxBuildsCached>5</maxBuildsCached>
+        </local>
+        <projectVersioning adjustMetaInf="true"/>
+        <attachedOutputs>
+            <dirNames>
+                <dirName glob="jacoco.exec"/>
+                <dirName>classes</dirName>
+                <dirName>failsafe-reports</dirName>
+                <dirName>site/jacoco</dirName>
+                <dirName>surefire-reports</dirName>
+                <dirName>test-classes</dirName>
+            </dirNames>
+        </attachedOutputs>
+    </configuration>
+
+    <input>
+
+        <global>
+            <!-- If not defined, default glob is "*" -->
+            <glob>
+                {*.java,*.kt,*.yml,*.yaml,*.xml,*.properties,*.sql,*.sh,*.json,*.js,*.jsx,*.ts,*.tsx,*.html,*.css, .env.*}
+            </glob>
+            <includes>
+                <!-- By default, project sources and resources directories are included (src/main/java and src/main/resources) -->
+                <!-- In this example, the goal is to include a wider range of src directories (like src/main/assembly or src/main/groovy) -->
+                <include>src/</include>
+            </includes>
+            <excludes>
+                <!-- We don't want a static "hash" pom resolution (it would conflict the will to adjust the version in the manifest), -->
+                <!-- we exclude this specific file (as it is already by default since it is not in an include folder -->
+                <!-- The need to rebuild a project based on the pom is already computed with some intelligence by the extension. -->
+                <exclude>pom.xml</exclude>
+                <exclude>stats.html</exclude>
+            </excludes>
+
+        </global>
+        <plugins>
+            <plugin artifactId="maven-resources-plugin" groupId="org.apache.maven.plugins">
+                <executions>
+                    <execution>
+                        <execIds>
+                            <execId>copy-fat-jar</execId>
+                        </execIds>
+                        <dirScan>
+                            <excludes>
+                                <exclude tagName="outputDirectory"/>
+                            </excludes>
+                        </dirScan>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </input>
+    <output>
+        <exclude>
+            <patterns>
+                <pattern>.*\.jar</pattern>
+            </patterns>
+        </exclude>
+    </output>
+    <executionControl>
+        <runAlways>
+            <executions>
+                <execution artifactId="maven-dependency-plugin" groupId="org.apache.maven.plugins">
+                    <execIds>
+                        <execId>unpack</execId>
+                    </execIds>
+                </execution>
+                <execution artifactId="spring-boot-maven-plugin" groupId="org.springframework.boot">
+                    <execIds>
+                        <execId>default</execId>
+                        <execId>build-info</execId>
+                        <execId>repackage</execId>
+                    </execIds>
+                </execution>
+                <execution artifactId="frontend-maven-plugin" groupId="com.github.eirslett">
+                    <execIds>
+                        <execId>install node and npm</execId>
+                        <execId>npm ci</execId>
+                    </execIds>
+                </execution>
+                <execution artifactId="git-commit-id-maven-plugin" groupId="io.github.git-commit-id">
+                    <execIds>
+                        <execId>default</execId>
+                    </execIds>
+                </execution>
+
+            </executions>
+            <goalsLists>
+                <goalsList artifactId="maven-install-plugin" groupId="org.apache.maven.plugins">
+                    <goals>
+                        <goal>install</goal>
+                    </goals>
+                </goalsList>
+                <goalsList artifactId="maven-resources-plugin" groupId="org.apache.maven.plugins">
+                    <goals>
+                        <goal>copy-resources</goal>
+                    </goals>
+                </goalsList>
+                <goalsList artifactId="maven-assembly-plugin" groupId="org.apache.maven.plugins">
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                </goalsList>
+            </goalsLists>
+        </runAlways>
+        <reconcile>
+            <plugins>
+                <plugin groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" goal="test">
+                    <reconciles>
+                        <reconcile propertyName="skip" skipValue="true"/>
+                        <reconcile propertyName="skipExec" skipValue="true"/>
+                        <reconcile propertyName="skipTests" skipValue="true"/>
+                        <reconcile propertyName="testFailureIgnore" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+                <plugin groupId="org.apache.maven.plugins" artifactId="maven-failsafe-plugin" goal="test">
+                    <reconciles>
+                        <reconcile propertyName="skip" skipValue="true"/>
+                        <reconcile propertyName="skipExec" skipValue="true"/>
+                        <reconcile propertyName="skipTests" skipValue="true"/>
+                        <reconcile propertyName="skipITs" skipValue="true"/>
+                        <reconcile propertyName="testFailureIgnore" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+                <plugin groupId="org.jacoco" artifactId="jacoco-maven-plugin" goal="report">
+                    <reconciles>
+                        <reconcile propertyName="skip" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+                <plugin groupId="org.apache.maven.plugins" artifactId="maven-enforcer-plugin" goal="enforce">
+                    <reconciles>
+                        <reconcile propertyName="skip" defaultValue="false" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+                <plugin groupId="org.apache.maven.plugins" artifactId="maven-checkstyle-plugin" goal="checkstyle">
+                    <reconciles>
+                        <reconcile propertyName="skip" defaultValue="false" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+                <plugin groupId="com.github.spotbugs" artifactId="spotbugs-maven-plugin" goal="check">
+                    <reconciles>
+                        <reconcile propertyName="skip" defaultValue="false" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+                <plugin groupId="org.apache.maven.plugins" artifactId="maven-pmd-plugin" goal="check">
+                    <reconciles>
+                        <reconcile propertyName="skip" defaultValue="false" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+                <plugin groupId="org.apache.maven.plugins" artifactId="maven-pmd-plugin" goal="cpd-check">
+                    <reconciles>
+                        <reconcile propertyName="skip" defaultValue="false" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+                <plugin groupId="com.diffplug.spotless" artifactId="spotless-maven-plugin" goal="check">
+                    <reconciles>
+                        <reconcile propertyName="skip" defaultValue="false" skipValue="true"/>
+                        <reconcile propertyName="checkSkip" defaultValue="false" skipValue="true"/>
+                        <reconcile propertyName="applySkip" defaultValue="false" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+                <plugin groupId="com.github.ekryd.sortpom" artifactId="sortpom-maven-plugin" goal="verify">
+                    <reconciles>
+                        <reconcile propertyName="skip" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+            </plugins>
+        </reconcile>
+    </executionControl>
+</cache>
