@@ -44,6 +44,7 @@ fun main(args: Array<String>) {
             amountOfMatches = 5,
             amountOfEvents = 2,
             amountOfAliases = 5,
+            amountOfTransactionExclusions = 10,
             strictMode = isStrict,
         )
 

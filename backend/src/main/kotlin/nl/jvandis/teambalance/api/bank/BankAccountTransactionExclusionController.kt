@@ -30,33 +30,39 @@ class BankAccountTransactionExclusionController(
     private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
-    fun getTransactionExclusions(): TransactionExclusions {
+    fun getTransactionExclusions(): TransactionExclusionsResponse {
         log.debug("getTransactionExclusion")
 
-        return TransactionExclusions(transactionExclusionRepository.findAll())
+        return TransactionExclusions(transactionExclusionRepository.findAll()).toResponse()
     }
 
     @GetMapping("/{id}")
     fun getTransactionExclusion(
         @PathVariable(value = "id") transactionExclusionId: String,
-    ): TransactionExclusion {
+    ): TransactionExclusionResponse {
         val transactionTeamBalanceId = TeamBalanceId(transactionExclusionId)
         log.debug("getTransactionExclusion $transactionTeamBalanceId")
 
-        return transactionExclusionRepository.findByIdOrNull(transactionTeamBalanceId) ?: throw InvalidTransactionException(
-            transactionTeamBalanceId,
-        )
+        return transactionExclusionRepository.findByIdOrNull(transactionTeamBalanceId)?.toResponse()
+            ?: throw InvalidTransactionException(
+                transactionTeamBalanceId,
+            )
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun postTransactionExclusion(
         @RequestBody potentialTransactionExclusion: PotentialTransactionExclusion,
-    ) {
+    ): TransactionExclusionResponse {
         log.debug("postTransactionExclusion $potentialTransactionExclusion")
-
-        val transactionExclusion = potentialTransactionExclusion.internalize()
-        transactionExclusionRepository.insert(transactionExclusion)
+        check(
+            potentialTransactionExclusion.transactionId != null || potentialTransactionExclusion.date != null ||
+                potentialTransactionExclusion.counterParty != null || potentialTransactionExclusion.description != null,
+        ) {
+            "At least one field must be provided to create a transaction exclusion."
+        }
+        val transactionExclusion = transactionExclusionRepository.insert(potentialTransactionExclusion.internalize())
+        return transactionExclusion.toResponse()
     }
 
     @ResponseStatus(NO_CONTENT)
@@ -82,6 +88,30 @@ class BankAccountTransactionExclusionController(
         )
     }
 }
+
+private fun TransactionExclusions.toResponse(): TransactionExclusionsResponse =
+    TransactionExclusionsResponse(transactionExclusions.map { it.toResponse() })
+
+private fun TransactionExclusion.toResponse(): TransactionExclusionResponse =
+    TransactionExclusionResponse(
+        id = teamBalanceId.toString(),
+        date = date,
+        transactionId = transactionId,
+        counterParty = counterParty,
+        description = description,
+    )
+
+data class TransactionExclusionsResponse(
+    val transactionExclusions: List<TransactionExclusionResponse>,
+)
+
+data class TransactionExclusionResponse(
+    val id: String,
+    val date: LocalDate?,
+    val transactionId: Int?,
+    val counterParty: String?,
+    val description: String?,
+)
 
 data class PotentialTransactionExclusion(
     val transactionId: Int?,

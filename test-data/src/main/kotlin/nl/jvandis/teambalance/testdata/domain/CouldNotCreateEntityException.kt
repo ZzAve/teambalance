@@ -8,6 +8,9 @@ sealed class CouldNotCreateEntityException(override val message: String?, overri
     class AliasCreationException(message: String?, cause: Throwable? = null) :
         CouldNotCreateEntityException(message, cause)
 
+    class TransactionExclusionCreationException(message: String?, cause: Throwable? = null) :
+        CouldNotCreateEntityException(message, cause)
+
     class EventCreationException(message: String?, cause: Throwable? = null) :
         CouldNotCreateEntityException(message, cause)
 }
