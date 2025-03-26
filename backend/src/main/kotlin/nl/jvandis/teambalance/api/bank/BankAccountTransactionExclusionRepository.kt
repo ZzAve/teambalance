@@ -35,6 +35,7 @@ class BankAccountTransactionExclusionRepository(private val context: MultiTenant
         val transactionExclusionsResult =
             context.insertInto(
                 TRANSACTION_EXCLUSION,
+                TRANSACTION_EXCLUSION.TEAM_BALANCE_ID,
                 TRANSACTION_EXCLUSION.DATE,
                 TRANSACTION_EXCLUSION.TRANSACTION_ID,
                 TRANSACTION_EXCLUSION.COUNTER_PARTY,
@@ -42,6 +43,7 @@ class BankAccountTransactionExclusionRepository(private val context: MultiTenant
             )
                 .valuesFrom(
                     transactionExclusions,
+                    { it.teamBalanceId.value },
                     { it.date },
                     { it.transactionId },
                     { it.counterParty },

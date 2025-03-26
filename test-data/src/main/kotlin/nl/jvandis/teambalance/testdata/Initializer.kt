@@ -7,11 +7,13 @@ import io.kotest.property.arbs.games.cluedoLocations
 import io.kotest.property.arbs.games.cluedoSuspects
 import io.kotest.property.arbs.geo.country
 import io.kotest.property.arbs.movies.harryPotterCharacter
+import io.kotest.property.arbs.name
 import io.kotest.property.arbs.products.googleTaxonomy
 import io.kotest.property.arbs.stockExchanges
 import io.kotest.property.arbs.travel.airport
 import io.kotest.property.arbs.tube.tubeJourney
 import io.kotest.property.arbs.usernames
+import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.datetime.toKotlinLocalDateTime
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -22,11 +24,13 @@ import nl.jvandis.teambalance.testdata.domain.BankAccountAliases
 import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException
 import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.AliasCreationException
 import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.EventCreationException
+import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.TransactionExclusionCreationException
 import nl.jvandis.teambalance.testdata.domain.CreateAttendee
 import nl.jvandis.teambalance.testdata.domain.CreateBankAccountAlias
 import nl.jvandis.teambalance.testdata.domain.CreateMatch
 import nl.jvandis.teambalance.testdata.domain.CreateMiscEvent
 import nl.jvandis.teambalance.testdata.domain.CreateTraining
+import nl.jvandis.teambalance.testdata.domain.CreateTransactionExclusion
 import nl.jvandis.teambalance.testdata.domain.CreateUser
 import nl.jvandis.teambalance.testdata.domain.EventResponse
 import nl.jvandis.teambalance.testdata.domain.Match
@@ -34,6 +38,7 @@ import nl.jvandis.teambalance.testdata.domain.MiscEvent
 import nl.jvandis.teambalance.testdata.domain.Place
 import nl.jvandis.teambalance.testdata.domain.Role
 import nl.jvandis.teambalance.testdata.domain.Training
+import nl.jvandis.teambalance.testdata.domain.TransactionExclusion
 import nl.jvandis.teambalance.testdata.domain.User
 import nl.jvandis.teambalance.testdata.domain.Users
 import org.http4k.client.ApacheClient
@@ -86,6 +91,7 @@ class Initializer(
     val aMiscEvent = Body.auto<EventResponse<MiscEvent>>().toLens()
     val anAttendeeLens = Body.auto<Attendee>().toLens()
     val aBankAccountAliasLens = Body.auto<BankAccountAlias>().toLens()
+    val aTransactionExclusion = Body.auto<TransactionExclusion>().toLens()
 
     private fun createUser(user: CreateUser): User {
         val body = jsonFormatter.encodeToString(user)
@@ -221,23 +227,63 @@ class Initializer(
         return aBankAccountAliasLens(response)
     }
 
+    private fun createTransactionExclusion(createTransactionExclusion: CreateTransactionExclusion): TransactionExclusion {
+        val request =
+            Request(POST, "$host/api/transaction-exclusions")
+                .body(jsonFormatter.encodeToString(createTransactionExclusion))
+        val response: Response = client(request)
+
+        check(response.status.successful) {
+            "Something went wrong creating a transactionExclusion: ${response.bodyString()}"
+        }
+
+        return aTransactionExclusion(response)
+    }
+
     fun spawnData() {
         measureTime { createUsers() }.also { log.info("Created ${config.amountOfMatches} users in $it") }
         log.info("All users in the system: ")
         val allUsers = getAllUsers()
         log.info("All users: {}", allUsers)
 
-        measureTime {
-            addTrainings(
-                allUsers,
-            )
-        }.also { log.info("Created ${config.amountOfTrainings} trainings in $it") }
+        measureTime { addTrainings(allUsers) }
+            .also { log.info("Created ${config.amountOfTrainings} trainings in $it") }
         measureTime { addMatches(allUsers) }
             .also { log.info("Created ${config.amountOfMatches} matches in $it") }
         measureTime { addEvents(allUsers) }
             .also { log.info("Created ${config.amountOfEvents} misc events in $it") }
         measureTime { createBankAccountAliases(allUsers) }
             .also { log.info("Created ${config.amountOfAliases} aliases in $it") }
+        measureTime { createTransactionExclusions() }
+            .also { log.info("Created ${config.amountOfTransactionExclusions} aliases in $it") }
+    }
+
+    private fun createTransactionExclusions() {
+        (0..config.amountOfTransactionExclusions).forEach { i ->
+            val date = if (random.nextDouble(1.0) < .1) java.time.LocalDate.now().toKotlinLocalDate() else null
+            val transactionId = if (random.nextDouble(1.0) < .3) random.nextInt(5_000, 10_000) else null
+            val counterParty = if (random.nextDouble(1.0) < .3) Arb.name().take(1).first().let { "${it.first} ${it.last}" } else null
+            val createTransactionExclusion =
+                CreateTransactionExclusion(
+                    date = date,
+                    transactionId = transactionId,
+                    counterParty = counterParty,
+                    description = if (date == null && transactionId == null && counterParty == null) "Description $i" else null,
+                )
+            try {
+                log.info("Creating transactionExclusion $createTransactionExclusion")
+                createTransactionExclusion(createTransactionExclusion)
+            } catch (e: RuntimeException) {
+                if (config.strictMode) {
+                    throw TransactionExclusionCreationException(
+                        "Could not add transactionExclusion $createTransactionExclusion",
+                        e,
+                    )
+                }
+                log.error("Could not add transactionExclusion $createTransactionExclusion", e)
+                null
+            }
+        }
     }
 
     private fun createBankAccountAliases(allUsers: List<User>) {
@@ -532,5 +578,6 @@ data class SpawnDataConfig(
     val amountOfMatches: Int,
     val amountOfEvents: Int,
     val amountOfAliases: Int,
+    val amountOfTransactionExclusions: Int,
     val strictMode: Boolean,
 )
