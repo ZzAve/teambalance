@@ -259,7 +259,7 @@ class Initializer(
     }
 
     private fun createTransactionExclusions() {
-        (0..config.amountOfTransactionExclusions).forEach { i ->
+        (0 until config.amountOfTransactionExclusions).forEach { i ->
             val date = if (random.nextDouble(1.0) < .1) java.time.LocalDate.now().toKotlinLocalDate() else null
             val transactionId = if (random.nextDouble(1.0) < .3) random.nextInt(5_000, 10_000) else null
             val counterParty = if (random.nextDouble(1.0) < .3) Arb.name().take(1).first().let { "${it.first} ${it.last}" } else null
@@ -363,7 +363,7 @@ class Initializer(
 
         val dayRange = 100L
         val hourRange = 100L
-        (0..config.amountOfTrainings).forEach { i ->
+        (0 until config.amountOfTrainings).forEach { i ->
             try {
                 log.info("Creating Training $i")
                 val training =
@@ -435,7 +435,7 @@ class Initializer(
 
         val dayRange = 100L
         val hourRange = 100L
-        (0..config.amountOfMatches).forEach { i ->
+        (0 until config.amountOfMatches).forEach { i ->
             try {
                 log.info("Creating match $i")
                 val match =
@@ -504,7 +504,7 @@ class Initializer(
 
         val dayRange = 100L
         val hourRange = 100L
-        (0..config.amountOfEvents).forEach { i ->
+        (0 until config.amountOfEvents).forEach { i ->
             try {
                 log.info("Creating match $i")
                 val miscEvent =
