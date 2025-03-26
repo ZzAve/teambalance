@@ -255,7 +255,7 @@ class Initializer(
         measureTime { createBankAccountAliases(allUsers) }
             .also { log.info("Created ${config.amountOfAliases} aliases in $it") }
         measureTime { createTransactionExclusions() }
-            .also { log.info("Created ${config.amountOfTransactionExclusions} aliases in $it") }
+            .also { log.info("Created ${config.amountOfTransactionExclusions} transaction exclusions in $it") }
     }
 
     private fun createTransactionExclusions() {
