@@ -3,7 +3,6 @@ package nl.jvandis.teambalance.testdata
 import kotlin.random.Random
 
 class Conditional(private val random: Random) {
-
     /**
      * Determines whether an event occurs based on the given success rate.
      *
@@ -21,8 +20,11 @@ class Conditional(private val random: Random) {
      * @param onFalse A lambda that is executed if the success condition is not met.
      * @return The result of invoking either the onTrue or onFalse lambda.
      */
-    operator fun <T> invoke(successRate: Double, onTrue: () -> T, onFalse: () -> T) =
-        if (invoke(successRate)) onTrue() else onFalse()
+    operator fun <T> invoke(
+        successRate: Double,
+        onTrue: () -> T,
+        onFalse: () -> T,
+    ) = if (invoke(successRate)) onTrue() else onFalse()
 
     /**
      * Invokes the provided `onTrue` lambda if the success condition is met, otherwise returns null.
@@ -32,7 +34,10 @@ class Conditional(private val random: Random) {
      * @param onTrue A lambda that is executed if the success condition is met.
      * @return The result of the `onTrue` lambda if the success condition is met, otherwise null.
      */
-    operator fun <T> invoke(successRate: Double, onTrue: () -> T) = invoke(successRate, onTrue) { null }
+    operator fun <T> invoke(
+        successRate: Double,
+        onTrue: () -> T,
+    ) = invoke(successRate, onTrue) { null }
 
     /**
      * Determines whether a conditional event should occur, bases on a random number between and the given argument.

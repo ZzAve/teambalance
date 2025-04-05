@@ -56,8 +56,10 @@ class BankAccountTransactionExclusionController(
     ): TransactionExclusionResponse {
         log.debug("postTransactionExclusion $potentialTransactionExclusion")
         check(
-            potentialTransactionExclusion.transactionId != null || potentialTransactionExclusion.date != null ||
-                potentialTransactionExclusion.counterParty != null || potentialTransactionExclusion.description != null,
+            potentialTransactionExclusion.transactionId != null ||
+                potentialTransactionExclusion.date != null ||
+                potentialTransactionExclusion.counterParty != null ||
+                potentialTransactionExclusion.description != null,
         ) {
             "At least one field must be provided to create a transaction exclusion."
         }
@@ -68,7 +70,7 @@ class BankAccountTransactionExclusionController(
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun deleteTransactionExclusion(
-        @PathVariable(value = "id") transactionExclusionId: Long,
+        @PathVariable(value = "id") transactionExclusionId: TeamBalanceId,
     ) {
         log.debug("deleting transactionExclusion: $transactionExclusionId")
 
@@ -79,14 +81,13 @@ class BankAccountTransactionExclusionController(
         }
     }
 
-    private fun PotentialTransactionExclusion.internalize(): TransactionExclusion {
-        return TransactionExclusion(
+    private fun PotentialTransactionExclusion.internalize(): TransactionExclusion =
+        TransactionExclusion(
             date = date,
             transactionId = transactionId,
             counterParty = counterParty,
             description = description,
         )
-    }
 }
 
 private fun TransactionExclusions.toResponse(): TransactionExclusionsResponse =
