@@ -11,7 +11,6 @@ import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.NO_CONTENT
 import org.springframework.http.MediaType
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -68,7 +67,6 @@ class UserController(
     }
 
     @Admin
-    @PreAuthorize("hasRole('admin')")
     @PutMapping("/{id}")
     fun updateUser(
         @PathVariable(value = "id") userId: String,
@@ -100,11 +98,11 @@ class UserController(
         }
     }
 
-    @PreAuthorize("hasRole('admin')")
+    @Admin
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun updateUser(
-        @PathVariable(value = "id") userId: Long,
+        @PathVariable(value = "id") userId: TeamBalanceId,
     ) {
         log.debug("deletingUser: $userId")
 

@@ -42,14 +42,16 @@ class AttendeeRepository(
         sort: Sort = Sort.by("user.role", "user.name"),
     ): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
-        context.select()
+        context
+            .select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
             .leftJoin(UZER)
             .on(ATTENDEE.USER_ID.eq(UZER.ID))
             .where(EVENT.TEAM_BALANCE_ID.`in`(eventIds.map(TeamBalanceId::value)))
-            .orderBy(UZER.ROLE, UZER.NAME).limit(100)
+            .orderBy(UZER.ROLE, UZER.NAME)
+            .limit(1000)
             .fetch()
             .forEach(recordHandler)
 
@@ -66,7 +68,8 @@ class AttendeeRepository(
         var recurringEventInFutureCondition = noCondition()
         if (listOf(CURRENT_AND_FUTURE, ALL).contains(affectedRecurringEvents)) {
             val fetchOne =
-                context.select(EVENT.RECURRING_EVENT_ID, EVENT.START_TIME)
+                context
+                    .select(EVENT.RECURRING_EVENT_ID, EVENT.START_TIME)
                     .from(EVENT)
                     .where(EVENT.TEAM_BALANCE_ID.eq(eventId.value))
                     .fetchOne()
@@ -86,7 +89,8 @@ class AttendeeRepository(
                 .and(recurringEventInFutureCondition)
 
         val recordHandler = AttendeeWithUserRecordHandler()
-        context.select()
+        context
+            .select()
             .from(ATTENDEE)
             .join(EVENT)
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
@@ -108,24 +112,25 @@ class AttendeeRepository(
         }
 
         val insertResult =
-            context.insertInto(
-                ATTENDEE,
-                ATTENDEE.TEAM_BALANCE_ID,
-                ATTENDEE.AVAILABILITY,
-                ATTENDEE.EVENT_ID,
-                ATTENDEE.USER_ID,
-            )
-                .valuesFrom(
+            context
+                .insertInto(
+                    ATTENDEE,
+                    ATTENDEE.TEAM_BALANCE_ID,
+                    ATTENDEE.AVAILABILITY,
+                    ATTENDEE.EVENT_ID,
+                    ATTENDEE.USER_ID,
+                ).valuesFrom(
                     potentialAttendees,
                     { TeamBalanceId.random().value },
                     { it.availability },
                     { it.internalEventId },
                     { it.user.id },
-                )
-                .returningResult(ATTENDEE.ID).fetch()
+                ).returningResult(ATTENDEE.ID)
+                .fetch()
 
         val recordHandler = AttendeeWithUserRecordHandler()
-        context.select()
+        context
+            .select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
@@ -153,31 +158,7 @@ class AttendeeRepository(
         user: User,
         availability: Availability = NOT_RESPONDED,
     ): Attendee =
-        context
-            .insertInto(
-                ATTENDEE,
-                ATTENDEE.TEAM_BALANCE_ID,
-                ATTENDEE.AVAILABILITY,
-                ATTENDEE.EVENT_ID,
-                ATTENDEE.USER_ID,
-            )
-            .values(
-                TeamBalanceId.random().value,
-                availability,
-                eventInternalId,
-                user.id,
-            )
-            .returning(
-                ATTENDEE.ID,
-                ATTENDEE.TEAM_BALANCE_ID,
-                ATTENDEE.AVAILABILITY,
-                ATTENDEE.EVENT_ID,
-                ATTENDEE.USER_ID,
-            )
-            .fetchOne()
-            ?.into(Attendee.Builder::class.java)
-            ?.apply { this.user = user }
-            ?.build()
+        insertMany(listOf(PotentialAttendee(user, availability, eventInternalId))).firstOrNull()
             ?: throw DataAccessException("Could not insert attendee for user ${user.name} (id ${user.teamBalanceId} ")
 
     fun deleteAll(attendees: List<Attendee>): Int =
@@ -189,7 +170,8 @@ class AttendeeRepository(
 
     fun findAll(): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
-        context.select()
+        context
+            .select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
@@ -206,7 +188,8 @@ class AttendeeRepository(
         userIds: List<TeamBalanceId>,
     ): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
-        context.select()
+        context
+            .select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
@@ -222,20 +205,23 @@ class AttendeeRepository(
 
     fun findAllByUserIdIn(userIds: List<TeamBalanceId>): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
-        context.select()
+        context
+            .select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
             .leftJoin(UZER)
             .on(UZER.ID.eq(ATTENDEE.USER_ID))
             .where(ATTENDEE.USER_ID.`in`(userIds.map(TeamBalanceId::value)))
-            .fetch().forEach(recordHandler)
+            .fetch()
+            .forEach(recordHandler)
 
         return recordHandler.build()
     }
 
     fun findByIdOrNull(attendeeId: TeamBalanceId): Attendee? =
-        context.select()
+        context
+            .select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
@@ -255,7 +241,8 @@ class AttendeeRepository(
         eventId: TeamBalanceId,
     ): List<Attendee> {
         val recordHandler = AttendeeWithUserRecordHandler()
-        context.select()
+        context
+            .select()
             .from(ATTENDEE)
             .leftJoin(EVENT)
             .on(ATTENDEE.EVENT_ID.eq(EVENT.ID))
@@ -263,7 +250,8 @@ class AttendeeRepository(
             .on(UZER.ID.eq(ATTENDEE.USER_ID))
             .where(UZER.TEAM_BALANCE_ID.eq(userId.value))
             .and(EVENT.TEAM_BALANCE_ID.eq(eventId.value))
-            .fetch().forEach(recordHandler)
+            .fetch()
+            .forEach(recordHandler)
 
         return recordHandler.build()
     }

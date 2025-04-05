@@ -65,17 +65,10 @@ class UserRepository(
         }
     }
 
-    fun deleteById(userId: Long) {
-        if (userId == NO_ID) {
-            throw IllegalStateException(
-                "User with 'special' id $NO_ID can not be deleted. " +
-                    "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back",
-            )
-        }
+    fun deleteById(userId: TeamBalanceId) {
         val execute =
             context.deleteFrom(UZER)
-                .where(UZER.ID.eq(userId))
+                .where(UZER.TEAM_BALANCE_ID.eq(userId.value))
                 .execute()
         if (execute != 1) {
             throw DataAccessException("Removed $execute users, expected to remove only 1")

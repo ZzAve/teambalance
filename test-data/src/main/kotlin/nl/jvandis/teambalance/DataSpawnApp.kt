@@ -25,7 +25,6 @@ fun main(args: Array<String>) {
                 --apiKey=<apiKey>       The API key for authentication.
                 --randomSeed=<seed>     The seed for random number generation.
                 --host=<host>           The host (default: http://localhost:8080).
-                --strict                Enable strict mode.
                 --help                  Show this help message.
             """.trimIndent(),
         )
@@ -35,7 +34,6 @@ fun main(args: Array<String>) {
     val apiKey = namedArg(args, "apiKey") { System.getenv("TEAMBALANCE_API_KEY") ?: "" }
     val seed = namedArg(args, "randomSeed") { Random.nextLong().toString() }.toLong()
     val host = namedArg(args, "host") { DEFAULT_HOST }
-    val isStrict = namedBooleanArg(args, "strict") { false }
 
     val config =
         SpawnDataConfig(
@@ -45,11 +43,10 @@ fun main(args: Array<String>) {
             amountOfEvents = 2,
             amountOfAliases = 5,
             amountOfTransactionExclusions = 10,
-            strictMode = isStrict,
         )
 
     val random = Random(seed)
-    log.info("Running SpawnData with config: $config, apiKey: $apiKey, seed: $seed, host: $host, strictMode: $isStrict ...")
+    log.info("Running SpawnData with config: $config, apiKey: $apiKey, seed: $seed, host: $host ...")
     val time =
         measureTime {
             Initializer(
@@ -75,4 +72,5 @@ private fun namedBooleanArg(
     defaultBlock: () -> Boolean,
 ) = args.any {
     it == "--$prefix" || it.startsWith("--$prefix=") && it.substringAfter("=").toBoolean()
-} || defaultBlock()
+} ||
+    defaultBlock()

@@ -30,7 +30,7 @@ format:
 	./mvnw test-compile -Pformat
 
 clean:
-	./mvnw clean
+	./mvnw clean && docker compose down
 
 update:
 	./mvnw versions:update-parent versions:update-properties versions:use-latest-versions
@@ -45,6 +45,9 @@ run-local: run-local-backend run-local-frontend
 
 run-local-backend:
 	docker compose up --wait backend
+
+rerun-local-backend:
+	docker compose restart backend
 
 run-local-frontend:
 	docker compose up --wait frontend

@@ -33,3 +33,11 @@ enum class Role {
     LIBERO,
     OTHER,
 }
+
+@Serializable
+data class PotentialUserUpdate(
+    val name: String?,
+    val role: Role?,
+    val isActive: Boolean?,
+    val jerseyNumber: Int?,
+)

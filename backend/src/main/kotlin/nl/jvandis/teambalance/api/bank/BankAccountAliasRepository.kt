@@ -11,20 +11,25 @@ import org.jooq.exception.DataAccessException
 import org.springframework.stereotype.Repository
 
 @Repository
-class BankAccountAliasRepository(private val context: MultiTenantDslContext) {
+class BankAccountAliasRepository(
+    private val context: MultiTenantDslContext,
+) {
     fun findAll(): List<BankAccountAlias> {
         val recordHandler = BankAccountAliasWithUserRecordHandler()
-        context.select()
+        context
+            .select()
             .from(BANK_ACCOUNT_ALIAS)
             .leftJoin(UZER)
             .on(BANK_ACCOUNT_ALIAS.USER_ID.eq(UZER.ID))
-            .fetch().forEach(recordHandler)
+            .fetch()
+            .forEach(recordHandler)
         return recordHandler.build()
     }
 
     fun findByIdOrNull(aliasId: TeamBalanceId): BankAccountAlias? {
         val recordHandler = BankAccountAliasWithUserRecordHandler()
-        context.select()
+        context
+            .select()
             .from(BANK_ACCOUNT_ALIAS)
             .leftJoin(UZER)
             .on(BANK_ACCOUNT_ALIAS.USER_ID.eq(UZER.ID))
@@ -36,8 +41,7 @@ class BankAccountAliasRepository(private val context: MultiTenantDslContext) {
             .build()
             .also {
                 check(it.size < 2) { "Fetched more than 1 bankAccountAliases with the same id. Should not be possible!" }
-            }
-            .firstOrNull()
+            }.firstOrNull()
     }
 
     fun insertMany(aliases: List<BankAccountAlias>): List<BankAccountAlias> {
@@ -45,28 +49,30 @@ class BankAccountAliasRepository(private val context: MultiTenantDslContext) {
             return emptyList()
         }
         val insertResult =
-            context.insertInto(
-                BANK_ACCOUNT_ALIAS,
-                BANK_ACCOUNT_ALIAS.TEAM_BALANCE_ID,
-                BANK_ACCOUNT_ALIAS.USER_ID,
-                BANK_ACCOUNT_ALIAS.ALIAS,
-            )
-                .valuesFrom(
+            context
+                .insertInto(
+                    BANK_ACCOUNT_ALIAS,
+                    BANK_ACCOUNT_ALIAS.TEAM_BALANCE_ID,
+                    BANK_ACCOUNT_ALIAS.USER_ID,
+                    BANK_ACCOUNT_ALIAS.ALIAS,
+                ).valuesFrom(
                     aliases,
                     { it.teamBalanceId.value },
                     { it.user.id },
                     { it.alias },
-                )
-                .returningResult(BANK_ACCOUNT_ALIAS.ID).fetch()
+                ).returningResult(BANK_ACCOUNT_ALIAS.ID)
+                .fetch()
 
         val recordHandler = BankAccountAliasWithUserRecordHandler()
 
-        context.select()
+        context
+            .select()
             .from(BANK_ACCOUNT_ALIAS)
             .leftJoin(UZER)
             .on(UZER.ID.eq(BANK_ACCOUNT_ALIAS.USER_ID))
             .where(BANK_ACCOUNT_ALIAS.ID.`in`(insertResult.mapNotNull(Record1<Long?>::value1)))
-            .fetch().forEach(recordHandler)
+            .fetch()
+            .forEach(recordHandler)
 
         return if (insertResult.size == aliases.size) {
             recordHandler.build()
@@ -75,13 +81,12 @@ class BankAccountAliasRepository(private val context: MultiTenantDslContext) {
         }
     }
 
-    fun insert(bankAccountAlias: BankAccountAlias): BankAccountAlias {
-        return insertMany(listOf(bankAccountAlias)).first()
-    }
+    fun insert(bankAccountAlias: BankAccountAlias): BankAccountAlias = insertMany(listOf(bankAccountAlias)).first()
 
     fun deleteById(bankAccountAliasId: TeamBalanceId) {
         val execute =
-            context.deleteFrom(BANK_ACCOUNT_ALIAS)
+            context
+                .deleteFrom(BANK_ACCOUNT_ALIAS)
                 .where(BANK_ACCOUNT_ALIAS.TEAM_BALANCE_ID.eq(bankAccountAliasId.value))
                 .execute()
         if (execute != 1) {

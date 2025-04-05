@@ -10,6 +10,11 @@ data class CreateAttendee(
 )
 
 @Serializable
+data class Attendees(
+    val attendees: List<Attendee>,
+)
+
+@Serializable
 data class Attendee(
     val id: String,
     val eventId: String,
