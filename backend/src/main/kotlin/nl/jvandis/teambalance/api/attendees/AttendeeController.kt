@@ -99,11 +99,12 @@ class AttendeeController(
         }
         val eventInternalId = eventRepository.findInternalId(eventTeamBalanceId) ?: throw InvalidEventException(eventTeamBalanceId)
         return try {
-            attendeeRepository.insert(
-                eventInternalId = eventInternalId,
-                user = user,
-                availability = potentialAttendee.state,
-            ).expose()
+            attendeeRepository
+                .insert(
+                    eventInternalId = eventInternalId,
+                    user = user,
+                    availability = potentialAttendee.state,
+                ).expose()
         } catch (e: DataIntegrityViolationException) {
             throw DataConstraintViolationException(
                 "Could not add user $userTeamBalanceId to training $eventTeamBalanceId. User already added",
@@ -134,7 +135,8 @@ class AttendeeController(
         if (!success) {
             throw IllegalStateException("Could not update Attendee state with id $attendeeTeamBalanceId.")
         }
-        return attendeeRepository.findByIdOrNull(attendeeTeamBalanceId)
+        return attendeeRepository
+            .findByIdOrNull(attendeeTeamBalanceId)
             ?.expose()
             ?: throw AttendeeNotFoundException(attendeeTeamBalanceId, TeamBalanceId("unknown user"))
     }
@@ -158,7 +160,8 @@ class AttendeeController(
         val userTeamBalanceId = TeamBalanceId(userId)
         val eventTeamBalanceId = TeamBalanceId(eventId)
         log.debug("Deleting user $userTeamBalanceId from training $eventTeamBalanceId")
-        attendeeRepository.findByUserIdAndEventId(userTeamBalanceId, eventTeamBalanceId)
+        attendeeRepository
+            .findByUserIdAndEventId(userTeamBalanceId, eventTeamBalanceId)
             .firstOrNull()
             ?.let {
                 attendeeRepository.delete(it)
@@ -168,7 +171,8 @@ class AttendeeController(
 
     @ExceptionHandler(AttendeeNotFoundException::class)
     fun attendeeNotFoundException(e: AttendeeNotFoundException) =
-        ResponseEntity.status(NOT_FOUND)
+        ResponseEntity
+            .status(NOT_FOUND)
             .body(
                 Error(
                     status = NOT_FOUND,
@@ -177,7 +181,10 @@ class AttendeeController(
             )
 }
 
-data class AttendeeNotFoundException(val userId: TeamBalanceId, val eventId: TeamBalanceId) : RuntimeException()
+data class AttendeeNotFoundException(
+    val userId: TeamBalanceId,
+    val eventId: TeamBalanceId,
+) : RuntimeException()
 
 data class PotentialAttendee(
     val eventId: String,

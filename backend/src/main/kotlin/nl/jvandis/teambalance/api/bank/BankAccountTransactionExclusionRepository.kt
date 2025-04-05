@@ -3,7 +3,6 @@ package nl.jvandis.teambalance.api.bank
 import nl.jvandis.jooq.support.valuesFrom
 import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.data.MultiTenantDslContext
-import nl.jvandis.teambalance.data.NO_ID
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.TRANSACTION_EXCLUSION
 import org.jooq.exception.DataAccessException
 import org.springframework.stereotype.Repository
@@ -64,17 +63,10 @@ class BankAccountTransactionExclusionRepository(private val context: MultiTenant
         return insertMany(listOf(transactionExclusion)).first()
     }
 
-    fun deleteById(transactionExclusionId: Long) {
-        if (transactionExclusionId == NO_ID) {
-            throw IllegalStateException(
-                "TransactionExclusion with 'special' id $NO_ID can not be deleted. " +
-                    "The special no id serves a special purpose in transforming items " +
-                    "from records to entities and back",
-            )
-        }
+    fun deleteById(transactionExclusionId: TeamBalanceId) {
         val execute =
             context.deleteFrom(TRANSACTION_EXCLUSION)
-                .where(TRANSACTION_EXCLUSION.ID.eq(transactionExclusionId))
+                .where(TRANSACTION_EXCLUSION.TEAM_BALANCE_ID.eq(transactionExclusionId.value))
                 .execute()
         if (execute != 1) {
             throw DataAccessException("Removed $execute bankAccountAliases, expected to remove only 1")

@@ -2,7 +2,6 @@ package nl.jvandis.teambalance.api.bank
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.TeamBalanceId
-import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidAliasException
 import nl.jvandis.teambalance.api.InvalidUserException
