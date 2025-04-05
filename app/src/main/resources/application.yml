@@ -6,6 +6,9 @@ app:
     bunq:
       api-key: ${BUNQ_APIKEY}
       environment: PRODUCTION
+      oauth-client-id: ${BUNQ_OAUTH_CLIENT_ID:}
+      oauth-client-secret: ${BUNQ_OAUTH_CLIENT_SECRET:}
+      oauth-redirect-uri: ${BUNQ_OAUTH_REDIRECT_URI:}
     transaction-limit: 200 # up this when pagination is built (max is 200 from bunq)
     cache:
       balance:

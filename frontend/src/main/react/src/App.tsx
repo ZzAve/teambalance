@@ -28,6 +28,7 @@ const Login = lazy(() => import("./views/Login"));
 const Overview = lazy(() => import("./views/Overview"));
 const Transaction = lazy(() => import("./views/TransactionsPage"));
 const Users = lazy(() => import("./views/UsersPage"));
+const ConnectBunq = lazy(() => import("./views/ConnectBunqPage"));
 
 const themeLight = createTheme({
   palette: {
@@ -136,6 +137,15 @@ const App = () => {
               element={
                 <RequireAuth>
                   <CompetitionPage refresh={shouldRefresh} />
+                </RequireAuth>
+              }
+            />
+
+            <Route
+              path="connect-bunq"
+              element={
+                <RequireAuth>
+                  <ConnectBunq />
                 </RequireAuth>
               }
             />

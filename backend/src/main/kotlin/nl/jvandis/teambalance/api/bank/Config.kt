@@ -21,12 +21,18 @@ data class BankCacheConfig(
  * @property bankAccountId the ID of the bank account associated with Bunq services.
  * @property environment the environment setting for Bunq (e.g., PRODUCTION or SANDBOX).
  * @property saveSessionToFile flag indicating whether to save the session to a file.
+ * @property oauthClientId the client ID for OAuth authentication.
+ * @property oauthClientSecret the client secret for OAuth authentication.
+ * @property oauthRedirectUri the redirect URI for OAuth authentication.
  */
 data class BankBunqConfig(
     val apiKey: String?,
     val bankAccountId: Int?,
     val environment: BunqEnvironment,
     val saveSessionToFile: Boolean = false,
+    val oauthClientId: String? = null,
+    val oauthClientSecret: String? = null,
+    val oauthRedirectUri: String? = null,
 )
 
 enum class BunqEnvironment {
