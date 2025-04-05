@@ -4,6 +4,10 @@ import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class TransactionExclusions(
+    val transactionExclusions: List<TransactionExclusion>
+)
+@Serializable
 data class TransactionExclusion(
     val id: String,
     val date: LocalDate?,
