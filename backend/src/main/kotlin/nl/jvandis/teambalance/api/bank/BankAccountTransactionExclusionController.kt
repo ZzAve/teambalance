@@ -94,7 +94,7 @@ private fun TransactionExclusions.toResponse(): TransactionExclusionsResponse =
 
 private fun TransactionExclusion.toResponse(): TransactionExclusionResponse =
     TransactionExclusionResponse(
-        id = teamBalanceId.toString(),
+        id = teamBalanceId.value,
         date = date,
         transactionId = transactionId,
         counterParty = counterParty,

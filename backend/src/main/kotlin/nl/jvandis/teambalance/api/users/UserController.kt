@@ -68,7 +68,6 @@ class UserController(
     }
 
     @Admin
-    @PreAuthorize("hasRole('admin')")
     @PutMapping("/{id}")
     fun updateUser(
         @PathVariable(value = "id") userId: String,
@@ -100,11 +99,11 @@ class UserController(
         }
     }
 
-    @PreAuthorize("hasRole('admin')")
+    @Admin
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun updateUser(
-        @PathVariable(value = "id") userId: Long,
+        @PathVariable(value = "id") userId: TeamBalanceId,
     ) {
         log.debug("deletingUser: $userId")
 
