@@ -38,7 +38,8 @@ class UserController(
 
         return Users(
             users =
-                userRepository.findAll(Sort.by("name"))
+                userRepository
+                    .findAll(Sort.by("name"))
                     .filter { includeInactiveUsers || it.isActive },
         ).expose()
     }
@@ -101,7 +102,7 @@ class UserController(
     @Admin
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
-    fun updateUser(
+    fun deleteUser(
         @PathVariable(value = "id") userId: TeamBalanceId,
     ) {
         log.debug("deletingUser: $userId")

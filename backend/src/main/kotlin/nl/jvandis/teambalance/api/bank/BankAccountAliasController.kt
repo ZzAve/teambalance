@@ -48,7 +48,8 @@ class BankAccountAliasController(
         val bankAccountAliasTeamBalanceId = TeamBalanceId(bankAccountAliasId)
         log.debug("getUser $bankAccountAliasTeamBalanceId")
 
-        return bankAccountAliasRepository.findByIdOrNull(bankAccountAliasTeamBalanceId)
+        return bankAccountAliasRepository
+            .findByIdOrNull(bankAccountAliasTeamBalanceId)
             ?.expose()
             ?: throw InvalidAliasException(bankAccountAliasTeamBalanceId)
     }
@@ -72,10 +73,9 @@ class BankAccountAliasController(
         }
     }
 
-    //    @PreAuthorize("hasRole('admin')")
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
-    fun updateUser(
+    fun updateAlias(
         @PathVariable(value = "id") bankAccountAliasId: String,
     ) {
         log.debug("Deleting bankAccountAlias: $bankAccountAliasId")

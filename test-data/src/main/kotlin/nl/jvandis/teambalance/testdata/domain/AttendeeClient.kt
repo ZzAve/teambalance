@@ -2,10 +2,10 @@ package nl.jvandis.teambalance.testdata.domain
 
 import kotlinx.serialization.encodeToString
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
+import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.AttendeeCreationException
 import nl.jvandis.teambalance.testdata.jsonFormatter
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -13,6 +13,8 @@ import org.http4k.core.Response
 import org.http4k.format.KotlinxSerialization.auto
 import org.slf4j.LoggerFactory
 import kotlin.random.Random
+
+private const val ATTENDEE_BASE_URL = "/api/attendees"
 
 class AttendeeClient(
     private val client: HttpHandler,
@@ -40,32 +42,27 @@ class AttendeeClient(
                     availability = Availability.entries[random.nextInt(Availability.entries.size)],
                 )
             }.forEach {
-                val result = kotlin.runCatching { createAttendee(it) }
-                if (result.isSuccess) {
-                    val createdAttendee = result.getOrNull() ?: error("Shouldn't be null")
-                    log.debug(
-                        "Created attendee {} [{}] for event with id {}",
-                        createdAttendee.user.id,
-                        createdAttendee.state,
-                        createdAttendee.eventId,
-                    )
+                val createdAttendee = createAttendee(it)
+                log.info(
+                    "Created attendee {} [{}] for event with id {}",
+                    createdAttendee.user.id,
+                    createdAttendee.state,
+                    createdAttendee.eventId,
+                )
 
-                    val fetchedAttendee = getAttendee(createdAttendee.id)
-                    if (createdAttendee != fetchedAttendee) {
-                        throw CouldNotCreateEntityException.AttendeeCreationException(
-                            "Created BankAccountAttendee cannot be fetched. It seems something is wrong with the database. " +
-                                "Created alias: -- $createdAttendee --, fetched alias: -- $fetchedAttendee --",
-                        )
-                    }
-                    addedAttendees.add(createdAttendee)
-                } else {
-                    log.error("Could not create attendee for userId ${it.userId}", result.exceptionOrNull())
+                val fetchedAttendee = getAttendee(createdAttendee.id)
+                if (createdAttendee != fetchedAttendee) {
+                    throw AttendeeCreationException(
+                        "Created attendee cannot be fetched. It seems something is wrong with the database. " +
+                            "Created alias: -- $createdAttendee --, fetched alias: -- $fetchedAttendee --",
+                    )
                 }
+                addedAttendees.add(createdAttendee)
             }
 
         val allAttendees = getAllAttendees(listOf(eventId))
         if (!allAttendees.containsAll(addedAttendees)) {
-            throw CouldNotCreateEntityException.AttendeeCreationException(
+            throw AttendeeCreationException(
                 "Not all attendees were created. Created: $addedAttendees, all: $allAttendees" +
                     "Missing attendees for event $eventId: ${addedAttendees.filter { !allAttendees.contains(it) }}",
             )
@@ -75,22 +72,22 @@ class AttendeeClient(
     }
 
     private fun createAttendee(attendee: CreateAttendee): Attendee {
-        val request = Request(POST, "/api/attendees").body(jsonFormatter.encodeToString(attendee))
+        val request = Request(POST, "$ATTENDEE_BASE_URL").body(jsonFormatter.encodeToString(attendee))
         val response: Response = client(request)
 
         check(response.status.successful) {
-            "Something went wrong creating a user: ${response.bodyString()}"
+            "Something went wrong creating an attendee: ${response.bodyString()}"
         }
 
         return anAttendeeLens(response)
     }
 
     private fun getAttendee(attendeeId: String): Attendee {
-        val request = Request(GET, "/api/attendees/$attendeeId")
+        val request = Request(GET, "$ATTENDEE_BASE_URL/$attendeeId")
         val response: Response = client(request)
 
         if (!response.status.successful) {
-            throw CouldNotCreateEntityException.AliasCreationException(
+            throw AttendeeCreationException(
                 "Failed to get attendee with ID: $attendeeId. Status: ${response.status}",
             )
         }
@@ -99,11 +96,11 @@ class AttendeeClient(
     }
 
     fun getAllAttendees(eventIds: List<String>?): List<Attendee> {
-        val request = Request(Method.GET, "/api/attendees?event-ids=${(eventIds ?: emptyList()).joinToString(",")}")
+        val request = Request(GET, ATTENDEE_BASE_URL).query("event-ids", (eventIds ?: emptyList()).joinToString(","))
         val response = client(request)
 
         if (!response.status.successful) {
-            throw CouldNotCreateEntityException.AttendeeCreationException("Failed to get all attendees. Status: ${response.status}")
+            throw AttendeeCreationException("Failed to get all attendees. Status: ${response.status}")
         }
 
         return anAttendeesLens.extract(response).attendees

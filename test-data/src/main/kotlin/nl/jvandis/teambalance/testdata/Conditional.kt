@@ -2,7 +2,9 @@ package nl.jvandis.teambalance.testdata
 
 import kotlin.random.Random
 
-class Conditional(private val random: Random) {
+class Conditional(
+    private val random: Random,
+) {
     /**
      * Determines whether an event occurs based on the given success rate.
      *
@@ -37,7 +39,10 @@ class Conditional(private val random: Random) {
     operator fun <T> invoke(
         successRate: Double,
         onTrue: () -> T,
-    ) = invoke(successRate, onTrue) { null }
+    ): T? {
+        require(successRate in 0.0..1.0) { "successRate must be between 0.0 and 1.0" }
+        return invoke(successRate, onTrue) { null }
+    }
 
     /**
      * Determines whether a conditional event should occur, bases on a random number between and the given argument.
@@ -46,5 +51,8 @@ class Conditional(private val random: Random) {
      * @param succeedsOneIn the one in x change that this method returns true. 1 would return true always,
      * 2 about 50% of the time. 10^10 would hardly ever return true
      */
-    operator fun invoke(succeedsOneIn: Int): Boolean = invoke(1.0 / succeedsOneIn)
+    operator fun invoke(succeedsOneIn: Int): Boolean {
+        require(succeedsOneIn > 0) { "succeedsOneIn must be greater than 0" }
+        return invoke(1.0 / succeedsOneIn)
+    }
 }

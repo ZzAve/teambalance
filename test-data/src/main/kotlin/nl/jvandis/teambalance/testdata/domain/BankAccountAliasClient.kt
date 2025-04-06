@@ -1,10 +1,12 @@
 package nl.jvandis.teambalance.testdata.domain
 
 import io.kotest.property.Arb
+import io.kotest.property.RandomSource
 import io.kotest.property.arbitrary.take
 import io.kotest.property.arbs.usernames
 import kotlinx.serialization.encodeToString
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
+import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.AliasCreationException
 import nl.jvandis.teambalance.testdata.jsonFormatter
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
@@ -27,7 +29,7 @@ class BankAccountAliasClient(
         val bankAccountAliases: List<BankAccountAlias> =
             Arb
                 .usernames()
-                .take(config.amountOfAliases)
+                .take(config.amountOfAliases, RandomSource(random, random.nextLong()))
                 .map {
                     CreateBankAccountAlias(it.value, allUsers.random(random).id)
                 }.mapNotNull {
@@ -36,7 +38,7 @@ class BankAccountAliasClient(
                         val createdAlias = createAlias(it)
                         val fetchedAlias = getAlias(createdAlias.id)
                         if (createdAlias != fetchedAlias) {
-                            throw CouldNotCreateEntityException.AliasCreationException(
+                            throw AliasCreationException(
                                 "Created BankAccountAlias cannot be fetched. It seems something is wrong with the database. " +
                                     "Created alias: -- $createdAlias --, fetched alias: -- $fetchedAlias --",
                             )
@@ -44,7 +46,7 @@ class BankAccountAliasClient(
 
                         createdAlias
                     } catch (e: RuntimeException) {
-                        throw CouldNotCreateEntityException.AliasCreationException(
+                        throw AliasCreationException(
                             "Could not add bankAccountAlias ${it.alias}",
                             e,
                         )
@@ -54,7 +56,7 @@ class BankAccountAliasClient(
         log.info("All injected aliases: {}", bankAccountAliases)
         val allAliases = getAllAliases()
         if (!allAliases.containsAll(bankAccountAliases)) {
-            throw CouldNotCreateEntityException.AliasCreationException(
+            throw AliasCreationException(
                 "Not all bankAccountAliases were created. Created: $bankAccountAliases, all: $allAliases",
             )
         }
@@ -87,7 +89,7 @@ class BankAccountAliasClient(
         val response = client(request)
 
         if (!response.status.successful) {
-            throw CouldNotCreateEntityException.AliasCreationException(
+            throw AliasCreationException(
                 "Failed to create bank account alias: $alias. Status: ${response.status}",
             )
         }
@@ -100,7 +102,7 @@ class BankAccountAliasClient(
         val response = client(request)
 
         if (!response.status.successful) {
-            throw CouldNotCreateEntityException.AliasCreationException(
+            throw AliasCreationException(
                 "Failed to get bank account alias with ID: $id. Status: ${response.status}",
             )
         }
@@ -113,7 +115,7 @@ class BankAccountAliasClient(
         val response = client(request)
 
         if (!response.status.successful) {
-            throw CouldNotCreateEntityException.AliasCreationException("Failed to get all bank account aliases. Status: ${response.status}")
+            throw AliasCreationException("Failed to get all bank account aliases. Status: ${response.status}")
         }
 
         return aBankAccountAliasesLens.extract(response).bankAccountAliases
