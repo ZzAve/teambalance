@@ -5,6 +5,7 @@ MAKEFLAGS += -j2
 build:
 	./mvnw install -Pformat
 
+
 ci:
 	./mvnw -B \
 		clean install \

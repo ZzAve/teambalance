@@ -16,7 +16,7 @@
     <name>Team balance - Frontend React App</name>
 
     <properties>
-        <sonar.tests>src,package*.json,playwright.config.ts, setupTests.js,tsconfig.json,vite.config.js</sonar.tests>
+        <sonar.tests>src,package.json,package-lock.json,setupTests.js,tsconfig.json,vite.config.js</sonar.tests>
         <sonar.sources>pom.xml</sonar.sources>
     </properties>
     <build>
