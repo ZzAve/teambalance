@@ -93,24 +93,21 @@ class Initializer(
         baseUri: String,
     ) = Filter { next ->
         {
-            val header =
-                it
-                    .run { if (sessionId != null) cookie("JSESSIONID", sessionId!!) else this }
-                    .header("X-Secret", apiKey)
-                    .header("Content-Type", ContentType.APPLICATION_JSON.value)
-            val apply =
-                header
-                    .run {
-                        if (it.uri.host.isBlank()) {
-                            return@run uri(Uri.of(baseUri + it.uri.path + "?" + it.uri.query))
-                        } else {
-                            return@run this
-                        }
-                    }
-            apply
+            it
+                .run { if (sessionId != null) cookie("JSESSIONID", sessionId!!) else this }
+                .header("X-Secret", apiKey)
+                .header("Content-Type", ContentType.APPLICATION_JSON.value)
+                .updateUriWithBaseUri(baseUri)
                 .let(next)
         }
     }
+
+    private fun Request.updateUriWithBaseUri(baseUri: String) =
+        if (uri.host.isBlank()) {
+            uri(Uri.of(baseUri + uri.path + "?" + uri.query))
+        } else {
+            this
+        }
 
     fun spawnData() {
         measureTime { initializeUsers() }.also { log.info("Created ${config.amountOfUsers} users in $it") }

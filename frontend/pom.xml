@@ -15,6 +15,10 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>Team balance - Frontend React App</name>
 
+    <properties>
+        <sonar.tests>src,package*.json,playwright.config.ts, setupTests.js,tsconfig.json,vite.config.js</sonar.tests>
+        <sonar.sources>pom.xml</sonar.sources>
+    </properties>
     <build>
         <plugins>
             <plugin>
