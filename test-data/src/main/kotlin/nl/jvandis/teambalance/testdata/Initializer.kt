@@ -113,7 +113,7 @@ class Initializer(
     }
 
     fun spawnData() {
-        measureTime { initializeUsers() }.also { log.info("Created ${config.amountOfMatches} users in $it") }
+        measureTime { initializeUsers() }.also { log.info("Created ${config.amountOfUsers} users in $it") }
 
         log.info("All users in the system: ")
         val allUsers = userClient.getAllUsers()
