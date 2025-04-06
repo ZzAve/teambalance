@@ -20,6 +20,11 @@
 
         <http4k.version>4.39.0.0</http4k.version>
         <kotlinx-datetime.version>0.3.1</kotlinx-datetime.version>
+
+        <!-- mark the src/main files as test files -->
+        <sonar.tests>src/main</sonar.tests>
+        <!-- mark the src/main files to be excluded from the sonar sources, i.e. production code -->
+        <sonar.exclusions>src/main</sonar.exclusions>
     </properties>
 
 
