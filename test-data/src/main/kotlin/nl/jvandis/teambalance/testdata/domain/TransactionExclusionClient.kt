@@ -128,7 +128,7 @@ class TransactionExclusionClient(
 
         val remainingTransactionExclusions = getAllTransactionExclusions()
         check(remainingTransactionExclusions.none { it.id == transactionExclusion.id }) {
-            "Deleted transactionExclusion with id ${transactionExclusion.id} is still present in the alias pool."
+            "Deleted transactionExclusion with id ${transactionExclusion.id} is still present in the transactionExclusion list."
         }
     }
 }
