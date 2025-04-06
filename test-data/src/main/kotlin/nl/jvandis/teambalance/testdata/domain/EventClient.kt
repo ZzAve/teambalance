@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.testdata.domain
 
 import io.kotest.property.Arb
+import io.kotest.property.RandomSource
 import io.kotest.property.arbitrary.take
 import io.kotest.property.arbs.geo.country
 import io.kotest.property.arbs.products.googleTaxonomy
@@ -8,6 +9,7 @@ import io.kotest.property.arbs.tube.tubeJourney
 import kotlinx.datetime.toKotlinLocalDateTime
 import kotlinx.serialization.encodeToString
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
+import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.EventCreationException
 import nl.jvandis.teambalance.testdata.jsonFormatter
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
@@ -45,19 +47,19 @@ class EventClient(
         val locations =
             Arb
                 .country()
-                .take(10)
+                .take(10, RandomSource(random, random.nextLong()))
                 .map { it.name }
                 .toList()
         val comments =
             Arb
                 .googleTaxonomy()
-                .take(4)
+                .take(4, RandomSource(random, random.nextLong()))
                 .map { it.value }
                 .toList() + null
         val titles =
             Arb
                 .tubeJourney()
-                .take(5)
+                .take(5, RandomSource(random, random.nextLong()))
                 .map { "Travel from ${it.start.name} tot ${it.end.name}" }
                 .toList()
         log.info(
@@ -104,8 +106,7 @@ class EventClient(
                 val addedAttendees = attendeeClient.createAndValidateAttendees(allUsers, savedMiscEvent.id)
                 log.info("Added attendees to match with id ${savedMiscEvent.id}: ${addedAttendees.map { it.user.name }}")
             } catch (e: Exception) {
-                log.warn("Could not add match $i. continuing with the rest", e)
-                throw CouldNotCreateEntityException.EventCreationException("Could not add event $i", e)
+                throw EventCreationException("Could not add event $i", e)
             }
         }
 

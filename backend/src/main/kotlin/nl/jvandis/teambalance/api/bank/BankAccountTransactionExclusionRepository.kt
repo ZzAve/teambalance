@@ -8,47 +8,48 @@ import org.jooq.exception.DataAccessException
 import org.springframework.stereotype.Repository
 
 @Repository
-class BankAccountTransactionExclusionRepository(private val context: MultiTenantDslContext) {
-    fun findAll(): List<TransactionExclusion> {
-        return context.select()
+class BankAccountTransactionExclusionRepository(
+    private val context: MultiTenantDslContext,
+) {
+    fun findAll(): List<TransactionExclusion> =
+        context
+            .select()
             .from(TRANSACTION_EXCLUSION)
             .fetch()
             .into(TransactionExclusion::class.java)
-    }
 
     fun findByIdOrNull(transactionExclusionId: TeamBalanceId): TransactionExclusion? =
-        context.select()
+        context
+            .select()
             .from(TRANSACTION_EXCLUSION)
             .where(TRANSACTION_EXCLUSION.TEAM_BALANCE_ID.eq(transactionExclusionId.value))
             .fetch()
             .into(TransactionExclusion::class.java)
             .also {
                 check(it.size < 2) { "Fetched more than 1 bankAccountAliases with the same id. Should not be possible!" }
-            }
-            .firstOrNull()
+            }.firstOrNull()
 
     fun insertMany(transactionExclusions: List<TransactionExclusion>): List<TransactionExclusion> {
         if (transactionExclusions.isEmpty()) {
             return emptyList()
         }
         val transactionExclusionsResult =
-            context.insertInto(
-                TRANSACTION_EXCLUSION,
-                TRANSACTION_EXCLUSION.TEAM_BALANCE_ID,
-                TRANSACTION_EXCLUSION.DATE,
-                TRANSACTION_EXCLUSION.TRANSACTION_ID,
-                TRANSACTION_EXCLUSION.COUNTER_PARTY,
-                TRANSACTION_EXCLUSION.DESCRIPTION,
-            )
-                .valuesFrom(
+            context
+                .insertInto(
+                    TRANSACTION_EXCLUSION,
+                    TRANSACTION_EXCLUSION.TEAM_BALANCE_ID,
+                    TRANSACTION_EXCLUSION.DATE,
+                    TRANSACTION_EXCLUSION.TRANSACTION_ID,
+                    TRANSACTION_EXCLUSION.COUNTER_PARTY,
+                    TRANSACTION_EXCLUSION.DESCRIPTION,
+                ).valuesFrom(
                     transactionExclusions,
                     { it.teamBalanceId.value },
                     { it.date },
                     { it.transactionId },
                     { it.counterParty },
                     { it.description },
-                )
-                .returningResult(TRANSACTION_EXCLUSION.fields().toList())
+                ).returningResult(TRANSACTION_EXCLUSION.fields().toList())
                 .fetch()
                 .into(TransactionExclusion::class.java)
 
@@ -59,17 +60,16 @@ class BankAccountTransactionExclusionRepository(private val context: MultiTenant
         }
     }
 
-    fun insert(transactionExclusion: TransactionExclusion): TransactionExclusion {
-        return insertMany(listOf(transactionExclusion)).first()
-    }
+    fun insert(transactionExclusion: TransactionExclusion): TransactionExclusion = insertMany(listOf(transactionExclusion)).first()
 
     fun deleteById(transactionExclusionId: TeamBalanceId) {
         val execute =
-            context.deleteFrom(TRANSACTION_EXCLUSION)
+            context
+                .deleteFrom(TRANSACTION_EXCLUSION)
                 .where(TRANSACTION_EXCLUSION.TEAM_BALANCE_ID.eq(transactionExclusionId.value))
                 .execute()
         if (execute != 1) {
-            throw DataAccessException("Removed $execute bankAccountAliases, expected to remove only 1")
+            throw DataAccessException("Removed $execute transactionExclusions, expected to remove only 1")
         }
     }
 }

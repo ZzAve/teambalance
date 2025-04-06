@@ -12,7 +12,7 @@ ci:
 		-Dsonar.projectKey=ZzAve_teambalance
 
 test: run-local-backend
-	./mvnw spring-boot:run -pl test-data -Dspring-boot.run.arguments="--host=http://localhost:8080 --apiKey=dGVhbWJhbGFuY2U= --strict"
+	./mvnw spring-boot:run -pl test-data -Dspring-boot.run.arguments="--host=http://localhost:8080 --apiKey=dGVhbWJhbGFuY2U= --username=admin --password=admin"
 
 e2e:
 	(rm -rf ./e2e/playwright-report/index.html || true) && \

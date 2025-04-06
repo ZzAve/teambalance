@@ -36,6 +36,8 @@ val jsonFormatter =
 
 class Initializer(
     apiKey: String,
+    username: String,
+    password: String,
     random: Random,
     private val host: String = "http://localhost:8080",
     private val config: SpawnDataConfig,
@@ -63,7 +65,7 @@ class Initializer(
                             "Accept",
                             "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
                         ).header("Content-Type", "application/x-www-form-urlencoded")
-                        .body("username=admin&password=admin"),
+                        .body("username=$username&password=$password"),
                 )
             }
 
@@ -117,7 +119,7 @@ class Initializer(
         val allUsers = userClient.getAllUsers()
         log.info("All users (${allUsers.size}): {}", allUsers.map { "\n\t $it" })
 
-        measureTime { addTrainings(allUsers) }.also { log.info("Created ${config.amountOfTrainings} trainings in $it") }
+        measureTime { createAndValidateTrainings(allUsers) }.also { log.info("Created ${config.amountOfTrainings} trainings in $it") }
         measureTime { addMatches(allUsers) }.also { log.info("Created ${config.amountOfMatches} matches in $it") }
         measureTime { addEvents(allUsers) }.also { log.info("Created ${config.amountOfEvents} misc events in $it") }
         measureTime { createAndValidateAliases(allUsers) }.also { log.info("Created ${config.amountOfAliases} aliases in $it") }
@@ -153,8 +155,14 @@ class Initializer(
         transactionExclusionClient.deleteAndValidateTransactionExclusions(createdTransactionExclusions.last())
     }
 
-    private fun addTrainings(allUsers: List<User>) {
-        trainingClient.addTrainings(allUsers)
+    private fun createAndValidateTrainings(allUsers: List<User>) {
+        val trainings = trainingClient.createAndValidateTrainings(allUsers)
+
+        // Ensure trainings can be updated
+        trainingClient.updateAndValidateTraining(trainings.last())
+
+        // Ensure trainings can be deleted
+        trainingClient.deleteTraining(trainings.last().id)
     }
 
     private fun addMatches(allUsers: List<User>) {

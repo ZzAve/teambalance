@@ -31,7 +31,21 @@ fun main(args: Array<String>) {
         return
     }
 
-    val apiKey = namedArg(args, "apiKey") { System.getenv("TEAMBALANCE_API_KEY") ?: "" }
+    val apiKey =
+        namedArg(args, "apiKey") {
+            System.getenv("TEAMBALANCE_API_KEY")
+                ?: "".also { log.warn("No API key provided, using empty string") }
+        }
+    val username =
+        namedArg(args, "username") {
+            System.getenv("TEAMBALANCE_USERNAME")
+                ?: "".also { log.warn("No username provided, using empty string") }
+        }
+    val password =
+        namedArg(args, "password") {
+            System.getenv("TEAMBALANCE_PASSWORD")
+                ?: "".also { log.warn("No password provided, using empty string") }
+        }
     val seed = namedArg(args, "randomSeed") { Random.nextLong().toString() }.toLong()
     val host = namedArg(args, "host") { DEFAULT_HOST }
 
@@ -46,11 +60,13 @@ fun main(args: Array<String>) {
         )
 
     val random = Random(seed)
-    log.info("Running SpawnData with config: $config, apiKey: $apiKey, seed: $seed, host: $host ...")
+    log.info("Running SpawnData with config: $config, apiKey: ${apiKey.take(3)}***, seed: $seed, host: $host ...")
     val time =
         measureTime {
             Initializer(
                 apiKey = apiKey,
+                username = username,
+                password = password,
                 host = host,
                 random = random,
                 config = config,
@@ -65,12 +81,3 @@ private fun namedArg(
     prefix: String,
     defaultBlock: () -> String,
 ) = args.find { it.startsWith("--$prefix=") }?.substringAfter("=") ?: defaultBlock()
-
-private fun namedBooleanArg(
-    args: Array<String>,
-    prefix: String,
-    defaultBlock: () -> Boolean,
-) = args.any {
-    it == "--$prefix" || it.startsWith("--$prefix=") && it.substringAfter("=").toBoolean()
-} ||
-    defaultBlock()

@@ -1,6 +1,7 @@
 package nl.jvandis.teambalance.testdata.domain
 
 import io.kotest.property.Arb
+import io.kotest.property.RandomSource
 import io.kotest.property.arbitrary.take
 import io.kotest.property.arbs.games.cluedoLocations
 import io.kotest.property.arbs.stockExchanges
@@ -31,8 +32,13 @@ class TrainingClient(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    private val aTrainingsLens = Body.auto<Event<Training>>().toLens()
+    private val aTrainingLens = Body.auto<Training>().toLens()
+
     fun deleteTraining(id: String) {
-        val request = Request(Method.DELETE, "$TRAINING_BASE_URL/$id")
+        val request =
+            Request(Method.DELETE, "$TRAINING_BASE_URL/$id")
+                .query("delete-attendees", "true")
         val response: Response = client(request)
 
         check(response.status.successful) {
@@ -43,13 +49,13 @@ class TrainingClient(
 
         val remainingTrainings = getAllTrainings()
         check(remainingTrainings.none { it.id == id }) {
-            "Deleted alias with id $id is still present in the alias pool."
+            "Deleted training with id $id is still present."
         }
     }
 
     fun getAllTrainings(): List<Training> {
         val request =
-            Request(Method.GET, "$TRAINING_BASE_URL")
+            Request(Method.GET, TRAINING_BASE_URL)
                 .query("limit", "1000")
         val response: Response = client(request)
         check(response.status.successful) {
@@ -58,9 +64,6 @@ class TrainingClient(
 
         return aTrainingsLens.extract(response).events
     }
-
-    private val aTrainingsLens = Body.auto<Event<Training>>().toLens()
-    private val aTrainingLens = Body.auto<Training>().toLens()
 
     private fun createTraining(training: CreateTraining): Event<Training> {
         val request = Request(POST, TRAINING_BASE_URL).body(jsonFormatter.encodeToString(training))
@@ -91,17 +94,17 @@ class TrainingClient(
         return aTrainingLens(response)
     }
 
-    fun addTrainings(allUsers: List<User>) {
+    fun createAndValidateTrainings(allUsers: List<User>): List<Training> {
         val locations =
             Arb
                 .cluedoLocations()
-                .take(10)
+                .take(10, RandomSource(random, random.nextLong()))
                 .map { it.name }
                 .toList()
         val comments =
             Arb
                 .stockExchanges()
-                .take(2)
+                .take(2, RandomSource(random, random.nextLong()))
                 .map { it.name }
                 .toList() + null
 
@@ -153,26 +156,31 @@ class TrainingClient(
                         val trainerId = addedAttendees.take(1).map { it.user.id }.firstOrNull()
                         val updatedTraining = addTrainer(savedTraining.id, trainerId)
 
-                        log.info("Added training to training with id ${savedTraining.id}: ${updatedTraining.trainer}")
+                        log.info("Added trainer to training with id ${savedTraining.id}: ${updatedTraining.trainer}")
                     } else {
                         log.info("No trainer will be added to training with id ${savedTraining.id}")
                     }
                     savedTraining
                 } catch (e: Exception) {
-                    log.warn("Could not add training $i. continuing with the rest", e)
                     throw EventCreationException("Could not add training $i", e)
                 }
             }
 
-        val allAliases = getAllTrainings()
-        if (!allAliases.map { it.id }.containsAll(createdTrainings.map { it.id })) {
+        val allTrainings = getAllTrainings()
+        if (!allTrainings.map { it.id }.containsAll(createdTrainings.map { it.id })) {
             throw EventCreationException(
                 "Not all trainings were created." +
                     "\nCreated: ${createdTrainings.map { "\n\t ${it.id}" }}, " +
-                    "\nAll: ${allAliases.map { "\n\t ${it.id}" }}" +
-                    "\n Diff: ${createdTrainings.map{it.id}.minus(allAliases.map{it.id}.toSet()).map { "\n\t $it" }}",
+                    "\nAll: ${allTrainings.map { "\n\t ${it.id}" }}" +
+                    "\n Diff: ${createdTrainings.map{it.id}.minus(allTrainings.map{it.id}.toSet()).map { "\n\t $it" }}",
             )
         }
         log.info("Done adding ${config.amountOfTrainings} trainings")
+
+        return createdTrainings
+    }
+
+    fun updateAndValidateTraining(training: Training) {
+        log.warn("NOT IMPLEMENTED: updateAndValidateTraining")
     }
 }

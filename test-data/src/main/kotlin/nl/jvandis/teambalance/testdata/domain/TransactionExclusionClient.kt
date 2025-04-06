@@ -1,12 +1,14 @@
 package nl.jvandis.teambalance.testdata.domain
 
 import io.kotest.property.Arb
+import io.kotest.property.RandomSource
 import io.kotest.property.arbitrary.take
 import io.kotest.property.arbs.name
 import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.serialization.encodeToString
 import nl.jvandis.teambalance.testdata.Conditional
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
+import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.TransactionExclusionCreationException
 import nl.jvandis.teambalance.testdata.jsonFormatter
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
@@ -33,7 +35,7 @@ class TransactionExclusionClient(
 
     fun createAndValidateTransactionExclusions(): List<TransactionExclusion> {
         val createdTransactionExclusions =
-            (0 until config.amountOfTransactionExclusions).mapNotNull { i ->
+            (0 until config.amountOfTransactionExclusions).map { i ->
                 val date =
                     conditional(.1) {
                         java.time.LocalDate
@@ -45,7 +47,7 @@ class TransactionExclusionClient(
                     conditional(.3) {
                         Arb
                             .name()
-                            .take(1)
+                            .take(1, RandomSource(random, random.nextLong()))
                             .first()
                             .let { "${it.first} ${it.last}" }
                     }
@@ -58,31 +60,24 @@ class TransactionExclusionClient(
                         counterParty = counterParty,
                         description = description,
                     )
-                try {
-                    log.info("Creating transactionExclusion $createTransactionExclusion")
-                    val exclusion = createTransactionExclusion(createTransactionExclusion)
-                    val exclusion2 = getTransactionExclusion(exclusion.id)
+                log.info("Creating transactionExclusion $createTransactionExclusion")
+                val exclusion = createTransactionExclusion(createTransactionExclusion)
+                val exclusion2 = getTransactionExclusion(exclusion.id)
 
-                    if (exclusion != exclusion2) {
-                        throw CouldNotCreateEntityException.TransactionExclusionCreationException(
-                            "Created transactionExclusion cannot be fetched. " +
-                                "It seems something is wrong with the database. " +
-                                "Created exclusion: -- $exclusion --, fetched exclusion: -- $exclusion2 --",
-                        )
-                    }
-
-                    exclusion
-                } catch (e: RuntimeException) {
-                    throw CouldNotCreateEntityException.TransactionExclusionCreationException(
-                        "Could not add transactionExclusion $createTransactionExclusion",
-                        e,
+                if (exclusion != exclusion2) {
+                    throw TransactionExclusionCreationException(
+                        "Created transactionExclusion cannot be fetched. " +
+                            "It seems something is wrong with the database. " +
+                            "Created exclusion: -- $exclusion --, fetched exclusion: -- $exclusion2 --",
                     )
                 }
+
+                exclusion
             }
 
         val allTransactionExclusions = getAllTransactionExclusions()
         if (!allTransactionExclusions.containsAll(createdTransactionExclusions)) {
-            throw CouldNotCreateEntityException.TransactionExclusionCreationException(
+            throw TransactionExclusionCreationException(
                 "Not all transactionExclusions were created. Created: $createdTransactionExclusions, all: $allTransactionExclusions",
             )
         }

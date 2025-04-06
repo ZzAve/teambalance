@@ -1,10 +1,12 @@
 package nl.jvandis.teambalance.testdata.domain
 
 import io.kotest.property.Arb
+import io.kotest.property.RandomSource
 import io.kotest.property.arbitrary.take
 import io.kotest.property.arbs.firstName
 import kotlinx.serialization.encodeToString
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
+import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.UserCreationException
 import nl.jvandis.teambalance.testdata.jsonFormatter
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
@@ -30,7 +32,7 @@ class UserClient(
         val request = Request(Method.POST, "/api/users").body(body)
         val response: Response = client(request)
         check(response.status.successful) {
-            "Something went wrong creating a user: ${response.bodyString()}"
+            "Something went wrong creating a user: requestBody: $body, status: ${response.status}, body: ${response.bodyString()}"
         }
 
         return aUserLens(response)
@@ -40,7 +42,7 @@ class UserClient(
         val request = Request(Method.GET, "/api/users/$id")
         val response: Response = client(request)
         check(response.status.successful) {
-            "Something went fetching use with id $id: ${response.bodyString()}"
+            "Something went fetching user with id $id: status: ${response.status}, body: ${response.bodyString()}"
         }
 
         return aUserLens(response)
@@ -50,7 +52,7 @@ class UserClient(
         val request = Request(Method.GET, "/api/users")
         val response: Response = client(request)
         check(response.status.successful) {
-            "Something went fetching users: ${response.bodyString()}"
+            "Something went fetching users: ${response.status} - ${response.bodyString()}"
         }
 
         return aUsersLens(response).users
@@ -60,7 +62,7 @@ class UserClient(
         val request = Request(Method.DELETE, "/api/users/${user.id}")
         val response: Response = client(request)
         check(response.status.successful) {
-            "Something went wrong deleting the user with id ${user.id}: ${response.bodyString()}"
+            "Something went wrong deleting the user with id ${user.id}: ${response.status} - ${response.bodyString()}"
         }
 
         val remainingUsers = getAllUsers()
@@ -80,7 +82,7 @@ class UserClient(
         val response: Response = client(request.body(body))
 
         check(response.status.successful) {
-            "Something went wrong updating the user with id $user:  ${response.status}: ${response.bodyString()}"
+            "Something went wrong updating the user with id ${user.id}: ${response.status} - ${response.bodyString()}"
         }
 
         val updatedUser = aUserLens(response)
@@ -101,7 +103,7 @@ class UserClient(
         val usersToCreate =
             Arb
                 .firstName()
-                .take(config.amountOfUsers)
+                .take(config.amountOfUsers, RandomSource(random, random.nextLong()))
                 .map { it.name }
                 .map {
                     CreateUser(it, Role.entries.random(random))
@@ -122,7 +124,7 @@ class UserClient(
 
                     val fetchedUser = getUser(user.id)
                     if (user != fetchedUser) {
-                        throw CouldNotCreateEntityException.UserCreationException(
+                        throw UserCreationException(
                             "Created user cannot be fetched. It seems something is wrong with the database. " +
                                 "Created user: -- $user --, fetched user: -- $fetchedUser --",
                         )
@@ -134,7 +136,7 @@ class UserClient(
                         "Could not create user ${it.name} [${it.role}]: ${result.exceptionOrNull()?.message}",
                         result.exceptionOrNull(),
                     )
-                    throw CouldNotCreateEntityException.UserCreationException(
+                    throw UserCreationException(
                         "Could not create user ${it.name} [${it.role}]: ${result.exceptionOrNull()?.message}",
                         result.exceptionOrNull(),
                     )
@@ -146,7 +148,7 @@ class UserClient(
         val allUsers = getAllUsers()
         if (!allUsers.containsAll(createdUsers)) {
             val missingUsers = createdUsers.filter { !allUsers.contains(it) }
-            throw CouldNotCreateEntityException.UserCreationException(
+            throw UserCreationException(
                 "Not all users were created exist in the user pool. Created: $createdUsers, missing users: $missingUsers",
             )
         }
