@@ -26,7 +26,7 @@ class BankAccountTransactionExclusionRepository(
             .fetch()
             .into(TransactionExclusion::class.java)
             .also {
-                check(it.size < 2) { "Fetched more than 1 bankAccountAliases with the same id. Should not be possible!" }
+                check(it.size < 2) { "Fetched more than 1 transactionExclusions with the same id. Should not be possible!" }
             }.firstOrNull()
 
     fun insertMany(transactionExclusions: List<TransactionExclusion>): List<TransactionExclusion> {
