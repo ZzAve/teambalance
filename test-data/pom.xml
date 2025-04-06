@@ -24,7 +24,7 @@
         <!-- mark the src/main files as test files -->
         <sonar.tests>src/main</sonar.tests>
         <!-- mark the src/main files to be excluded from the sonar sources, i.e. production code -->
-        <sonar.exclusions>src/main</sonar.exclusions>
+        <sonar.exclusions>src/main/**</sonar.exclusions>
     </properties>
 
 
