@@ -1,6 +1,6 @@
 {
   "extends": [
-    "config:base",
+    "config:recommended",
     "default:semanticCommits",
     "default:separateMultipleMajorReleases",
     "default:enableVulnerabilityAlerts",
@@ -14,18 +14,27 @@
   ],
   "packageRules": [
     {
-      "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["patch", "minor"],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
       "groupName": "devDependencies (non-major)",
       "groupSlug": "dev-dependencies"
     },
     {
-      "matchPackagePatterns": ["^nl\\.jvandis.*"],
       "description": "Disable any intra-module dependency. This is quite an aggressive one, and goes beyond the current repo",
-      "enabled": false
+      "enabled": false,
+      "matchPackageNames": [
+        "/^nl\\.jvandis.*/"
+      ]
     },
     {
-      "matchPackageNames": ["@date-io/date-fns"],
+      "matchPackageNames": [
+        "@date-io/date-fns"
+      ],
       "allowedVersions": "< 2",
       "groupName": "Tightly coupled with material-ui/pickers v3",
       "groupSlug": "date-io-date-fns"
