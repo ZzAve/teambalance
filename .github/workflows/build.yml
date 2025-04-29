@@ -75,6 +75,7 @@ jobs:
         with:
           # Don't push in this step
           push: false
+          load: true
           # Build the frontend image
           context: ./frontend
           file: ./frontend/Dockerfile
@@ -88,6 +89,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: false
+          load: true
           context: ./e2e
           tags: teambalance/e2e:latest
           file: ./e2e/Dockerfile
