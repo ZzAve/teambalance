@@ -66,6 +66,36 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      # Set up Docker caching
+      - name: Setup Docker cache
+        uses: docker/build-push-action@v5
+        with:
+          # Don't push in this step
+          push: false
+          # Build the frontend image
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          tags: teambalance/frontend:latest
+          # Setup caching
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Do the same for e2e image if needed
+      - name: Setup Docker cache for e2e
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          context: ./e2e
+          tags: teambalance/e2e:latest
+          file: ./e2e/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+#      - name: Prepare api and e2e tests
+#        run: make docker
+#        env:
+#          COMPOSE_BAKE: true
+
       - name: API tests
         run: make test
 
