@@ -12,6 +12,7 @@ jobs:
       pull-requests: write
       id-token: write
       contents: read
+      actions: write
 
     runs-on: ubuntu-latest
     steps:
