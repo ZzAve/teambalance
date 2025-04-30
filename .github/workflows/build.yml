@@ -93,20 +93,15 @@ jobs:
           cache-to: type=gha,mode=max
       # Do the same for e2e image if needed
 
-#      - name: Build / cache e2e image
-#        uses: docker/build-push-action@v5
-#        with:
-#          load: true
-#          context: ./e2e
-#          tags: teambalance/e2e:latest
-#          file: ./e2e/Dockerfile
-#          cache-from: type=gha
-#          cache-to: type=gha,mode=max
-#      - name: Prepare api and e2e tests
-#        run: make docker
-#        env:
-
-#          COMPOSE_BAKE: true
+      - name: Build / cache e2e image
+        uses: docker/build-push-action@v5
+        with:
+          load: true
+          context: ./e2e
+          tags: teambalance/e2e:latest
+          file: ./e2e/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
 #      - name: E2E tests
 #        run: make e2e  || (docker compose logs frontend && exit 1)
