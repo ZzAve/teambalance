@@ -75,11 +75,20 @@ jobs:
       - name: API tests
         run: make test
 
+      - name: Build and push Docker image with caching
+        run: |
+          cd frontend && docker buildx build \
+            --cache-from=type=registry,ref=eu.gcr.io/${{ env.GCP_PROJECT_ID }}/cache-${{ github.repository }} \
+            --cache-to=type=registry,ref=eu.gcr.io/${{ env.GCP_PROJECT_ID }}/cache-${{ github.repository }},mode=max \
+            -t eu.gcr.io/${{ env.GCP_PROJECT_ID }}/ci-image-frontend-${{ github.repository }} . \
+            --push
+
       - name: Build / cache frontend image
         uses: docker/build-push-action@v5
         with:
           # Don't push in this step
           load: true
+#          push: true
           # Build the frontend image
           context: ./frontend
           file: ./frontend/Dockerfile
@@ -93,6 +102,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           load: true
+
           context: ./e2e
           tags: teambalance/e2e:latest
           file: ./e2e/Dockerfile
