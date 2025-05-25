@@ -78,9 +78,9 @@ jobs:
       - name: Build and push Docker image with caching
         run: |
           cd frontend && docker buildx build \
-            --cache-from=type=registry,ref=eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/cache-${{ github.repository }} \
-            --cache-to=type=registry,ref=eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/cache-${{ github.repository }},mode=max \
-            -t eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/ci-image-frontend-${{ github.repository }} . \
+            --cache-from=type=registry,ref=eu.gcr.io/tovoheren5/cache-teambalance \
+            --cache-to=type=registry,ref=eu.gcr.io/tovoheren5/cache-teambalance,mode=max \
+            -t eu.gcr.io/tovoheren5/ci-image-frontend-teambalance . \
             --push
 
       - name: Build / cache frontend image
