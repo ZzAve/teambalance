@@ -63,21 +63,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-#      - name: Build app
-#        run: make ci
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#
+      - name: Build app
+        run: make ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
 #      - name: Expose GitHub Runtime
 #        uses: crazy-max/ghaction-github-runtime@v3
 #
-#      - name: API tests
-#        run: make test
-
-      #Todo remove me
-      - name: yolo
-        run: make yolo
+      - name: API tests
+        run: make test
 
       - name: Build / cache frontend image
         uses: docker/build-push-action@v5
@@ -91,8 +87,8 @@ jobs:
           # Setup caching
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      # Do the same for e2e image if needed
 
+      # Do the same for e2e image
       - name: Build / cache e2e image
         uses: docker/build-push-action@v5
         with:
@@ -103,12 +99,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-#      - name: E2E tests
-#        run: make e2e  || (docker compose logs frontend && exit 1)
+      - name: E2E tests
+        run: make e2e  || (docker compose logs frontend && exit 1)
 
       - name: Upload report
         uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+        if: ${{ failure() && !cancelled() }}
         with:
           name: playwright-report
           path: e2e/playwright-report/

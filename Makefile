@@ -23,8 +23,6 @@ e2e:
 
 e2e-report:
 	cd e2e && npm run report
-docker:
-	docker compose build
 
 deploy:
 	./mvnw -B clean verify jib:build -DskipTests -Dnpm.lint.skip
