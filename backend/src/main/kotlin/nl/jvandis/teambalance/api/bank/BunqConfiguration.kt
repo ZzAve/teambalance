@@ -13,11 +13,16 @@ class BunqConfiguration(
     private val bankConfig: BankConfig,
 ) {
     @Bean
-    fun bunqLib(): BunqRepository {
-        return when (bankConfig.bunq.environment) {
+    fun bunqLib(): BunqRepository =
+        when (bankConfig.bunq.environment) {
             PRODUCTION -> initializeProductionSetup(bankConfig.bunq)
             SANDBOX -> initializeSandboxSetup(bankConfig.bunq)
         }
+
+    @Bean
+    fun bunqLibNew(bunqRepository: BunqRepository): BunqRepo {
+        require(bankConfig.bunq.environment == SANDBOX) { "Bunq environment only allowed for sandbox" }
+        return BunqRepo(bunqRepository.uglyApiContext.apiKey)
     }
 
     private fun initializeProductionSetup(bunqConfig: BankBunqConfig): BunqRepository {

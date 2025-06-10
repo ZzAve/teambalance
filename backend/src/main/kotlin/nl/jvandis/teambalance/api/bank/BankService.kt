@@ -3,6 +3,7 @@ package nl.jvandis.teambalance.api.bank
 import com.bunq.sdk.model.generated.endpoint.Payment
 import com.bunq.sdk.model.generated.`object`.Amount
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
+import kotlinx.coroutines.runBlocking
 import nl.jvandis.teambalance.MultiTenantContext
 import nl.jvandis.teambalance.Tenant
 import nl.jvandis.teambalance.api.ConfigurationService
@@ -28,6 +29,7 @@ val EUROPE_AMSTERDAM: ZoneId = ZoneId.of("Europe/Amsterdam")
 @Service
 class BankService(
     @Lazy private val bunqRepository: BunqRepository,
+    private val bunqRepo: BunqRepo,
     private val bankAccountAliasRepository: BankAccountAliasRepository,
     private val transactionExclusionRepository: BankAccountTransactionExclusionRepository,
     private val bankConfig: BankConfig,
@@ -35,7 +37,7 @@ class BankService(
 ) {
     private val balanceCache: AsyncLoadingCache<Tenant, String> =
         setupCache(bankConfig.cache.balance) { tenant: Tenant ->
-            updateBalance(getAccountId())
+            updateBalance2(getAccountId())
         }
 
     private val transactionsCache: AsyncLoadingCache<Tenant, Transactions> =
@@ -64,6 +66,12 @@ class BankService(
             }.also {
                 bunqRepository.updateContext()
             }
+
+    private fun updateBalance2(accountId: Int): String =
+        runBlocking {
+            bunqRepo
+                .getMonetaryAccountBank(accountId.toLong())
+        }
 
     // TODO: Fetch all transactions up to datelimit
     private fun updateTransactions(accountId: Int): Transactions =

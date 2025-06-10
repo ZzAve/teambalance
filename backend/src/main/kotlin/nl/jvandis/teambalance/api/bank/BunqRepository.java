@@ -60,6 +60,7 @@ public class BunqRepository {
     private final ApiEnvironmentType environmentType;
     private final String apiKey;
     private final Boolean saveSessionToFile;
+    public ApiContext uglyApiContext;
 
     public BunqRepository(ApiEnvironmentType environmentType,
                           @Nullable String apiKey,
@@ -74,6 +75,8 @@ public class BunqRepository {
         this.saveSessionToFile = saveSessionToFile;
 
         setupContext();
+
+
     }
 
     public BunqRepository(BankBunqConfig config) throws UnknownHostException {
@@ -190,6 +193,7 @@ public class BunqRepository {
      *
      */
     private void setupContext() throws UnknownHostException {
+
         final boolean isSandboxEnvironment = SANDBOX.equals(environmentType);
         setupContext(isSandboxEnvironment ? 1 : 0);
 
@@ -220,6 +224,8 @@ public class BunqRepository {
             apiContext.ensureSessionActive();
             safeSave(apiContext);
             loadApiContext(apiContext);
+
+            uglyApiContext = apiContext;
         } catch (ApiException apiException) {
             if (retries > 0) {
                 log.warn("Could not create API context. Will retry creating config", apiException);
