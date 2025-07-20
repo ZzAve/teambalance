@@ -20,9 +20,12 @@ class BunqConfiguration(
         }
 
     @Bean
-    fun bunqLibNew(bunqRepository: BunqRepository): BunqRepo {
-        require(bankConfig.bunq.environment == SANDBOX) { "Bunq environment only allowed for sandbox" }
-        return BunqRepo(bunqRepository.uglyApiContext.apiKey)
+    fun setupBunqRepository(): BunqRepo {
+        when (bankConfig.bunq.environment) {
+            PRODUCTION -> initializeProductionSetup2(bankConfig.bunq)
+            SANDBOX -> initializeSandboxSetup2(bankConfig.bunq)
+        }
+        return BunqRepo(bunqConfig = bankConfig.bunq)
     }
 
     private fun initializeProductionSetup(bunqConfig: BankBunqConfig): BunqRepository {
@@ -43,24 +46,58 @@ class BunqConfiguration(
         }
     }
 
+    private fun initializeProductionSetup2(bunqConfig: BankBunqConfig): BunqRepo {
+        require(bunqConfig.environment == PRODUCTION) { "Bunq environment was not set to PRODUCTION" }
+        require(bunqConfig.apiKey != null) { "No apikey was set for Bunq" }
+
+        val obfuscatedApiKey = "${bunqConfig.apiKey.take(5)}******"
+        log.info("Setting up connection with bunq PRODUCTION using api-key '$obfuscatedApiKey'")
+
+        return try {
+            BunqRepo(bunqConfig)
+        } catch (t: Throwable) {
+            throw IllegalStateException(
+                "Could not create bunqRepository for production setup (apiKey: $obfuscatedApiKey, accountId: ${bunqConfig.bankAccountId})",
+                t,
+            )
+        }
+    }
+
     private fun initializeSandboxSetup(bunqConfig: BankBunqConfig): BunqRepository {
         require(bunqConfig.environment == SANDBOX) {
             "Bunq environment was not set to PRODUCTION"
         }
-        require(bunqConfig.apiKey.isNullOrEmpty()) {
+        require(bunqConfig.apiKey.isNullOrEmpty() || bunqConfig.apiKey.startsWith("sandbox")) {
             """
             An apikey was set for Bunq while trying to setup SANDBOX environment. \
             This is not allowed, for your protection\
             """
         }
-//        require(bunqConfig.bankAccountId == null || bunqConfig.bankAccountId == -1) {
-//            "A bankAccountId was set while trying to setup SANDBOX environment. " +
-//                "This is not allowed, for your protection"
-//        }
+
         log.info("Setting up connection with bunq SANDBOX")
 
         return try {
             BunqRepository(bunqConfig)
+        } catch (t: Throwable) {
+            throw IllegalStateException("Could not create bunqRepository for sandbox setup", t)
+        }
+    }
+
+    private fun initializeSandboxSetup2(bunqConfig: BankBunqConfig): BunqRepo {
+        require(bunqConfig.environment == SANDBOX) {
+            "Bunq environment was not set to PRODUCTION"
+        }
+        require(bunqConfig.apiKey.isNullOrEmpty() || bunqConfig.apiKey.startsWith("sandbox")) {
+            """
+            An apikey was set for Bunq while trying to setup SANDBOX environment. \
+            This is not allowed, for your protection\
+            """
+        }
+
+        log.info("Setting up connection with bunq SANDBOX")
+
+        return try {
+            BunqRepo(bunqConfig)
         } catch (t: Throwable) {
             throw IllegalStateException("Could not create bunqRepository for sandbox setup", t)
         }

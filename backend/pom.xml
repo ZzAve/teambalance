@@ -29,14 +29,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>nl.jvandis</groupId>
+        <groupId>nl.jvandis</groupId>
             <artifactId>shaded-bunq-sdk</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>community.flock.wirespec.example.gradle</groupId>
+            <groupId>com.github.community-flock</groupId>
             <artifactId>kotlin</artifactId>
-            <version>0.15.2</version>
+            <!-- TODO linked to final version (instead of local/snapshot)-->
+            <version>0.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>

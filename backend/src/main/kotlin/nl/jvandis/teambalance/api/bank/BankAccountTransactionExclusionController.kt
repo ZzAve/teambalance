@@ -109,13 +109,13 @@ data class TransactionExclusionsResponse(
 data class TransactionExclusionResponse(
     val id: String,
     val date: LocalDate?,
-    val transactionId: Int?,
+    val transactionId: String?,
     val counterParty: String?,
     val description: String?,
 )
 
 data class PotentialTransactionExclusion(
-    val transactionId: Int?,
+    val transactionId: String?,
     val date: LocalDate?,
     val counterParty: String?,
     val description: String?,

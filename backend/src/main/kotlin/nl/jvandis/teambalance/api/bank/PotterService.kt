@@ -17,12 +17,13 @@ class PotterService(
         includeSupportRoles: Boolean,
     ): Potters {
         val relevantTransactions = getRelevantTransactions(since, includeSupportRoles)
-        val groupedTransactions: Map<User, List<Transaction>> =
+        val groupedTransactions: Map<User, List<TransactionWithAlias>> =
             relevantTransactions
-                .groupBy { x -> x.user!! }
+                .groupBy { x -> x.alias!! }
 
         val potters: List<Potter> =
-            userRepository.findAll()
+            userRepository
+                .findAll()
                 .filter { includeSupportRoles || !SUPPORT_TEAM_ROLES.contains(it.role) }
                 .filter { includeInactiveUsers || it.isActive }
                 .map {
@@ -35,19 +36,21 @@ class PotterService(
             currency = "€",
             amountOfTransactions = relevantTransactions.size,
             from = since,
-            until = if (relevantTransactions.isNotEmpty()) relevantTransactions.last().date else since,
+            until = if (relevantTransactions.isNotEmpty()) relevantTransactions.last().transaction.date else since,
         )
     }
 
     private fun getRelevantTransactions(
         since: ZonedDateTime,
         includeSupportRoles: Boolean,
-    ) = bankService.getTransactions().transactions
+    ) = bankService
+        .getTransactions()
+        .transactions
         .asSequence()
-        .filter { it.date > since }
-        .filter { it.type == TransactionType.DEBIT && it.currency == "€" }
-        .filter { it.user != null }
-        .filter { includeSupportRoles || !SUPPORT_TEAM_ROLES.contains(it.user?.role) }
+        .filter { it.transaction.date > since }
+        .filter { it.transaction.type == TransactionType.DEBIT && it.transaction.currency == "€" }
+        .filter { it.alias != null }
+        .filter { includeSupportRoles || !SUPPORT_TEAM_ROLES.contains(it.alias?.role) }
         .toList()
 
     companion object {
