@@ -6,13 +6,18 @@ import com.bunq.sdk.serialization
 import community.flock.wirespec.kotlin.Wirespec
 
 fun createSandboxUserApiKey(baseUrl: String): String {
+    require(baseUrl.isNotBlank()) { "Base URL cannot be blank" }
+    require(baseUrl.startsWith("http")) { "Base URL must be a valid HTTP(S) URL" }
+
     val sandboxUserPersonResponse = createSandboxUserPerson(baseUrl, SandboxUserPerson)
     return when (sandboxUserPersonResponse) {
         is CREATE_SandboxUserPerson.Response200 -> {
-            sandboxUserPersonResponse.body.ApiKey?.api_key ?: error("No sandbox api key was found in the response ")
+            sandboxUserPersonResponse.body.ApiKey?.api_key
+                ?: throw IllegalStateException("No sandbox API key found in response")
         }
-
-        is CREATE_SandboxUserPerson.Response400 -> TODO()
+        is CREATE_SandboxUserPerson.Response400 -> {
+            throw IllegalArgumentException("Failed to create sandbox user: Bad request")
+        }
     }
 }
 
