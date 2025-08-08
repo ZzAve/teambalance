@@ -30,7 +30,9 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 @Repository
-class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<Training>(context) {
+class TrainingRepository(
+    context: MultiTenantDslContext,
+) : TeamEventsRepository<Training>(context) {
     override fun findAll(): List<Training> = findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
 
     private fun findAllByIds(eventIds: List<Long>): List<Training> {
@@ -52,8 +54,7 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
                 UZER.ROLE,
                 UZER.NAME,
                 EVENT.ID.desc(),
-            )
-            .fetch()
+            ).fetch()
             .handleWith(recordHandler)
     }
 
@@ -96,14 +97,16 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
         val allEventsToDeleteConditions: Condition = allEventsToDeleteCondition(eventId, affectedRecurringEvents)
 
         val deletedTrainingRecords =
-            context.deleteFrom(TRAINING)
+            context
+                .deleteFrom(TRAINING)
                 .using(EVENT)
                 .where(allEventsToDeleteConditions)
                 .and(EVENT.ID.eq(TRAINING.ID))
                 .execute()
 
         val deletedEventRecords =
-            context.delete(EVENT)
+            context
+                .delete(EVENT)
                 .where(allEventsToDeleteConditions)
                 .execute()
 
@@ -116,7 +119,7 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
 
         // if recurring event properties are not linked to event anymore, remove recurring event
         if (affectedRecurringEvents != null) {
-            deleteStaleRecurringEvent(context)
+            deleteStaleRecurringEvent(context, log())
         }
 
         return deletedTrainingRecords
@@ -136,8 +139,7 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
                     EVENT.LOCATION,
                     EVENT.START_TIME,
                     EVENT.RECURRING_EVENT_ID,
-                )
-                .values(event.teamBalanceId.value, event.comment, event.location, event.startTime, null)
+                ).values(event.teamBalanceId.value, event.comment, event.location, event.startTime, null)
                 .returningResult(
                     EVENT.ID,
                     EVENT.TEAM_BALANCE_ID,
@@ -145,8 +147,7 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
                     EVENT.LOCATION,
                     EVENT.START_TIME,
                     EVENT.RECURRING_EVENT_ID,
-                )
-                .fetchOne()
+                ).fetchOne()
                 ?: throw DataAccessException("Could not insert Training")
 
         return context
@@ -190,16 +191,14 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
                     EVENT.LOCATION,
                     EVENT.START_TIME,
                     EVENT.RECURRING_EVENT_ID,
-                )
-                .valuesFrom(
+                ).valuesFrom(
                     events,
                     { it.teamBalanceId.value },
                     { it.comment },
                     { it.location },
                     { it.startTime },
                     { recurringEventProperties.id },
-                )
-                .returningResult(EVENT.fields().toList())
+                ).returningResult(EVENT.fields().toList())
                 .fetch()
                 .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
 
@@ -209,8 +208,7 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
                 events,
                 { it.trainer?.id },
                 { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] },
-            )
-            .returningResult(TRAINING.ID, TRAINING.TRAINER_USER_ID)
+            ).returningResult(TRAINING.ID, TRAINING.TRAINER_USER_ID)
             .fetch()
             .map { trainingRecord ->
                 val eventRecord =
@@ -227,8 +225,7 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
                     trainer = events.first { it.startTime == eventRecord.getFieldOrThrow(EVENT.START_TIME) }.trainer,
                     recurringEventProperties = recurringEventProperties,
                 )
-            }
-            .also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
+            }.also { if (it.size != events.size) throw DataAccessException("Could not insert Trainings $events. One or more failed") }
     }
 
     @Transactional
@@ -238,12 +235,12 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
         durationToAddToEachEvent: Duration,
     ): List<Training> {
         val updatedEventIds =
-            context.update(EVENT)
+            context
+                .update(EVENT)
                 .set(
                     EVENT.START_TIME,
                     localDateTimeAdd(EVENT.START_TIME, durationToAddToEachEvent.toSeconds(), DatePart.SECOND),
-                )
-                .set(EVENT.COMMENT, examplarUpdatedEvent.comment)
+                ).set(EVENT.COMMENT, examplarUpdatedEvent.comment)
                 .set(EVENT.LOCATION, examplarUpdatedEvent.location)
                 .from(RECURRING_EVENT_PROPERTIES)
                 .where(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
@@ -267,8 +264,7 @@ class TrainingRepository(context: MultiTenantDslContext) : TeamEventsRepository<
                 if (removeRecurringEvent) {
                     setNull(EVENT.RECURRING_EVENT_ID)
                 }
-            }
-            .where(EVENT.ID.eq(event.id))
+            }.where(EVENT.ID.eq(event.id))
             .execute()
             .let { if (it != 1) throw DataAccessException("Could not update Training. EventRecord not updated") }
 

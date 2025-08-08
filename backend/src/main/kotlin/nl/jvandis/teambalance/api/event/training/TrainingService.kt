@@ -66,20 +66,20 @@ class TrainingService(
         val updatedTrainings =
             when (affectedRecurringEvents) {
                 CURRENT ->
-                    trainingRepository.updateSingleEvent(
-                        event = originalTraining.createUpdatedTraining(updateTrainingRequest),
-                        removeRecurringEvent = true,
-                    )
-                        .also { log.info("Removed recurringEvent $teamBalanceId from Training with id $originalTraining.id") }
+                    trainingRepository
+                        .updateSingleEvent(
+                            event = originalTraining.createUpdatedTraining(updateTrainingRequest),
+                            removeRecurringEvent = true,
+                        ).also { log.info("Removed recurringEvent $teamBalanceId from Training with id $originalTraining.id") }
                         .let(::listOf)
 
                 CURRENT_AND_FUTURE ->
-                    trainingRepository.partitionRecurringEvent(
-                        currentRecurringEventId = teamBalanceId,
-                        startTime = originalTraining.startTime,
-                        newRecurringEventId = TeamBalanceId.random(),
-                    )
-                        ?.also {
+                    trainingRepository
+                        .partitionRecurringEvent(
+                            currentRecurringEventId = teamBalanceId,
+                            startTime = originalTraining.startTime,
+                            newRecurringEventId = TeamBalanceId.random(),
+                        )?.also {
                             log.info(
                                 "Split the existing recurringEvent with id $teamBalanceId into 2 separate recurring events. " +
                                     "All events before ${originalTraining.startTime} are part of recurring event " +
@@ -103,19 +103,17 @@ class TrainingService(
         recurringEventId: TeamBalanceId,
         originalTraining: Training,
         updateTrainingRequest: UpdateTrainingRequest,
-    ): List<Training> {
-        return trainingRepository.updateAllFromRecurringEvent(
+    ): List<Training> =
+        trainingRepository.updateAllFromRecurringEvent(
             recurringEventId = recurringEventId,
             examplarUpdatedEvent = originalTraining.createUpdatedTraining(updateTrainingRequest),
             durationToAddToEachEvent = Duration.between(originalTraining.startTime, updateTrainingRequest.startTime),
         )
-    }
 
-    private fun Training.createUpdatedTraining(updateRequest: UpdateTrainingRequest): Training {
-        return copy(
+    private fun Training.createUpdatedTraining(updateRequest: UpdateTrainingRequest): Training =
+        copy(
             startTime = updateRequest.startTime ?: startTime,
             comment = updateRequest.comment ?: comment,
             location = updateRequest.location ?: location,
         )
-    }
 }

@@ -31,7 +31,9 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 @Repository
-class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsRepository<MiscellaneousEvent>(context) {
+class MiscellaneousEventRepository(
+    context: MultiTenantDslContext,
+) : TeamEventsRepository<MiscellaneousEvent>(context) {
     override fun findAll(): List<MiscellaneousEvent> =
         findAllWithStartTimeAfter(LocalDateTime.now().minusYears(5), Pageable.unpaged()).content
 
@@ -54,8 +56,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
                 UZER.ROLE,
                 UZER.NAME,
                 EVENT.ID.desc(),
-            )
-            .fetch()
+            ).fetch()
             .handleWith(recordHandler)
     }
 
@@ -99,14 +100,16 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
         val allEventsToDeleteConditions: Condition = allEventsToDeleteCondition(eventId, affectedRecurringEvents)
 
         val deletedMiscEventRecords =
-            context.delete(MISCELLANEOUS_EVENT)
+            context
+                .delete(MISCELLANEOUS_EVENT)
                 .using(EVENT)
                 .where(allEventsToDeleteConditions)
                 .and(EVENT.ID.eq(MISCELLANEOUS_EVENT.ID))
                 .execute()
 
         val deletedEventRecords =
-            context.delete(EVENT)
+            context
+                .delete(EVENT)
                 .where(allEventsToDeleteConditions)
                 .execute()
 
@@ -119,7 +122,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
 
         // if recurring event properties are not linked to event anymore, remove recurring event
         if (affectedRecurringEvents != null) {
-            deleteStaleRecurringEvent(context)
+            deleteStaleRecurringEvent(context, log())
         }
 
         return deletedMiscEventRecords
@@ -139,8 +142,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
                     EVENT.LOCATION,
                     EVENT.START_TIME,
                     EVENT.RECURRING_EVENT_ID,
-                )
-                .values(event.teamBalanceId.value, event.comment, event.location, event.startTime, null)
+                ).values(event.teamBalanceId.value, event.comment, event.location, event.startTime, null)
                 .returningResult(
                     EVENT.ID,
                     EVENT.TEAM_BALANCE_ID,
@@ -148,8 +150,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
                     EVENT.LOCATION,
                     EVENT.START_TIME,
                     EVENT.RECURRING_EVENT_ID,
-                )
-                .fetchOne()
+                ).fetchOne()
                 ?: throw DataAccessException("Could not insert Event part of MiscEvent")
 
         return context
@@ -192,16 +193,14 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
                     EVENT.LOCATION,
                     EVENT.START_TIME,
                     EVENT.RECURRING_EVENT_ID,
-                )
-                .valuesFrom(
+                ).valuesFrom(
                     events,
                     { it.teamBalanceId.value },
                     { it.comment },
                     { it.location },
                     { it.startTime },
                     { recurringEventProperties.id },
-                )
-                .returningResult(EVENT.fields().toList())
+                ).returningResult(EVENT.fields().toList())
                 .fetch()
                 .also { if (it.size != events.size) throw DataAccessException("Could not insert Events $events. One or more failed") }
 
@@ -211,8 +210,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
                 events,
                 { it.title },
                 { insertEventRecordResult.first { a -> a.getFieldOrThrow(EVENT.START_TIME) == it.startTime }[EVENT.ID] },
-            )
-            .returningResult(MISCELLANEOUS_EVENT.TITLE, MISCELLANEOUS_EVENT.ID)
+            ).returningResult(MISCELLANEOUS_EVENT.TITLE, MISCELLANEOUS_EVENT.ID)
             .fetch()
             .map { matchRecord ->
                 val eventRecord =
@@ -228,8 +226,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
                     title = matchRecord.getField(MISCELLANEOUS_EVENT.TITLE),
                     recurringEventProperties = recurringEventProperties,
                 )
-            }
-            .also { if (it.size != events.size) throw DataAccessException("Could not insert MiscEvents $events. One or more failed") }
+            }.also { if (it.size != events.size) throw DataAccessException("Could not insert MiscEvents $events. One or more failed") }
     }
 
     @Transactional
@@ -239,12 +236,12 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
         durationToAddToEachEvent: Duration,
     ): List<MiscellaneousEvent> {
         val updatedEventIds =
-            context.update(EVENT)
+            context
+                .update(EVENT)
                 .set(
                     EVENT.START_TIME,
                     localDateTimeAdd(EVENT.START_TIME, durationToAddToEachEvent.toSeconds(), DatePart.SECOND),
-                )
-                .set(EVENT.COMMENT, examplarUpdatedEvent.comment)
+                ).set(EVENT.COMMENT, examplarUpdatedEvent.comment)
                 .set(EVENT.LOCATION, examplarUpdatedEvent.location)
                 .from(RECURRING_EVENT_PROPERTIES)
                 .where(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
@@ -255,14 +252,19 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
                 .toSet()
 
         val matchingMiscEvents =
-            context.select(MISCELLANEOUS_EVENT.ID)
+            context
+                .select(MISCELLANEOUS_EVENT.ID)
                 .from(MISCELLANEOUS_EVENT)
-                .join(EVENT).on(MISCELLANEOUS_EVENT.ID.eq(EVENT.ID))
-                .join(RECURRING_EVENT_PROPERTIES).on(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
-                .where(RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID.eq(recurringEventId.value)).asTable("MatchingMiscEvents")
+                .join(EVENT)
+                .on(MISCELLANEOUS_EVENT.ID.eq(EVENT.ID))
+                .join(RECURRING_EVENT_PROPERTIES)
+                .on(EVENT.RECURRING_EVENT_ID.eq(RECURRING_EVENT_PROPERTIES.ID))
+                .where(RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID.eq(recurringEventId.value))
+                .asTable("MatchingMiscEvents")
 
         val updatedMiscEventIds =
-            context.update(MISCELLANEOUS_EVENT)
+            context
+                .update(MISCELLANEOUS_EVENT)
                 .set(MISCELLANEOUS_EVENT.TITLE, examplarUpdatedEvent.title)
                 .from(matchingMiscEvents)
                 .where(MISCELLANEOUS_EVENT.ID.eq(matchingMiscEvents.field(MISCELLANEOUS_EVENT.ID)))
@@ -293,8 +295,7 @@ class MiscellaneousEventRepository(context: MultiTenantDslContext) : TeamEventsR
                 if (removeRecurringEvent) {
                     setNull(EVENT.RECURRING_EVENT_ID)
                 }
-            }
-            .where(EVENT.ID.eq(event.id))
+            }.where(EVENT.ID.eq(event.id))
             .execute()
             .let { if (it != 1) throw DataAccessException("Could not update MiscEvent. EventRecord was not updated") }
 

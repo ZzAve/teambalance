@@ -30,9 +30,7 @@ import java.time.LocalDateTime
 abstract class TeamEventsRepository<T : Event>(
     protected val context: MultiTenantDslContext,
 ) : LoggingContext {
-    override fun log(): Logger {
-        return log
-    }
+    override fun log(): Logger = log
 
     abstract fun findByIdOrNull(eventId: TeamBalanceId): T?
 
@@ -74,13 +72,14 @@ abstract class TeamEventsRepository<T : Event>(
         currentRecurringEventId: TeamBalanceId,
         startTime: LocalDateTime,
         newRecurringEventId: TeamBalanceId,
-    ): TeamBalanceId? = partitionRecurringEvent(context, currentRecurringEventId, startTime, newRecurringEventId)
+    ): TeamBalanceId? = partitionRecurringEvent(context, currentRecurringEventId, startTime, newRecurringEventId, log())
 
     /**
      * Removes the recurringEventId from the event with the provided `id`
      */
     fun removeRecurringEvent(eventId: Long) =
-        context.update(EVENT)
+        context
+            .update(EVENT)
             .setNull(EVENT.RECURRING_EVENT_ID)
             .where(EVENT.ID.eq(eventId))
             .execute()
@@ -106,7 +105,10 @@ abstract class TeamEventsRepository<T : Event>(
         affectedRecurringEvents: AffectedRecurringEvents?,
     ): Condition {
         val eventDetails =
-            context.select(EVENT.RECURRING_EVENT_ID, EVENT.START_TIME).from(EVENT).where(EVENT.TEAM_BALANCE_ID.eq(eventId.value))
+            context
+                .select(EVENT.RECURRING_EVENT_ID, EVENT.START_TIME)
+                .from(EVENT)
+                .where(EVENT.TEAM_BALANCE_ID.eq(eventId.value))
                 .asTable("EventDetails")
 
         val recurringEventId: Field<Long?> =
@@ -117,7 +119,8 @@ abstract class TeamEventsRepository<T : Event>(
             when (affectedRecurringEvents) {
                 AffectedRecurringEvents.ALL ->
                     EVENT.ID.`in`(
-                        DSL.select(EVENT.ID)
+                        DSL
+                            .select(EVENT.ID)
                             .from(EVENT)
                             .join(eventDetails)
                             .on(recurringEventId.eq(EVENT.RECURRING_EVENT_ID))
@@ -126,7 +129,9 @@ abstract class TeamEventsRepository<T : Event>(
 
                 AffectedRecurringEvents.CURRENT_AND_FUTURE ->
                     EVENT.ID.`in`(
-                        DSL.select(EVENT.ID).from(EVENT)
+                        DSL
+                            .select(EVENT.ID)
+                            .from(EVENT)
                             .join(eventDetails)
                             .on(recurringEventId.eq(EVENT.RECURRING_EVENT_ID))
                             .where(EVENT.RECURRING_EVENT_ID.eq(recurringEventId))
@@ -216,31 +221,36 @@ fun <EV : Event> eventsOfType(
             UZER.ROLE,
             UZER.NAME,
             EVENT.ID.desc(),
-        )
-        .fetch()
+        ).fetch()
         .handleWith(recordHandler)
 }
 
 /**
  * if recurring event properties are not linked to event anymore, remove recurring event
  */
-context(LoggingContext)
-fun deleteStaleRecurringEvent(context: MultiTenantDslContext) {
+fun deleteStaleRecurringEvent(
+    context: MultiTenantDslContext,
+    log: Logger,
+) {
     log.info("Trying to delete stale recurringEventProperties records")
     // CTE: which recurring event properties are not linked from any event
     val staleRecurringEventProperties =
-        context.select(RECURRING_EVENT_PROPERTIES.ID).from(RECURRING_EVENT_PROPERTIES).leftAntiJoin(EVENT).on(
-            EVENT.RECURRING_EVENT_ID.eq(
-                RECURRING_EVENT_PROPERTIES.ID,
-            ),
-        ).asTable("StaleRecurringEventProperties")
+        context
+            .select(RECURRING_EVENT_PROPERTIES.ID)
+            .from(RECURRING_EVENT_PROPERTIES)
+            .leftAntiJoin(EVENT)
+            .on(
+                EVENT.RECURRING_EVENT_ID.eq(
+                    RECURRING_EVENT_PROPERTIES.ID,
+                ),
+            ).asTable("StaleRecurringEventProperties")
 
-    context.delete(RECURRING_EVENT_PROPERTIES)
+    context
+        .delete(RECURRING_EVENT_PROPERTIES)
         .using(staleRecurringEventProperties)
         .where(
             RECURRING_EVENT_PROPERTIES.ID.eq(staleRecurringEventProperties.field(RECURRING_EVENT_PROPERTIES.ID)),
-        )
-        .returning()
+        ).returning()
         .fetch()
         .also {
             if (it.size > 1) {
@@ -251,12 +261,12 @@ fun deleteStaleRecurringEvent(context: MultiTenantDslContext) {
         }
 }
 
-context(LoggingContext)
-fun partitionRecurringEvent(
+private fun partitionRecurringEvent(
     context: MultiTenantDslContext,
     currentRecurringEventId: TeamBalanceId,
     startTime: LocalDateTime,
     newRecurringEventId: TeamBalanceId,
+    log: Logger,
 ): TeamBalanceId? {
     // fetch one event with an earlier startTime
     val record =
@@ -280,30 +290,30 @@ fun partitionRecurringEvent(
 
     // insert recurring event
     val recurringEventProperties =
-        context.insertInto(
-            RECURRING_EVENT_PROPERTIES,
-            RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID,
-            RECURRING_EVENT_PROPERTIES.INTERVAL_AMOUNT,
-            RECURRING_EVENT_PROPERTIES.INTERVAL_TIME_UNIT,
-            RECURRING_EVENT_PROPERTIES.AMOUNT_LIMIT,
-            RECURRING_EVENT_PROPERTIES.DATE_LIMIT,
-            RECURRING_EVENT_PROPERTIES.SELECTED_DAYS,
-        )
-            .values(
+        context
+            .insertInto(
+                RECURRING_EVENT_PROPERTIES,
+                RECURRING_EVENT_PROPERTIES.TEAM_BALANCE_ID,
+                RECURRING_EVENT_PROPERTIES.INTERVAL_AMOUNT,
+                RECURRING_EVENT_PROPERTIES.INTERVAL_TIME_UNIT,
+                RECURRING_EVENT_PROPERTIES.AMOUNT_LIMIT,
+                RECURRING_EVENT_PROPERTIES.DATE_LIMIT,
+                RECURRING_EVENT_PROPERTIES.SELECTED_DAYS,
+            ).values(
                 newRecurringEventId.value,
                 record.getFieldOrThrow(RECURRING_EVENT_PROPERTIES.INTERVAL_AMOUNT),
                 record.getFieldOrThrow(RECURRING_EVENT_PROPERTIES.INTERVAL_TIME_UNIT),
                 record.getField(RECURRING_EVENT_PROPERTIES.AMOUNT_LIMIT),
                 record.getField(RECURRING_EVENT_PROPERTIES.DATE_LIMIT),
                 record.getFieldOrThrow(RECURRING_EVENT_PROPERTIES.SELECTED_DAYS),
-            )
-            .returningResult(RECURRING_EVENT_PROPERTIES.fields().toList())
+            ).returningResult(RECURRING_EVENT_PROPERTIES.fields().toList())
             .fetchOne()
             ?: throw DataAccessException("Couldn't persist a new RECURRING_EVENT_PROPERTIES")
 
     // update all event with earlier timestamp to refer to recurring event
     val updatedEvents =
-        context.update(EVENT)
+        context
+            .update(EVENT)
             .set(EVENT.RECURRING_EVENT_ID, recurringEventProperties.getFieldOrThrow(RECURRING_EVENT_PROPERTIES.ID))
             .where(EVENT.RECURRING_EVENT_ID.eq(record.getFieldOrThrow(RECURRING_EVENT_PROPERTIES.ID)))
             .and(EVENT.START_TIME.lessThan(startTime))
