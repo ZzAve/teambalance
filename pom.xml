@@ -21,7 +21,6 @@
         <module>backend</module>
         <module>frontend</module>
         <module>jooq-support</module>
-        <module>shaded-bunq-sdk</module>
         <module>test-data</module>
     </modules>
 

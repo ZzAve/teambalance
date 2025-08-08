@@ -1,35 +1,29 @@
 package nl.jvandis.teambalance.api.bank
 
-import com.bunq.sdk.model.generated.endpoint.Payment
-import com.bunq.sdk.model.generated.`object`.Amount
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import kotlinx.coroutines.runBlocking
 import nl.jvandis.teambalance.MultiTenantContext
 import nl.jvandis.teambalance.Tenant
 import nl.jvandis.teambalance.api.ConfigurationService
+import nl.jvandis.teambalance.api.bank.BankConfig.BunqEnvironment
 import nl.jvandis.teambalance.api.setupCache
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.filters.START_OF_SEASON_ZONED
-import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import kotlin.math.min
 
 private val FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS").withZone(ZoneId.of("UTC"))
 val EUROPE_AMSTERDAM: ZoneId = ZoneId.of("Europe/Amsterdam")
 
 /**
- * BankService resolves bank related questions
+ * BankService resolves bank-related questions
  *
  * Its main function is to retrieve information from the BunqRepository and make it available in domain objects.
  * Makes use of a BunqRepository to connect to the bunqAPI
  */
 @Service
 class BankService(
-    @Lazy private val bunqRepository: BunqRepository,
+//    @Lazy private val bunqRepository: BunqRepository,
     private val bunqRepo: BunqRepo,
     private val bankAccountAliasRepository: BankAccountAliasRepository,
     private val transactionExclusionRepository: BankAccountTransactionExclusionRepository,
@@ -38,33 +32,12 @@ class BankService(
 ) {
     private val balanceCache: AsyncLoadingCache<Tenant, String> =
         setupCache(bankConfig.cache.balance) { tenant: Tenant ->
-            println("--- START ---")
-            val updateBalance = updateBalance(getAccountId())
-            println(updateBalance)
-            println("---")
-            val updateBalance2 = updateBalance2(getAccountId())
-            println(updateBalance2)
-            println("--- DONE ---")
-            if (updateBalance != updateBalance2) {
-                println("!!! The balance is not equal for the two caches. !!!")
-            }
-            updateBalance
+            updateBalance(getAccountId())
         }
 
     private val transactionsCache: AsyncLoadingCache<Tenant, Transactions> =
         setupCache(bankConfig.cache.transactions) { tenant: Tenant ->
-            println("--- START ---")
-            val updateTransactions = updateTransactions(getAccountId())
-            println(updateTransactions.transactions.take(3).joinToString("\n"))
-            println("---")
-            val updateTransactions2 = updateTransactions2(getAccountId())
-            println(updateTransactions2.transactions.take(3).joinToString("\n"))
-            println("--- DONE ---")
-            if (updateTransactions.transactions.size != updateTransactions2.transactions.size) {
-                println("!!! The transaction list is not equal for the two caches. !!!")
-            }
-
-            updateTransactions2
+            updateTransactions(getAccountId())
         }
 
     fun getBalance(): String = balanceCache[MultiTenantContext.getCurrentTenant()].get()
@@ -77,19 +50,9 @@ class BankService(
             .get()
             .filter(limit, offset)
 
-    private fun updateBalance(accountId: Int): String =
-        bunqRepository
-            .getMonetaryAccountBank(accountId)
-            .balance
-            .let {
-                "${it.parseCurrency()} ${it.value}"
-            }.also {
-                bunqRepository.updateContext()
-            }
-
-    private suspend fun updateBalance2(accountId: Int): String {
+    private suspend fun updateBalance(accountId: Int): String {
         val validatedAccountId: Int = getValidatedAccountId(accountId)
-        return bunqRepo.getAccountBalance(validatedAccountId.toLong()) ?: "Unknown"
+        return bunqRepo.getAccountBalance(validatedAccountId.toLong())
     }
 
     val accountIds = mutableMapOf<Int, Int>()
@@ -105,28 +68,7 @@ class BankService(
             }
         }
 
-    // TODO: Fetch all transactions up to datelimit
-    private suspend fun updateTransactions(accountId: Int): Transactions =
-        bunqRepository
-            .getAllPayments(accountId, bankConfig.transactionLimit)
-            .let {
-                val aliases = getAllAliases()
-                val exclusions = getAllTransactionExclusions()
-                val transactions =
-                    it
-                        .filter { p -> !p.shouldBeExcluded(exclusions) }
-                        .map { payment -> payment.toDomain(aliases) }
-                        .filter { t -> t.transaction.date > START_OF_SEASON_ZONED }
-
-                Transactions(
-                    transactions = transactions,
-                    limit = transactions.size,
-                )
-            }.also {
-                bunqRepository.updateContext()
-            }
-
-    private suspend fun updateTransactions2(accountId: Int): Transactions {
+    private suspend fun updateTransactions(accountId: Int): Transactions {
         val validatedAccountId: Int = getValidatedAccountId(accountId)
         return bunqRepo
             .getTransactions(validatedAccountId.toLong())
@@ -154,44 +96,6 @@ class BankService(
                 (e.counterParty == null || counterParty.displayName == e.counterParty || counterParty.iban == e.counterParty)
         }
 
-    private fun Payment.shouldBeExcluded(exclusions: List<TransactionExclusion>) =
-        exclusions.any { e ->
-            (e.transactionId == null || "$id" == e.transactionId) &&
-                (e.date == null || created.toZonedDateTime().toLocalDate().isEqual(e.date)) &&
-                (e.description == null || description == e.description) &&
-                (e.counterParty == null || counterpartyAlias.displayName == e.counterParty)
-        }
-
-    private fun Payment.toDomain(aliases: Map<String, User>): TransactionWithAlias {
-        val transaction =
-            Transaction(
-                id = "$id",
-                type = toTransactionType(),
-                currency = amount.parseCurrency(),
-                amount = amount.value,
-                counterParty = CounterParty(counterpartyAlias.iban, counterpartyAlias.displayName),
-                date = created.toZonedDateTime(),
-                description = description,
-            )
-        val alias = counterpartyAlias.displayName.getAlias(aliases)
-        return TransactionWithAlias(
-            transaction,
-            alias = alias,
-        )
-    }
-
-    fun Payment.toTransactionType() = if (amount.value.startsWith("-")) TransactionType.CREDIT else TransactionType.DEBIT
-
-    private fun Amount.parseCurrency() = if (currency == "EUR") "€" else currency
-
-    private fun String.toZonedDateTime() = ZonedDateTime.parse(this, FORMATTER).withZoneSameInstant(EUROPE_AMSTERDAM)
-
-    private fun Instant.roundToClosestMinute(): Instant {
-        val seconds = this.epochSecond
-        val roundedSeconds = ((seconds + 30) / 60) * 60
-        return Instant.ofEpochSecond(roundedSeconds)
-    }
-
     private fun Transactions.filter(
         limit: Int,
         offset: Int,
@@ -204,8 +108,6 @@ class BankService(
             limit = filteredTransactions.size,
         )
     }
-
-    private fun String.getAlias(aliases: Map<String, User>): User? = aliases[this]
 
     private fun getAllAliases() =
         bankAccountAliasRepository

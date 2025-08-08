@@ -15,7 +15,9 @@ import com.bunq.sdk.generated.model.MonetaryAccountBankListing
 import com.bunq.sdk.generated.model.PaymentListing
 import com.bunq.sdk.handler
 import com.bunq.sdk.initContext
-import nl.jvandis.teambalance.api.bank.BunqEnvironment.PRODUCTION
+import nl.jvandis.teambalance.api.bank.BankConfig.BankBunqConfig
+import nl.jvandis.teambalance.api.bank.BankConfig.BunqEnvironment.PRODUCTION
+import nl.jvandis.teambalance.api.bank.BankConfig.BunqEnvironment.SANDBOX
 import java.io.File
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -58,11 +60,16 @@ class BunqRepo(
                 sdk = Sdk(handler(context = context, signing = signing))
             }
 
-            BunqEnvironment.SANDBOX -> {
-                require(bunqConfig.apiKey == null || bunqConfig.apiKey.startsWith("sandbox")) {
+            SANDBOX -> {
+                require(bunqConfig.apiKey.isNullOrEmpty() || bunqConfig.apiKey.startsWith("sandbox")) {
                     "Sandbox environment API keys always start with 'sandbox'. Yours doesn't, and is most likely a misconfiguration."
                 }
-                val apiKey = bunqConfig.apiKey ?: createSandboxUserApiKey(BUNQ_SANDBOX_SERVER.baseUrl)
+                val apiKey =
+                    if (bunqConfig.apiKey?.startsWith("sandbox") == true) {
+                        bunqConfig.apiKey
+                    } else {
+                        createSandboxUserApiKey(BUNQ_SANDBOX_SERVER.baseUrl)
+                    }
                 val config =
                     Config(
                         bunqServer = BUNQ_SANDBOX_SERVER,
@@ -87,15 +94,16 @@ class BunqRepo(
     }
 
     suspend fun getAccountBalance(accountId: Long): String {
-        val readMonetaryaccountbankForUser = sdk.rEAD_MonetaryAccountBank_for_User(context.userId, accountId)
-        return when (readMonetaryaccountbankForUser) {
+        val monetaryAccountResponse = sdk.rEAD_MonetaryAccountBank_for_User(context.userId, accountId)
+        return when (monetaryAccountResponse) {
             is READ_MonetaryAccountBank_for_User.Response200 -> {
-                val balancePreferred =
-                    readMonetaryaccountbankForUser.body.MonetaryAccountBank
-                        ?.balance
-                balancePreferred?.toDomain() ?: "Unknown"
+                monetaryAccountResponse
+                    .body
+                    .MonetaryAccountBank
+                    ?.balance
+                    ?.toDomain()
+                    ?: "Unknown"
             }
-
             is READ_MonetaryAccountBank_for_User.Response400 -> TODO()
         }
     }

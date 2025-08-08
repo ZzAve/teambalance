@@ -28,16 +28,20 @@
     </properties>
 
     <dependencies>
+<!--        <dependency>-->
+<!--        <groupId>nl.jvandis</groupId>-->
+<!--            <artifactId>shaded-bunq-sdk</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.github.flock-community</groupId>-->
+<!--            <artifactId>bunq-sdk</artifactId>-->
+<!--            <version>server-configuration-and-pagination-618f257b26-1</version>-->
+<!--        </dependency>-->
         <dependency>
-        <groupId>nl.jvandis</groupId>
-            <artifactId>shaded-bunq-sdk</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.community-flock</groupId>
+            <groupId>com.github.flock-community.bunq-sdk</groupId>
             <artifactId>kotlin</artifactId>
-            <!-- TODO linked to final version (instead of local/snapshot)-->
-            <version>0.0.1</version>
+            <version>0.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
@@ -197,32 +201,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <executions>
-                    <!-- Replacing default-compile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-compile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <!-- Replacing default-testCompile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>java-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>java-test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jooq</groupId>

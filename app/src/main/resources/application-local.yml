@@ -1,7 +1,7 @@
 app:
   bank:
     bunq:
-      api-key: "sandbox_4cb06f4ce682498955ddaa644a2c33b54ff85a4f65f8cc61dc56d9cb"
+      api-key: ""
       environment: SANDBOX
       saveSessionToFile: true
     transaction-limit: 200 # up this when pagination is built (max is 200 from bunq)
