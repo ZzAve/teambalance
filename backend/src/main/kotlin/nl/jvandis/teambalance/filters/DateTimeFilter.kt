@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.servlet.HandlerExceptionResolver
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
