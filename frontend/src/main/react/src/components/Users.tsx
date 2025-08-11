@@ -8,7 +8,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { SpinnerWithText } from "./SpinnerWithText";
 import { withLoading } from "../utils/util";
-import { Hidden, IconButton } from "@mui/material";
+import { Chip, IconButton } from "@mui/material";
 import {
   BankAccountAlias,
   PotentialBankAccountAlias,
@@ -23,6 +23,9 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { useAlerts } from "../hooks/alertsHook";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
 
 export const Users = (props: { refresh: boolean }) => {
   const [users, setUsers] = useState<User[]>([]);
@@ -86,76 +89,47 @@ export const Users = (props: { refresh: boolean }) => {
     return <SpinnerWithText text="ophalen teamleden" />;
   }
 
-  const UsersTable = () => (
-    <TableContainer component={Paper}>
-      <Table sx={{ width: "100%" }} aria-label="Alle spelers en teamleaden">
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ width: "25%" }}>Naam</TableCell>
-            <TableCell sx={{ width: "25%" }}>Positie</TableCell>
-            <TableCell sx={{ width: "15%" }}>Rugnummer</TableCell>
-            <TableCell sx={{ width: "35%" }}>
-              Bank aliases{" "}
-              <IconButton
-                onClick={() => {
-                  setAllBankAccountAliasesExpanded((x) => !x);
-                }}
-              >
-                {allBankAccountAliasesExpanded ? (
-                  <VisibilityOffIcon />
-                ) : (
-                  <VisibilityIcon />
-                )}
-              </IconButton>
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell component="th" scope="row">
-                {user.name}
-              </TableCell>
-              <TableCell>{roleMapper[user.role]}</TableCell>
-              <TableCell>{user.jerseyNumber ?? "-"}</TableCell>
-              <TableCell sx={{ overflowX: "auto" }}>
-                <BankAccountAliases
-                  user={user}
-                  aliases={aliases.filter((a) => a.user.id == user.id)}
-                  initiallyExpanded={allBankAccountAliasesExpanded}
-                  onCreate={createAlias}
-                  onDelete={deleteAlias}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-
-  // TODO: make me pretty
   const UserList = () => (
-    <>
-      <Grid container>
-        <Grid item>WIP</Grid>
-        {users.map((it, idx) => (
-          <Grid xs={12} item key={idx}>
-            <Typography>
-              {it.name} - {roleMapper[it.role]} - {it.jerseyNumber || "?"}
-            </Typography>
-          </Grid>
-        ))}
-      </Grid>
-    </>
+    <Grid container spacing={2}>
+      {users.map((user) => (
+        <Grid xs={12} item key={user.id} spacing={2} margin={2}>
+          <Card variant="outlined">
+            <CardHeader
+              title={
+                <Grid container alignItems="center" spacing={1}>
+                  <Grid item>
+                    <Typography variant="h6">{user.name}</Typography>
+                  </Grid>
+                  <Grid item>
+                    <Chip size="small" label={roleMapper[user.role]} />
+                  </Grid>
+                </Grid>
+              }
+              subheader={
+                <Typography variant="body2">
+                  Rugnummer: {user.jerseyNumber ?? "-"}
+                </Typography>
+              }
+            />
+            <CardContent>
+              <Typography variant="subtitle2" gutterBottom>
+                Bank aliases
+              </Typography>
+              <BankAccountAliases
+                user={user}
+                aliases={aliases.filter((a) => a.user.id == user.id)}
+                initiallyExpanded={false}
+                onCreate={createAlias}
+                onDelete={deleteAlias}
+              />
+            </CardContent>
+          </Card>
+        </Grid>
+      ))}
+    </Grid>
   );
 
-  return (
-    <>
-      <Hidden mdDown>{UsersTable()}</Hidden>
-      <Hidden mdUp>{UserList()}</Hidden>
-    </>
-  );
+  return UserList();
 };
 
 export default Users;

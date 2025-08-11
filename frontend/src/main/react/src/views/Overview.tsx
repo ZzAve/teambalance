@@ -9,6 +9,9 @@ import React from "react";
 import Events from "../components/events/Events";
 import { useNavigate } from "react-router-dom";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import GroupIcon from "@mui/icons-material/Group";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import Typography from "@mui/material/Typography";
 import PageTitle from "../components/PageTitle";
 
@@ -148,26 +151,42 @@ const Overview = (props: { refresh: boolean }) => {
               </Grid>
             </Grid>
           </PageItem>
-          <PageItem title="☣️ Danger zone" dataTestId="danger-zone">
+          <PageItem title="Snelkoppelingen" dataTestId="quick-links">
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={4}>
                 <Button
-                  variant="contained"
+                  fullWidth
+                  variant="outlined"
                   color="primary"
+                  startIcon={<AdminPanelSettingsIcon />}
+                  endIcon={<ArrowForwardIcon />}
                   onClick={() => navigate("admin")}
                 >
                   Admin dingen
-                  <ArrowForwardIcon spacing={5} />
                 </Button>
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={4}>
                 <Button
-                  variant="contained"
+                  fullWidth
+                  variant="outlined"
                   color="primary"
+                  startIcon={<GroupIcon />}
+                  endIcon={<ArrowForwardIcon />}
                   onClick={() => navigate("users")}
                 >
                   Teamleden
-                  <ArrowForwardIcon spacing={5} />
+                </Button>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<EmojiEventsIcon />}
+                  endIcon={<ArrowForwardIcon />}
+                  onClick={() => navigate("competition")}
+                >
+                  Competitie
                 </Button>
               </Grid>
             </Grid>

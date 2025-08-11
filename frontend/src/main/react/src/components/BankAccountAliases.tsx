@@ -50,13 +50,17 @@ export const BankAccountAliases = (props: {
               container
               item
               alignItems="center"
-              justifyContent="flex-between"
+              justifyContent="space-between"
+              spacing={1}
             >
-              <Grid item>
+              <Grid item xs={8} sm={9} md={9} lg={10}>
                 <Typography>{it.alias}</Typography>
               </Grid>
               <Grid item>
-                <IconButton onClick={() => setConfirmDeleteAlias(it.id)}>
+                <IconButton
+                  onClick={() => setConfirmDeleteAlias(it.id)}
+                  aria-label="Verwijder alias"
+                >
                   <DeleteIcon />
                 </IconButton>
               </Grid>
