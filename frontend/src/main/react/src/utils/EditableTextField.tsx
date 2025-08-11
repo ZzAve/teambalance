@@ -5,7 +5,6 @@ import IconButton from "@mui/material/IconButton";
 import CheckIcon from "@mui/icons-material/Check";
 
 export const EditableTextField = (props: {
-  prefix?: string;
   onSubmit: (value: string) => Promise<boolean>;
   initialValue?: string;
   placeholder?: string;
@@ -45,7 +44,7 @@ export const EditableTextField = (props: {
           size="small"
         />
       </Grid>
-      <Grid>
+      <Grid item>
         <IconButton onClick={submit} size="small" aria-label="Bevestig">
           <CheckIcon />
         </IconButton>
