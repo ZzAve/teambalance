@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter
 import kotlin.math.min
 
 private val FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS").withZone(ZoneId.of("UTC"))
+val EUROPE_AMSTERDAM: ZoneId = ZoneId.of("Europe/Amsterdam")
 
 /**
  * BankService resolves bank related questions
@@ -50,21 +51,24 @@ class BankService(
         limit: Int = bankConfig.transactionLimit,
         offset: Int = 0,
     ): Transactions =
-        transactionsCache[MultiTenantContext.getCurrentTenant()].get()
+        transactionsCache[MultiTenantContext.getCurrentTenant()]
+            .get()
             .filter(limit, offset)
 
-    private fun updateBalance(accountId: Int): String {
-        return bunqRepository.getMonetaryAccountBank(accountId).balance
+    private fun updateBalance(accountId: Int): String =
+        bunqRepository
+            .getMonetaryAccountBank(accountId)
+            .balance
             .let {
                 "${it.parseCurrency()} ${it.value}"
             }.also {
                 bunqRepository.updateContext()
             }
-    }
 
     // TODO: Fetch all transactions up to datelimit
     private fun updateTransactions(accountId: Int): Transactions =
-        bunqRepository.getAllPayments(accountId, bankConfig.transactionLimit)
+        bunqRepository
+            .getAllPayments(accountId, bankConfig.transactionLimit)
             .let {
                 val aliases = getAllAliases()
                 val exclusions = getAllTransactionExclusions()
@@ -78,15 +82,14 @@ class BankService(
                     transactions = transactions,
                     limit = transactions.size,
                 )
-            }
-            .also {
+            }.also {
                 bunqRepository.updateContext()
             }
 
     private fun Payment.shouldBeExcluded(exclusions: List<TransactionExclusion>) =
         exclusions.any { e ->
             (e.transactionId == null || id == e.transactionId) &&
-                (e.date == null || created.toZonedDateTime().toLocalDate() == e.date) &&
+                (e.date == null || created.toZonedDateTime().toLocalDate().isEqual(e.date)) &&
                 (e.description == null || description == e.description) &&
                 (e.counterParty == null || counterpartyAlias.displayName == e.counterParty)
         }
@@ -106,7 +109,7 @@ class BankService(
 
     private fun Amount.parseCurrency() = if (currency == "EUR") "€" else currency
 
-    private fun String.toZonedDateTime() = ZonedDateTime.parse(this, FORMATTER).withZoneSameInstant(ZoneId.of("Europe/Paris"))
+    private fun String.toZonedDateTime() = ZonedDateTime.parse(this, FORMATTER).withZoneSameInstant(EUROPE_AMSTERDAM)
 
     private fun Transactions.filter(
         limit: Int,
