@@ -124,8 +124,8 @@ class TrainingClient(
             """.trimIndent(),
         )
 
-        val dayRange = 100L
-        val hourRange = 100L
+        val dayRange = 10L
+        val hourRange = 10L
         val createdTrainings =
             (0 until config.amountOfTrainings).map { i ->
                 try {
