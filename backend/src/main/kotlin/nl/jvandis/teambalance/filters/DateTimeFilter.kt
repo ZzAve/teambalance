@@ -3,6 +3,7 @@ package nl.jvandis.teambalance.filters
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import nl.jvandis.teambalance.api.bank.EUROPE_AMSTERDAM
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.servlet.HandlerExceptionResolver
@@ -21,7 +22,8 @@ class DateTimeFilter(
         filterChain: FilterChain,
     ) {
         try {
-            request.getParameter("since")
+            request
+                .getParameter("since")
                 ?.also {
                     val since = LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME)
                     if (START_OF_SEASON.isAfter(since)) {
@@ -41,12 +43,12 @@ class DateTimeFilter(
 }
 
 // Limit is bound to the start of the season, which typically starts around the 10th of August
-const val START_OF_SEASON_RAW: String = "2024-08-05T00:00:00"
+const val START_OF_SEASON_RAW: String = "2025-08-01T00:00:00"
 val START_OF_SEASON: LocalDateTime = LocalDateTime.parse(START_OF_SEASON_RAW)
 val START_OF_SEASON_ZONED: ZonedDateTime = START_OF_SEASON.toZonedDateTime()
 
-fun LocalDateTime.toZonedDateTime(): ZonedDateTime {
-    return atZone(ZoneId.of("Europe/Paris"))
-}
+fun LocalDateTime.toZonedDateTime(): ZonedDateTime = atZone(EUROPE_AMSTERDAM)
 
-class InvalidDateTimeException(msg: String) : RuntimeException(msg)
+class InvalidDateTimeException(
+    msg: String,
+) : RuntimeException(msg)
