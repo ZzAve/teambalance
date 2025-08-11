@@ -101,7 +101,7 @@ export const BankAccountAliases = (props: {
 
   const renderAddAliasTextField = () => (
     <Grid item xs={12}>
-      <EditableTextField prefix="🎭" onSubmit={onSubmit} />
+      <EditableTextField onSubmit={onSubmit} />
     </Grid>
   );
   const getAlertDialog = () => {
