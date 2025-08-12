@@ -10,7 +10,6 @@ import nl.jvandis.teambalance.api.setupCache
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.filters.START_OF_SEASON_ZONED
 import org.springframework.stereotype.Service
-import java.time.ZoneId
 import kotlin.math.min
 
 /**
@@ -21,7 +20,6 @@ import kotlin.math.min
  */
 @Service
 class BankService(
-//    @Lazy private val bunqRepository: BunqRepository,
     private val bunqRepo: BunqRepo,
     private val bankAccountAliasRepository: BankAccountAliasRepository,
     private val transactionExclusionRepository: BankAccountTransactionExclusionRepository,
