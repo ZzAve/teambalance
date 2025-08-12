@@ -10,10 +10,8 @@ import nl.jvandis.teambalance.api.setupCache
 import nl.jvandis.teambalance.api.users.User
 import nl.jvandis.teambalance.filters.START_OF_SEASON_ZONED
 import org.springframework.stereotype.Service
+import java.time.ZoneId
 import kotlin.math.min
-
-private val FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS").withZone(ZoneId.of("UTC"))
-val EUROPE_AMSTERDAM: ZoneId = ZoneId.of("Europe/Amsterdam")
 
 /**
  * BankService resolves bank-related questions
