@@ -2,6 +2,10 @@ package nl.jvandis.teambalance.api
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.future.future
 import nl.jvandis.teambalance.Tenant
 import java.time.Duration
 
@@ -14,9 +18,11 @@ import java.time.Duration
  */
 fun <K, V> setupCache(
     config: CacheConfig,
-    loadingFunction: (K) -> V,
+    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    loadingFunction: suspend (K) -> V,
 ): AsyncLoadingCache<K, V> =
-    Caffeine.newBuilder()
+    Caffeine
+        .newBuilder()
         .expireAfterWrite(config.expireAfterWrite)
         .apply { if (config.refreshAfterWrite != null) refreshAfterWrite(config.refreshAfterWrite) }
         .maximumSize(
@@ -25,8 +31,9 @@ fun <K, V> setupCache(
             } else {
                 0
             },
-        )
-        .buildAsync { key -> loadingFunction(key) }
+        ).buildAsync { key, _ ->
+            coroutineScope.future { loadingFunction(key) }
+        }
 
 /**
  * Configuration for setting up a cache.

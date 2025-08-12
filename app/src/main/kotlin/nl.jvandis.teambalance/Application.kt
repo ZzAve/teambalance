@@ -16,34 +16,24 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 @ConfigurationPropertiesScan
 class Application
 
-internal fun interface LoggingContext {
-    fun logger(): Logger
-}
-
 internal inline val <reified T> T.log: Logger
     get() = LoggerFactory.getLogger(T::class.java)
 
+private val logger = LoggerFactory.getLogger("nl.jvandis.teambalance.init")
+
 fun main(args: Array<String>) {
     val applicationContext = SpringApplication.run(Application::class.java, *args)
-
-    with(
-        LoggingContext {
-            loggerFor("nl.jvandis.teambalance.init")
-        },
-    ) {
-        warmUp(applicationContext)
-    }
+    warmUp(applicationContext)
 }
 
-context(LoggingContext)
 private fun warmUp(applicationContext: ConfigurableApplicationContext) {
     Tenant.entries.forEach {
-        log.info("Retrieving balance and transactions for $it")
+        logger.info("Retrieving balance and transactions for $it")
         MultiTenantContext.setCurrentTenant(it)
         applicationContext.getBean(BankService::class.java).getBalance()
         applicationContext.getBean(BankService::class.java).getTransactions(1, 0)
         MultiTenantContext.clear()
     }
 
-    log.info("Retrieved balance and transactions to warm up cache")
+    logger.info("Retrieved balance and transactions to warm up cache")
 }

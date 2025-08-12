@@ -7,7 +7,7 @@ app:
     transaction-limit: 200 # up this when pagination is built (max is 200 from bunq)
     cache:
       balance:
-        enabled: true
+        enabled: false
         expire-after-write: 60s
         refresh-after-write: 30s
       transactions:

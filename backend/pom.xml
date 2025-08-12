@@ -22,16 +22,38 @@
         <postgresql.version>42.7.2</postgresql.version>
         <springdoc-openapi.version>2.0.2</springdoc-openapi.version>
         <testcontainers.postgresql.version>16.5-alpine</testcontainers.postgresql.version>
+        <kotlinx-coroutines.version>1.9.0</kotlinx-coroutines.version>
 
         <kminrandom.version>1.0.4</kminrandom.version>
     </properties>
 
     <dependencies>
+<!--        <dependency>-->
+<!--        <groupId>nl.jvandis</groupId>-->
+<!--            <artifactId>shaded-bunq-sdk</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.github.flock-community</groupId>-->
+<!--            <artifactId>bunq-sdk</artifactId>-->
+<!--            <version>server-configuration-and-pagination-618f257b26-1</version>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>nl.jvandis</groupId>
-            <artifactId>shaded-bunq-sdk</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.github.flock-community.bunq-sdk</groupId>
+            <artifactId>kotlin</artifactId>
+            <version>0.0.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>${kotlinx-coroutines.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-reactor</artifactId>
+            <version>${kotlinx-coroutines.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>nl.jvandis</groupId>
             <artifactId>jooq-support</artifactId>
@@ -179,32 +201,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <executions>
-                    <!-- Replacing default-compile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-compile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <!-- Replacing default-testCompile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>java-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>java-test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jooq</groupId>

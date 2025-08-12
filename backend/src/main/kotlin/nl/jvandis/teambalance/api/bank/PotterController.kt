@@ -67,7 +67,7 @@ class PotterController(
     )
 
     private fun Potter.toPotterResponse(currency: String): PotterResponse {
-        val cumulativeAmount = transactions.fold(0.0) { acc, cur -> acc + cur.amount.toDouble() }
+        val cumulativeAmount = transactions.fold(0.0) { acc, cur -> acc + cur.transaction.amount.toDouble() }
         return PotterResponse(
             name = name,
             role = role,
@@ -78,7 +78,8 @@ class PotterController(
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleSecretExceptions(e: IllegalArgumentException) =
-        ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,

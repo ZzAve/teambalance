@@ -51,9 +51,7 @@ class BankController(
     }
 
     @GetMapping("/balance")
-    fun getBalance(): BalanceResponse {
-        return bankService.getBalance().toResponse()
-    }
+    fun getBalance(): BalanceResponse = bankService.getBalance().toResponse()
 
     @GetMapping("/transactions")
     fun getTransactions(
@@ -65,30 +63,31 @@ class BankController(
         @Max(1000)
         @Min(0)
         offset: Int,
-    ): TransactionsResponse {
-        return bankService.getTransactions(limit, offset).let {
+    ): TransactionsResponse =
+        bankService.getTransactions(limit, offset).let {
             val transactionResponses = it.transactions.toResponse()
             TransactionsResponse(transactions = transactionResponses)
         }
-    }
 
     private fun String.toResponse() = BalanceResponse(this)
 
-    private fun List<Transaction>.toResponse() =
-        map {
+    private fun List<TransactionWithAlias>.toResponse() =
+        map { itt ->
+            val it = itt.transaction
             TransactionResponse(
                 id = it.id,
                 type = it.type,
                 // non-breakable whitespace
                 amount = "${it.currency}\u00A0${it.amount}",
-                counterParty = it.user?.name ?: it.counterParty,
+                counterParty = itt.alias?.name ?: it.counterParty.displayName,
                 timestamp = it.date.toEpochSecond(),
             )
         }
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleSecretExceptions(e: IllegalArgumentException) =
-        ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,

@@ -42,7 +42,7 @@ class TransactionExclusionClient(
                             .now()
                             .toKotlinLocalDate()
                     }
-                val transactionId = conditional(.3) { random.nextInt(5_000, 10_000) }
+                val transactionId = conditional(.3) { random.nextInt(5_000, 10_000).toString() }
                 val counterParty =
                     conditional(.3) {
                         Arb

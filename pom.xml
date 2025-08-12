@@ -21,13 +21,12 @@
         <module>backend</module>
         <module>frontend</module>
         <module>jooq-support</module>
-        <module>shaded-bunq-sdk</module>
         <module>test-data</module>
     </modules>
 
     <properties>
         <java.version>21</java.version>
-        <kotlin.version>1.9.25</kotlin.version>
+        <kotlin.version>2.1.20</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 

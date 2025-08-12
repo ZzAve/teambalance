@@ -1,27 +1,27 @@
 services:
 
   backend:
-    image: maven:3.9-eclipse-temurin-21
-    command: ./mvnw spring-boot:run -Dspring-boot.run.profiles=local -pl app
+    image: teambalance/backend
+    build:
+      context: ./app
+      dockerfile: Dockerfile.backend
     environment:
       DB_HOST: postgresql
       DB_PORT: 5432
+      SPRING_PROFILES_ACTIVE: local
     ports:
       - "8080:8080"
     depends_on:
       postgresql:
         condition: service_healthy
-    volumes:
-      - .:/usr/src/mymaven:rw
-      - $HOME/.m2:/root/.m2
-    working_dir: /usr/src/mymaven
     healthcheck:
-      test: [ "CMD", "curl", "-f", "-u", "admin:admin", "http://localhost:8080/internal/actuator/health" ]
+      test: [ "CMD", "curl", "-f", "-u", "admin:admin", "http://backend:8080/internal/actuator/health" ]
       interval: 30s
       timeout: 10s
-      start_period: 15s
-      start_interval: 2s
-      retries: 3
+      start_period: 60s
+      start_interval: 5s
+      retries: 5
+
 
 
   frontend:

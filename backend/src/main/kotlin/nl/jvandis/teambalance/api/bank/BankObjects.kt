@@ -9,18 +9,29 @@ data class BalanceResponse(
 )
 
 data class Transactions(
-    val transactions: List<Transaction>,
+    val transactions: List<TransactionWithAlias>,
     val limit: Int,
 )
 
+data class TransactionWithAlias(
+    val transaction: Transaction,
+    val alias: User?,
+)
+
 data class Transaction(
-    val id: Int,
+    val id: String,
     val type: TransactionType,
     val currency: String,
     val amount: String,
-    val counterParty: String,
-    val user: User?,
+    val counterParty: CounterParty,
+//    val user: User?,
     val date: ZonedDateTime,
+    val description: String?,
+)
+
+data class CounterParty(
+    val iban: String?,
+    val displayName: String,
 )
 
 enum class TransactionType {
@@ -33,7 +44,7 @@ data class TransactionsResponse(
 )
 
 data class TransactionResponse(
-    val id: Int,
+    val id: String,
     val type: TransactionType,
     val amount: String,
     val counterParty: String,
@@ -51,7 +62,7 @@ data class Potters(
 data class Potter(
     val name: String,
     val role: Role,
-    val transactions: List<Transaction>,
+    val transactions: List<TransactionWithAlias>,
 )
 
 data class PottersResponse(
@@ -68,4 +79,10 @@ data class PotterResponse(
     val role: Role,
     val currency: String,
     val amount: Double,
+)
+
+data class BankAccount(
+    val id: Long,
+    val balance: String,
+    val alias: String?,
 )

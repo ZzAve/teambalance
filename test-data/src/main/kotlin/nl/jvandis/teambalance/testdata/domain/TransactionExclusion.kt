@@ -12,7 +12,7 @@ data class TransactionExclusions(
 data class TransactionExclusion(
     val id: String,
     val date: LocalDate?,
-    val transactionId: Int?,
+    val transactionId: String?,
     val counterParty: String?,
     val description: String?,
 )
@@ -20,7 +20,7 @@ data class TransactionExclusion(
 @Serializable
 data class CreateTransactionExclusion(
     val date: LocalDate?,
-    val transactionId: Int?,
+    val transactionId: String?,
     val counterParty: String?,
     val description: String?,
 )

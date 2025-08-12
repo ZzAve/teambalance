@@ -12,13 +12,13 @@ data class TransactionExclusion(
     val id: Long = NO_ID,
     val teamBalanceId: TeamBalanceId,
     val date: LocalDate?,
-    val transactionId: Int?,
+    val transactionId: String?,
     val counterParty: String?,
     val description: String?,
 ) {
     constructor(
         date: LocalDate? = null,
-        transactionId: Int? = null,
+        transactionId: String? = null,
         counterParty: String? = null,
         description: String? = null,
     ) : this(
