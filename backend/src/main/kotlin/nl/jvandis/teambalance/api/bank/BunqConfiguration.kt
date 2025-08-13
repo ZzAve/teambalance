@@ -14,13 +14,11 @@ class BunqConfiguration(
     private val bankConfig: BankConfig,
 ) {
     @Bean
-    fun setupBunqRepository(): BunqRepo {
+    fun setupBunqRepository(): BunqRepo =
         when (bankConfig.bunq.environment) {
             PRODUCTION -> initializeProductionSetup2(bankConfig.bunq)
             SANDBOX -> initializeSandboxSetup2(bankConfig.bunq)
         }
-        return BunqRepo(bunqConfig = bankConfig.bunq)
-    }
 
     private fun initializeProductionSetup2(bunqConfig: BankBunqConfig): BunqRepo {
         require(bunqConfig.environment == PRODUCTION) { "Bunq environment was not set to PRODUCTION" }
@@ -30,6 +28,7 @@ class BunqConfiguration(
         log.info("Setting up connection with bunq PRODUCTION using api-key '$obfuscatedApiKey'")
 
         return try {
+            log.info("Creating prod bunqRepo")
             BunqRepo(bunqConfig)
         } catch (t: Throwable) {
             throw IllegalStateException(
@@ -53,6 +52,7 @@ class BunqConfiguration(
         log.info("Setting up connection with bunq SANDBOX")
 
         return try {
+            log.info("Creating sandbox bunqRepo")
             BunqRepo(bunqConfig)
         } catch (t: Throwable) {
             throw IllegalStateException("Could not create bunqRepository for sandbox setup", t)
