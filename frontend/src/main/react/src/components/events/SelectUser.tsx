@@ -46,9 +46,8 @@ export const SelectUser = (props: {
   >(props.initialOption);
 
   useEffect(() => {
-    console.log("Updating selectedOption");
     setSelectedOption(props.options.find((it) => it.id === selectedOption?.id));
-  }, [props.options]);
+  }, [props.options, selectedOption?.id]);
 
   const handleOptionSelection = async (event: SelectChangeEvent) => {
     const newOptionId: string = event.target.value;
