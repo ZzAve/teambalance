@@ -87,7 +87,7 @@ class BankService(
     private fun Transaction.shouldBeExcluded(exclusions: List<TransactionExclusion>) =
         exclusions.any { e ->
             (e.transactionId == null || id == e.transactionId) &&
-                (e.date == null || this.date.toLocalDate() == e.date) &&
+                (e.date == null || this.date.toLocalDate().isEqual(e.date)) &&
                 (e.description == null || this.description == e.description) &&
                 (e.counterParty == null || counterParty.displayName == e.counterParty || counterParty.iban == e.counterParty)
         }

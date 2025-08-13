@@ -26,13 +26,15 @@ import org.springframework.stereotype.Component
 import java.util.regex.Pattern
 
 /**
- * An extension on top of Jooq's DSLContext to allow for multitenancy by means of separate schema's.
+ * An extension on top of Jooq's DSLContext to allow for multitenancy by separate schema's.
  *
- * Rationale: Each interaction with a DSLContext (select, update, delete ...), is wrapped by a multi-tenant context
+ * Rationale: Each interaction with a DSLContext (select, update, delete ...) is wrapped by a multi-tenant context
  * selector {@link MultiTenantContext}
  */
 @Component
-class MultiTenantDslContext(private val context: DSLContext) {
+class MultiTenantDslContext(
+    private val context: DSLContext,
+) {
     private val contexts: MutableMap<Tenant, DSLContext> = mutableMapOf()
 
     private fun tenantContext(): DSLContext =
@@ -44,7 +46,8 @@ class MultiTenantDslContext(private val context: DSLContext) {
         val settings: Settings =
             Settings().withRenderMapping(
                 RenderMapping().withSchemata(
-                    MappedSchema().withInputExpression(Pattern.compile("public"))
+                    MappedSchema()
+                        .withInputExpression(Pattern.compile("public"))
                         .withOutput(tenant.name.lowercase()),
                 ),
             )

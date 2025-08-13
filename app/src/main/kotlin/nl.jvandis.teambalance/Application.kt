@@ -27,12 +27,16 @@ fun main(args: Array<String>) {
 }
 
 private fun warmUp(applicationContext: ConfigurableApplicationContext) {
+    val bankService = applicationContext.getBean(BankService::class.java)
     Tenant.entries.forEach {
-        logger.info("Retrieving balance and transactions for $it")
-        MultiTenantContext.setCurrentTenant(it)
-        applicationContext.getBean(BankService::class.java).getBalance()
-        applicationContext.getBean(BankService::class.java).getTransactions(1, 0)
-        MultiTenantContext.clear()
+        try {
+            MultiTenantContext.setCurrentTenant(it)
+            logger.info("Retrieving balance and transactions for tenant $it")
+            bankService.getBalance()
+            bankService.getTransactions(1, 0)
+        } finally {
+            MultiTenantContext.clear()
+        }
     }
 
     logger.info("Retrieved balance and transactions to warm up cache")
