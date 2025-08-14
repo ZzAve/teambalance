@@ -40,7 +40,7 @@ class BunqConfiguration(
 
     private fun initializeSandboxSetup2(bunqConfig: BankBunqConfig): BunqRepo {
         require(bunqConfig.environment == SANDBOX) {
-            "Bunq environment was not set to PRODUCTION"
+            "Bunq environment was not set to SANDBOX"
         }
         require(bunqConfig.apiKey.isNullOrEmpty() || bunqConfig.apiKey.startsWith("sandbox")) {
             """
