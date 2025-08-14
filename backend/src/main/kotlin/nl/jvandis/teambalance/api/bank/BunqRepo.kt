@@ -65,9 +65,9 @@ class BunqRepo(
         }
     }
 
-    suspend fun getAccountBalance(accountId: Long): String =
-        sdkMutex.withLock {
-            ensureInitialized()
+    suspend fun getAccountBalance(accountId: Long): String {
+        ensureInitialized()
+        return sdkMutex.withLock {
             val monetaryAccountResponse =
                 sdk.rEAD_MonetaryAccountBank_for_User(
                     userID = context.userId,
@@ -82,16 +82,16 @@ class BunqRepo(
                         ?.toDomain()
                         ?: "Unknown"
                 }
-
                 is READ_MonetaryAccountBank_for_User.Response400 -> TODO()
             }
         }
+    }
 
     private fun Amount.toDomain(): String = "${parseCurrency()} $value"
 
-    suspend fun getTransactions(accountId: Long): List<Transaction> =
-        sdkMutex.withLock {
-            ensureInitialized()
+    suspend fun getTransactions(accountId: Long): List<Transaction> {
+        ensureInitialized()
+        return sdkMutex.withLock {
             val paymentsResponse =
                 sdk.list_all_Payment_for_User_MonetaryAccount(
                     userID = context.userId,
@@ -107,14 +107,14 @@ class BunqRepo(
                         .filter { it.amount != null && it.created != null && it.counterparty_alias.isValid() }
                         .map(PaymentListing::toDomain)
                 }
-
                 is List_all_Payment_for_User_MonetaryAccount.Response400 -> TODO()
             }
         }
+    }
 
-    suspend fun listMonetaryAccountBank(): List<BankAccount> =
-        sdkMutex.withLock {
-            ensureInitialized()
+    suspend fun listMonetaryAccountBank(): List<BankAccount> {
+        ensureInitialized()
+        return sdkMutex.withLock {
             val bankAccountsResponse =
                 sdk.list_all_MonetaryAccountBank_for_User(
                     userID = context.userId,
@@ -126,10 +126,10 @@ class BunqRepo(
                 is List_all_MonetaryAccountBank_for_User.Response200 -> {
                     bankAccountsResponse.body.map { it.toDomain() }
                 }
-
                 is List_all_MonetaryAccountBank_for_User.Response400 -> TODO()
             }
         }
+    }
 
     private fun getBunqSdkConfig(): Config {
         val config =
@@ -149,15 +149,20 @@ class BunqRepo(
                 }
 
                 SANDBOX -> {
-                    require(bunqConfig.apiKey.isNullOrEmpty() || bunqConfig.apiKey.startsWith("sandbox")) {
-                        "Sandbox environment API keys always start with 'sandbox'. " +
-                            "Yours doesn't, and is most likely a misconfiguration."
-                    }
                     val apiKey =
-                        if (bunqConfig.apiKey?.startsWith("sandbox") == true) {
-                            bunqConfig.apiKey
-                        } else {
-                            createSandboxUserApiKey(BUNQ_SANDBOX_SERVER.baseUrl)
+                        when {
+                            bunqConfig.apiKey.isNullOrBlank() -> {
+                                createSandboxUserApiKey(BUNQ_SANDBOX_SERVER.baseUrl)
+                            }
+                            bunqConfig.apiKey?.startsWith("sandbox") == true -> {
+                                bunqConfig.apiKey!!
+                            }
+                            else -> {
+                                log.warn(
+                                    "Provided API key does not start with 'sandbox'. Falling back to generated sandbox key.",
+                                )
+                                createSandboxUserApiKey(BUNQ_SANDBOX_SERVER.baseUrl)
+                            }
                         }
 
                     Config(
@@ -176,13 +181,16 @@ class BunqRepo(
 private fun MonetaryAccountBankListing.toDomain() =
     BankAccount(
         id = id ?: -1,
-        balance = balance?.parseCurrency() ?: "Unknown",
+        balance = balance.toDomain(),
         alias = alias?.filter { it.name != null }?.joinToString { it.name!! },
     )
 
+private fun Amount?.toDomain(): String = if (this == null) "Unknown" else "${parseCurrency()} $value"
+
 private fun PaymentListing.toDomain(): Transaction {
     require(amount != null && created != null && counterparty_alias.isValid()) {
-        "PaymentListing is not valid. It needs an amount, created and counterparty_alias to be valid, but received: $this"
+        "PaymentListing is not valid. It needs an amount, created and counterparty_alias to be valid, " +
+            "but received: $this"
     }
     val amount = amount!!
     val created = created!!
@@ -208,11 +216,14 @@ private fun Amount.toTransactionType(): TransactionType =
     }
 
 private fun LabelMonetaryAccount?.toDomain(): CounterParty {
-    require(isValid()) { "LabelMonetaryAccount is not valid. It needs a display_name and iban to be valid, but received: $this" }
+    require(isValid()) {
+        "LabelMonetaryAccount is not valid. It needs a display_name and iban to be valid, " +
+            "but received: $this"
+    }
     return CounterParty(
         iban = this!!.iban,
         displayName = this.display_name!!,
     )
 }
 
-private fun LabelMonetaryAccount?.isValid() = this != null && this.display_name != null
+private fun LabelMonetaryAccount?.isValid() = this != null && this.display_name != null && this.iban != null
