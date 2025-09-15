@@ -39,7 +39,7 @@ class BankService(
     fun getBalance(): String = balanceCache[MultiTenantContext.getCurrentTenant()].get()
 
     fun getTransactions(
-        limit: Int = bankConfig.transactionLimit,
+        limit: Inmakefit = bankConfig.transactionLimit,
         offset: Int = 0,
     ): Transactions =
         transactionsCache[MultiTenantContext.getCurrentTenant()]

@@ -1,9 +1,61 @@
 package nl.jvandis.teambalance.api.bank
 
+import com.bunq.sdk.generated.Sdk
+import com.bunq.sdk.generated.endpoint.CREATE_RequestInquiry_for_User_MonetaryAccount
 import com.bunq.sdk.generated.endpoint.CREATE_SandboxUserPerson
+import com.bunq.sdk.generated.model.Amount
+import com.bunq.sdk.generated.model.CreateRequestInquiry
+import com.bunq.sdk.generated.model.Pointer
 import com.bunq.sdk.generated.model.SandboxUserPerson
 import com.bunq.sdk.serialization
 import community.flock.wirespec.kotlin.Wirespec
+import nl.jvandis.teambalance.loggerFor
+import java.net.URI
+import java.net.URLEncoder
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+
+private val log = loggerFor("nl.jvandis.teambalance.api.bank.CreateSandboxUserApiKey")
+
+suspend fun requireSpendingMoney(
+    userId: Long,
+    monetaryAccountId: Long,
+    sdk: Sdk,
+) = try {
+    when (
+        val response =
+            sdk.cREATE_RequestInquiry_for_User_MonetaryAccount(
+                userID = userId,
+                monetaryaccountID = monetaryAccountId,
+                body =
+                    CreateRequestInquiry(
+                        amount_inquired =
+                            Amount(
+                                value = "123.45",
+                                currency = "EUR",
+                            ),
+                        counterparty_alias =
+                            Pointer(
+                                type = "EMAIL",
+                                value = "sugardaddy@bunq.com",
+                                name = "Sugar Daddy",
+                                service = null,
+                            ),
+                        description = "Asking sugar daddy for help",
+                        allow_bunqme = false,
+                    ),
+            )
+    ) {
+        is CREATE_RequestInquiry_for_User_MonetaryAccount.Response200 -> {
+            response.body
+        }
+        is CREATE_RequestInquiry_for_User_MonetaryAccount.Response400 -> error("Failed to create request inquiry to sugar daddy")
+    }
+} catch (e: Exception) {
+    log.warn("Failed to create request inquiry to sugar daddy", e)
+    null
+}
 
 fun createSandboxUserApiKey(baseUrl: String): String {
     require(baseUrl.isNotBlank()) { "Base URL cannot be blank" }
@@ -43,18 +95,18 @@ private fun send(
     req: Wirespec.RawRequest,
 ): Wirespec.RawResponse {
     val client =
-        java.net.http.HttpClient
+        HttpClient
             .newBuilder()
             .build()
 
-    val baseUri = java.net.URI(baseUrl + req.path.joinToString("/"))
+    val baseUri = URI(baseUrl + req.path.joinToString("/"))
     val uri =
         if (req.queries.isNotEmpty()) {
             val queryString =
                 req.queries.entries.joinToString("&") { (key, value) ->
-                    value.joinToString("&") { v -> "$key=${java.net.URLEncoder.encode(v, Charsets.UTF_8)}" }
+                    value.joinToString("&") { v -> "$key=${URLEncoder.encode(v, Charsets.UTF_8)}" }
                 }
-            java.net.URI("$baseUri?$queryString")
+            URI("$baseUri?$queryString")
         } else {
             baseUri
         }
@@ -68,17 +120,17 @@ private fun send(
             .let { it + arrayOf("test", "value") }
 
     val requestBuilder =
-        java.net.http.HttpRequest
+        HttpRequest
             .newBuilder()
             .uri(uri)
             .method(
                 req.method.uppercase(),
                 req.body
                     ?.let {
-                        java.net.http.HttpRequest.BodyPublishers
+                        HttpRequest.BodyPublishers
                             .ofString(it)
                     }
-                    ?: java.net.http.HttpRequest.BodyPublishers
+                    ?: HttpRequest.BodyPublishers
                         .noBody(),
             ).headers(*headers)
 
@@ -86,7 +138,7 @@ private fun send(
     val response =
         client.send(
             requestBuilder.build(),
-            java.net.http.HttpResponse.BodyHandlers
+            HttpResponse.BodyHandlers
                 .ofString(),
         )
 
