@@ -36,7 +36,7 @@
         <dependency>
             <groupId>com.github.flock-community.bunq-sdk</groupId>
             <artifactId>kotlin</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.3</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
