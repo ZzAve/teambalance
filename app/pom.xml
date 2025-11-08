@@ -122,7 +122,7 @@
                 <executions>
                     <execution>
                         <id>unpack-dependencies</id>
-                        <phase>generate-resources</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>unpack-dependencies</goal>
                         </goals>

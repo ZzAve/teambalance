@@ -10,7 +10,6 @@ import com.bunq.sdk.generated.endpoint.List_all_MonetaryAccountBank_for_User
 import com.bunq.sdk.generated.endpoint.List_all_Payment_for_User_MonetaryAccount
 import com.bunq.sdk.generated.endpoint.READ_MonetaryAccountBank_for_User
 import com.bunq.sdk.generated.model.Amount
-import com.bunq.sdk.generated.model.LabelMonetaryAccount
 import com.bunq.sdk.generated.model.MonetaryAccountBankListing
 import com.bunq.sdk.generated.model.PaymentListing
 import com.bunq.sdk.handler
@@ -111,7 +110,7 @@ class BunqRepo(
             when (paymentsResponse) {
                 is List_all_Payment_for_User_MonetaryAccount.Response200 -> {
                     paymentsResponse.body
-                        .filter { it.amount != null && it.created != null && it.counterparty_alias.isValid() }
+                        .filter { it.amount != null && it.created != null && it.counterparty_alias?.display_name != null }
                         .map(PaymentListing::toDomain)
                 }
 
@@ -215,20 +214,27 @@ private fun MonetaryAccountBankListing.toDomain() =
 private fun Amount?.toDomain(): String = if (this == null) "Unknown" else "${parseCurrency()} $value"
 
 private fun PaymentListing.toDomain(): Transaction {
-    require(amount != null && created != null && counterparty_alias.isValid()) {
+    val amount = this.amount
+    val createdDate = this.created
+    val counterpartyAlias = this.counterparty_alias
+    val displayName = counterpartyAlias?.display_name
+
+    require(amount != null && createdDate != null && displayName != null) {
         "PaymentListing is not valid. It needs an amount, created and counterparty_alias to be valid, " +
             "but received: $this"
     }
-    val amount = amount!!
-    val created = created!!
 
     return Transaction(
         id = id?.let { "$it" } ?: "UNKNOWN",
         type = amount.toTransactionType(),
         currency = amount.parseCurrency() ?: "",
         amount = amount.value ?: "",
-        counterParty = counterparty_alias.toDomain(),
-        date = created.let { LocalDateTime.parse(it, FORMATTER).atZone(ZoneId.of("UTC")) },
+        counterParty =
+            CounterParty(
+                iban = counterpartyAlias.iban,
+                displayName = displayName,
+            ),
+        date = createdDate.let { LocalDateTime.parse(it, FORMATTER).atZone(ZoneId.of("UTC")) },
         description = description,
     )
 }
@@ -241,16 +247,3 @@ private fun Amount.toTransactionType(): TransactionType =
     } else {
         TransactionType.DEBIT
     }
-
-private fun LabelMonetaryAccount?.toDomain(): CounterParty {
-    require(isValid()) {
-        "LabelMonetaryAccount is not valid. It needs a display_name and iban to be valid, " +
-            "but received: $this"
-    }
-    return CounterParty(
-        iban = this!!.iban,
-        displayName = this.display_name!!,
-    )
-}
-
-private fun LabelMonetaryAccount?.isValid() = this != null && this.display_name != null && this.iban != null
