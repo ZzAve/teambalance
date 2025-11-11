@@ -54,7 +54,7 @@
         <npm.install.skip>true</npm.install.skip>
         <npm.lint.skip>true</npm.lint.skip>
         <npm.lint.fix.skip>true</npm.lint.fix.skip>
-        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 
         <sonar.organization>zzave</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
