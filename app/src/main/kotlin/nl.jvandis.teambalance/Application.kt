@@ -1,5 +1,9 @@
 package nl.jvandis.teambalance
 
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.future.future
+import kotlinx.coroutines.runBlocking
 import nl.jvandis.teambalance.api.bank.BankService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -21,12 +25,17 @@ internal inline val <reified T> T.log: Logger
 
 private val logger = LoggerFactory.getLogger("nl.jvandis.teambalance.init")
 
+@OptIn(DelicateCoroutinesApi::class)
 fun main(args: Array<String>) {
     val applicationContext = SpringApplication.run(Application::class.java, *args)
-    warmUp(applicationContext)
+
+    // Warm up the application
+    runBlocking {
+        warmUp(applicationContext)
+    }
 }
 
-private fun warmUp(applicationContext: ConfigurableApplicationContext) {
+private suspend fun warmUp(applicationContext: ConfigurableApplicationContext) {
     val bankService = applicationContext.getBean(BankService::class.java)
     Tenant.entries.forEach {
         try {

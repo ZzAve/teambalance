@@ -1,6 +1,6 @@
 package nl.jvandis.teambalance.api.bank
 
-import com.github.benmanes.caffeine.cache.AsyncLoadingCache
+import dev.hsbrysk.caffeine.CoroutineLoadingCache
 import kotlinx.coroutines.runBlocking
 import nl.jvandis.teambalance.MultiTenantContext
 import nl.jvandis.teambalance.Tenant
@@ -26,24 +26,24 @@ class BankService(
     private val bankConfig: BankConfig,
     private val configurationService: ConfigurationService,
 ) {
-    private val balanceCache: AsyncLoadingCache<Tenant, String> =
-        setupCache(bankConfig.cache.balance) { tenant: Tenant ->
+    private val balanceCache: CoroutineLoadingCache<Tenant, String> =
+        setupCache(bankConfig.cache.balance) { _ ->
             updateBalance(getAccountId())
         }
 
-    private val transactionsCache: AsyncLoadingCache<Tenant, Transactions> =
-        setupCache(bankConfig.cache.transactions) { tenant: Tenant ->
+    private val transactionsCache: CoroutineLoadingCache<Tenant, Transactions> =
+        setupCache(bankConfig.cache.transactions) { _ ->
             updateTransactions(getAccountId())
         }
 
-    fun getBalance(): String = balanceCache[MultiTenantContext.getCurrentTenant()].get()
+    suspend fun getBalance(): String = balanceCache.get(MultiTenantContext.getCurrentTenant())
 
-    fun getTransactions(
+    suspend fun getTransactions(
         limit: Int = bankConfig.transactionLimit,
         offset: Int = 0,
     ): Transactions =
-        transactionsCache[MultiTenantContext.getCurrentTenant()]
-            .get()
+        transactionsCache
+            .get(MultiTenantContext.getCurrentTenant())
             .filter(limit, offset)
 
     private suspend fun updateBalance(accountId: Int): String {

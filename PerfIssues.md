@@ -68,11 +68,11 @@ Queries:
 ℹ️ Locally grouping all attendees by training is apparently way cheaper than 
 doing seperate db calls for each training to get attendees.
 
-| Processing times ||  
-|---|---:|
-| sample size:  |  50|
-| mean μ:       |  132.4 ms|
-| std δ:        |  19.0 ms|
+| Processing times |          |  
+|------------------|---------:|
+| sample size:     |       50 |
+| mean μ:          | 132.4 ms |
+| std δ:           |  19.0 ms |
 
 Improvement comparision: factor >15 times faster
 
@@ -98,4 +98,3 @@ Queries:
  
  Improvement comparision: factor >35 times faster
 
- 

@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "competition")
 @RestController
 @RequestMapping(path = ["/api/competition"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class CompetitionController(private val service: CompetitionService) {
+class CompetitionController(
+    private val service: CompetitionService,
+) {
     @GetMapping
-    fun getRanking(): CompetitionRankingDto = service.getRanking().expose()
+    suspend fun getRanking(): CompetitionRankingDto = service.getRanking().expose()
 }
 
 fun CompetitionRanking.expose() =

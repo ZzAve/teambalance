@@ -62,7 +62,8 @@ class LiquibaseSupport {
             liquibase.database.defaultSchemaName = schemaName
 
             if (liquibase.isSafeToRunUpdate) {
-                liquibase.update(Contexts(), LabelExpression())
+                liquibase
+                    .update(Contexts(), LabelExpression())
             } else {
                 throw IllegalStateException("Cannot run migrations, liquibase does not deem it safe.")
             }

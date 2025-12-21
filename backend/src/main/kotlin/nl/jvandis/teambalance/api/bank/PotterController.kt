@@ -29,7 +29,7 @@ class PotterController(
     private val potterService: PotterService,
 ) {
     @GetMapping("/potters")
-    fun getPotters(
+    suspend fun getPotters(
         @RequestParam(defaultValue = "3")
         @Max(200)
         @Min(1)

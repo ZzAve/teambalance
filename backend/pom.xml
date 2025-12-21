@@ -18,21 +18,17 @@
         <jakarta-servlet.version>5.0.0</jakarta-servlet.version>
         <jetty.version>12.0.19</jetty.version>
         <jooq-postgres-extensions.version>3.16.13</jooq-postgres-extensions.version>
-        <jooq.version>3.17.7</jooq.version> <!-- same as from spring-boot-starter-jooq -->
+        <jooq.version>3.20.8</jooq.version> <!-- same as from spring-boot-starter-jooq -->
         <postgresql.version>42.7.2</postgresql.version>
         <springdoc-openapi.version>2.0.2</springdoc-openapi.version>
         <testcontainers.postgresql.version>16.5-alpine</testcontainers.postgresql.version>
         <kotlinx-coroutines.version>1.9.0</kotlinx-coroutines.version>
-
+        <jooq-extensions.version>3.18.7</jooq-extensions.version>
         <kminrandom.version>1.0.4</kminrandom.version>
+        <caffeine-coroutines.version>2.0.3</caffeine-coroutines.version>
     </properties>
 
     <dependencies>
-<!--        <dependency>-->
-<!--        <groupId>nl.jvandis</groupId>-->
-<!--            <artifactId>shaded-bunq-sdk</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>com.github.flock-community.bunq-sdk</groupId>
             <artifactId>kotlin</artifactId>
@@ -50,11 +46,24 @@
         </dependency>
 
         <dependency>
-            <groupId>nl.jvandis</groupId>
-            <artifactId>jooq-support</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jooq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-meta-extensions-liquibase</artifactId>
+            <version>${jooq-extensions.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-meta-extensions</artifactId>
+            <version>${jooq-extensions.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
@@ -93,6 +102,11 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <version>${caffeine.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.hsbrysk</groupId>
+            <artifactId>caffeine-coroutines</artifactId>
+            <version>${caffeine-coroutines.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -164,17 +178,13 @@
             <scope>test</scope>
         </dependency>
 
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>${testcontainers.version}</version>
-        </dependency>
-        <!-- Junit is still needed for testcontainers and jooq -->
         <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-postgresql</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
@@ -225,8 +235,12 @@
                         <name>org.jooq.codegen.KotlinGenerator</name>
                         <database>
                             <inputSchema>public</inputSchema>
-                            <catalogVersionProvider>SELECT id || orderexecuted || databasechangelog.md5sum FROM "databasechangelog" ORDER BY dateexecuted desc limit 1</catalogVersionProvider>
-                            <schemaVersionProvider>SELECT id || orderexecuted || databasechangelog.md5sum FROM "databasechangelog" ORDER BY dateexecuted desc limit 1</schemaVersionProvider>
+                            <catalogVersionProvider>SELECT id || orderexecuted || databasechangelog.md5sum FROM
+                                "databasechangelog" ORDER BY dateexecuted desc limit 1
+                            </catalogVersionProvider>
+                            <schemaVersionProvider>SELECT id || orderexecuted || databasechangelog.md5sum FROM
+                                "databasechangelog" ORDER BY dateexecuted desc limit 1
+                            </schemaVersionProvider>
                             <forcedTypes combine.children="append">
                                 <forcedType>
                                     <userType>nl.jvandis.teambalance.api.event.match.Place</userType>
@@ -248,7 +262,8 @@
                                     <includeTypes>role</includeTypes>
                                 </forcedType>
                                 <forcedType>
-                                    <userType>nl.jvandis.teambalance.api.event.RecurringEventProperties.TimeUnit</userType>
+                                    <userType>nl.jvandis.teambalance.api.event.RecurringEventProperties.TimeUnit
+                                    </userType>
                                     <enumConverter>true</enumConverter>
                                     <objectType>COLUMN</objectType>
                                     <includeTypes>recurring_event_properties_time_unit</includeTypes>
@@ -260,6 +275,36 @@
                         </target>
                     </generator>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.testcontainers</groupId>
+                        <artifactId>testcontainers</artifactId>
+                        <version>${testcontainers.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>nl.jvandis</groupId>
+                        <artifactId>jooq-support</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.testcontainers</groupId>
+                        <artifactId>testcontainers-postgresql</artifactId>
+                        <version>${testcontainers.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${postgresql.version}</version>
+                    </dependency>
+                    <!-- Junit is still needed for testcontainers and jooq -->
+                    <dependency>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                        <version>4.13.2</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

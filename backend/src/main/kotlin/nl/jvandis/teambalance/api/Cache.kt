@@ -2,10 +2,8 @@ package nl.jvandis.teambalance.api
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache
 import com.github.benmanes.caffeine.cache.Caffeine
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.future.future
+import dev.hsbrysk.caffeine.CoroutineLoadingCache
+import dev.hsbrysk.caffeine.buildCoroutine
 import nl.jvandis.teambalance.Tenant
 import java.time.Duration
 
@@ -16,11 +14,10 @@ import java.time.Duration
  * @param loadingFunction the function to load cache values.
  * @return an instance of [AsyncLoadingCache] configured based on the supplied [CacheConfig].
  */
-fun <K, V> setupCache(
+fun <K : Any, V : Any> setupCache(
     config: CacheConfig,
-    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     loadingFunction: suspend (K) -> V,
-): AsyncLoadingCache<K, V> =
+): CoroutineLoadingCache<K, V> =
     Caffeine
         .newBuilder()
         .expireAfterWrite(config.expireAfterWrite)
@@ -31,8 +28,8 @@ fun <K, V> setupCache(
             } else {
                 0
             },
-        ).buildAsync { key, _ ->
-            coroutineScope.future { loadingFunction(key) }
+        ).buildCoroutine { key ->
+            loadingFunction(key)
         }
 
 /**

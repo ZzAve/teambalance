@@ -14,11 +14,8 @@ class CompetitionService(
     private val nevoboClient: NevoboClient,
     private val configurationService: ConfigurationService,
 ) {
-    fun getRanking(): CompetitionRanking {
+    suspend fun getRanking(): CompetitionRanking {
         val config = configurationService.getConfig("competitionConfig", CompetitionConfig::class)
         return nevoboClient.getRankingForCompetition(config)
-        // "regio-west",
-        // "competitie-seniorencompetitie-1",
-        // "regio-west-h2e-10",
     }
 }

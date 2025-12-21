@@ -51,10 +51,10 @@ class BankController(
     }
 
     @GetMapping("/balance")
-    fun getBalance(): BalanceResponse = bankService.getBalance().toResponse()
+    suspend fun getBalance(): BalanceResponse = bankService.getBalance().toResponse()
 
     @GetMapping("/transactions")
-    fun getTransactions(
+    suspend fun getTransactions(
         @RequestParam(defaultValue = "10")
         @Max(50)
         @Min(1)

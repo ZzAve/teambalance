@@ -74,22 +74,23 @@ class NevoboClient(
             )
         }
 
-    fun getRankingForCompetition(competitionConfig: CompetitionConfig): CompetitionRanking = rankingCache[competitionConfig].get()
+    suspend fun getRankingForCompetition(competitionConfig: CompetitionConfig): CompetitionRanking = rankingCache.get(competitionConfig)
 
     private fun updateRankingForCompetition(
         regionId: String,
         competitionId: String,
         poolId: String,
-    ): CompetitionRanking {
-        return restTemplate.getForEntity(
-            "https://api.nevobo.nl/export/poule/$regionId/$competitionId/$poolId/stand.rss",
-            String::class.java,
-        ).body?.let { responseBody ->
-            xmlMapper
-                .readValue(responseBody, RssFeed::class.java)
-                .internalize()
-        } ?: error("Could not fetch loaderboard from Nevobo")
-    }
+    ): CompetitionRanking =
+        restTemplate
+            .getForEntity(
+                "https://api.nevobo.nl/export/poule/$regionId/$competitionId/$poolId/stand.rss",
+                String::class.java,
+            ).body
+            ?.let { responseBody ->
+                xmlMapper
+                    .readValue(responseBody, RssFeed::class.java)
+                    .internalize()
+            } ?: error("Could not fetch loaderboard from Nevobo")
 
     private fun RssFeed.internalize() =
         CompetitionRanking(

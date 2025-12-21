@@ -11,7 +11,7 @@ class PotterService(
     private val bankService: BankService,
     private val userRepository: UserRepository,
 ) {
-    fun getPotters(
+    suspend fun getPotters(
         since: ZonedDateTime,
         includeInactiveUsers: Boolean,
         includeSupportRoles: Boolean,
@@ -40,7 +40,7 @@ class PotterService(
         )
     }
 
-    private fun getRelevantTransactions(
+    private suspend fun getRelevantTransactions(
         since: ZonedDateTime,
         includeSupportRoles: Boolean,
     ) = bankService
