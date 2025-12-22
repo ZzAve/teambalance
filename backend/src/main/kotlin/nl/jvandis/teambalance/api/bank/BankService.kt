@@ -68,14 +68,14 @@ class BankService(
         val validatedAccountId: Int = getValidatedAccountId(accountId)
         return bunqRepo
             .getTransactions(validatedAccountId.toLong())
-            .let {
+            .let { transactions ->
                 val aliases = getAllAliases()
                 val exclusions = getAllTransactionExclusions()
                 val transactions =
-                    it
-                        .filter { p -> !p.shouldBeExcluded(exclusions) }
-                        .map { transaction -> transaction.enrichWithAliasFrom(aliases) }
-                        .filter { t -> t.transaction.date > START_OF_SEASON_ZONED }
+                    transactions
+                        .filter { it.date > START_OF_SEASON_ZONED }
+                        .filter { !it.matchesExclusionCriteria(exclusions) }
+                        .map { it.enrichWithAliasFrom(aliases) }
 
                 Transactions(
                     transactions = transactions,
@@ -84,7 +84,15 @@ class BankService(
             }
     }
 
-    private fun Transaction.shouldBeExcluded(exclusions: List<TransactionExclusion>) =
+    /**
+     * Determines whether the transaction should be excluded based on the provided list
+     * of transaction exclusions. Exclusion conditions are checked against transaction
+     * ID, date, description, and counterparty details.
+     *
+     * @param exclusions A list of TransactionExclusion objects that represent the exclusion
+     * criteria, including optional transaction ID, date, description, and counterparty details.
+     */
+    private fun Transaction.matchesExclusionCriteria(exclusions: List<TransactionExclusion>) =
         exclusions.any { e ->
             (e.transactionId == null || id == e.transactionId) &&
                 (e.date == null || this.date.toLocalDate().isEqual(e.date)) &&

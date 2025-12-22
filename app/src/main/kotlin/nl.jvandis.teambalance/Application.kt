@@ -1,8 +1,6 @@
 package nl.jvandis.teambalance
 
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.future.future
 import kotlinx.coroutines.runBlocking
 import nl.jvandis.teambalance.api.bank.BankService
 import org.slf4j.Logger

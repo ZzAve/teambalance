@@ -53,6 +53,11 @@
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
         </dependency>
+        <dependency>
+            <groupId>nl.jvandis</groupId>
+            <artifactId>jooq-support</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.jooq</groupId>

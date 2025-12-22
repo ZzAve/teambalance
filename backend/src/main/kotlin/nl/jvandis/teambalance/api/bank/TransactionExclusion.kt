@@ -8,6 +8,12 @@ data class TransactionExclusions(
     val transactionExclusions: List<TransactionExclusion>,
 )
 
+/**
+ * Represents an exclusion of a transaction from team balance calculations.
+ *
+ * Conceptually, a transaction exclusion represents a block of rules that should be ignored for a specific team balance.
+ * This can be used to ignore transactions that are unrelated to the teambalance, or to course correct the potters / floppers
+ */
 data class TransactionExclusion(
     val id: Long = NO_ID,
     val teamBalanceId: TeamBalanceId,

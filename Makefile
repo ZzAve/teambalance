@@ -1,10 +1,8 @@
 .PHONY: *
-MAKEFLAGS += -j2
 
 # The first command will be invoked with `make` only and should be `build`
 build:
 	./mvnw install -Pformat
-
 
 ci:
 	./mvnw -B \
@@ -42,7 +40,8 @@ yolo:
 db:
 	docker compose up --wait postgresql
 
-run-local: run-local-backend run-local-frontend
+run-local:
+	docker compose up --wait backend frontend
 
 run-local-backend:
 	docker compose up --wait backend
@@ -52,5 +51,4 @@ rerun-local-backend:
 
 run-local-frontend:
 	docker compose up --wait frontend
-	#cd frontend && npm start
 
