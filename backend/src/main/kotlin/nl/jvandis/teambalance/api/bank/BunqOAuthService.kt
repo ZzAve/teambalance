@@ -1,5 +1,7 @@
 package nl.jvandis.teambalance.api.bank
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
+import com.fasterxml.jackson.databind.annotation.JsonNaming
 import nl.jvandis.teambalance.log
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -18,6 +20,7 @@ import java.util.UUID
 @Service
 class BunqOAuthService(
     private val bankConfig: BankConfig,
+    private val tokenService: BunqTokenService,
     private val restTemplate: RestTemplate = RestTemplate(),
 ) {
     companion object {
@@ -26,12 +29,8 @@ class BunqOAuthService(
 
         // Store state to prevent CSRF attacks
         private val stateMap = mutableMapOf<String, Long>()
-
-        // Store tokens (in a real application, these should be stored in a database)
-        private var accessToken: String? = null
-        private var refreshToken: String? = null
-        private var tokenExpiresAt: Long = 0
     }
+
 
     /**
      * Generates the authorization URL for the OAuth flow.
@@ -104,7 +103,6 @@ class BunqOAuthService(
         queryParams.add("client_secret", clientSecret)
         queryParams.add("redirect_uri", redirectUri)
 
-        
         try {
             val response =
                 restTemplate.exchange(
@@ -119,65 +117,14 @@ class BunqOAuthService(
 
             val tokenResponse = response.body
             if (tokenResponse != null) {
-                accessToken = tokenResponse.access_token
-//                refreshToken = tokenResponse.refresh_token
-//                tokenExpiresAt = System.currentTimeMillis() + (tokenResponse.expires_in * 1000)
+                tokenService.saveAccessToken(tokenResponse.accessToken)
+                // If the response includes a refresh token and expiration time, save those too
+                // tokenService.saveRefreshToken(tokenResponse.refresh_token)
+                // tokenService.saveTokenExpiresAt(System.currentTimeMillis() + (tokenResponse.expires_in * 1000))
                 return true
             }
         } catch (e: Exception) {
             log.error("Error exchanging authorization code for access token", e)
-        }
-
-        return false
-    }
-
-    /**
-     * Refreshes the access token using the refresh token.
-     *
-     * @return True if the refresh was successful, false otherwise.
-     */
-    fun refreshToken(): Boolean {
-        val currentRefreshToken =
-            refreshToken
-                ?: return false
-
-        val clientId =
-            bankConfig.bunq.oauthClientId
-                ?: throw IllegalStateException("OAuth client ID is not configured")
-        val clientSecret =
-            bankConfig.bunq.oauthClientSecret
-                ?: throw IllegalStateException("OAuth client secret is not configured")
-
-        // Exchange refresh token for new access token
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
-
-        val body: MultiValueMap<String, String> = LinkedMultiValueMap()
-        body.add("grant_type", "refresh_token")
-        body.add("refresh_token", currentRefreshToken)
-        body.add("client_id", clientId)
-        body.add("client_secret", clientSecret)
-
-        val request = HttpEntity(body, headers)
-
-        try {
-            val response =
-                restTemplate.exchange(
-                    BUNQ_OAUTH_TOKEN_URL,
-                    HttpMethod.POST,
-                    request,
-                    TokenResponse::class.java,
-                )
-
-            val tokenResponse = response.body
-            if (tokenResponse != null) {
-                accessToken = tokenResponse.access_token
-//                refreshToken = tokenResponse.refresh_token
-//                tokenExpiresAt = System.currentTimeMillis() + (tokenResponse.expires_in * 1000)
-                return true
-            }
-        } catch (e: Exception) {
-            log.error("Error refreshing access token", e)
         }
 
         return false
@@ -189,12 +136,7 @@ class BunqOAuthService(
      * @return The access token, or null if not authenticated.
      */
     fun getAccessToken(): String? {
-        // If token is expired or about to expire (within 5 minutes), refresh it
-        if (accessToken != null && System.currentTimeMillis() > tokenExpiresAt - (5 * 60 * 1000)) {
-            refreshToken()
-        }
-
-        return accessToken
+        return tokenService.getAccessToken()
     }
 
     /**
@@ -210,18 +152,16 @@ class BunqOAuthService(
      * Clears the authentication tokens.
      */
     fun clearAuthentication() {
-        accessToken = null
-        refreshToken = null
-        tokenExpiresAt = 0
+        tokenService.clearToken()
     }
 
     /**
      * Response object for the token endpoint.
      */
+
+    @JsonNaming(SnakeCaseStrategy::class)
     data class TokenResponse(
-        val access_token: String,
-        val token_type: String,
-//        val expires_in: Int,
-//        val refresh_token: String,
+        val accessToken: String,
+        val tokenType: String,
     )
 }

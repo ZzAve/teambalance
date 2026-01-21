@@ -65,7 +65,7 @@ public class BunqRepository {
                           @Nullable String apiKey,
                           Boolean saveSessionToFile) throws UnknownHostException {
         if (PRODUCTION == environmentType && apiKey == null) {
-            throw new IllegalArgumentException("Apikey is expected for production environment");
+            throw new IllegalStateException("No Bunq connection available. Please connect with Bunq first.");
         }
         log.info("Starting BunqRepository of type {}", environmentType);
 
@@ -233,7 +233,7 @@ public class BunqRepository {
 
 
     private void safeSave(ApiContext apiContext) {
-        if (saveSessionToFile) {
+        if (Boolean.TRUE.equals(saveSessionToFile)) {
             apiContext.save(determineBunqConfigFileName());
         } else {
             log.info("Skipping saving context to file");

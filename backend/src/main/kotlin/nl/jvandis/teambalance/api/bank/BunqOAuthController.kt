@@ -71,7 +71,7 @@ class BunqOAuthController(
      * @return A success response.
      */
     @PostMapping("/clear")
-    fun clearAuthentication(): ResponseEntity<Void> {
+    fun clearAuthentication(): ResponseEntity<Unit> {
         bunqOAuthService.clearAuthentication()
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
