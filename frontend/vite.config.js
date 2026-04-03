@@ -28,6 +28,7 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "0.0.0.0",
       port: 3000,
+      allowedHosts: ["localhost", "127.0.0.1", "frontend"],
       proxy: {
         "/api": `http://${env.VITE_SERVER_BACKEND || "localhost"}:8080`,
       },
