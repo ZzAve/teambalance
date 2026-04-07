@@ -1,6 +1,6 @@
 # Simple shell Dockerfile for local development purposes
 
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 # Set working directory
 WORKDIR /tmp
@@ -15,7 +15,7 @@ RUN --mount=type=cache,target=/tmp/.npm \
   npm ci
 #-------------------------------------------
 
-FROM node:20-alpine AS dev
+FROM node:22-alpine AS dev
 WORKDIR /usr/src/app
 
 COPY --from=base  /tmp/node_modules ./node_modules
