@@ -25,7 +25,7 @@
         <kotlinx-coroutines.version>1.9.0</kotlinx-coroutines.version>
         <jooq-extensions.version>3.18.7</jooq-extensions.version>
         <kminrandom.version>1.0.4</kminrandom.version>
-        <caffeine-coroutines.version>2.0.3</caffeine-coroutines.version>
+        <caffeine-coroutines.version>2.0.4</caffeine-coroutines.version>
     </properties>
 
     <dependencies>
