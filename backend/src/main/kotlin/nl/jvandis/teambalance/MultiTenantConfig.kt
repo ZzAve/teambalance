@@ -55,7 +55,9 @@ class MultiTenantConfig {
         )
 }
 
-internal class MyMultiTenantSpringLiquibase(private val hikariDataSource: HikariDataSource) : MultiTenantSpringLiquibase() {
+internal class MyMultiTenantSpringLiquibase(
+    private val hikariDataSource: HikariDataSource,
+) : MultiTenantSpringLiquibase() {
     init {
         dataSource = hikariDataSource
     }

@@ -37,13 +37,15 @@ class MatchWithAttendeesRecordHandler : TeamBalanceRecordHandler<Match> {
         val event =
             events.computeIfAbsent(eventId) {
                 // mapping via EventRecord works better with column name clashes (like `id`)
-                record.into(EventRecord::class.java)
+                record
+                    .into(EventRecord::class.java)
                     .into(Event.Builder::class.java)
             }
         val recurringEventProperties =
             recurringEventId?.let {
                 recurringEventsPropertiesMap.computeIfAbsent(it) {
-                    record.into(RecurringEventPropertiesRecord::class.java)
+                    record
+                        .into(RecurringEventPropertiesRecord::class.java)
                         .into(RecurringEventProperties::class.java)
                 }
             }
@@ -51,7 +53,8 @@ class MatchWithAttendeesRecordHandler : TeamBalanceRecordHandler<Match> {
         val match =
             matches.computeIfAbsent(matchId) {
                 // mapping via MatchRecord works better with column name clashes (like `id`)
-                record.into(MatchRecord::class.java) //
+                record
+                    .into(MatchRecord::class.java) //
                     .into(Match.Builder::class.java)
             }
 
@@ -59,15 +62,14 @@ class MatchWithAttendeesRecordHandler : TeamBalanceRecordHandler<Match> {
         match.event = event
     }
 
-    fun stats(): String {
-        return """
-            Nr of records handled: $recordsHandled. 
-            Nr of events: ${events.size}. 
-            Nr of subEvents: ${matches.size}. 
-            -- Attendees:
-            ${attendeeRecordHandler.stats()}
-            """.trimIndent()
-    }
+    fun stats(): String =
+        """
+        Nr of records handled: $recordsHandled. 
+        Nr of events: ${events.size}. 
+        Nr of subEvents: ${matches.size}. 
+        -- Attendees:
+        ${attendeeRecordHandler.stats()}
+        """.trimIndent()
 
     override fun build(): List<Match> =
         result ?: run {

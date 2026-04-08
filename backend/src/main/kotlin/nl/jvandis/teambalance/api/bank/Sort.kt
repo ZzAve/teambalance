@@ -8,18 +8,15 @@ enum class Sort {
     ;
 
     companion object {
-        fun fromValue(value: String): Sort {
-            return values()
+        fun fromValue(value: String): Sort =
+            values()
                 .firstOrNull { it.name.equals(value, ignoreCase = true) }
                 ?: throw IllegalArgumentException(
                     "Unknown sort type " + value + ", Allowed values are " + values().contentToString(),
                 )
-        }
     }
 }
 
 class StringToEnumConverter : Converter<String, Sort> {
-    override fun convert(source: String): Sort {
-        return Sort.fromValue(source)
-    }
+    override fun convert(source: String): Sort = Sort.fromValue(source)
 }

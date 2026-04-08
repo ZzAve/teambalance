@@ -19,8 +19,7 @@ class XmlConfiguration {
             JacksonXmlModule().apply {
                 setDefaultUseWrapper(false)
             },
-        )
-            .registerKotlinModule()
+        ).registerKotlinModule()
             .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
 }

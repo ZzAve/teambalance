@@ -8,26 +8,51 @@ data class Error(
     val reason: String,
 )
 
-open class InvalidIdException(val teamBalanceId: TeamBalanceId, val type: String) : RuntimeException()
+open class InvalidIdException(
+    val teamBalanceId: TeamBalanceId,
+    val type: String,
+) : RuntimeException()
 
-class InvalidUserException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "user")
+class InvalidUserException(
+    teamBalanceId: TeamBalanceId,
+) : InvalidIdException(teamBalanceId, "user")
 
-class InvalidTransactionException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "transaction")
+class InvalidTransactionException(
+    teamBalanceId: TeamBalanceId,
+) : InvalidIdException(teamBalanceId, "transaction")
 
-class InvalidAliasException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "alias")
+class InvalidAliasException(
+    teamBalanceId: TeamBalanceId,
+) : InvalidIdException(teamBalanceId, "alias")
 
-class InvalidTrainingException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "training")
+class InvalidTrainingException(
+    teamBalanceId: TeamBalanceId,
+) : InvalidIdException(teamBalanceId, "training")
 
-class InvalidMatchException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "match")
+class InvalidMatchException(
+    teamBalanceId: TeamBalanceId,
+) : InvalidIdException(teamBalanceId, "match")
 
-class InvalidMiscellaneousEventException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "miscellaneous-event")
+class InvalidMiscellaneousEventException(
+    teamBalanceId: TeamBalanceId,
+) : InvalidIdException(teamBalanceId, "miscellaneous-event")
 
-class InvalidEventException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "event")
+class InvalidEventException(
+    teamBalanceId: TeamBalanceId,
+) : InvalidIdException(teamBalanceId, "event")
 
-class InvalidAttendeeException(teamBalanceId: TeamBalanceId) : InvalidIdException(teamBalanceId, "attendee")
+class InvalidAttendeeException(
+    teamBalanceId: TeamBalanceId,
+) : InvalidIdException(teamBalanceId, "attendee")
 
-class InvalidSecretException(msg: String) : RuntimeException(msg)
+class InvalidSecretException(
+    msg: String,
+) : RuntimeException(msg)
 
-class DataConstraintViolationException(override val message: String) : RuntimeException()
+class DataConstraintViolationException(
+    override val message: String,
+) : RuntimeException()
 
-class CreateEventException(override val message: String) : RuntimeException()
+class CreateEventException(
+    override val message: String,
+) : RuntimeException()

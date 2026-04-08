@@ -72,27 +72,26 @@ class MiscellaneousEventService(
         val updatedMiscellaneousEvents =
             when (affectedRecurringEvents) {
                 CURRENT ->
-                    miscellaneousEventRepository.updateSingleEvent(
-                        event =
-                            originalMiscellaneousEvent.createUpdatedMiscellaneousEvent(
-                                updateMiscellaneousEventRequest,
-                            ),
-                        removeRecurringEvent = true,
-                    )
-                        .also {
+                    miscellaneousEventRepository
+                        .updateSingleEvent(
+                            event =
+                                originalMiscellaneousEvent.createUpdatedMiscellaneousEvent(
+                                    updateMiscellaneousEventRequest,
+                                ),
+                            removeRecurringEvent = true,
+                        ).also {
                             log.info(
                                 "Removed recurringEvent $teamBalanceId from MiscellaneousEvent with id $originalMiscellaneousEvent.id",
                             )
-                        }
-                        .let(::listOf)
+                        }.let(::listOf)
 
                 CURRENT_AND_FUTURE ->
-                    miscellaneousEventRepository.partitionRecurringEvent(
-                        currentRecurringEventId = teamBalanceId,
-                        startTime = originalMiscellaneousEvent.startTime,
-                        newRecurringEventId = TeamBalanceId.random(),
-                    )
-                        ?.also {
+                    miscellaneousEventRepository
+                        .partitionRecurringEvent(
+                            currentRecurringEventId = teamBalanceId,
+                            startTime = originalMiscellaneousEvent.startTime,
+                            newRecurringEventId = TeamBalanceId.random(),
+                        )?.also {
                             log.info(
                                 "Split the existing recurringEvent with id $teamBalanceId into 2 separate recurring events. " +
                                     "All events before ${originalMiscellaneousEvent.startTime} are part of recurring event " +
@@ -125,8 +124,8 @@ class MiscellaneousEventService(
         recurringEventId: TeamBalanceId,
         originalMiscellaneousEvent: MiscellaneousEvent,
         updateMiscellaneousEventRequest: UpdateMiscellaneousEventRequest,
-    ): List<MiscellaneousEvent> {
-        return miscellaneousEventRepository.updateAllFromRecurringEvent(
+    ): List<MiscellaneousEvent> =
+        miscellaneousEventRepository.updateAllFromRecurringEvent(
             recurringEventId = recurringEventId,
             examplarUpdatedEvent =
                 originalMiscellaneousEvent.createUpdatedMiscellaneousEvent(
@@ -138,7 +137,6 @@ class MiscellaneousEventService(
                     updateMiscellaneousEventRequest.startTime,
                 ),
         )
-    }
 
     private fun MiscellaneousEvent.createUpdatedMiscellaneousEvent(updateRequest: UpdateMiscellaneousEventRequest) =
         copy(

@@ -14,9 +14,7 @@ class SecretFilter(
     private val secretService: SecretService,
     private val handlerExceptionResolver: HandlerExceptionResolver,
 ) : OncePerRequestFilter() {
-    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-        return !request.requestURI.startsWith("/api")
-    }
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean = !request.requestURI.startsWith("/api")
 
     override fun destroy() {}
 
@@ -26,7 +24,8 @@ class SecretFilter(
         filterChain: FilterChain,
     ) {
         try {
-            request.getHeader(SECRET_HEADER)
+            request
+                .getHeader(SECRET_HEADER)
                 .let { secretService.ensureSecret(it) }
 
             // call next filter in the filter chain

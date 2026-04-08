@@ -23,9 +23,7 @@ interface TeamBalanceRecordHandler<OUT> : Consumer<Record> {
     fun build(): List<OUT>
 }
 
-fun <T> Record?.handleWith(recordHandler: TeamBalanceRecordHandler<T>): T? {
-    return recordHandler.acceptOneOrNull(this)
-}
+fun <T> Record?.handleWith(recordHandler: TeamBalanceRecordHandler<T>): T? = recordHandler.acceptOneOrNull(this)
 
 fun <T> Result<Record>.handleWith(recordHandler: TeamBalanceRecordHandler<T>): List<T> =
     this.forEach(recordHandler).let { recordHandler.build() }

@@ -56,8 +56,8 @@ class UtilsKtTest {
         val GOOD_FRIDAY: LocalDateTime = LocalDateTime.of(2023, 4, 7, 0, 0, 0)
 
         @JvmStatic
-        fun expectedNextDates(): Stream<Arguments> {
-            return Stream.of(
+        fun expectedNextDates(): Stream<Arguments> =
+            Stream.of(
                 arguments(
                     GOOD_FRIDAY,
                     Period.ofWeeks(1),
@@ -95,6 +95,5 @@ class UtilsKtTest {
                     GOOD_FRIDAY.minusDays(2).minusDays(7).plusMonths(3),
                 ),
             )
-        }
     }
 }

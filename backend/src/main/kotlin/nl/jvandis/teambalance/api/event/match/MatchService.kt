@@ -63,20 +63,20 @@ class MatchService(
         val updatedMatchs =
             when (affectedRecurringEvents) {
                 CURRENT ->
-                    matchRepository.updateSingleEvent(
-                        event = originalMatch.createUpdatedMatch(updateMatchRequest),
-                        removeRecurringEvent = true,
-                    )
-                        .also { log.info("Removed recurringEvent $teamBalanceId from Match with id $originalMatch.id") }
+                    matchRepository
+                        .updateSingleEvent(
+                            event = originalMatch.createUpdatedMatch(updateMatchRequest),
+                            removeRecurringEvent = true,
+                        ).also { log.info("Removed recurringEvent $teamBalanceId from Match with id $originalMatch.id") }
                         .let(::listOf)
 
                 CURRENT_AND_FUTURE ->
-                    matchRepository.partitionRecurringEvent(
-                        currentRecurringEventId = teamBalanceId,
-                        startTime = originalMatch.startTime,
-                        newRecurringEventId = TeamBalanceId.random(),
-                    )
-                        ?.also {
+                    matchRepository
+                        .partitionRecurringEvent(
+                            currentRecurringEventId = teamBalanceId,
+                            startTime = originalMatch.startTime,
+                            newRecurringEventId = TeamBalanceId.random(),
+                        )?.also {
                             log.info(
                                 "Split the existing recurringEvent with id $teamBalanceId into 2 separate recurring events. " +
                                     "All events before ${originalMatch.startTime} are part of recurring event " +
@@ -100,13 +100,12 @@ class MatchService(
         recurringEventId: TeamBalanceId,
         originalMatch: Match,
         updateMatchRequest: UpdateMatchRequest,
-    ): List<Match> {
-        return matchRepository.updateAllFromRecurringEvent(
+    ): List<Match> =
+        matchRepository.updateAllFromRecurringEvent(
             recurringEventId = recurringEventId,
             examplarUpdatedEvent = originalMatch.createUpdatedMatch(updateMatchRequest),
             durationToAddToEachEvent = Duration.between(originalMatch.startTime, updateMatchRequest.startTime),
         )
-    }
 
     fun Match.createUpdatedMatch(updateMatchRequestBody: UpdateMatchRequest) =
         copy(
