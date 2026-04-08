@@ -30,12 +30,10 @@
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <ktlint.format.skip>true</ktlint.format.skip>
         <verification.skip>false</verification.skip>
 
         <jib-maven-plugin.version>3.5.1</jib-maven-plugin.version>
-        <ktlint.version>0.51.0-FINAL</ktlint.version>
-        <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
+        <spotless.version>2.44.4</spotless.version>
         <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
         <mockito-kotlin.version>4.0.0</mockito-kotlin.version>
         <testcontainers.version>2.0.4</testcontainers.version>
@@ -108,6 +106,28 @@
                     <configuration>
                         <skip>true</skip>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>${spotless.version}</version>
+                    <configuration>
+                        <kotlin>
+                            <includes>
+                                <include>src/main/kotlin/**/*.kt</include>
+                                <include>src/test/kotlin/**/*.kt</include>
+                            </includes>
+                            <ktlint/>
+                        </kotlin>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>check</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -228,59 +248,8 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <configuration>
-                    <skip>${verification.skip}</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>ktlint</id>
-                        <phase>verify</phase>
-                        <inherited>false</inherited>
-                        <configuration>
-                            <target name="ktlint">
-                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
-                                      classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
-                                    <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
-                                    <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
-                                    <arg value="*/src/**/*.kt"/>
-                                </java>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>ktlint-format</id>
-                        <inherited>false</inherited>
-                        <configuration>
-                            <skip>${ktlint.format.skip}</skip>
-                            <target name="ktlint">
-                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
-                                      classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
-                                    <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
-                                    <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
-                                    <arg value="-F"/>
-                                    <arg value="*/src/**/*.kt"/>
-                                </java>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <phase>validate</phase>
-
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.pinterest</groupId>
-                        <artifactId>ktlint</artifactId>
-                        <version>${ktlint.version}</version>
-                    </dependency>
-                </dependencies>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
             </plugin>
 
         </plugins>
@@ -298,12 +267,26 @@
                 </dependency>
             </dependencies>
         </profile>
-            <profile>
-                <id>format</id>
-                <properties>
-                    <ktlint.format.skip>false</ktlint.format.skip>
-                </properties>
-            </profile>
+        <profile>
+            <id>format</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.diffplug.spotless</groupId>
+                        <artifactId>spotless-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>format</id>
+                                <goals>
+                                    <goal>apply</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
     </profiles>
     <repositories>
