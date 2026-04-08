@@ -17,7 +17,7 @@ e2e:
 	(rm -rf ./e2e/playwright-report/index.html || true) && \
 		mkdir -p ./e2e/playwright-report && \
 		(echo "E2E tests are running ... " > ./e2e/playwright-report/index.html) && \
-		docker compose up --wait --build && docker compose logs e2e -f
+		docker compose up --build --exit-code-from e2e
 
 e2e-report:
 	cd e2e && npm run report
