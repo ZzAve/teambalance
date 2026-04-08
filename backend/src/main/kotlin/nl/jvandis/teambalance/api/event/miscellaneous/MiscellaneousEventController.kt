@@ -156,7 +156,8 @@ class MiscellaneousEventController(
                         .groupBy { it.eventId }
                 }
 
-        return savedEvents.map { it.expose(savedAttendeesByEvent[it.teamBalanceId] ?: listOf()) }
+        return savedEvents
+            .map { it.expose(savedAttendeesByEvent[it.teamBalanceId] ?: listOf()) }
             .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
             .also {
                 log.info(
@@ -210,7 +211,8 @@ class MiscellaneousEventController(
         val miscellaneousTeamBalanceId = TeamBalanceId(eventId)
         log.info("Updating miscellaneousEvent $miscellaneousTeamBalanceId with $updateEventRequest")
 
-        return miscellaneousEventService.updateMiscellaneousEvent(miscellaneousTeamBalanceId, affectedRecurringEvents, updateEventRequest)
+        return miscellaneousEventService
+            .updateMiscellaneousEvent(miscellaneousTeamBalanceId, affectedRecurringEvents, updateEventRequest)
             .expose(attendees = emptyList())
             .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
             .also { log.info("Updated miscellaneousEvent $miscellaneousTeamBalanceId") }
@@ -228,12 +230,14 @@ class MiscellaneousEventController(
         log.info("Deleting event: $eventTeamBalanceId")
 
         if (deleteAttendees) {
-            attendeeRepository.findAllAttendeesBelongingToEvent(eventTeamBalanceId, affectedRecurringEvents)
+            attendeeRepository
+                .findAllAttendeesBelongingToEvent(eventTeamBalanceId, affectedRecurringEvents)
                 .let { attendeeRepository.deleteAll(it) }
         }
 
         try {
-            return eventRepository.deleteById(eventTeamBalanceId, affectedRecurringEvents)
+            return eventRepository
+                .deleteById(eventTeamBalanceId, affectedRecurringEvents)
                 .let(::DeletedEventsResponse)
         } catch (e: DataIntegrityViolationException) {
             throw DataConstraintViolationException(

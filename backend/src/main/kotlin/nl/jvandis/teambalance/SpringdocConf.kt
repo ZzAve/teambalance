@@ -48,47 +48,44 @@ class SpringdocConf {
     @Bean
     fun customOpenAPI(
         @Value("\${app.version}") appVersion: String,
-    ): OpenAPI {
-        return OpenAPI()
+    ): OpenAPI =
+        OpenAPI()
             .components(
                 Components().addSecuritySchemes(
                     "basicScheme",
                     SecurityScheme().type(SecurityScheme.Type.APIKEY).`in`(SecurityScheme.In.HEADER).name("X-Secret"),
                 ),
-            )
-            .security(listOf(SecurityRequirement().addList("basicScheme")))
+            ).security(listOf(SecurityRequirement().addList("basicScheme")))
             .info(
                 Info()
                     .title("Teambalance API")
                     .version(appVersion),
             )
-    }
 
     @Bean
-    fun publicApi(): GroupedOpenApi {
-        return GroupedOpenApi.builder()
+    fun publicApi(): GroupedOpenApi =
+        GroupedOpenApi
+            .builder()
             .group("public")
             .pathsToMatch("/*")
             .addOpenApiMethodFilter(this::isPublicMethod)
             .build()
-    }
 
     @Bean
-    fun adminApi(): GroupedOpenApi {
-        return GroupedOpenApi.builder()
+    fun adminApi(): GroupedOpenApi =
+        GroupedOpenApi
+            .builder()
             .group("admin")
             .pathsToMatch("/*")
             .addOpenApiMethodFilter(this::isAdminMethod)
             .build()
-    }
 
     private fun isPublicMethod(method: Method) = !isAdminMethod(method)
 
     private fun isAdminMethod(method: Method) = !isExplicitlyPublic(method) && isMethodMarkedAsAdmin(method)
 
-    private fun isMethodMarkedAsAdmin(method: Method): Boolean {
-        return method.isAnnotationPresent(Admin::class.java) || method.declaringClass.isAnnotationPresent(Admin::class.java)
-    }
+    private fun isMethodMarkedAsAdmin(method: Method): Boolean =
+        method.isAnnotationPresent(Admin::class.java) || method.declaringClass.isAnnotationPresent(Admin::class.java)
 
     private fun isExplicitlyPublic(method: Method) = method.isAnnotationPresent(Public::class.java)
 }

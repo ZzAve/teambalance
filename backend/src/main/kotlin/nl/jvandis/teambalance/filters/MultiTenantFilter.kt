@@ -46,7 +46,9 @@ data class TenantsConfig(
     }
 
     @JvmInline
-    value class Secret(val value: String) {
+    value class Secret(
+        val value: String,
+    ) {
         override fun toString() = "Secret[***]"
     }
 }

@@ -15,7 +15,8 @@ class UserRepository(
     val context: MultiTenantDslContext,
 ) {
     fun findByIdOrNull(userId: TeamBalanceId): User? =
-        context.select()
+        context
+            .select()
             .from(UZER)
             .where(UZER.TEAM_BALANCE_ID.eq(userId.value))
             .fetchOne()
@@ -24,7 +25,8 @@ class UserRepository(
 
     // TODO: add sort
     fun findAll(sort: Sort = Sort.unsorted()): List<User> =
-        context.select()
+        context
+            .select()
             .from(UZER)
             .orderBy(UZER.NAME.asc())
             .fetchInto(User::class.java)
@@ -34,17 +36,17 @@ class UserRepository(
             return emptyList()
         }
         val usersResult =
-            context.insertInto(
-                UZER,
-                UZER.TEAM_BALANCE_ID,
-                UZER.ROLE,
-                UZER.NAME,
-                UZER.IS_ACTIVE,
-                UZER.SHOW_FOR_MATCHES,
-                UZER.SHOW_FOR_TRAININGS,
-                UZER.JERSEY_NUMBER,
-            )
-                .valuesFrom(
+            context
+                .insertInto(
+                    UZER,
+                    UZER.TEAM_BALANCE_ID,
+                    UZER.ROLE,
+                    UZER.NAME,
+                    UZER.IS_ACTIVE,
+                    UZER.SHOW_FOR_MATCHES,
+                    UZER.SHOW_FOR_TRAININGS,
+                    UZER.JERSEY_NUMBER,
+                ).valuesFrom(
                     users,
                     { it.teamBalanceId.value },
                     { it.role },
@@ -53,8 +55,7 @@ class UserRepository(
                     { it.showForMatches },
                     { it.showForTrainings },
                     { it.jerseyNumber },
-                )
-                .returningResult(UZER.fields().toList())
+                ).returningResult(UZER.fields().toList())
                 .fetch()
                 .into(User::class.java)
 
@@ -67,7 +68,8 @@ class UserRepository(
 
     fun deleteById(userId: TeamBalanceId) {
         val execute =
-            context.deleteFrom(UZER)
+            context
+                .deleteFrom(UZER)
                 .where(UZER.TEAM_BALANCE_ID.eq(userId.value))
                 .execute()
         if (execute != 1) {
@@ -102,8 +104,7 @@ class UserRepository(
                 UZER.SHOW_FOR_MATCHES,
                 UZER.SHOW_FOR_TRAININGS,
                 UZER.JERSEY_NUMBER,
-            )
-            .fetchOne()
+            ).fetchOne()
             ?.into(UzerRecord::class.java)
             ?.into(User::class.java)
             ?: throw DataAccessException("Could not update user with id ${updatedUser.id}")

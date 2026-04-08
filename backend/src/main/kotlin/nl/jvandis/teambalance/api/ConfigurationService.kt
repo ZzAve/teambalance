@@ -15,9 +15,10 @@ class ConfigurationService(
     fun <T : Any> getConfig(
         key: String,
         clazz: KClass<T>,
-    ): T {
-        return try {
-            repository.getConfig(key)
+    ): T =
+        try {
+            repository
+                .getConfig(key)
                 ?.let { objectMapper.readValue(it, clazz.java) }
                 ?: throw NoConfigFound("There was no configuration found for config with key '$key'")
         } catch (e: JsonProcessingException) {
@@ -25,20 +26,18 @@ class ConfigurationService(
         } catch (e: JsonMappingException) {
             throw MalformedConfigFound("Config for '$key' seems to be malformed. Expected type $clazz", e)
         }
-    }
 
     fun <T : Any> getConfig(
         key: String,
         clazz: KClass<T>,
         default: T,
-    ): T {
-        return try {
+    ): T =
+        try {
             getConfig(key, clazz)
         } catch (e: NoConfigFound) {
             log.warn("Could not find any config for '$key'. Using fallback  $default")
             default
         }
-    }
 }
 
 sealed class ConfigurationServiceException(

@@ -25,7 +25,8 @@ class WebConfig : WebMvcConfigurer {
     }
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
-        registry.addResourceHandler("/**", "/", "")
+        registry
+            .addResourceHandler("/**", "/", "")
             .addResourceLocations("classpath:/static/")
             .resourceChain(true)
             .addResolver(

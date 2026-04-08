@@ -11,20 +11,20 @@ import org.springframework.web.client.RestTemplate
 @Configuration
 class AppConfig {
     @Bean
-    fun restTemplate(): RestTemplate {
-        return RestTemplate()
-    }
+    fun restTemplate(): RestTemplate = RestTemplate()
 
     @Bean
     fun objectMapper(): ObjectMapper =
         ObjectMapper()
             .registerKotlinModule()
             .registerModules(
-                com.fasterxml.jackson.datatype.jsr310.JavaTimeModule(),
-                com.fasterxml.jackson.datatype.jdk8.Jdk8Module(),
-                com.fasterxml.jackson.dataformat.xml.JacksonXmlModule(),
-            )
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                com.fasterxml.jackson.datatype.jsr310
+                    .JavaTimeModule(),
+                com.fasterxml.jackson.datatype.jdk8
+                    .Jdk8Module(),
+                com.fasterxml.jackson.dataformat.xml
+                    .JacksonXmlModule(),
+            ).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
 }

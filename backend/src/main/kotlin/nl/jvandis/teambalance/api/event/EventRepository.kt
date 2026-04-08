@@ -18,7 +18,8 @@ class EventRepository(
      * Returns whether an event with id {@code eventId} exists
      */
     fun exists(eventId: TeamBalanceId): Boolean =
-        context.select(count())
+        context
+            .select(count())
             .from(EVENT)
             .where(EVENT.TEAM_BALANCE_ID.eq(eventId.value))
             .fetchOne()
@@ -26,7 +27,8 @@ class EventRepository(
             ?: false
 
     fun findInternalId(eventId: TeamBalanceId): Long? =
-        context.select()
+        context
+            .select()
             .from(EVENT)
             .where(EVENT.TEAM_BALANCE_ID.eq(eventId.value))
             .fetchOne()
@@ -45,16 +47,14 @@ fun MultiTenantDslContext.insertRecurringEventPropertyRecord(event: Event): Recu
             RECURRING_EVENT_PROPERTIES.AMOUNT_LIMIT,
             RECURRING_EVENT_PROPERTIES.DATE_LIMIT,
             RECURRING_EVENT_PROPERTIES.SELECTED_DAYS,
-        )
-            .values(
-                recurringEventProperties.teamBalanceId.value,
-                recurringEventProperties.intervalAmount,
-                recurringEventProperties.intervalTimeUnit,
-                recurringEventProperties.amountLimit,
-                recurringEventProperties.dateLimit,
-                recurringEventProperties.selectedDays.toTypedArray(),
-            )
-            .returningResult(RECURRING_EVENT_PROPERTIES.fields().toList())
+        ).values(
+            recurringEventProperties.teamBalanceId.value,
+            recurringEventProperties.intervalAmount,
+            recurringEventProperties.intervalTimeUnit,
+            recurringEventProperties.amountLimit,
+            recurringEventProperties.dateLimit,
+            recurringEventProperties.selectedDays.toTypedArray(),
+        ).returningResult(RECURRING_EVENT_PROPERTIES.fields().toList())
             .fetchOne()
             ?: throw DataAccessException("Couldn't persist RECURRING_EVENT_PROPERTIES for $event")
 

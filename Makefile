@@ -26,7 +26,7 @@ deploy:
 	./mvnw -B clean verify jib:build -DskipTests -Dnpm.lint.skip
 
 format:
-	./mvnw test-compile -Pformat
+	./mvnw process-sources -Pformat
 
 clean:
 	./mvnw clean && docker compose down

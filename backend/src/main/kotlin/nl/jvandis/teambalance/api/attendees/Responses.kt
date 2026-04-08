@@ -3,7 +3,9 @@ package nl.jvandis.teambalance.api.attendees
 import nl.jvandis.teambalance.api.users.UserResponse
 import nl.jvandis.teambalance.api.users.expose
 
-data class AttendeesResponse(val attendees: List<AttendeeResponse>)
+data class AttendeesResponse(
+    val attendees: List<AttendeeResponse>,
+)
 
 data class AttendeeResponse(
     val id: String,

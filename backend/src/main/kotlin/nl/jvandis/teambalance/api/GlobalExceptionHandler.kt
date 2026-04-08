@@ -20,7 +20,8 @@ class GlobalExceptionHandler {
     @ExceptionHandler(InvalidSecretException::class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     fun handleSecretExceptions(e: InvalidSecretException) =
-        ResponseEntity.status(HttpStatus.FORBIDDEN)
+        ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
             .body(
                 Error(
                     status = HttpStatus.FORBIDDEN,
@@ -31,7 +32,8 @@ class GlobalExceptionHandler {
     @ExceptionHandler(InvalidDateTimeException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleDateTimeExceptions(e: InvalidDateTimeException) =
-        ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
@@ -99,8 +101,8 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidIdException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    fun handleInvalidRequestArguments(e: InvalidIdException): ResponseEntity<Error> {
-        return ResponseEntity
+    fun handleInvalidRequestArguments(e: InvalidIdException): ResponseEntity<Error> =
+        ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(
                 Error(
@@ -108,12 +110,11 @@ class GlobalExceptionHandler {
                     reason = "Could not find ${e.type} item with Id ${e.teamBalanceId} ",
                 ),
             )
-    }
 
     @ExceptionHandler(DataConstraintViolationException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun handleDataConstraintValidationExceptions(e: DataConstraintViolationException): ResponseEntity<Error> {
-        return ResponseEntity
+    fun handleDataConstraintValidationExceptions(e: DataConstraintViolationException): ResponseEntity<Error> =
+        ResponseEntity
             .badRequest()
             .body(
                 Error(
@@ -121,11 +122,11 @@ class GlobalExceptionHandler {
                     reason = e.message,
                 ),
             )
-    }
 
     @ExceptionHandler(CreateEventException::class)
     fun handleCreateEventException(e: CreateEventException) =
-        ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
@@ -135,7 +136,8 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgumentException(e: IllegalArgumentException) =
-        ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
             .body(
                 Error(
                     status = HttpStatus.BAD_REQUEST,
@@ -146,7 +148,8 @@ class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException::class)
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
     fun handleAccessDeniedException(e: AccessDeniedException) =
-        ResponseEntity.status(HttpStatus.FORBIDDEN)
+        ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
             .body(
                 Error(
                     status = HttpStatus.FORBIDDEN,

@@ -20,24 +20,36 @@ class SecurityConfiguration {
             .authorizeHttpRequests { requests ->
                 requests
                     // Permit public API calls
-                    .requestMatchers("/api/**").permitAll()
+                    .requestMatchers("/api/**")
+                    .permitAll()
                     // Require auth on internal pages
-                    .requestMatchers("/internal/**").fullyAuthenticated()
-                    .requestMatchers("/webjars/**").fullyAuthenticated()
+                    .requestMatchers("/internal/**")
+                    .fullyAuthenticated()
+                    .requestMatchers("/webjars/**")
+                    .fullyAuthenticated()
                     // Be lean on resource files
-                    .requestMatchers("/**.html").permitAll()
-                    .requestMatchers("/**.js").permitAll()
-                    .requestMatchers("/**.css").permitAll()
-                    .requestMatchers("/**.ico").permitAll()
-                    .requestMatchers("/**.png").permitAll()
-                    .requestMatchers("/**.jpg").permitAll()
-                    .requestMatchers("/manifest.json").permitAll()
+                    .requestMatchers("/**.html")
+                    .permitAll()
+                    .requestMatchers("/**.js")
+                    .permitAll()
+                    .requestMatchers("/**.css")
+                    .permitAll()
+                    .requestMatchers("/**.ico")
+                    .permitAll()
+                    .requestMatchers("/**.png")
+                    .permitAll()
+                    .requestMatchers("/**.jpg")
+                    .permitAll()
+                    .requestMatchers("/manifest.json")
+                    .permitAll()
                     // Permit frontend paths
-                    .requestMatchers("/_ah/**").permitAll() // check this one!
-                    .requestMatchers("/**").permitAll()
-                    .anyRequest().authenticated()
-            }
-            .formLogin(withDefaults())
+                    .requestMatchers("/_ah/**")
+                    .permitAll() // check this one!
+                    .requestMatchers("/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
+            }.formLogin(withDefaults())
             .httpBasic(withDefaults())
 
         return http.build()

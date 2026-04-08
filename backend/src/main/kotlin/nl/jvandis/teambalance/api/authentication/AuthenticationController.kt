@@ -14,11 +14,9 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @Tag(name = "authentication")
 @RequestMapping(path = ["api/authentication"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class AuthenticationController() {
+class AuthenticationController {
     @GetMapping
-    fun authenticate(): Success {
-        return Success()
-    }
+    fun authenticate(): Success = Success()
 
     data class Success(
         val message: String = "You have managed to get access. Well done",
@@ -26,7 +24,8 @@ class AuthenticationController() {
 
     @ExceptionHandler(InvalidSecretException::class)
     fun handleSecretExceptions(e: InvalidSecretException) =
-        ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
             .body(
                 Error(
                     status = HttpStatus.UNAUTHORIZED,

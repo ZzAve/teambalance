@@ -44,7 +44,6 @@ Processing times:
 | sample size:  |  ${timings.size}|
 | mean μ:       |  $mean ms|
 | std δ:        |  ${round(standardDeviation)} ms|
-                        """
-            .trimMargin(),
+        """.trimMargin(),
     )
 }

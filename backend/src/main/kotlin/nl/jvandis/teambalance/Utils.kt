@@ -22,7 +22,9 @@ internal inline val <reified T> T.log: Logger
     get() = LoggerFactory.getLogger(T::class.java)
 
 @JvmInline
-value class TeamBalanceId private constructor(val value: String) {
+value class TeamBalanceId private constructor(
+    val value: String,
+) {
     companion object {
         fun create() = invoke(UUID.randomUUID().toString())
 

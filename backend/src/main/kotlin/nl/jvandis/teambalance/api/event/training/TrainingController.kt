@@ -156,7 +156,8 @@ class TrainingController(
                         .groupBy { it.eventId }
                 }
 
-        return savedEvents.map { it.expose(savedAttendeesByEvent[it.teamBalanceId] ?: listOf()) }
+        return savedEvents
+            .map { it.expose(savedAttendeesByEvent[it.teamBalanceId] ?: listOf()) }
             .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
             .also {
                 val firstEvent = it.events.firstOrNull()
@@ -213,7 +214,8 @@ class TrainingController(
     ): EventsResponse<TrainingResponse> {
         val trainingTeamBalanceId = TeamBalanceId(trainingId)
         log.info("Updating training $trainingTeamBalanceId with $updateTrainingRequest")
-        return trainingService.updateTraining(trainingTeamBalanceId, affectedRecurringEvents, updateTrainingRequest)
+        return trainingService
+            .updateTraining(trainingTeamBalanceId, affectedRecurringEvents, updateTrainingRequest)
             .expose(attendees = emptyList())
             .let { EventsResponse(it.size.toLong(), 1, 1, it.size, it) }
             .also { log.info("Updated training $trainingTeamBalanceId") }
@@ -234,8 +236,7 @@ class TrainingController(
                         trainer = potentialTrainer,
                     )
                 eventRepository.updateSingleEvent(updatedTraining)
-            }
-            ?.expose(emptyList())
+            }?.expose(emptyList())
             ?.also { log.info("Updated trainer of training $trainingTeamBalanceId. New trainer ${it.trainer}") }
             ?: throw InvalidTrainingException(trainingTeamBalanceId)
     }
@@ -262,12 +263,14 @@ class TrainingController(
         val trainingTeamBalanceId = TeamBalanceId(trainingId)
         log.info("Deleting training: $trainingTeamBalanceId")
         if (deleteAttendees) {
-            attendeeRepository.findAllAttendeesBelongingToEvent(trainingTeamBalanceId, affectedRecurringEvents)
+            attendeeRepository
+                .findAllAttendeesBelongingToEvent(trainingTeamBalanceId, affectedRecurringEvents)
                 .let { attendeeRepository.deleteAll(it) }
         }
 
         try {
-            return eventRepository.deleteById(trainingTeamBalanceId, affectedRecurringEvents)
+            return eventRepository
+                .deleteById(trainingTeamBalanceId, affectedRecurringEvents)
                 .let(::DeletedEventsResponse)
         } catch (e: DataIntegrityViolationException) {
             throw DataConstraintViolationException(
