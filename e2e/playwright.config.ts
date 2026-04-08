@@ -22,6 +22,11 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
+  /* Auth restoration via localStorage involves an API call (up to 6s) before
+     the app redirects from /authenticate to the Overview. Increase timeouts
+     so tests don't race against the startup auth flow. */
+  timeout: 60000,
+  expect: { timeout: 15000 },
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ["html", { open: "never" }],
