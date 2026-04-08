@@ -38,11 +38,12 @@ class AbstractIntegrationTest {
             postgresqlContainer.start()
             runLiquibaseMigrations()
 
-            TestPropertyValues.of(
-                "spring.datasource.username=${postgresqlContainer.username}",
-                "spring.datasource.password=${postgresqlContainer.password}",
-                "spring.datasource.url=${postgresqlContainer.jdbcUrl}",
-            ).applyTo(configurableApplicationContext.environment)
+            TestPropertyValues
+                .of(
+                    "spring.datasource.username=${postgresqlContainer.username}",
+                    "spring.datasource.password=${postgresqlContainer.password}",
+                    "spring.datasource.url=${postgresqlContainer.jdbcUrl}",
+                ).applyTo(configurableApplicationContext.environment)
         }
 
         private fun runLiquibaseMigrations() {

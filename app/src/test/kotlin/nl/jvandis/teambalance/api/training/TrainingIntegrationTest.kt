@@ -22,21 +22,21 @@ class TrainingIntegrationTest : AbstractIntegrationTest() {
     @Test
     fun basicTraining() {
         val greeting = "Hello Testcontainers with Kotlin"
-        mockMvc.post("/api/trainings") {
-            content = greeting
-            contentType = MediaType.APPLICATION_JSON
-            header("X-Secret", "dGVhbWJhbGFuY2U=")
-            header("Host", "5.teambalance.local")
-        }
-            .andExpect {
+        mockMvc
+            .post("/api/trainings") {
+                content = greeting
+                contentType = MediaType.APPLICATION_JSON
+                header("X-Secret", "dGVhbWJhbGFuY2U=")
+                header("Host", "5.teambalance.local")
+            }.andExpect {
                 status { isBadRequest() }
             }
 
-        mockMvc.get("/api/trainings") {
-            header("X-Secret", "dGVhbWJhbGFuY2U=")
-            header("Host", "5.teambalance.local")
-        }
-            .andExpect {
+        mockMvc
+            .get("/api/trainings") {
+                header("X-Secret", "dGVhbWJhbGFuY2U=")
+                header("Host", "5.teambalance.local")
+            }.andExpect {
                 status { isOk() }
             }
     }
