@@ -18,3 +18,5 @@ src/main/webapp
 .env.*
 !.env.*.template
 *.pem
+
+.worktrees
