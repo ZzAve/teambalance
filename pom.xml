@@ -180,7 +180,6 @@
                 <configuration>
                     <args>
                         <arg>-Xjsr305=strict</arg>
-                        <arg>-Xcontext-receivers</arg>
                     </args>
                     <compilerPlugins>
                         <plugin>spring</plugin>
