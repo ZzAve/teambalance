@@ -7,27 +7,23 @@ export const createTrainingEvent = async (
   date: Date = addDays(NOW, 1),
 ) => {
   await page.getByRole("button", { name: "nieuwe training" }).click();
-  await page
-    .locator("div")
-    .filter({ hasText: /^Datum \/ tijd$/ })
-    .first()
-    .click();
-  await page.getByLabel("calendar view is open, go to").click();
 
-  const formattedDate = date
-    .toLocaleString("nl-NL", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-    .replace(",", "");
-  await page.getByPlaceholder("dd-mm-yyyy hh:mm").fill(formattedDate);
+  // Build the date string manually to avoid locale/OS differences across browsers.
+  // MUI MobileDateTimePicker input expects "dd-mm-yyyy hh:mm" (Dutch format).
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const formattedDate =
+    [pad(date.getDate()), pad(date.getMonth() + 1), String(date.getFullYear())].join("-") +
+    " " +
+    [pad(date.getHours()), pad(date.getMinutes())].join(":");
+
+  // Click the input directly to avoid relying on MUI's dialog ARIA labels,
+  // which are not reliably exposed in webkit. Then type the value
+  // sequentially so the masked input registers each keystroke.
+  const dateInput = page.getByPlaceholder("dd-mm-yyyy hh:mm");
+  await dateInput.click();
+  await dateInput.pressSequentially(formattedDate, { delay: 50 });
 
   await page.getByRole("button", { name: "OK", exact: true }).click();
-
-  // await page.getByLabel("Choose date, selected date is 28 dec").click();
 
   await page.getByLabel("Locatie *").fill("Test locatie");
   await page.getByLabel("Opmerking").fill(comment);
