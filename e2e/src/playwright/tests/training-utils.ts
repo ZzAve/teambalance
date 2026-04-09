@@ -1,33 +1,62 @@
 import { expect, Page } from "@playwright/test";
 import { addDays, ensure, NOW } from "./utils";
 
+/**
+ * Pick a date+time in the MUI MobileDateTimePicker dialog.
+ *
+ * Strategy: open dialog → switch to text-input view (pen icon) →
+ *           type date + time into the text fields → confirm with OK.
+ *
+ * Previous approaches that used calendar month-navigation + gridcell clicking
+ * broke because MUI renders duplicate day gridcells (overflow days from
+ * adjacent months or transition animation artifacts). Using the text-input
+ * view avoids all of that.
+ */
+async function pickDateTime(page: Page, date: Date) {
+  // Open the MUI MobileDateTimePicker dialog by clicking the date input.
+  const dateInput = page.getByRole("textbox", { name: /Choose date/ });
+  await dateInput.waitFor({ state: "visible" });
+  await dateInput.click();
+
+  const dialog = page.getByRole("dialog");
+  await dialog.waitFor({ state: "visible" });
+
+  // Switch to text-input view immediately. The button label is
+  // "calendar view is open, go to text input view" (or similar).
+  const textInputToggle = dialog.getByRole("button", {
+    name: /text input/i,
+  });
+  await textInputToggle.click();
+
+  // In text-input mode, MUI v5 renders ONE combined date-time input field.
+  // Format for nl locale with 24h time: dd-mm-yyyy hh:mm
+  const pad2 = (n: number) => String(n).padStart(2, "0");
+
+  // MUI's masked input auto-inserts separators when you type digits only.
+  const digits = `${pad2(date.getDate())}${pad2(date.getMonth() + 1)}${date.getFullYear()}${pad2(date.getHours())}${pad2(date.getMinutes())}`;
+
+  // The single combined field — only one textbox exists in the dialog in keyboard mode.
+  const combinedInput = dialog.getByRole("textbox");
+  await combinedInput.waitFor({ state: "visible" });
+  await combinedInput.click();
+  await combinedInput.pressSequentially(digits);
+
+  // Confirm the selection
+  await dialog.getByRole("button", { name: "OK", exact: true }).click();
+
+  // Wait for the dialog to close
+  await dialog.waitFor({ state: "hidden" });
+}
+
 export const createTrainingEvent = async (
   page: Page,
   comment: string,
   date: Date = addDays(NOW, 1),
 ) => {
   await page.getByRole("button", { name: "nieuwe training" }).click();
-  await page
-    .locator("div")
-    .filter({ hasText: /^Datum \/ tijd$/ })
-    .first()
-    .click();
-  await page.getByLabel("calendar view is open, go to").click();
 
-  const formattedDate = date
-    .toLocaleString("nl-NL", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-    .replace(",", "");
-  await page.getByPlaceholder("dd-mm-yyyy hh:mm").fill(formattedDate);
-
-  await page.getByRole("button", { name: "OK", exact: true }).click();
-
-  // await page.getByLabel("Choose date, selected date is 28 dec").click();
+  // Use the MUI MobileDateTimePicker dialog to set the date.
+  await pickDateTime(page, date);
 
   await page.getByLabel("Locatie *").fill("Test locatie");
   await page.getByLabel("Opmerking").fill(comment);
@@ -42,7 +71,12 @@ export const createTrainingEvent = async (
   const matches = snackbarText?.match(/id ([a-f0-9-]+)/);
   const eventId = matches && matches[1];
 
-  await page.getByRole("alert").getByRole("button").click();
+  // Dismiss the snackbar. The MUI Snackbar auto-hides and the button can
+  // become detached mid-click. Try clicking, but if it fails just wait for
+  // the snackbar to disappear on its own.
+  const alertDismiss = page.getByRole("alert").getByRole("button");
+  await alertDismiss.click({ timeout: 3000 }).catch(() => {});
+  await page.getByRole("alert").waitFor({ state: "hidden", timeout: 10000 }).catch(() => {});
   return ensure(eventId, "event training Id");
 };
 
@@ -56,7 +90,8 @@ export async function updateTraining(page: Page, eventId: string) {
   await expect(page.getByRole("alert")).toContainText(
     `Training event (id ${eventId}) geüpdate`,
   );
-  await page.getByRole("alert").getByRole("button").click();
+  await page.getByRole("alert").getByRole("button").click({ timeout: 3000 }).catch(() => {});
+  await page.getByRole("alert").waitFor({ state: "hidden", timeout: 10000 }).catch(() => {});
 }
 
 export async function deleteTraining(page: Page, eventId: string | void) {
