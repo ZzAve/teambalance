@@ -20,7 +20,7 @@ FROM node:20-bookworm AS dev
 USER root
 WORKDIR /usr/src/app
 RUN npm install @playwright/test@1.59.1 && \
-  npx -y playwright@1.59.1 install --with-deps
+  npx -y playwright@1.59.1 install --with-deps chrome-for-testing firefox webkit
 
 COPY package.json package-lock.json ./
 COPY --from=base /tmp/node_modules ./node_modules
