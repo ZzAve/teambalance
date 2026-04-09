@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 # Simple shell Dockerfile for local development purposes
 
 FROM node:20-alpine AS base
@@ -18,7 +19,8 @@ FROM node:20-bookworm AS dev
 # not the best idea to run under root
 USER root
 WORKDIR /usr/src/app
-RUN npm install @playwright/test@1.59.1 && \
+RUN --mount=type=cache,target=/root/.cache/ms-playwright \
+  npm install @playwright/test@1.59.1 && \
   npx -y playwright@1.59.1 install --with-deps
 
 COPY package.json package-lock.json ./
