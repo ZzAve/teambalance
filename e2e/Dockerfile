@@ -19,9 +19,8 @@ FROM node:20-bookworm AS dev
 # not the best idea to run under root
 USER root
 WORKDIR /usr/src/app
-RUN --mount=type=cache,target=/root/.cache/ms-playwright \
-  npm install @playwright/test@1.59.1 && \
-  npx -y playwright --with-deps
+RUN npm install @playwright/test@1.59.1 && \
+  npx -y playwright@1.59.1 --with-deps
 
 COPY package.json package-lock.json ./
 COPY --from=base /tmp/node_modules ./node_modules
