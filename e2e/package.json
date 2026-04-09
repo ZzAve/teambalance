@@ -16,7 +16,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.48.1",
+    "@playwright/test": "1.59.1",
     "@types/node": "^22.5.5",
     "@types/uuid": "^10.0.0",
     "dotenv": "^16.4.5",
