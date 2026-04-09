@@ -75,7 +75,7 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build / cache frontend image
@@ -85,8 +85,8 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           tags: teambalance/frontend:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/teambalance-cache:frontend
-          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/teambalance-cache:frontend,mode=max
+          cache-from: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/teambalance-cache:frontend
+          cache-to: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/teambalance-cache:frontend,mode=max
 
       - name: Build / cache e2e image
         uses: docker/build-push-action@v5
@@ -95,8 +95,8 @@ jobs:
           context: ./e2e
           tags: teambalance/e2e:latest
           file: ./e2e/Dockerfile
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/teambalance-cache:e2e
-          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/teambalance-cache:e2e,mode=max
+          cache-from: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/teambalance-cache:e2e
+          cache-to: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/teambalance-cache:e2e,mode=max
 
       - name: E2E tests
         run: make e2e  || (docker compose logs frontend && exit 1)
