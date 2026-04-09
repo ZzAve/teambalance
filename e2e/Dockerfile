@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1.23
 # Simple shell Dockerfile for local development purposes
 
 FROM node:20-alpine AS base
