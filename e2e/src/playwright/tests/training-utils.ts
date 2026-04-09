@@ -28,34 +28,18 @@ async function pickDateTime(page: Page, date: Date) {
   });
   await textInputToggle.click();
 
-  // In text-input mode, MUI renders a single date text field (dd/mm/yyyy
-  // format for nl locale) and two fields for hours and minutes.
-  // The date field is labelled "Datum / tijd" and uses the format dd/mm/yyyy.
+  // In text-input mode, MUI v5 renders ONE combined date-time input field.
+  // Format for nl locale with 24h time: dd-mm-yyyy hh:mm
   const pad2 = (n: number) => String(n).padStart(2, "0");
-  const dateStr = `${pad2(date.getDate())}/${pad2(date.getMonth() + 1)}/${date.getFullYear()}`;
 
-  // The date text input — MUI renders it with the accessible name matching
-  // the label "Datum / tijd" (same label as the outer input).
-  const dateField = dialog.locator('input[placeholder="dd/mm/yyyy"]').or(
-    dialog.getByRole("textbox", { name: /datum/i }),
-  );
-  await dateField.waitFor({ state: "visible" });
-  // Triple-click to select all, then type the new date
-  await dateField.click({ clickCount: 3 });
-  await dateField.pressSequentially(dateStr);
+  // MUI's masked input auto-inserts separators when you type digits only.
+  const digits = `${pad2(date.getDate())}${pad2(date.getMonth() + 1)}${date.getFullYear()}${pad2(date.getHours())}${pad2(date.getMinutes())}`;
 
-  // Hours and minutes fields
-  const hoursInput = dialog.getByRole("textbox", { name: /hours/i }).or(
-    dialog.locator('input[aria-label="hours"]'),
-  );
-  const minutesInput = dialog.getByRole("textbox", { name: /minutes/i }).or(
-    dialog.locator('input[aria-label="minutes"]'),
-  );
-
-  await hoursInput.click({ clickCount: 3 });
-  await hoursInput.pressSequentially(pad2(date.getHours()));
-  await minutesInput.click({ clickCount: 3 });
-  await minutesInput.pressSequentially(pad2(date.getMinutes()));
+  // The single combined field — only one textbox exists in the dialog in keyboard mode.
+  const combinedInput = dialog.getByRole("textbox");
+  await combinedInput.waitFor({ state: "visible" });
+  await combinedInput.click();
+  await combinedInput.pressSequentially(digits);
 
   // Confirm the selection
   await dialog.getByRole("button", { name: "OK", exact: true }).click();
