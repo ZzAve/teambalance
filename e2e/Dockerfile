@@ -21,7 +21,7 @@ USER root
 WORKDIR /usr/src/app
 RUN --mount=type=cache,target=/root/.cache/ms-playwright \
   npm install @playwright/test@1.59.1 && \
-  npx -y playwright@1.59.1 install --with-deps
+  npx -y playwright --with-deps
 
 COPY package.json package-lock.json ./
 COPY --from=base /tmp/node_modules ./node_modules
