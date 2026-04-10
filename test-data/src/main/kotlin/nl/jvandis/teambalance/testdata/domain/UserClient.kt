@@ -35,7 +35,14 @@ class UserClient(
         val rawBody = response.bodyString()
         log.info("DEBUG createUser raw response body: {}", rawBody)
         val decoded = jsonFormatter.decodeFromString<User>(rawBody)
-        log.info("DEBUG createUser decoded User: id='{}' name='{}' role={} isActive={} jerseyNumber={}", decoded.id, decoded.name, decoded.role, decoded.isActive, decoded.jerseyNumber)
+        log.info(
+            "DEBUG createUser decoded User: id='{}' name='{}' role={} isActive={} jerseyNumber={}",
+            decoded.id,
+            decoded.name,
+            decoded.role,
+            decoded.isActive,
+            decoded.jerseyNumber,
+        )
         return decoded
     }
 

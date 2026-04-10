@@ -248,6 +248,12 @@
                             </schemaVersionProvider>
                             <forcedTypes combine.children="append">
                                 <forcedType>
+                                    <userType>nl.jvandis.teambalance.TeamBalanceId</userType>
+                                    <converter>nl.jvandis.jooq.support.converters.TeamBalanceIdConverter</converter>
+                                    <objectType>COLUMN</objectType>
+                                    <includeTypes>.*id</includeTypes>
+                                </forcedType>
+                                <forcedType>
                                     <userType>nl.jvandis.teambalance.api.event.match.Place</userType>
                                     <enumConverter>true</enumConverter>
                                     <objectType>COLUMN</objectType>

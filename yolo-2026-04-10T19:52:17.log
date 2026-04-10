@@ -1,0 +1,427 @@
+./mvnw install -T0.5C -DskipTests -Dverification.skip -Dnpm.ci.skip -Dnpm.install.skip=false -Dnpm.lint.skip
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Team balance parent                                                [pom]
+[INFO] Team balance - E2E tests                                           [jar]
+[INFO] Team balance - jooq support                                        [jar]
+[INFO] Team balance - Spring boot backend                                 [jar]
+[INFO] Team balance - Frontend React App                                  [jar]
+[INFO] Team balance - app                                                 [jar]
+[INFO] Team balance - test-data                                           [jar]
+[INFO] 
+[INFO] Using the MultiThreadedBuilder implementation with a thread count of 7
+[INFO] 
+[INFO] -----------------------< nl.jvandis:teambalance >-----------------------
+[INFO] Building Team balance parent 0.0.1-SNAPSHOT                        [1/7]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- git-commit-id:8.0.2:revision (default) @ teambalance ---
+[INFO] 
+[INFO] --- frontend:1.15.4:install-node-and-npm (install node and npm) @ teambalance ---
+[INFO] Node v20.12.2 is already installed.
+[INFO] NPM 10.5.0 is already installed.
+[INFO] 
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ teambalance ---
+[INFO] argLine set to -javaagent:/Users/julius.van.dis/.m2/repository/org/jacoco/org.jacoco.agent/0.8.14/org.jacoco.agent-0.8.14-runtime.jar=destfile=/Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/target/jacoco.exec
+[INFO] 
+[INFO] --- kotlin:2.3.20:compile (compile) @ teambalance ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- kotlin:2.3.20:test-compile (test-compile) @ teambalance ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- jacoco:0.8.14:report (report) @ teambalance ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO] 
+[INFO] --- spotless:2.46.1:check (check) @ teambalance ---
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ teambalance ---
+[INFO] Installing /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/pom.xml to /Users/julius.van.dis/.m2/repository/nl/jvandis/teambalance/0.0.1-SNAPSHOT/teambalance-0.0.1-SNAPSHOT.pom
+[INFO] 
+[INFO] 
+[INFO] 
+[INFO] ---------------------< nl.jvandis.teambalance:e2e >---------------------
+[INFO] 
+[INFO] ------------------< nl.jvandis.teambalance:frontend >-------------------
+[INFO] ----------------------< nl.jvandis:jooq-support >-----------------------
+[INFO] Building Team balance - Frontend React App 0.0.1-SNAPSHOT          [3/7]
+[INFO] ------------------< nl.jvandis.teambalance:test-data >------------------
+[INFO]   from frontend/pom.xml
+[INFO] Building Team balance - E2E tests 0.0.1-SNAPSHOT                   [2/7]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] Building Team balance - test-data 0.0.1-SNAPSHOT                   [5/7]
+[INFO] Building Team balance - jooq support 0.0.1-SNAPSHOT                [4/7]
+[INFO]   from test-data/pom.xml
+[INFO]   from e2e/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]   from jooq-support/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- frontend:1.15.4:npm (npm lint:fix) @ frontend ---
+[INFO] 
+[INFO] --- frontend:1.15.4:npm (npm lint:fix) @ e2e ---
+[INFO] Skipping execution.
+[INFO] 
+[INFO] --- git-commit-id:8.0.2:revision (default) @ frontend ---
+[INFO] Skipping execution.
+[INFO] 
+[INFO] --- git-commit-id:8.0.2:revision (default) @ e2e ---
+[INFO] 
+[INFO] --- git-commit-id:8.0.2:revision (default) @ test-data ---
+[INFO] 
+[INFO] --- git-commit-id:8.0.2:revision (default) @ jooq-support ---
+[INFO] 
+[INFO] --- frontend:1.15.4:npm (npm ci) @ e2e ---
+[INFO] Skipping execution.
+[INFO] 
+[INFO] --- frontend:1.15.4:npm (npm install) @ e2e ---
+[INFO] 
+[INFO] --- frontend:1.15.4:npm (npm ci) @ frontend ---
+[INFO] Skipping execution.
+[INFO] 
+[INFO] --- frontend:1.15.4:npm (npm install) @ frontend ---
+[INFO] Running 'npm install' in /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/e2e
+[INFO] Running 'npm install' in /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/frontend
+[INFO] 
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ test-data ---
+[INFO] argLine set to -javaagent:/Users/julius.van.dis/.m2/repository/org/jacoco/org.jacoco.agent/0.8.14/org.jacoco.agent-0.8.14-runtime.jar=destfile=/Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/test-data/target/jacoco.exec
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ test-data ---
+[INFO] 
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ jooq-support ---
+[INFO] argLine set to -javaagent:/Users/julius.van.dis/.m2/repository/org/jacoco/org.jacoco.agent/0.8.14/org.jacoco.agent-0.8.14-runtime.jar=destfile=/Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/jooq-support/target/jacoco.exec
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ jooq-support ---
+[INFO] skip non existing resourceDirectory /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/test-data/src/main/resources
+[INFO] skip non existing resourceDirectory /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/jooq-support/src/main/resources
+[INFO] skip non existing resourceDirectory /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/jooq-support/src/main/resources
+[INFO] skip non existing resourceDirectory /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/test-data/src/main/resources
+[INFO] 
+[INFO] --- kotlin:2.3.20:compile (compile) @ jooq-support ---
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ test-data ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- kotlin:2.3.20:compile (compile) @ test-data ---
+[INFO] Applied plugin: 'spring'
+[INFO] Applied plugin: 'all-open'
+[INFO] Applied plugin: 'kotlinx-serialization'
+[WARNING] Using experimental Kotlin incremental compilation
+[WARNING] Using experimental Kotlin incremental compilation
+[INFO] Options for KOTLIN DAEMON: IncrementalCompilationOptions(super=CompilationOptions(compilerMode=INCREMENTAL_COMPILER, targetPlatform=JVM, reportCategories=[0], reportSeverity=2, requestedCompilationResults=[0], kotlinScriptExtensions=null, generateCompilerRefIndex=false), sourceChanges=org.jetbrains.kotlin.buildtools.api.SourcesChanges$ToBeCalculated@40838f1a, classpathChanges=ToBeComputedByIncrementalCompiler, workingDir=/Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/test-data/target/kotlin-ic/compile, multiModuleICSettings=null, icFeatures=IncrementalCompilationFeatures(usePreciseJavaTracking=false, withAbiSnapshot=false, preciseCompilationResultsBackup=false, keepIncrementalCompilationCachesInMemory=false, enableUnsafeIncrementalCompilationForMultiplatform=false, enableMonotonousIncrementalCompileSetExpansion=false), outputFiles=null)
+[INFO] Options for KOTLIN DAEMON: IncrementalCompilationOptions(super=CompilationOptions(compilerMode=INCREMENTAL_COMPILER, targetPlatform=JVM, reportCategories=[0], reportSeverity=2, requestedCompilationResults=[0], kotlinScriptExtensions=null, generateCompilerRefIndex=false), sourceChanges=org.jetbrains.kotlin.buildtools.api.SourcesChanges$ToBeCalculated@425fa965, classpathChanges=ToBeComputedByIncrementalCompiler, workingDir=/Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/jooq-support/target/kotlin-ic/compile, multiModuleICSettings=null, icFeatures=IncrementalCompilationFeatures(usePreciseJavaTracking=false, withAbiSnapshot=false, preciseCompilationResultsBackup=false, keepIncrementalCompilationCachesInMemory=false, enableUnsafeIncrementalCompilationForMultiplatform=false, enableMonotonousIncrementalCompileSetExpansion=false), outputFiles=null)
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ test-data ---
+[INFO] skip non existing resourceDirectory /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/test-data/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ test-data ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- kotlin:2.3.20:test-compile (test-compile) @ test-data ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ test-data ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ test-data ---
+[INFO] Building jar: /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/test-data/target/test-data-0.0.1-SNAPSHOT.jar
+[INFO] 
+[INFO] up to date, audited 65 packages in 764ms
+[INFO] 
+[INFO] 28 packages are looking for funding
+[INFO]   run `npm fund` for details
+[INFO] 
+[INFO] 3 moderate severity vulnerabilities
+[INFO] 
+[INFO] To address all issues (including breaking changes), run:
+[INFO]   npm audit fix --force
+[INFO] 
+[INFO] Run `npm audit` for details.
+[INFO] 
+[INFO] --- jacoco:0.8.14:report (report) @ test-data ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO] 
+[INFO] --- spotless:2.46.1:check (check) @ test-data ---
+[INFO] 
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ e2e ---
+[INFO] argLine set to -javaagent:/Users/julius.van.dis/.m2/repository/org/jacoco/org.jacoco.agent/0.8.14/org.jacoco.agent-0.8.14-runtime.jar=destfile=/Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/e2e/target/jacoco.exec
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ e2e ---
+[INFO] skip non existing resourceDirectory /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/e2e/src/main/resources
+[INFO] skip non existing resourceDirectory /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/e2e/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ e2e ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- kotlin:2.3.20:compile (compile) @ e2e ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ e2e ---
+[INFO] skip non existing resourceDirectory /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/e2e/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ e2e ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- kotlin:2.3.20:test-compile (test-compile) @ e2e ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ e2e ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ e2e ---
+[INFO] Building jar: /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/e2e/target/e2e-0.0.1-SNAPSHOT.jar
+[INFO] 
+[INFO] --- frontend:1.15.4:npm (npm lint) @ e2e ---
+[INFO] Skipping execution.
+[INFO] 
+[INFO] --- jacoco:0.8.14:report (report) @ e2e ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO] 
+[INFO] --- spotless:2.46.1:check (check) @ e2e ---
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ e2e ---
+[INFO] Installing /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/e2e/pom.xml to /Users/julius.van.dis/.m2/repository/nl/jvandis/teambalance/e2e/0.0.1-SNAPSHOT/e2e-0.0.1-SNAPSHOT.pom
+[INFO] Installing /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/e2e/target/e2e-0.0.1-SNAPSHOT.jar to /Users/julius.van.dis/.m2/repository/nl/jvandis/teambalance/e2e/0.0.1-SNAPSHOT/e2e-0.0.1-SNAPSHOT.jar
+[INFO] Index file does not exist. Fallback to an empty index
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ jooq-support ---
+[INFO] skip non existing resourceDirectory /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/jooq-support/src/test/resources
+[INFO] 
+[INFO] --- kotlin:2.3.20:test-compile (test-compile) @ jooq-support ---
+[INFO] Applied plugin: 'spring'
+[INFO] Applied plugin: 'all-open'
+[WARNING] Using experimental Kotlin incremental compilation
+[INFO] 
+[INFO] > web@0.1.0 prepare
+[INFO] > cd .. && husky install
+[INFO] 
+[INFO] Options for KOTLIN DAEMON: IncrementalCompilationOptions(super=CompilationOptions(compilerMode=INCREMENTAL_COMPILER, targetPlatform=JVM, reportCategories=[0], reportSeverity=2, requestedCompilationResults=[0], kotlinScriptExtensions=null, generateCompilerRefIndex=false), sourceChanges=org.jetbrains.kotlin.buildtools.api.SourcesChanges$ToBeCalculated@425fa965, classpathChanges=ToBeComputedByIncrementalCompiler, workingDir=/Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/jooq-support/target/kotlin-ic/test, multiModuleICSettings=null, icFeatures=IncrementalCompilationFeatures(usePreciseJavaTracking=false, withAbiSnapshot=false, preciseCompilationResultsBackup=false, keepIncrementalCompilationCachesInMemory=false, enableUnsafeIncrementalCompilationForMultiplatform=false, enableMonotonousIncrementalCompileSetExpansion=false), outputFiles=null)
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ jooq-support ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ jooq-support ---
+[INFO] Building jar: /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/jooq-support/target/jooq-support-0.0.1-SNAPSHOT.jar
+[INFO] 
+[INFO] --- jacoco:0.8.14:report (report) @ jooq-support ---
+[INFO] Loading execution data file /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/jooq-support/target/jacoco.exec
+[INFO] Analyzed bundle 'Team balance - jooq support' with 3 classes
+[INFO] husky - Git hooks installed
+[INFO] 
+[INFO] up to date, audited 756 packages in 1s
+[INFO] 
+[INFO] 196 packages are looking for funding
+[INFO]   run `npm fund` for details
+[INFO] 
+[INFO] 4 vulnerabilities (3 moderate, 1 high)
+[INFO] 
+[INFO] To address issues that do not require attention, run:
+[INFO]   npm audit fix
+[INFO] 
+[INFO] To address all issues (including breaking changes), run:
+[INFO]   npm audit fix --force
+[INFO] 
+[INFO] Run `npm audit` for details.
+[INFO] 
+[INFO] --- spotless:2.46.1:check (check) @ jooq-support ---
+[INFO] 
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ frontend ---
+[INFO] argLine set to -javaagent:/Users/julius.van.dis/.m2/repository/org/jacoco/org.jacoco.agent/0.8.14/org.jacoco.agent-0.8.14-runtime.jar=destfile=/Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/frontend/target/jacoco.exec
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ frontend ---
+[INFO] skip non existing resourceDirectory /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/frontend/src/main/resources
+[INFO] skip non existing resourceDirectory /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/frontend/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ frontend ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- kotlin:2.3.20:compile (compile) @ frontend ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ frontend ---
+[INFO] skip non existing resourceDirectory /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/frontend/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ frontend ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- kotlin:2.3.20:test-compile (test-compile) @ frontend ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ frontend ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- frontend:1.15.4:npm (npm build) @ frontend ---
+[INFO] Running 'npm run build' in /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/frontend
+[INFO] 
+[INFO] > web@0.1.0 build
+[INFO] > tsc && vite build --mode tovoheren4 && vite build --mode tovoheren5
+[INFO] 
+[INFO] Spotless.Kotlin is keeping 3 files clean - 1 needs changes to be clean, 0 were already clean, 2 were skipped because caching determined they were already clean
+[INFO] Spotless.Kotlin is keeping 19 files clean - 1 needs changes to be clean, 18 were already clean, 0 were skipped because caching determined they were already clean
+[INFO] Running in tovoheren4 mode
+[INFO] All env vars: {
+[INFO]   VITE_BUILD_OUT_DIR: '../../../target/classes/static/tovoheren4',
+[INFO]   VITE_TENANT: 'Tovo heren 4'
+[INFO] }
+[INFO] vite v6.4.2 building for tovoheren4...
+[INFO] transforming...
+[INFO] ✓ 1221 modules transformed.
+[INFO] rendering chunks...
+[INFO] computing gzip size...
+[INFO] ../../../target/classes/static/tovoheren4/index.html                             1.01 kB │ gzip:   0.51 kB
+[INFO] ../../../target/classes/static/tovoheren4/.vite/manifest.json                    5.34 kB │ gzip:   0.82 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/index-CPLVraPx.css              0.33 kB │ gzip:   0.26 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/PageItem-CrvfrU3E.js            0.41 kB │ gzip:   0.28 kB │ map:     1.50 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/Add-C-958JGV.js                 0.49 kB │ gzip:   0.36 kB │ map:     1.76 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/LockOpen-DBjojbJb.js            0.53 kB │ gzip:   0.38 kB │ map:     1.21 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/TransactionsPage-CBukz-SY.js    1.07 kB │ gzip:   0.53 kB │ map:     3.04 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/BankApiClient-C_ljzWcn.js       1.36 kB │ gzip:   0.66 kB │ map:     7.60 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/Login-D_adF9ff.js               1.81 kB │ gzip:   0.98 kB │ map:     6.52 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/EventsPage-DTTpXdb7.js          1.99 kB │ gzip:   0.89 kB │ map:     6.59 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/Checkbox-KEKhab6I.js            2.51 kB │ gzip:   1.17 kB │ map:    14.27 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/Transactions-Mdfrhkjb.js        3.30 kB │ gzip:   1.54 kB │ map:    13.60 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/domain-DGU1FTaZ.js              3.41 kB │ gzip:   1.53 kB │ map:    19.52 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/Overview-Bt7tGqv6.js            7.04 kB │ gzip:   2.35 kB │ map:    20.24 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/Alert-DwqTpkhp.js               9.89 kB │ gzip:   3.71 kB │ map:    45.82 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/TextField-CXGz2zKF.js          10.30 kB │ gzip:   3.39 kB │ map:    60.03 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/UsersPage-DIPId3cA.js          14.18 kB │ gzip:   4.42 kB │ map:    52.31 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/TablePagination-Bmz7iQlC.js    16.97 kB │ gzip:   5.67 kB │ map:    87.31 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/Admin-DUnv9T3L.js              59.23 kB │ gzip:  19.69 kB │ map:   261.19 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/Select-CoRjwKXC.js             61.21 kB │ gzip:  19.06 kB │ map:   351.03 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/Events-BzPoooFS.js            127.49 kB │ gzip:  40.49 kB │ map:   598.39 kB
+[INFO] ../../../target/classes/static/tovoheren4/assets/index-MeOoi-gA.js             389.70 kB │ gzip: 130.29 kB │ map: 1,857.79 kB
+[INFO] ✓ built in 1.65s
+[INFO] Running in tovoheren5 mode
+[INFO] All env vars: {
+[INFO]   VITE_BUILD_OUT_DIR: '../../../target/classes/static/tovoheren5',
+[INFO]   VITE_TENANT: 'Tovo heren 5'
+[INFO] }
+[INFO] vite v6.4.2 building for tovoheren5...
+[INFO] transforming...
+[INFO] ✓ 1221 modules transformed.
+[INFO] rendering chunks...
+[INFO] computing gzip size...
+[INFO] ../../../target/classes/static/tovoheren5/index.html                             1.01 kB │ gzip:   0.52 kB
+[INFO] ../../../target/classes/static/tovoheren5/.vite/manifest.json                    5.34 kB │ gzip:   0.82 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/index-CPLVraPx.css              0.33 kB │ gzip:   0.26 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/PageItem-D1H0gbne.js            0.41 kB │ gzip:   0.28 kB │ map:     1.50 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/Add-CkpVhv7-.js                 0.49 kB │ gzip:   0.36 kB │ map:     1.76 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/LockOpen-BAQvCe9J.js            0.53 kB │ gzip:   0.38 kB │ map:     1.21 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/TransactionsPage-By_7f6Op.js    1.07 kB │ gzip:   0.53 kB │ map:     3.04 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/BankApiClient-CLk8oEt6.js       1.36 kB │ gzip:   0.66 kB │ map:     7.60 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/Login-GmWglwpV.js               1.81 kB │ gzip:   0.98 kB │ map:     6.52 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/EventsPage-BcMg-bAG.js          1.99 kB │ gzip:   0.89 kB │ map:     6.59 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/Checkbox-BbAC_pV2.js            2.51 kB │ gzip:   1.18 kB │ map:    14.27 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/Transactions-ePMW_eig.js        3.30 kB │ gzip:   1.54 kB │ map:    13.60 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/domain-CgD6pL7r.js              3.41 kB │ gzip:   1.53 kB │ map:    19.52 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/Overview-j-Heyzo1.js            7.04 kB │ gzip:   2.35 kB │ map:    20.24 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/Alert-DQ_SDK29.js               9.89 kB │ gzip:   3.71 kB │ map:    45.82 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/TextField-Czmadall.js          10.30 kB │ gzip:   3.39 kB │ map:    60.03 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/UsersPage-CvTEXlE5.js          14.18 kB │ gzip:   4.41 kB │ map:    52.31 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/TablePagination-D0yClHXv.js    16.97 kB │ gzip:   5.67 kB │ map:    87.31 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/Admin-DFLAbxfF.js              59.23 kB │ gzip:  19.69 kB │ map:   261.19 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/Select-FuimsOo0.js             61.21 kB │ gzip:  19.06 kB │ map:   351.03 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/Events-B5jqKuqZ.js            127.49 kB │ gzip:  40.49 kB │ map:   598.39 kB
+[INFO] ../../../target/classes/static/tovoheren5/assets/index-K2CEMUEi.js             389.70 kB │ gzip: 130.30 kB │ map: 1,857.79 kB
+[INFO] ✓ built in 1.94s
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ frontend ---
+[INFO] Building jar: /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/frontend/target/frontend-0.0.1-SNAPSHOT.jar
+[INFO] 
+[INFO] --- frontend:1.15.4:npm (npm lint) @ frontend ---
+[INFO] Skipping execution.
+[INFO] 
+[INFO] --- jacoco:0.8.14:report (report) @ frontend ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO] 
+[INFO] --- spotless:2.46.1:check (check) @ frontend ---
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ frontend ---
+[INFO] Installing /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/frontend/pom.xml to /Users/julius.van.dis/.m2/repository/nl/jvandis/teambalance/frontend/0.0.1-SNAPSHOT/frontend-0.0.1-SNAPSHOT.pom
+[INFO] Installing /Users/julius.van.dis/IdeaProjects/Personal/teambalance/.worktrees/fix-github-actions/frontend/target/frontend-0.0.1-SNAPSHOT.jar to /Users/julius.van.dis/.m2/repository/nl/jvandis/teambalance/frontend/0.0.1-SNAPSHOT/frontend-0.0.1-SNAPSHOT.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for Team balance parent 0.0.1-SNAPSHOT:
+[INFO] 
+[INFO] Team balance parent ................................ SUCCESS [  6.068 s]
+[INFO] Team balance - E2E tests ........................... SUCCESS [  1.192 s]
+[INFO] Team balance - jooq support ........................ FAILURE [  1.740 s]
+[INFO] Team balance - Spring boot backend ................. SKIPPED
+[INFO] Team balance - Frontend React App .................. SUCCESS [  6.655 s]
+[INFO] Team balance - app ................................. SKIPPED
+[INFO] Team balance - test-data ........................... FAILURE [  2.093 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  12.884 s (Wall Clock)
+[INFO] Finished at: 2026-04-10T19:52:30+02:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal com.diffplug.spotless:spotless-maven-plugin:2.46.1:check (check) on project jooq-support: The following files had format violations:
+[ERROR]     src/main/kotlin/nl/jvandis/jooq/support/converters/TeamBalanceIdConverter.kt
+[ERROR]         @@ -1,7 +1,6 @@
+[ERROR]          package·nl.jvandis.jooq.support.converters
+[ERROR]          
+[ERROR]          import·org.jooq.Converter
+[ERROR]         -import·org.jooq.impl.AbstractConverter
+[ERROR]          
+[ERROR]          /**
+[ERROR]          ·*·JOOQ·converter·for·Kotlin·value·class·TeamBalanceId.
+[ERROR]         @@ -13,12 +12,10 @@
+[ERROR]          ·*·of·the·actual·string·value.
+[ERROR]          ·*/
+[ERROR]          class·TeamBalanceIdConverter·:·Converter<String,·Any>·{
+[ERROR]         -····override·fun·from(databaseObject:·String?):·Any?·{
+[ERROR]         -········return·if·(databaseObject·==·null)·null·else·databaseObject
+[ERROR]         -····}
+[ERROR]         +····override·fun·from(databaseObject:·String?):·Any?·=·if·(databaseObject·==·null)·null·else·databaseObject
+[ERROR]          
+[ERROR]         -····override·fun·to(userObject:·Any?):·String?·{
+[ERROR]         -········return·when·(userObject)·{
+[ERROR]         +····override·fun·to(userObject:·Any?):·String?·=
+[ERROR]         +········when·(userObject)·{
+[ERROR]          ············null·->·null
+[ERROR]          ············is·String·->·userObject
+[ERROR]          ············else·->·{
+[ERROR]         @@ -33,7 +30,6 @@
+[ERROR]          ················}
+[ERROR]          ············}
+[ERROR]          ········}
+[ERROR]         -····}
+[ERROR]          
+[ERROR]          ····override·fun·fromType():·Class<String>·=·String::class.java
+[ERROR]          
+[ERROR] Run 'mvn spotless:apply' to fix these violations.
+[ERROR] -> [Help 1]
+[ERROR] Failed to execute goal com.diffplug.spotless:spotless-maven-plugin:2.46.1:check (check) on project test-data: The following files had format violations:
+[ERROR]     src/main/kotlin/nl/jvandis/teambalance/testdata/domain/UserClient.kt
+[ERROR]         @@ -35,7 +35,14 @@
+[ERROR]          ········val·rawBody·=·response.bodyString()
+[ERROR]          ········log.info("DEBUG·createUser·raw·response·body:·{}",·rawBody)
+[ERROR]          ········val·decoded·=·jsonFormatter.decodeFromString<User>(rawBody)
+[ERROR]         -········log.info("DEBUG·createUser·decoded·User:·id='{}'·name='{}'·role={}·isActive={}·jerseyNumber={}",·decoded.id,·decoded.name,·decoded.role,·decoded.isActive,·decoded.jerseyNumber)
+[ERROR]         +········log.info(
+[ERROR]         +············"DEBUG·createUser·decoded·User:·id='{}'·name='{}'·role={}·isActive={}·jerseyNumber={}",
+[ERROR]         +············decoded.id,
+[ERROR]         +············decoded.name,
+[ERROR]         +············decoded.role,
+[ERROR]         +············decoded.isActive,
+[ERROR]         +············decoded.jerseyNumber,
+[ERROR]         +········)
+[ERROR]          ········return·decoded
+[ERROR]          ····}
+[ERROR]          
+[ERROR] Run 'mvn spotless:apply' to fix these violations.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :jooq-support
+make: *** [yolo] Error 1
