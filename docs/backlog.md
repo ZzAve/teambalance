@@ -30,4 +30,12 @@ _(Tasks with unanswered questions — see docs/questions/README.md)_
 
 ## Done
 
-_(Completed tasks with completion date)_
+- [x] `[P1]` `[execute]` Get all open Renovate PRs reviewed and merged (2026-04-09)
+  - Depends: none
+  - Context: Review and merge all pending Renovate dependency update PRs. Use review-renovate skill if available.
+- [x] `[P2]` `[execute]` Set up Renovate auto-merge for minor and patch updates (2026-04-09)
+  - Depends: none
+  - Context: Configure renovate.json to auto-merge minor/patch updates. Requires automergeType and automergeStrategy settings.
+- [x] `[P1]` `[plan]` get back to automerge. Those changes are currently not checked in. Using a worktree, commit those changes (2026-04-09)
+  - Depends: none
+  - Context: See: Set up Renovate auto-merge for minor and patch updates
