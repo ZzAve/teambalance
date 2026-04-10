@@ -243,7 +243,7 @@ private fun Amount.parseCurrency() = if (currency == "EUR") "€" else currency
 
 private fun Amount.toTransactionType(): TransactionType =
     if (value?.startsWith("-") == true) {
-        TransactionType.DEPOSIT
-    } else {
         TransactionType.WITHDRAWAL
+    } else {
+        TransactionType.DEPOSIT
     }
