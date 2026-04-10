@@ -1,5 +1,6 @@
 package nl.jvandis.teambalance.testdata.domain
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,7 +19,7 @@ data class User(
     val id: String,
     val name: String,
     val role: Role,
-    val isActive: Boolean,
+    @SerialName("active") val isActive: Boolean,
     val jerseyNumber: Int? = null,
 )
 
@@ -38,6 +39,6 @@ enum class Role {
 data class PotentialUserUpdate(
     val name: String?,
     val role: Role?,
-    val isActive: Boolean?,
+    @SerialName("active") val isActive: Boolean?,
     val jerseyNumber: Int?,
 )
