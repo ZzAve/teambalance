@@ -74,7 +74,7 @@ export const roleMapper: Record<Role, string> = {
 };
 export type Place = "HOME" | "AWAY";
 
-export type TransactionType = "DEBIT" | "CREDIT";
+export type TransactionType = "WITHDRAWAL" | "DEPOSIT";
 
 export interface Transaction {
   date: Date;
