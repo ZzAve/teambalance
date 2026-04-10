@@ -20,7 +20,7 @@
         <jooq-postgres-extensions.version>3.16.13</jooq-postgres-extensions.version>
         <jooq.version>3.20.8</jooq.version> <!-- same as from spring-boot-starter-jooq -->
         <postgresql.version>42.7.10</postgresql.version>
-        <springdoc-openapi.version>2.0.2</springdoc-openapi.version>
+        <springdoc-openapi.version>2.8.16</springdoc-openapi.version>
         <testcontainers.postgresql.version>16.5-alpine</testcontainers.postgresql.version>
         <kotlinx-coroutines.version>1.9.0</kotlinx-coroutines.version>
         <jooq-extensions.version>3.18.7</jooq-extensions.version>
