@@ -15,9 +15,9 @@ data class Users(
 
 @Serializable
 data class User(
+    val id: String,
     val name: String,
     val role: Role,
-    val id: String,
     val isActive: Boolean,
     val jerseyNumber: Int? = null,
 )
