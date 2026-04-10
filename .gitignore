@@ -20,3 +20,5 @@ src/main/webapp
 *.pem
 
 .worktrees
+.orchestration/
+.claude/worktrees/
