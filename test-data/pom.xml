@@ -27,6 +27,24 @@
         <sonar.exclusions>src/main/**</sonar.exclusions>
     </properties>
 
+    <!--
+        Import the kotlinx-serialization BOM to override Spring Boot 3.3.1's parent BOM
+        (which pins kotlinx-serialization-* to 1.6.3). The Kotlin 2.3.20 compiler plugin
+        emits bytecode against the 1.11.0 descriptor API; running it on 1.6.3 classes
+        silently corrupts deserialization (e.g. Boolean true leaks into the id field).
+        See .orchestration/research/2026-04-10-kotlinx-serialization-compat.md.
+    -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jetbrains.kotlinx</groupId>
+                <artifactId>kotlinx-serialization-bom</artifactId>
+                <version>${kotlinx.serialization.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
