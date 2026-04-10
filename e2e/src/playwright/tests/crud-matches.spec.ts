@@ -3,15 +3,17 @@ import { HOST } from "./utils";
 import { v4 as uuid } from "uuid";
 import {
   createMatchEvent,
+  createUserViaApi,
   deleteMatch,
+  deleteUserViaApi,
   updateMatch,
   setMatchAttendance,
   verifyMatchAttendanceState,
 } from "./match-utils";
 
 /**
- * Display name of the user authenticated in auth.setup.ts.
- * Must match the name stored by the backend for the 'admin' account.
+ * Display name of the team member used for attendance tests.
+ * Created via API before the test and deleted afterwards.
  */
 const TEST_USER_NAME = "admin";
 
@@ -35,7 +37,14 @@ test.describe("Matches", () => {
     await expect(page.locator("tbody")).not.toContainText(opponent);
   });
 
-  test("Set match attendance: attending → maybe → absent", async ({ page }) => {
+  test("Set match attendance: attending → maybe → absent", async ({
+    page,
+    request,
+  }) => {
+    // 0. Create a team member so the event has attendees to interact with.
+    //    The e2e database starts empty; without a user, events have no attendees.
+    const userId = await createUserViaApi(request, TEST_USER_NAME);
+
     // 1. Create match via admin UI.
     await page.getByRole("button", { name: "Admin dingen" }).click();
     const opponent = `Team ${uuid().slice(0, 8)}`;
@@ -46,13 +55,12 @@ test.describe("Matches", () => {
       //    always visible inline — no expand toggle needed.
       //    The home page shows "Aanstaande wedstrijden"; navigate there directly.
       await page.goto(HOST);
-      await page.getByText("Aanstaande trainingen").waitFor({ state: "visible" });
+      await page
+        .getByText("Aanstaande trainingen")
+        .waitFor({ state: "visible" });
       // Home page has a "Meer" button in the "Aanstaande wedstrijden" section
       // that navigates to the full matches page (/matches).
-      await page
-        .getByTestId("match-events")
-        .getByTestId("more-button")
-        .click();
+      await page.getByTestId("match-events").getByTestId("more-button").click();
       await page.waitForURL(/matches/);
 
       // Ensure we are in list view — list view renders attendee buttons inline
@@ -91,7 +99,7 @@ test.describe("Matches", () => {
       await expect(page.getByText(opponent)).toBeVisible();
       await verifyMatchAttendanceState(page, "absent", TEST_USER_NAME);
     } finally {
-      // 7. Cleanup: always delete the match, even if assertions above failed.
+      // 7. Cleanup: always delete the match and the test user, even if assertions failed.
       // Wrap navigation in try/catch: Playwright may have already closed the
       // browser context by the time finally runs, which would cause a 90s timeout.
       try {
@@ -101,6 +109,8 @@ test.describe("Matches", () => {
       } catch {
         // Best-effort cleanup — ignore navigation errors after context teardown.
       }
+      // Delete the test user via API (best-effort).
+      await deleteUserViaApi(request, userId).catch(() => {});
     }
   });
 

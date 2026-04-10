@@ -1,5 +1,66 @@
-import { expect, Page } from "@playwright/test";
-import { addDays, ensure, NOW, pickDateTime } from "./utils";
+import { expect, APIRequestContext, Page } from "@playwright/test";
+import { addDays, ensure, HOST, NOW, pickDateTime } from "./utils";
+
+/**
+ * The X-Secret header value for the local/e2e tenant (base64 of "teambalance").
+ * Matches the secret configured in application-local.yml for domain frontend:3000.
+ */
+const API_SECRET = Buffer.from("teambalance").toString("base64");
+
+/**
+ * Headers required by the backend API: tenant resolution via Host + secret auth.
+ * The Vite dev server proxies /api/* to backend:8080 and forwards the Host header.
+ */
+const apiHeaders = {
+  Host: "frontend:3000",
+  "X-Secret": API_SECRET,
+  "Content-Type": "application/json",
+};
+
+/**
+ * Create a team member user via the backend API.
+ * Required so that newly created events have attendees to interact with.
+ *
+ * @returns the created user's id (for cleanup)
+ */
+export async function createUserViaApi(
+  request: APIRequestContext,
+  name: string,
+  role: string = "OTHER",
+): Promise<string> {
+  const response = await request.post(`${HOST}/api/users`, {
+    headers: apiHeaders,
+    data: { name, role },
+  });
+  if (!response.ok()) {
+    throw new Error(
+      `Failed to create user "${name}": ${response.status()} ${await response.text()}`,
+    );
+  }
+  const body = await response.json();
+  return ensure(body.id as string | undefined, `user id for "${name}"`);
+}
+
+/**
+ * Delete a team member user via the backend API (requires admin credentials).
+ */
+export async function deleteUserViaApi(
+  request: APIRequestContext,
+  userId: string,
+): Promise<void> {
+  const response = await request.delete(`${HOST}/api/users/${userId}`, {
+    headers: {
+      ...apiHeaders,
+      // DELETE /api/users/{id} is @Admin-protected; use HTTP Basic auth.
+      Authorization: `Basic ${Buffer.from("admin:admin").toString("base64")}`,
+    },
+  });
+  if (!response.ok() && response.status() !== 404) {
+    throw new Error(
+      `Failed to delete user "${userId}": ${response.status()} ${await response.text()}`,
+    );
+  }
+}
 
 /**
  * Generate realistic match date (next Saturday at 14:00)
@@ -166,17 +227,19 @@ const statusToMuiColorClass: Record<
 export async function setMatchAttendance(
   page: Page,
   status: "attending" | "maybe" | "absent",
-  attendeeName: string
+  attendeeName: string,
 ): Promise<void> {
   // Map status to the accessible name of the refinement icon button.
   // MUI renders aria-label from the SVG title; Playwright finds these by
   // role="button" with the SVG's accessible name.
-  const refinementButtonLabel: Record<"attending" | "maybe" | "absent", RegExp> =
-    {
-      attending: /check/i,
-      maybe: /help/i,
-      absent: /close/i,
-    };
+  const refinementButtonLabel: Record<
+    "attending" | "maybe" | "absent",
+    RegExp
+  > = {
+    attending: /check/i,
+    maybe: /help/i,
+    absent: /close/i,
+  };
 
   // Step 1: click the attendee's name button to open AttendeeRefinement.
   const attendeeBtn = page.getByRole("button", { name: attendeeName });
@@ -194,7 +257,7 @@ export async function setMatchAttendance(
   // button to reappear with the expected MUI colour class.
   const expectedClass = statusToMuiColorClass[status];
   await expect(
-    page.getByRole("button", { name: attendeeName })
+    page.getByRole("button", { name: attendeeName }),
   ).toHaveClass(new RegExp(expectedClass));
 }
 
@@ -209,10 +272,10 @@ export async function setMatchAttendance(
 export async function verifyMatchAttendanceState(
   page: Page,
   status: "attending" | "maybe" | "absent",
-  attendeeName: string
+  attendeeName: string,
 ): Promise<void> {
   const expectedClass = statusToMuiColorClass[status];
   await expect(
-    page.getByRole("button", { name: attendeeName })
+    page.getByRole("button", { name: attendeeName }),
   ).toHaveClass(new RegExp(expectedClass));
 }
