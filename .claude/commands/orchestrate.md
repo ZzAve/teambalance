@@ -46,8 +46,8 @@ Never proceed with a broken build.
 
 ## INIT (First Round Only)
 
-1. **Read** `docs/backlog.md`
-2. **Check** `docs/questions/README.md` for answered questions → update backlog (move from Parked to Active)
+1. **Read** `.orchestration/backlog.md`
+2. **Check** `.orchestration/questions/README.md` for answered questions → update backlog (move from Parked to Active)
 3. **Sync** to TaskList using TaskCreate for visibility
 4. **Set** round_number = 1
 
@@ -55,7 +55,7 @@ Never proceed with a broken build.
 
 ### 5. PARSE
 
-- Extract tasks from **Active** section of `docs/backlog.md`
+- Extract tasks from **Active** section of `.orchestration/backlog.md`
 - Filter for eligible: not done, not parked, all dependencies in Done
 
 ### 6. CHECK EXIT
@@ -199,7 +199,7 @@ NOTES: <one line>
 
 **For [research] tasks:**
 
-1. Worker will have created `docs/research/YYYY-MM-DD-<task-slug>.md`
+1. Worker will have created `.orchestration/research/YYYY-MM-DD-<task-slug>.md`
 2. Read the document to check for "## Questions for User" section
 3. If questions exist:
     - Present questions to user using clear formatting
@@ -213,7 +213,7 @@ NOTES: <one line>
 
 **For [plan] tasks:**
 
-1. Worker will have created `docs/plans/YYYY-MM-DD-<task-slug>.md`
+1. Worker will have created `.orchestration/plans/YYYY-MM-DD-<task-slug>.md`
 2. Read the document to check for "## Questions for User" section
 3. If questions exist:
     - Present questions to user with clear formatting
@@ -320,7 +320,7 @@ Use TaskUpdate to mark corresponding tasks as completed. Ad
 
 ### 15. WRITE HANDOVER
 
-Create `docs/handover/YYYY-MM-DD-HH-MM-round-N.md`:
+Create `.orchestration/handover/YYYY-MM-DD-HH-MM-round-N.md`:
 
 ```markdown
 # Handover — Round {{N}} ({{TIMESTAMP}})
@@ -343,10 +343,10 @@ Create `docs/handover/YYYY-MM-DD-HH-MM-round-N.md`:
 ## Worktree Status
 
 {{if any worktrees were created or used:}}
-- **.claude/worktrees/events-page** (feature/events-page)
+- **.worktrees/events-page** (feature/events-page)
   - Tasks: Build event list page, Add event filtering [2/3 complete]
   - Status: In progress
-- **.claude/worktrees/money-pool** (feature/money-pool)
+- **.worktrees/money-pool** (feature/money-pool)
   - Tasks: Build money pool page [1/1 complete]
   - Status: ✅ Ready for MR
 
@@ -383,7 +383,7 @@ GOTO step 5 (PARSE)
 When a worker reports `STATUS: blocked` due to unclear requirements:
 
 1. **Extract questions** from worker's notes
-2. **Create question file** `docs/questions/<task-slug>.md`:
+2. **Create question file** `.orchestration/questions/<task-slug>.md`:
 
 ```markdown
 # {{Task Name}} — Questions
@@ -401,10 +401,10 @@ When a worker reports `STATUS: blocked` due to unclear requirements:
 _(user fills in)_
 ```
 
-3. **Update questions index** `docs/questions/README.md`:
+3. **Update questions index** `.orchestration/questions/README.md`:
     - Add row to table with status "Unanswered"
 
-4. **Move task to Parked** in `docs/backlog.md`:
+4. **Move task to Parked** in `.orchestration/backlog.md`:
     - Remove from Active section
     - Add to Parked section with link to question file
 
@@ -414,7 +414,7 @@ Example:
 ## Parked
 
 - [ ] `[P1]` `[research]` Investigate Bunq integration options
-    - Questions: [docs/questions/bunq-integration.md](docs/questions/bunq-integration.md)
+    - Questions: [.orchestration/questions/bunq-integration.md](.orchestration/questions/bunq-integration.md)
 ```
 
 5. **Continue loop** with next eligible task (don't stop orchestrator)
@@ -541,7 +541,7 @@ Active PRs:
 
 # Start Orchestrating
 
-1. Read `docs/backlog.md`
+1. Read `.orchestration/backlog.md`
 2. If empty → ask user to populate it, then wait
 3. If populated → begin INIT phase and start loop
 

@@ -19,11 +19,11 @@ You are a focused worker agent in the TeamBalance orchestrate system. Your job i
 
 ## [research]
 - **Goal:** Explore codebase/docs to answer questions or gather information
-- **Output:** Write findings to a markdown file in `docs/research/YYYY-MM-DD-<task-slug>.md`
+- **Output:** Write findings to a markdown file in `.orchestration/research/YYYY-MM-DD-<task-slug>.md`
 - **No code changes:** Do not modify any source code
 - **Critical:** Include a "## Questions for User" section with the most important/influential decisions that need confirmation
 - **After completion:**
-  1. Add a follow-up `[plan]` task to `docs/backlog.md` in the Active section
+  1. Add a follow-up `[plan]` task to `.orchestration/backlog.md` in the Active section
   2. The plan task should depend on user answering the questions
   3. Format: `- [ ] \`[P1]\` \`[plan]\` <task name based on research>`
 - **Report:** List the research document created
@@ -54,12 +54,12 @@ You are a focused worker agent in the TeamBalance orchestrate system. Your job i
 
 ## [plan]
 - **Goal:** Design an implementation approach
-- **Output:** Write plan to `docs/plans/YYYY-MM-DD-<task-slug>.md`
+- **Output:** Write plan to `.orchestration/plans/YYYY-MM-DD-<task-slug>.md`
 - **No code changes:** Do not modify any source code
 - **Include:** Architecture decisions, file structure, key APIs, risks, step-by-step implementation
 - **Critical:** Include a "## Questions for User" section with critical architectural/design decisions that need confirmation
 - **After completion:**
-  1. Add a follow-up `[execute]` task to `docs/backlog.md` in the Active section
+  1. Add a follow-up `[execute]` task to `.orchestration/backlog.md` in the Active section
   2. The execute task should depend on user approving the plan
   3. Format: `- [ ] \`[P1]\` \`[execute]\` <task name> \`[review]\``
   4. Tag with `[review]` if code changes are significant
@@ -199,14 +199,14 @@ Task: Research Bunq API integration options
 Actions:
 1. Read Bunq API docs (use context-mode fetch_and_index)
 2. Search codebase for existing payment integrations
-3. Write findings to `docs/research/2026-04-09-bunq-integration.md` with Questions section
-4. Update `docs/backlog.md` - add follow-up plan task to Active section
+3. Write findings to `.orchestration/research/2026-04-09-bunq-integration.md` with Questions section
+4. Update `.orchestration/backlog.md` - add follow-up plan task to Active section
 
 Report:
 ```
 STATUS: done
 TASK: Research Bunq API integration options
-FILES: docs/research/2026-04-09-bunq-integration.md, docs/backlog.md
+FILES: .orchestration/research/2026-04-09-bunq-integration.md, .orchestration/backlog.md
 TESTS: n/a
 BUILD: n/a
 COMMIT: n/a
@@ -222,15 +222,15 @@ Task: Plan Bunq integration implementation
 Actions:
 1. Read research document for context
 2. Design approach with step-by-step implementation
-3. Write plan to `docs/plans/2026-04-09-bunq-integration.md` with Questions section
+3. Write plan to `.orchestration/plans/2026-04-09-bunq-integration.md` with Questions section
 4. Create detailed architecture diagram in plan doc
-5. Update `docs/backlog.md` - add follow-up execute task to Active section
+5. Update `.orchestration/backlog.md` - add follow-up execute task to Active section
 
 Report:
 ```
 STATUS: done
 TASK: Plan Bunq integration implementation
-FILES: docs/plans/2026-04-09-bunq-integration.md, docs/backlog.md
+FILES: .orchestration/plans/2026-04-09-bunq-integration.md, .orchestration/backlog.md
 TESTS: n/a
 BUILD: n/a
 COMMIT: n/a
@@ -242,10 +242,10 @@ NOTES: Plan includes 8 implementation steps, test strategy, and rollback procedu
 ## Execute Task Example (with worktree)
 
 Task: Build event list page
-Worktree: .claude/worktrees/events-page
+Worktree: .worktrees/events-page
 
 Actions:
-1. Navigate to worktree: `cd .claude/worktrees/events-page`
+1. Navigate to worktree: `cd .worktrees/events-page`
 2. Verify branch: `git branch --show-current` (should be feature/events-page)
 3. Read existing page components for patterns
 4. Create `app/src/pages/events/EventListPage.tsx`
@@ -266,7 +266,7 @@ BUILD: pass
 COMMIT: a1b2c3d
 FOLLOW-UP: Add pagination to event list
 USER-QUESTIONS: none
-NOTES: Worktree: .claude/worktrees/events-page | List shows 50 events max
+NOTES: Worktree: .worktrees/events-page | List shows 50 events max
 ```
 
 ## Execute Task with Report Document Example
@@ -276,7 +276,7 @@ Task: Implement event filtering system
 Actions:
 1. Implement complex filtering logic across multiple files
 2. Write comprehensive test suite
-3. Create `docs/reports/2026-04-09-event-filtering-implementation.md` summarizing:
+3. Create `.orchestration/reports/2026-04-09-event-filtering-implementation.md` summarizing:
    - Files created/modified with rationale
    - Filter options implemented (date range, event type, attendance status)
    - Performance considerations (indexed queries)
@@ -294,7 +294,7 @@ BUILD: pass
 COMMIT: f8a3b2e
 FOLLOW-UP: Add filter presets UI, Optimize filter performance for large datasets
 USER-QUESTIONS: none
-NOTES: See docs/reports/2026-04-09-event-filtering-implementation.md for details
+NOTES: See .orchestration/reports/2026-04-09-event-filtering-implementation.md for details
 ```
 
 ## Blocked Example
