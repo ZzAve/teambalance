@@ -10,8 +10,7 @@
     "group:recommended"
   ],
   "schedule": [
-    "after 10pm on weekdays",
-    "before 5am"
+    "after 10pm and before 5am every weekday"
   ],
   "automerge": true,
   "automergeType": "pr",
