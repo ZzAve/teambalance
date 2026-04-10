@@ -16,7 +16,7 @@
     <properties>
         <kotest-property-jvm.version>5.5.5</kotest-property-jvm.version>
         <kotest-property-arbs-jvm.version>2.1.2</kotest-property-arbs-jvm.version>
-        <kotlinx.serialization.version>1.5.0</kotlinx.serialization.version>
+        <kotlinx.serialization.version>1.11.0</kotlinx.serialization.version>
 
         <http4k.version>4.39.0.0</http4k.version>
         <kotlinx-datetime.version>0.3.1</kotlinx-datetime.version>
