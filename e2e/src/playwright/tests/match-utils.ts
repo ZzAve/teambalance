@@ -152,8 +152,8 @@ export async function setMatchAttendance(
   await button.waitFor({ state: "visible" });
   await button.click();
 
-  // Wait for state update (small delay for API call)
-  await page.waitForTimeout(300);
+  // Wait for the button to reflect selected state (API response applied)
+  await expect(button).toHaveAttribute("data-selected", "true");
 }
 
 /**
