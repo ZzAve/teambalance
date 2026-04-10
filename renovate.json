@@ -9,9 +9,14 @@
     "group:linters",
     "group:recommended"
   ],
-  "ignorePaths": [
-    "shaded-bunq-sdk/*"
+  "schedule": [
+    "after 10pm and before 5am every weekday"
   ],
+  "automerge": true,
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
+  "prConcurrentLimit": 2,
+  "branchConcurrentLimit": 3,
   "packageRules": [
     {
       "matchDepTypes": [
@@ -22,7 +27,51 @@
         "minor"
       ],
       "groupName": "devDependencies (non-major)",
-      "groupSlug": "dev-dependencies"
+      "groupSlug": "dev-dependencies",
+      "automerge": true
+    },
+    {
+      "matchDatasources": [
+        "npm"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "groupName": "npm packages (non-major)",
+      "groupSlug": "npm-non-major",
+      "automerge": true
+    },
+    {
+      "matchDatasources": [
+        "maven"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "groupName": "Maven packages (non-major)",
+      "groupSlug": "maven-non-major",
+      "automerge": true
+    },
+    {
+      "matchDatasources": [
+        "gradle"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "groupName": "Gradle plugins (non-major)",
+      "groupSlug": "gradle-non-major",
+      "automerge": true
+    },
+    {
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false,
+      "schedule": []
     },
     {
       "description": "Disable any intra-module dependency. This is quite an aggressive one, and goes beyond the current repo",
@@ -30,14 +79,6 @@
       "matchPackageNames": [
         "/^nl\\.jvandis.*/"
       ]
-    },
-    {
-      "matchPackageNames": [
-        "@date-io/date-fns"
-      ],
-      "allowedVersions": "< 2",
-      "groupName": "Tightly coupled with material-ui/pickers v3",
-      "groupSlug": "date-io-date-fns"
     }
   ]
 }
