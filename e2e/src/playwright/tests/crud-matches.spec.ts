@@ -1,7 +1,13 @@
 import { expect, test } from "@playwright/test";
 import { HOST } from "./utils";
 import { v4 as uuid } from "uuid";
-import { createMatchEvent, deleteMatch, updateMatch } from "./match-utils";
+import {
+  createMatchEvent,
+  deleteMatch,
+  updateMatch,
+  setMatchAttendance,
+  verifyMatchAttendanceState,
+} from "./match-utils";
 
 test.describe("Matches", () => {
   test.beforeEach(async ({ page }) => {
@@ -23,13 +29,34 @@ test.describe("Matches", () => {
     await expect(page.locator("tbody")).not.toContainText(opponent);
   });
 
-  test.skip("View match details and set attendance", async ({ page }) => {
-    // TODO: Requires event-card-{id} testid and Aanwezig/Misschien/Afwezig
-    // attendance buttons with data-selected attribute — not yet in the app.
-  });
+  test("Set match attendance: attending → maybe → absent", async ({ page }) => {
+    // 1. Create match
+    await page.getByRole("button", { name: "Admin dingen" }).click();
+    const opponent = `Team ${uuid().slice(0, 8)}`;
+    const eventId = await createMatchEvent(page, opponent);
 
-  test.skip("Change attendance state transitions", async ({ page }) => {
-    // TODO: Same as above — attendance UI not yet implemented.
+    // 2. Navigate to event details — click opponent text to open detail view
+    await page.getByText(opponent).first().click();
+
+    // 3. Set to Attending
+    await setMatchAttendance(page, "attending");
+    await verifyMatchAttendanceState(page, "attending");
+
+    // 4. Transition to Maybe
+    await setMatchAttendance(page, "maybe");
+    await verifyMatchAttendanceState(page, "maybe");
+
+    // 5. Transition to Absent
+    await setMatchAttendance(page, "absent");
+    await verifyMatchAttendanceState(page, "absent");
+
+    // 6. Verify persistence: reload page
+    await page.reload();
+    await verifyMatchAttendanceState(page, "absent");
+
+    // 7. Cleanup: navigate back to admin section and delete match
+    await page.getByRole("button", { name: "Admin dingen" }).click();
+    await deleteMatch(page, eventId);
   });
 
   test("Opponent field validation", async ({ page }) => {

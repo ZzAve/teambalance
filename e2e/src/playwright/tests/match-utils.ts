@@ -155,3 +155,20 @@ export async function setMatchAttendance(
   // Wait for state update (small delay for API call)
   await page.waitForTimeout(300);
 }
+
+/**
+ * Verify match attendance button shows selected state
+ */
+export async function verifyMatchAttendanceState(
+  page: Page,
+  status: "attending" | "maybe" | "absent"
+): Promise<void> {
+  const buttonMap = {
+    attending: /Aanwezig/i,
+    maybe: /Misschien/i,
+    absent: /Afwezig/i,
+  };
+
+  const button = page.getByRole("button", { name: buttonMap[status] });
+  await expect(button).toHaveAttribute("data-selected", "true");
+}
