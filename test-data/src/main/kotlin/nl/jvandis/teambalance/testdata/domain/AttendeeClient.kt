@@ -1,16 +1,15 @@
 package nl.jvandis.teambalance.testdata.domain
 
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
 import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.AttendeeCreationException
 import nl.jvandis.teambalance.testdata.jsonFormatter
-import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.format.KotlinxSerialization.auto
 import org.slf4j.LoggerFactory
 import kotlin.random.Random
 
@@ -22,8 +21,6 @@ class AttendeeClient(
     private val config: SpawnDataConfig,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
-    private val anAttendeeLens = Body.auto<Attendee>().toLens()
-    private val anAttendeesLens = Body.auto<Attendees>().toLens()
 
     fun createAndValidateAttendees(
         allUsers: List<User>,
@@ -79,7 +76,7 @@ class AttendeeClient(
             "Something went wrong creating an attendee: ${response.bodyString()}"
         }
 
-        return anAttendeeLens(response)
+        return jsonFormatter.decodeFromString<Attendee>(response.bodyString())
     }
 
     private fun getAttendee(attendeeId: String): Attendee {
@@ -92,7 +89,7 @@ class AttendeeClient(
             )
         }
 
-        return anAttendeeLens.extract(response)
+        return jsonFormatter.decodeFromString<Attendee>(response.bodyString())
     }
 
     fun getAllAttendees(eventIds: List<String>?): List<Attendee> {
@@ -103,6 +100,6 @@ class AttendeeClient(
             throw AttendeeCreationException("Failed to get all attendees. Status: ${response.status}")
         }
 
-        return anAttendeesLens.extract(response).attendees
+        return jsonFormatter.decodeFromString<Attendees>(response.bodyString()).attendees
     }
 }

@@ -8,16 +8,15 @@ import io.kotest.property.arbs.movies.harryPotterCharacter
 import io.kotest.property.arbs.products.googleTaxonomy
 import io.kotest.property.arbs.travel.airport
 import kotlinx.datetime.toKotlinLocalDateTime
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
 import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.EventCreationException
 import nl.jvandis.teambalance.testdata.jsonFormatter
-import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.format.KotlinxSerialization.auto
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -32,9 +31,6 @@ class MatchClient(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    val matchesLens = Body.auto<Event<Match>>().toLens()
-    val aMatchLens = Body.auto<Match>().toLens()
-
     private fun createMatch(match: CreateMatch): Event<Match> {
         val request = Request(Method.POST, MATCHES_BASE_URL).body(jsonFormatter.encodeToString(match))
         val response: Response = client(request)
@@ -43,7 +39,7 @@ class MatchClient(
             "Something went wrong creating a match: [${response.status}] ${response.bodyString()}"
         }
 
-        return matchesLens(response)
+        return jsonFormatter.decodeFromString<Event<Match>>(response.bodyString())
     }
 
     private fun addCoach(
@@ -58,7 +54,7 @@ class MatchClient(
         check(response.status.successful) {
             "Something went wrong updating additional-info: [${response.status}] ${response.bodyString()}"
         }
-        return aMatchLens(response)
+        return jsonFormatter.decodeFromString<Match>(response.bodyString())
     }
 
     fun addMatches(allUsers: List<User>): List<Match> {

@@ -5,17 +5,16 @@ import io.kotest.property.RandomSource
 import io.kotest.property.arbitrary.take
 import io.kotest.property.arbs.name
 import kotlinx.datetime.toKotlinLocalDate
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import nl.jvandis.teambalance.testdata.Conditional
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
 import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.TransactionExclusionCreationException
 import nl.jvandis.teambalance.testdata.jsonFormatter
-import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.format.KotlinxSerialization.auto
 import org.slf4j.LoggerFactory
 import kotlin.random.Random
 
@@ -29,9 +28,6 @@ class TransactionExclusionClient(
     private val log = LoggerFactory.getLogger(javaClass)
 
     private val conditional = Conditional(random)
-    val aTransactionExclusion = Body.auto<TransactionExclusion>().toLens()
-
-    val aTransactionExclusions = Body.auto<TransactionExclusions>().toLens()
 
     fun createAndValidateTransactionExclusions(): List<TransactionExclusion> {
         val createdTransactionExclusions =
@@ -92,7 +88,7 @@ class TransactionExclusionClient(
             "Something went wrong fetching the transaction-exclusions: ${response.bodyString()}"
         }
 
-        return aTransactionExclusions(response).transactionExclusions
+        return jsonFormatter.decodeFromString<TransactionExclusions>(response.bodyString()).transactionExclusions
     }
 
     private fun getTransactionExclusion(id: String): TransactionExclusion {
@@ -103,7 +99,7 @@ class TransactionExclusionClient(
             "Something went wrong fetching the transaction-exclusion with id $id: ${response.bodyString()}"
         }
 
-        return aTransactionExclusion(response)
+        return jsonFormatter.decodeFromString<TransactionExclusion>(response.bodyString())
     }
 
     private fun createTransactionExclusion(createTransactionExclusion: CreateTransactionExclusion): TransactionExclusion {
@@ -116,7 +112,7 @@ class TransactionExclusionClient(
             "Something went wrong creating a transactionExclusion: ${response.bodyString()}"
         }
 
-        return aTransactionExclusion(response)
+        return jsonFormatter.decodeFromString<TransactionExclusion>(response.bodyString())
     }
 
     fun deleteAndValidateTransactionExclusions(transactionExclusion: TransactionExclusion) {

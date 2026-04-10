@@ -4,16 +4,15 @@ import io.kotest.property.Arb
 import io.kotest.property.RandomSource
 import io.kotest.property.arbitrary.take
 import io.kotest.property.arbs.firstName
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
 import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.UserCreationException
 import nl.jvandis.teambalance.testdata.jsonFormatter
-import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.format.KotlinxSerialization.auto
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import kotlin.random.Random
@@ -24,8 +23,6 @@ class UserClient(
     private val config: SpawnDataConfig,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
-    val aUserLens = Body.auto<User>().toLens()
-    val aUsersLens = Body.auto<Users>().toLens()
 
     private fun createUser(user: CreateUser): User {
         val body = jsonFormatter.encodeToString(user)
@@ -35,7 +32,7 @@ class UserClient(
             "Something went wrong creating a user: requestBody: $body, status: ${response.status}, body: ${response.bodyString()}"
         }
 
-        return aUserLens(response)
+        return jsonFormatter.decodeFromString<User>(response.bodyString())
     }
 
     private fun getUser(id: String): User {
@@ -45,7 +42,7 @@ class UserClient(
             "Something went fetching user with id $id: status: ${response.status}, body: ${response.bodyString()}"
         }
 
-        return aUserLens(response)
+        return jsonFormatter.decodeFromString<User>(response.bodyString())
     }
 
     fun getAllUsers(): List<User> {
@@ -55,7 +52,7 @@ class UserClient(
             "Something went fetching users: ${response.status} - ${response.bodyString()}"
         }
 
-        return aUsersLens(response).users
+        return jsonFormatter.decodeFromString<Users>(response.bodyString()).users
     }
 
     fun deleteAndValidateUser(user: User) {
@@ -85,7 +82,7 @@ class UserClient(
             "Something went wrong updating the user with id ${user.id}: ${response.status} - ${response.bodyString()}"
         }
 
-        val updatedUser = aUserLens(response)
+        val updatedUser = jsonFormatter.decodeFromString<User>(response.bodyString())
         val updatedUser2 = getUser(user.id)
         check(
             updatedUser == updatedUser2 &&

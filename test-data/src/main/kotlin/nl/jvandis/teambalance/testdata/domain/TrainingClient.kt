@@ -6,18 +6,17 @@ import io.kotest.property.arbitrary.take
 import io.kotest.property.arbs.games.cluedoLocations
 import io.kotest.property.arbs.stockExchanges
 import kotlinx.datetime.toKotlinLocalDateTime
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
 import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.EventCreationException
 import nl.jvandis.teambalance.testdata.jsonFormatter
-import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.format.KotlinxSerialization.auto
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -31,9 +30,6 @@ class TrainingClient(
     private val attendeeClient: AttendeeClient,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
-
-    private val aTrainingsLens = Body.auto<Event<Training>>().toLens()
-    private val aTrainingLens = Body.auto<Training>().toLens()
 
     fun deleteTraining(id: String) {
         val request =
@@ -62,7 +58,7 @@ class TrainingClient(
             "Something went wrong getting all trainings: [${response.status}] ${response.bodyString()}"
         }
 
-        return aTrainingsLens.extract(response).events
+        return jsonFormatter.decodeFromString<Event<Training>>(response.bodyString()).events
     }
 
     private fun createTraining(training: CreateTraining): Event<Training> {
@@ -73,7 +69,7 @@ class TrainingClient(
             "Something went wrong creating a training: [${response.status}] ${response.bodyString()}"
         }
 
-        return aTrainingsLens(response)
+        return jsonFormatter.decodeFromString<Event<Training>>(response.bodyString())
     }
 
     private fun addTrainer(
@@ -91,7 +87,7 @@ class TrainingClient(
             "Something went wrong adding a trainer: [${response.status}] ${response.bodyString()}"
         }
 
-        return aTrainingLens(response)
+        return jsonFormatter.decodeFromString<Training>(response.bodyString())
     }
 
     fun createAndValidateTrainings(allUsers: List<User>): List<Training> {

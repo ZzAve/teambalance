@@ -7,16 +7,15 @@ import io.kotest.property.arbs.geo.country
 import io.kotest.property.arbs.products.googleTaxonomy
 import io.kotest.property.arbs.tube.tubeJourney
 import kotlinx.datetime.toKotlinLocalDateTime
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
 import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.EventCreationException
 import nl.jvandis.teambalance.testdata.jsonFormatter
-import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.format.KotlinxSerialization.auto
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -31,8 +30,6 @@ class EventClient(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    val aMiscEvent = Body.auto<Event<MiscEvent>>().toLens()
-
     private fun createMiscEvent(miscEvent: CreateMiscEvent): Event<MiscEvent> {
         val request = Request(Method.POST, MISC_EVENTS_BASE_URL).body(jsonFormatter.encodeToString(miscEvent))
         val response: Response = client(request)
@@ -40,7 +37,7 @@ class EventClient(
         check(response.status.successful) {
             "Something went wrong creating a misc event: [${response.status}] ${response.bodyString()}"
         }
-        return aMiscEvent(response)
+        return jsonFormatter.decodeFromString<Event<MiscEvent>>(response.bodyString())
     }
 
     fun addEvents(allUsers: List<User>) {

@@ -4,15 +4,14 @@ import io.kotest.property.Arb
 import io.kotest.property.RandomSource
 import io.kotest.property.arbitrary.take
 import io.kotest.property.arbs.usernames
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import nl.jvandis.teambalance.testdata.SpawnDataConfig
 import nl.jvandis.teambalance.testdata.domain.CouldNotCreateEntityException.AliasCreationException
 import nl.jvandis.teambalance.testdata.jsonFormatter
-import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.format.KotlinxSerialization.auto
 import org.slf4j.LoggerFactory
 import kotlin.random.Random
 
@@ -22,8 +21,6 @@ class BankAccountAliasClient(
     private val config: SpawnDataConfig,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
-    private val aBankAccountAliasLens = Body.auto<BankAccountAlias>().toLens()
-    private val aBankAccountAliasesLens = Body.auto<BankAccountAliases>().toLens()
 
     fun createAndValidateAliases(allUsers: List<User>): List<BankAccountAlias> {
         val bankAccountAliases: List<BankAccountAlias> =
@@ -94,7 +91,7 @@ class BankAccountAliasClient(
             )
         }
 
-        return aBankAccountAliasLens.extract(response)
+        return jsonFormatter.decodeFromString<BankAccountAlias>(response.bodyString())
     }
 
     private fun getAlias(id: String): BankAccountAlias {
@@ -107,7 +104,7 @@ class BankAccountAliasClient(
             )
         }
 
-        return aBankAccountAliasLens.extract(response)
+        return jsonFormatter.decodeFromString<BankAccountAlias>(response.bodyString())
     }
 
     fun getAllAliases(): List<BankAccountAlias> {
@@ -118,6 +115,6 @@ class BankAccountAliasClient(
             throw AliasCreationException("Failed to get all bank account aliases. Status: ${response.status}")
         }
 
-        return aBankAccountAliasesLens.extract(response).bankAccountAliases
+        return jsonFormatter.decodeFromString<BankAccountAliases>(response.bodyString()).bankAccountAliases
     }
 }
