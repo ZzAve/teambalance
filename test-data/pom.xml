@@ -19,7 +19,7 @@
         <kotlinx.serialization.version>1.5.0</kotlinx.serialization.version>
 
         <http4k.version>4.39.0.0</http4k.version>
-        <kotlinx-datetime.version>0.3.1</kotlinx-datetime.version>
+        <kotlinx-datetime.version>0.7.1-0.6.x-compat</kotlinx-datetime.version>
 
         <!-- mark the src/main files as test files -->
         <sonar.tests>src/main</sonar.tests>
