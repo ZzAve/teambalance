@@ -4,16 +4,13 @@ import kotlinx.serialization.json.Json
 import nl.jvandis.teambalance.testdata.domain.AttendeeClient
 import nl.jvandis.teambalance.testdata.domain.BankAccountAlias
 import nl.jvandis.teambalance.testdata.domain.BankAccountAliasClient
-import nl.jvandis.teambalance.testdata.domain.Event
 import nl.jvandis.teambalance.testdata.domain.EventClient
 import nl.jvandis.teambalance.testdata.domain.MatchClient
-import nl.jvandis.teambalance.testdata.domain.MiscEvent
 import nl.jvandis.teambalance.testdata.domain.TrainingClient
 import nl.jvandis.teambalance.testdata.domain.TransactionExclusionClient
 import nl.jvandis.teambalance.testdata.domain.User
 import nl.jvandis.teambalance.testdata.domain.UserClient
 import org.http4k.client.ApacheClient
-import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -21,17 +18,17 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
-import org.http4k.format.KotlinxSerialization.auto
 import org.slf4j.LoggerFactory
 import kotlin.random.Random
 import kotlin.time.measureTime
 
+// NOTE: isLenient is intentionally NOT enabled. Lenient parsing allows silent
+// type coercion (e.g. boolean true -> String "true"), which previously masked
+// deserialization mismatches and caused the id field to be populated with "true".
 val jsonFormatter =
     Json {
         encodeDefaults = true
-        isLenient = true
         ignoreUnknownKeys = true
-//    prettyPrint = true
     }
 
 class Initializer(
@@ -53,8 +50,6 @@ class Initializer(
     private val trainingClient = TrainingClient(client, random, config, attendeeClient)
     private val matchClient = MatchClient(client, random, config, attendeeClient)
     private val eventClient = EventClient(client, random, config, attendeeClient)
-
-    val aMiscEvent = Body.auto<Event<MiscEvent>>().toLens()
 
     init {
         val loginResponse =
