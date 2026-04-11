@@ -127,7 +127,7 @@ the orchestrator must escalate to the user rather than re-dispatching. Present:
    - Delete stale tasks that no longer match the backlog (`status: deleted`)
    - Mark done tasks that match backlog Done section (`status: completed`)
    - Create tasks for all Active backlog items not yet in the list
-   - **Limit to 7 tasks**: 2 most-recent Done, all Active, 3 next-up from future/blocked
+   - **Limit to 7 tasks**: 2 most-recent Done (remove older ones), all Active, 3 next-up from future/blocked
 4. **Set** round_number = 1
 
 ## LOOP (Repeats Until No Eligible Tasks)

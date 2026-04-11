@@ -75,6 +75,25 @@ Sports team management app for Tovo Utrecht volleyball club. Tracks event attend
 - Do not modify SQL schemas directly; use Flyway migrations
 - Do not share sensitive config (API keys, Bunq tokens) in code; use environment variables
 
+## Quick Start (Local Development)
+
+1. Clone the repo and `cd` to project root
+2. `make run-local` — starts PostgreSQL, backend (port 8080), and frontend (port 5173) via Docker
+3. Add to `/etc/hosts`: `127.0.0.1 4.teambalance.local app.teambalance.local api.teambalance.local`
+4. Open `http://4.teambalance.local:5173` in your browser
+5. Default credentials: username=`admin`, password=`admin` (set up via `make test`)
+6. Run `make format` before committing code
+
+When creating a worktree, be sure to run a `cd frontend && npm i` to bootsrap pre-commit hooks
+
+## Troubleshooting
+
+- **Port already in use**: Kill Docker containers with `make clean` first
+- **Frontend not hot-reloading**: Ensure `make run-local-frontend` is watching for changes
+- **Database migration failed**: Check Flyway SQL files in `backend/src/main/resources/db/migration/`
+- **Build hangs on JOOQ generation**: This is normal; it can take 1–2 minutes for large schemas
+
+<!-- code-review-graph MCP tools -->
 ## MCP Tools: code-review-graph
 
 **IMPORTANT: This project has a knowledge graph. ALWAYS use the
@@ -112,21 +131,3 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 2. Use `detect_changes` for code review.
 3. Use `get_affected_flows` to understand impact.
 4. Use `query_graph` pattern="tests_for" to check coverage.
-
-## Quick Start (Local Development)
-
-1. Clone the repo and `cd` to project root
-2. `make run-local` — starts PostgreSQL, backend (port 8080), and frontend (port 5173) via Docker
-3. Add to `/etc/hosts`: `127.0.0.1 4.teambalance.local app.teambalance.local api.teambalance.local`
-4. Open `http://4.teambalance.local:5173` in your browser
-5. Default credentials: username=`admin`, password=`admin` (set up via `make test`)
-6. Run `make format` before committing code
-
-When creating a worktree, be sure to run a `cd frontend && npm i` to bootsrap pre-commit hooks
-
-## Troubleshooting
-
-- **Port already in use**: Kill Docker containers with `make clean` first
-- **Frontend not hot-reloading**: Ensure `make run-local-frontend` is watching for changes
-- **Database migration failed**: Check Flyway SQL files in `backend/src/main/resources/db/migration/`
-- **Build hangs on JOOQ generation**: This is normal; it can take 1–2 minutes for large schemas

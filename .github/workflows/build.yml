@@ -5,6 +5,10 @@ name: Build
 
 on: [pull_request]
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     # Allow the job to fetch a GitHub ID token
