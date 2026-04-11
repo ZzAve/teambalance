@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.23
 # Simple shell Dockerfile for local development purposes
 
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 # Set working directory
 WORKDIR /tmp
@@ -14,7 +14,7 @@ RUN --mount=type=cache,target=/tmp/.npm \
   npm set cache /tmp/.npm && \
   npm ci
 
-FROM node:20-bookworm AS dev
+FROM node:22-bookworm AS dev
 
 # not the best idea to run under root
 USER root
