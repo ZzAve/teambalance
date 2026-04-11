@@ -1,23 +1,23 @@
 package nl.jvandis.teambalance.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
 import nl.jvandis.teambalance.filters.DEFAULT_START_OF_SEASON_RAW
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import java.time.LocalDateTime
 import java.time.ZoneId
 
 class ConfigurationServiceSeasonTest {
-    private val repository: ConfigurationRepository = mockk()
+    private val repository: ConfigurationRepository = mock()
     private val objectMapper = ObjectMapper()
     private val service = ConfigurationService(repository, objectMapper)
 
     @Test
     fun `getStartOfSeason returns DB value when present`() {
-        every { repository.getConfig(START_OF_SEASON_CONFIG_KEY) } returns "2024-09-01T00:00:00"
+        `when`(repository.getConfig(START_OF_SEASON_CONFIG_KEY)).thenReturn("2024-09-01T00:00:00")
 
         val result = service.getStartOfSeason()
 
@@ -26,7 +26,7 @@ class ConfigurationServiceSeasonTest {
 
     @Test
     fun `getStartOfSeason returns default fallback when not in DB`() {
-        every { repository.getConfig(START_OF_SEASON_CONFIG_KEY) } returns null
+        `when`(repository.getConfig(START_OF_SEASON_CONFIG_KEY)).thenReturn(null)
 
         val result = service.getStartOfSeason()
 
@@ -35,7 +35,7 @@ class ConfigurationServiceSeasonTest {
 
     @Test
     fun `getStartOfSeasonZoned returns DB value as ZonedDateTime in Amsterdam timezone`() {
-        every { repository.getConfig(START_OF_SEASON_CONFIG_KEY) } returns "2024-09-01T00:00:00"
+        `when`(repository.getConfig(START_OF_SEASON_CONFIG_KEY)).thenReturn("2024-09-01T00:00:00")
 
         val result = service.getStartOfSeasonZoned()
 
@@ -45,10 +45,9 @@ class ConfigurationServiceSeasonTest {
     @Test
     fun `setStartOfSeason persists the value to the repository`() {
         val newStart = LocalDateTime.of(2026, 8, 1, 0, 0, 0)
-        every { repository.upsertConfig(START_OF_SEASON_CONFIG_KEY, any()) } returns Unit
 
         service.setStartOfSeason(newStart)
 
-        verify(exactly = 1) { repository.upsertConfig(START_OF_SEASON_CONFIG_KEY, "2026-08-01T00:00") }
+        verify(repository).upsertConfig(START_OF_SEASON_CONFIG_KEY, "2026-08-01T00:00")
     }
 }

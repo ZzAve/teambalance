@@ -208,6 +208,12 @@
             <version>1.13.10</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.mockk</groupId>
+            <artifactId>mockk-core</artifactId>
+            <version>1.13.10</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
@@ -217,17 +223,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <groupId>io.mockk</groupId>
-                        <artifactId>mockk</artifactId>
-                        <version>1.13.10</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.jooq</groupId>

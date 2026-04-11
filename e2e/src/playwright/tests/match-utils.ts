@@ -60,7 +60,7 @@ export async function createMatchEvent(
     date?: Date;
     location?: string;
     description?: string;
-  }
+  },
 ): Promise<string> {
   const date = options?.date ?? addDays(NOW, 7); // Default: next week
   const location = options?.location ?? "Test Sporthal";
@@ -100,8 +100,15 @@ export async function createMatchEvent(
   const eventId = matches && matches[1];
 
   // Dismiss toast (may auto-hide; ignore errors)
-  await page.getByRole("alert").getByRole("button").click({ timeout: 3000 }).catch(() => {});
-  await page.getByRole("alert").waitFor({ state: "hidden", timeout: 10000 }).catch(() => {});
+  await page
+    .getByRole("alert")
+    .getByRole("button")
+    .click({ timeout: 3000 })
+    .catch(() => {});
+  await page
+    .getByRole("alert")
+    .waitFor({ state: "hidden", timeout: 10000 })
+    .catch(() => {});
 
   return ensure(eventId, "match event ID");
 }
@@ -113,7 +120,7 @@ export async function updateMatch(
   page: Page,
   eventId: string,
   newOpponent?: string,
-  newLocation?: string
+  newLocation?: string,
 ): Promise<void> {
   await page.getByRole("button", { name: `Update event ${eventId}` }).click();
 
@@ -128,35 +135,41 @@ export async function updateMatch(
   await page.getByRole("button", { name: "Opslaan" }).click();
 
   await expect(page.getByRole("alert")).toContainText(
-    `Wedstrijd event (id ${eventId}) geüpdate`
+    `Wedstrijd event (id ${eventId}) geüpdate`,
   );
 
-  await page.getByRole("alert").getByRole("button").click({ timeout: 3000 }).catch(() => {});
-  await page.getByRole("alert").waitFor({ state: "hidden", timeout: 10000 }).catch(() => {});
+  await page
+    .getByRole("alert")
+    .getByRole("button")
+    .click({ timeout: 3000 })
+    .catch(() => {});
+  await page
+    .getByRole("alert")
+    .waitFor({ state: "hidden", timeout: 10000 })
+    .catch(() => {});
 }
 
 /**
  * Delete match event with confirmation
  */
-export async function deleteMatch(
-  page: Page,
-  eventId: string
-): Promise<void> {
+export async function deleteMatch(page: Page, eventId: string): Promise<void> {
   await page
     .getByRole("button", { name: `Verwijder event ${eventId}` })
     .click();
 
   await expect(
-    page.getByRole("heading", { name: "Weet je zeker" })
+    page.getByRole("heading", { name: "Weet je zeker" }),
   ).toContainText(
-    `Weet je zeker dat je match met id #${eventId} wil verwijderen`
+    `Weet je zeker dat je match met id #${eventId} wil verwijderen`,
   );
 
   await page.getByRole("button", { name: "OK" }).click();
 
   // Use filter so multiple concurrent snackbars don't cause a strict-mode violation.
   await expect(
-    page.getByRole("alert").filter({ hasText: `Event #${eventId} is verwijderd` })
+    page
+      .getByRole("alert")
+      .filter({ hasText: `Event #${eventId} is verwijderd` }),
   ).toBeVisible();
 }
 
@@ -165,7 +178,7 @@ export async function deleteMatch(
  */
 export async function setMatchAttendance(
   page: Page,
-  status: "attending" | "maybe" | "absent"
+  status: "attending" | "maybe" | "absent",
 ): Promise<void> {
   const buttonMap = {
     attending: /Aanwezig/i,

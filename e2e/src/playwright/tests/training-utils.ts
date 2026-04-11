@@ -79,7 +79,10 @@ export const createTrainingEvent = async (
   // the snackbar to disappear on its own.
   const alertDismiss = page.getByRole("alert").getByRole("button");
   await alertDismiss.click({ timeout: 3000 }).catch(() => {});
-  await page.getByRole("alert").waitFor({ state: "hidden", timeout: 10000 }).catch(() => {});
+  await page
+    .getByRole("alert")
+    .waitFor({ state: "hidden", timeout: 10000 })
+    .catch(() => {});
   return ensure(eventId, "event training Id");
 };
 
@@ -93,8 +96,15 @@ export async function updateTraining(page: Page, eventId: string) {
   await expect(page.getByRole("alert")).toContainText(
     `Training event (id ${eventId}) geüpdate`,
   );
-  await page.getByRole("alert").getByRole("button").click({ timeout: 3000 }).catch(() => {});
-  await page.getByRole("alert").waitFor({ state: "hidden", timeout: 10000 }).catch(() => {});
+  await page
+    .getByRole("alert")
+    .getByRole("button")
+    .click({ timeout: 3000 })
+    .catch(() => {});
+  await page
+    .getByRole("alert")
+    .waitFor({ state: "hidden", timeout: 10000 })
+    .catch(() => {});
 }
 
 export async function deleteTraining(page: Page, eventId: string | void) {

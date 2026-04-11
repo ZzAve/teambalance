@@ -32,7 +32,7 @@ test("Validate previous events can be shown", async ({ page }) => {
 
   // The past event must NOT appear while old events are hidden.
   await expect(
-    page.getByTestId("event-list-item").filter({ hasText: comment })
+    page.getByTestId("event-list-item").filter({ hasText: comment }),
   ).not.toBeVisible();
 
   // Toggle old events ON.
@@ -41,6 +41,6 @@ test("Validate previous events can be shown", async ({ page }) => {
 
   // The past event must now be visible.
   await expect(
-    page.getByTestId("event-list-item").filter({ hasText: comment })
+    page.getByTestId("event-list-item").filter({ hasText: comment }),
   ).toBeVisible();
 });
