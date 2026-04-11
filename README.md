@@ -80,7 +80,7 @@ This shows everything you'd expect from a money pool:
 - Transaction history
 - most / least contributors to the money pool
 
-<div align="center"> 
+<div align="center">
 <img alt="Bunq balance" src="./bunq-balance-integration.jpg" />
 </div>
 
@@ -98,7 +98,7 @@ The Events api allows team members to register availability for upcoming events 
 
 Through admin screen, events can be created, modified, deleted at any point in time.
 
-<div align="center"> 
+<div align="center">
 <img alt="Events overview" width="45%" src="./teambalance-events-overview.jpg" />
 <img alt="Admin screens for events" width="45%" src="./teambalance-events-admin.jpg" />
 </div>
@@ -130,6 +130,8 @@ Infra
 - Jib, GCP container registry
 - Google cloud run
 
+This project makes use of `code-review-graph`. Install it using `pipx install code-review-graph`
+
 ## Setup
 
 ### Getting started
@@ -146,15 +148,15 @@ To be able to run this locally there are two options:
    for a service account](https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login)
 2. by using the 'local' application profile, teambalances assumes one has a local postgres instance running, exposed on
    port `54321` (note the trailing `1`), with a database named `teambalance`
-   - Hint: `docker compose up -d` 
+   - Hint: `docker compose up -d`
 
 > ⚠️ Attention
 > Because of the multitenant setup of teambalance, it is necessary to access teambalance through a recognised domain.
 > The ones that are set up are:
-> 
+>
 > - 4.teambalance.local
 > - 5.teambalance.local
-> 
+>
 > Make sure configure your local `/etc/hosts` file to map these domains to `127.0.0.1` in order to work with teambalance locally.
 > ([Both port 3000 and 8080 work for the local setup](app/src/main/resources/application-local.yml))
 
@@ -169,7 +171,7 @@ Through [google cloud console](https://console.cloud.google.com/run/0), deployme
 
 Teambalance makes use of a PostgreSQL database that sits in the cloud
 
-Using [JOOQ](https://www.jooq.org/) 
+Using [JOOQ](https://www.jooq.org/)
 (used to be [Spring data jpa](https://spring.io/projects/spring-data) )and [Postgres](https://www.postgresql.org/) dependency:
 
 ```xml
@@ -244,9 +246,9 @@ As with most projects, it's hardly ever considered finished.
 
 Unfortunately, Intellij doesn't understand shaded artifacts ([read up on it here](https://youtrack.jetbrains.com/issue/IDEA-126596))
 
-> A better workaround seems to be: 
-> 
+> A better workaround seems to be:
+>
 > - Right-click on shade-bug-repackaged -> pom.xml in the project view in IntelliJ,
-> - choose "Maven" -> "Ignore Projects". 
+> - choose "Maven" -> "Ignore Projects".
 > - Then do a "Maven" -> "Reload" on the top-level pom.xml.
 > .
