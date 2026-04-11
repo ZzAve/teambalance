@@ -5,6 +5,7 @@ import { v4 as uuid } from "uuid";
 
 test("Validate previous events can be shown", async ({ page }) => {
   await page.goto(HOST);
+  await page.getByText("Aanstaande trainingen").waitFor({ state: "visible" });
   await page.getByRole("button", { name: "Admin dingen" }).click();
 
   // Use a unique comment so we can find THIS specific past event later,
@@ -32,7 +33,7 @@ test("Validate previous events can be shown", async ({ page }) => {
 
   // The past event must NOT appear while old events are hidden.
   await expect(
-    page.getByTestId("event-list-item").filter({ hasText: comment })
+    page.getByTestId("event-list-item").filter({ hasText: comment }),
   ).not.toBeVisible();
 
   // Toggle old events ON.
@@ -41,6 +42,6 @@ test("Validate previous events can be shown", async ({ page }) => {
 
   // The past event must now be visible.
   await expect(
-    page.getByTestId("event-list-item").filter({ hasText: comment })
+    page.getByTestId("event-list-item").filter({ hasText: comment }),
   ).toBeVisible();
 });

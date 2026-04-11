@@ -1,15 +1,12 @@
 import { expect, test } from "@playwright/test";
 import { HOST } from "./utils";
 import { v4 as uuid } from "uuid";
-import {
-  createMatchEvent,
-  deleteMatch,
-  updateMatch,
-} from "./match-utils";
+import { createMatchEvent, deleteMatch, updateMatch } from "./match-utils";
 
 test.describe("Matches", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(HOST);
+    await page.getByText("Aanstaande trainingen").waitFor({ state: "visible" });
   });
 
   test("CRUD normal match", async ({ page }) => {
@@ -48,7 +45,7 @@ test.describe("Matches", () => {
 
     // Verify we're back on the Wedstrijden list
     await expect(
-      page.getByRole("button", { name: /nieuwe wedstrijd/i })
+      page.getByRole("button", { name: /nieuwe wedstrijd/i }),
     ).toBeVisible();
   });
 
@@ -59,8 +56,12 @@ test.describe("Matches", () => {
     const eventId = await createMatchEvent(page, opponent);
 
     // Attempt delete but cancel
-    await page.getByRole("button", { name: `Verwijder event ${eventId}` }).click();
-    await expect(page.getByRole("heading", { name: "Weet je zeker" })).toBeVisible();
+    await page
+      .getByRole("button", { name: `Verwijder event ${eventId}` })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "Weet je zeker" }),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Cancel" }).click();
 
     // Verify match still exists
