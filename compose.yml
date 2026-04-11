@@ -49,7 +49,7 @@ services:
       retries: 3
 
   postgresql:
-    image: postgres:16.5-alpine
+    image: postgres:16.13-alpine
     ports:
       - "54321:5432"
     environment:
