@@ -1,5 +1,6 @@
-package nl.jvandis.teambalance.api.config
+package nl.jvandis.teambalance.api.settings
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.ConfigurationService
@@ -42,5 +43,6 @@ data class SeasonConfigResponse(
 )
 
 data class UpdateSeasonConfigRequest(
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     val startOfSeason: LocalDateTime,
 )

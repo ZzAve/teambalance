@@ -202,18 +202,6 @@
             <version>${mockito-kotlin.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.mockk</groupId>
-            <artifactId>mockk</artifactId>
-            <version>1.13.10</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.mockk</groupId>
-            <artifactId>mockk-core</artifactId>
-            <version>1.13.10</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>

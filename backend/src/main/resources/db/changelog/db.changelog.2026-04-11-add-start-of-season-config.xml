@@ -4,6 +4,9 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet author="julius van dis" id="2026-04-11-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM config WHERE key = 'startOfSeason'</sqlCheck>
+        </preConditions>
         <comment>Seed startOfSeason config for all tenants (default: 2025-08-01T00:00:00)</comment>
         <insert tableName="config">
             <column name="key" value="startOfSeason"/>
