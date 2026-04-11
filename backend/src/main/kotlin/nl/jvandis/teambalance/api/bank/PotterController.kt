@@ -42,11 +42,11 @@ class PotterController(
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
         @RequestParam(value = "include-support-roles", defaultValue = "false") includeSupportRoles: Boolean,
     ): PottersResponse {
-        val effectiveSinceInput = sinceInput ?: configurationService.getStartOfSeason()
-        val pottersFullPeriod = potterService.getPotters(effectiveSinceInput.toZonedDateTime(), includeInactiveUsers, includeSupportRoles)
+        val effectiveSince = (sinceInput ?: configurationService.getStartOfSeason()).toZonedDateTime()
+        val pottersFullPeriod = potterService.getPotters(effectiveSince, includeInactiveUsers, includeSupportRoles)
         val now = ZonedDateTime.now()
         val pottersLastMonthResponse: PottersResponse? =
-            if (Duration.between(effectiveSinceInput, now) > Duration.ofDays(30)) {
+            if (Duration.between(effectiveSince, now) > Duration.ofDays(30)) {
                 potterService
                     .getPotters(now.minusDays(30), includeInactiveUsers, includeSupportRoles)
                     .toPottersResponse(limit)
