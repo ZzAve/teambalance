@@ -55,8 +55,8 @@ Sports team management app for Tovo Utrecht volleyball club. Tracks event attend
 
 ## Testing
 
-- **Backend**: JUnit 5 + Mockk (unit tests in `src/test/kotlin/`)
-- **Frontend**: React Testing Library (tests co-located with components)
+- **Backend**: JUnit 5 + MockK (unit tests in `src/test/kotlin/`)
+- **Frontend**: Jest + React Testing Library (tests co-located with components)
 - **E2E**: Playwright (orchestrated via Docker Compose in `e2e/`)
 - **Test data**: Use `make test` to populate a local backend with sample events, users, and transactions
 
@@ -116,15 +116,17 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 ## Quick Start (Local Development)
 
 1. Clone the repo and `cd` to project root
-2. `make run-local` — starts PostgreSQL, backend (port 8080), and frontend (port 3000) via Docker
+2. `make run-local` — starts PostgreSQL, backend (port 8080), and frontend (port 5173) via Docker
 3. Add to `/etc/hosts`: `127.0.0.1 4.teambalance.local app.teambalance.local api.teambalance.local`
-4. Open `http://4.teambalance.local:3000` in your browser
+4. Open `http://4.teambalance.local:5173` in your browser
 5. Default credentials: username=`admin`, password=`admin` (set up via `make test`)
 6. Run `make format` before committing code
+
+When creating a worktree, be sure to run a `cd frontend && npm i` to bootsrap pre-commit hooks
 
 ## Troubleshooting
 
 - **Port already in use**: Kill Docker containers with `make clean` first
 - **Frontend not hot-reloading**: Ensure `make run-local-frontend` is watching for changes
-- **Database migration failed**: Check Flyway SQL files in `docker/postgres/`
+- **Database migration failed**: Check Flyway SQL files in `backend/src/main/resources/db/migration/`
 - **Build hangs on JOOQ generation**: This is normal; it can take 1–2 minutes for large schemas
