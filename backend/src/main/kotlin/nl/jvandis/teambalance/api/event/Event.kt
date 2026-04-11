@@ -25,7 +25,7 @@ abstract class Event(
 ) {
     data class Builder(
         val id: Long,
-        val teamBalanceId: TeamBalanceId,
+        val teamBalanceId: String,
         val startTime: LocalDateTime,
         val location: String,
         val comment: String?,
@@ -48,7 +48,7 @@ abstract class Event(
             validate()
             return CommonEvent(
                 id,
-                teamBalanceId,
+                TeamBalanceId(teamBalanceId),
                 startTime,
                 location,
                 comment,

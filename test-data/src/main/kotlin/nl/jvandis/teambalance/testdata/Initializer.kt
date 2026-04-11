@@ -160,6 +160,9 @@ class Initializer(
 
         // Ensure trainings can be deleted
         trainingClient.deleteTraining(trainings.last().id)
+
+        // Ensure recurring trainings can be created, updated and deleted
+        trainingClient.createAndValidateRecurringTraining()
     }
 
     private fun addMatches(allUsers: List<User>) {

@@ -69,7 +69,7 @@ data class Match(
 
             return Match(
                 id = event.id,
-                teamBalanceId = event.teamBalanceId,
+                teamBalanceId = TeamBalanceId(event.teamBalanceId),
                 startTime = event.startTime,
                 location = event.location,
                 comment = event.comment,

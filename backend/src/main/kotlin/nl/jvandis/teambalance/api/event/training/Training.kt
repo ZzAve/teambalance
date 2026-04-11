@@ -41,7 +41,7 @@ data class Training(
         val id: Long,
         val trainerUserId: Long?,
         var event: Event.Builder? = null,
-        var trainer: User? = null,
+        var trainer: User.Builder? = null,
         var attendees: List<Attendee.Builder>? = null,
     ) : TeamBalanceEntityBuilder<Training> {
         override fun build(): Training {
@@ -55,11 +55,11 @@ data class Training(
 
             return Training(
                 id = event.id,
-                teamBalanceId = event.teamBalanceId,
+                teamBalanceId = TeamBalanceId(event.teamBalanceId),
                 startTime = event.startTime,
                 location = event.location,
                 comment = event.comment,
-                trainer = trainer,
+                trainer = trainer?.build(),
                 attendees = attendees?.build(),
                 recurringEventProperties = event.recurringEventProperties,
             )

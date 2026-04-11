@@ -4,6 +4,7 @@ import nl.jvandis.jooq.support.valuesFrom
 import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.data.MultiTenantDslContext
 import nl.jvandis.teambalance.data.NO_ID
+import nl.jvandis.teambalance.data.build
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.UzerRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.UZER
 import org.jooq.exception.DataAccessException
@@ -21,7 +22,8 @@ class UserRepository(
             .where(UZER.TEAM_BALANCE_ID.eq(userId.value))
             .fetchOne()
             ?.into(UzerRecord::class.java)
-            ?.into(User::class.java)
+            ?.toUserBuilder()
+            ?.build()
 
     // TODO: add sort
     fun findAll(sort: Sort = Sort.unsorted()): List<User> =
@@ -29,7 +31,8 @@ class UserRepository(
             .select()
             .from(UZER)
             .orderBy(UZER.NAME.asc())
-            .fetchInto(User::class.java)
+            .fetchInto(UzerRecord::class.java)
+            .map { it.toUserBuilder().build() }
 
     fun insertMany(users: List<User>): List<User> {
         if (users.isEmpty()) {
@@ -57,7 +60,9 @@ class UserRepository(
                     { it.jerseyNumber },
                 ).returningResult(UZER.fields().toList())
                 .fetch()
-                .into(User::class.java)
+                .into(UzerRecord::class.java)
+                .map { it.toUserBuilder() }
+                .build()
 
         return if (usersResult.size == users.size) {
             usersResult
@@ -106,9 +111,22 @@ class UserRepository(
                 UZER.JERSEY_NUMBER,
             ).fetchOne()
             ?.into(UzerRecord::class.java)
-            ?.into(User::class.java)
+            ?.toUserBuilder()
+            ?.build()
             ?: throw DataAccessException("Could not update user with id ${updatedUser.id}")
     }
 
     fun insert(user: User): User = insertMany(listOf(user)).first()
 }
+
+fun UzerRecord.toUserBuilder(): User.Builder =
+    User.Builder(
+        id = checkNotNull(id),
+        isActive = checkNotNull(isActive),
+        name = checkNotNull(name),
+        role = checkNotNull(role),
+        showForTrainings = checkNotNull(showForTrainings),
+        showForMatches = checkNotNull(showForMatches),
+        jerseyNumber = jerseyNumber,
+        teamBalanceId = checkNotNull(teamBalanceId),
+    )

@@ -60,5 +60,16 @@ fun MultiTenantDslContext.insertRecurringEventPropertyRecord(event: Event): Recu
 
     return insertRecurringEventPropertiesResult
         .into(RecurringEventPropertiesRecord::class.java)
-        .into(RecurringEventProperties::class.java)
+        .toRecurringEventProperties()
 }
+
+fun RecurringEventPropertiesRecord.toRecurringEventProperties(): RecurringEventProperties =
+    RecurringEventProperties(
+        id = checkNotNull(id),
+        teamBalanceId = TeamBalanceId(checkNotNull(teamBalanceId)),
+        intervalAmount = checkNotNull(intervalAmount),
+        intervalTimeUnit = checkNotNull(intervalTimeUnit),
+        amountLimit = amountLimit,
+        dateLimit = dateLimit,
+        selectedDays = selectedDays?.filterNotNull() ?: emptyList(),
+    )

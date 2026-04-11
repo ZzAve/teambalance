@@ -56,7 +56,7 @@ data class MiscellaneousEvent(
             event.validate()
             return MiscellaneousEvent(
                 id = event.id,
-                teamBalanceId = event.teamBalanceId,
+                teamBalanceId = TeamBalanceId(event.teamBalanceId),
                 startTime = event.startTime,
                 location = event.location,
                 comment = event.comment,

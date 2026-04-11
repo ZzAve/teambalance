@@ -21,21 +21,21 @@ data class Attendee(
 
     data class Builder(
         val id: Long,
-        val teamBalanceId: TeamBalanceId,
-        val userId: TeamBalanceId,
+        val teamBalanceId: String,
+        val userId: Long,
         val availability: Availability,
-        var eventId: TeamBalanceId? = null,
-        var user: User? = null,
+        var eventId: String? = null,
+        var user: User.Builder? = null,
     ) : TeamBalanceEntityBuilder<Attendee> {
         override fun build(): Attendee {
             val user = checkNotNull(user) { "User was not set" }
             val eventId = checkNotNull(eventId) { "EventId was not set" }
             return Attendee(
                 id = id,
-                teamBalanceId = teamBalanceId,
-                user = user,
+                teamBalanceId = TeamBalanceId(teamBalanceId),
+                user = user.build(),
                 availability = availability,
-                eventId = eventId,
+                eventId = TeamBalanceId(eventId),
             )
         }
     }

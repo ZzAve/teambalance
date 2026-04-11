@@ -5,6 +5,7 @@ import nl.jvandis.teambalance.api.attendees.AttendeeWithUserRecordHandler
 import nl.jvandis.teambalance.api.event.Event
 import nl.jvandis.teambalance.api.event.RecurringEventProperties
 import nl.jvandis.teambalance.api.event.TeamBalanceRecordHandler
+import nl.jvandis.teambalance.api.event.toRecurringEventProperties
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.EventRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.MatchRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.RecurringEventPropertiesRecord
@@ -37,25 +38,38 @@ class MatchWithAttendeesRecordHandler : TeamBalanceRecordHandler<Match> {
         val event =
             events.computeIfAbsent(eventId) {
                 // mapping via EventRecord works better with column name clashes (like `id`)
-                record
-                    .into(EventRecord::class.java)
-                    .into(Event.Builder::class.java)
+                record.into(EventRecord::class.java).let { er ->
+                    Event.Builder(
+                        id = checkNotNull(er.id),
+                        teamBalanceId = checkNotNull(er.teamBalanceId),
+                        startTime = checkNotNull(er.startTime),
+                        location = checkNotNull(er.location),
+                        comment = er.comment,
+                        recurringEventId = er.recurringEventId,
+                        recurringEventProperties = null,
+                    )
+                }
             }
         val recurringEventProperties =
             recurringEventId?.let {
                 recurringEventsPropertiesMap.computeIfAbsent(it) {
                     record
                         .into(RecurringEventPropertiesRecord::class.java)
-                        .into(RecurringEventProperties::class.java)
+                        .toRecurringEventProperties()
                 }
             }
 
         val match =
             matches.computeIfAbsent(matchId) {
                 // mapping via MatchRecord works better with column name clashes (like `id`)
-                record
-                    .into(MatchRecord::class.java) //
-                    .into(Match.Builder::class.java)
+                record.into(MatchRecord::class.java).let { mr ->
+                    Match.Builder(
+                        id = checkNotNull(mr.id),
+                        opponent = checkNotNull(mr.opponent),
+                        homeAway = checkNotNull(mr.homeAway),
+                        additionalInfo = mr.additionalInfo,
+                    )
+                }
             }
 
         event.recurringEventProperties = recurringEventProperties
@@ -64,9 +78,9 @@ class MatchWithAttendeesRecordHandler : TeamBalanceRecordHandler<Match> {
 
     fun stats(): String =
         """
-        Nr of records handled: $recordsHandled. 
-        Nr of events: ${events.size}. 
-        Nr of subEvents: ${matches.size}. 
+        Nr of records handled: $recordsHandled.
+        Nr of events: ${events.size}.
+        Nr of subEvents: ${matches.size}.
         -- Attendees:
         ${attendeeRecordHandler.stats()}
         """.trimIndent()
