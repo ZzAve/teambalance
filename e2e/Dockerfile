@@ -14,13 +14,11 @@ RUN --mount=type=cache,target=/tmp/.npm \
   npm set cache /tmp/.npm && \
   npm ci
 
-FROM node:20-bookworm AS dev
+FROM mcr.microsoft.com/playwright:v1.59.1-noble AS dev
 
 # not the best idea to run under root
 USER root
 WORKDIR /usr/src/app
-RUN npm install @playwright/test@1.59.1 && \
-  npx -y playwright@1.59.1 install --with-deps chrome-for-testing firefox webkit
 
 COPY package.json package-lock.json ./
 COPY --from=base /tmp/node_modules ./node_modules
