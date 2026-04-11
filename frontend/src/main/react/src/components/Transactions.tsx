@@ -22,16 +22,16 @@ import Grid from "@mui/material/Grid";
 const PREFIX = "Transactions";
 
 const transactionClasses = {
-  DEBIT: `${PREFIX}-DEBIT`,
-  CREDIT: `${PREFIX}-CREDIT`,
+  WITHDRAWAL: `${PREFIX}-WITHDRAWAL`,
+  DEPOSIT: `${PREFIX}-DEPOSIT`,
 };
 
 const TransactionTableCell = styled(TableCell)((theme) => ({
-  [`&.${transactionClasses.DEBIT}`]: {
+  [`&.${transactionClasses.WITHDRAWAL}`]: {
     color: "green",
   },
 
-  [`&.${transactionClasses.CREDIT}`]: {
+  [`&.${transactionClasses.DEPOSIT}`]: {
     color: "red",
   },
 }));

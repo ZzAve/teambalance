@@ -35,8 +35,8 @@ data class CounterParty(
 )
 
 enum class TransactionType {
-    DEBIT,
-    CREDIT,
+    WITHDRAWAL,
+    DEPOSIT,
 }
 
 data class TransactionsResponse(
