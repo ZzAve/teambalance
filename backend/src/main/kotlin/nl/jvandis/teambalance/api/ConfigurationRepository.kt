@@ -16,4 +16,18 @@ class ConfigurationRepository(
             .fetch()
             .into(String::class.java)
             .firstOrNull()
+
+    fun upsertConfig(
+        key: String,
+        value: String,
+    ) {
+        context
+            .insertInto(CONFIG)
+            .set(CONFIG.KEY, key)
+            .set(CONFIG.VALUE, value)
+            .onConflict(CONFIG.KEY)
+            .doUpdate()
+            .set(CONFIG.VALUE, value)
+            .execute()
+    }
 }

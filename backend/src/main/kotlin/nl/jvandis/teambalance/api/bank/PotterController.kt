@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.tags.Tags
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
+import nl.jvandis.teambalance.api.ConfigurationService
 import nl.jvandis.teambalance.api.Error
-import nl.jvandis.teambalance.filters.START_OF_SEASON_RAW
 import nl.jvandis.teambalance.filters.toZonedDateTime
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
@@ -27,6 +27,7 @@ import java.time.ZonedDateTime
 @RequestMapping(path = ["/api/bank"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class PotterController(
     private val potterService: PotterService,
+    private val configurationService: ConfigurationService,
 ) {
     @GetMapping("/potters")
     suspend fun getPotters(
@@ -35,16 +36,17 @@ class PotterController(
         @Min(1)
         limit: Int,
         @RequestParam(defaultValue = "desc") sort: Sort,
-        @RequestParam(value = "since", defaultValue = START_OF_SEASON_RAW)
+        @RequestParam(value = "since", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-        sinceInput: LocalDateTime,
+        sinceInput: LocalDateTime?,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
         @RequestParam(value = "include-support-roles", defaultValue = "false") includeSupportRoles: Boolean,
     ): PottersResponse {
-        val pottersFullPeriod = potterService.getPotters(sinceInput.toZonedDateTime(), includeInactiveUsers, includeSupportRoles)
+        val effectiveSinceInput = sinceInput ?: configurationService.getStartOfSeason()
+        val pottersFullPeriod = potterService.getPotters(effectiveSinceInput.toZonedDateTime(), includeInactiveUsers, includeSupportRoles)
         val now = ZonedDateTime.now()
         val pottersLastMonthResponse: PottersResponse? =
-            if (Duration.between(sinceInput, now) > Duration.ofDays(30)) {
+            if (Duration.between(effectiveSinceInput, now) > Duration.ofDays(30)) {
                 potterService
                     .getPotters(now.minusDays(30), includeInactiveUsers, includeSupportRoles)
                     .toPottersResponse(limit)
