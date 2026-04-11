@@ -56,7 +56,7 @@ Sports team management app for Tovo Utrecht volleyball club. Tracks event attend
 ## Testing
 
 - **Backend**: JUnit 5 + MockK (unit tests in `src/test/kotlin/`)
-- **Frontend**: Jest + React Testing Library (tests co-located with components)
+- **Frontend**: None, no unit tests
 - **E2E**: Playwright (orchestrated via Docker Compose in `e2e/`)
 - **Test data**: Use `make test` to populate a local backend with sample events, users, and transactions
 
