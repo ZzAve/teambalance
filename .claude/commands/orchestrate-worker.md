@@ -121,7 +121,7 @@ If `PARENT_TASK_FILE` is empty, you are a standalone task — behave as before.
 
 ## [execute]
 - **Goal:** Implement the feature/fix described in the task
-wo- **Working directory:**
+- **Working directory:**
   - If `WORKTREE_PATH` is provided → work in that worktree directory
   - Navigate to worktree: `cd {{WORKTREE_PATH}}`
   - All file paths are relative to the worktree root

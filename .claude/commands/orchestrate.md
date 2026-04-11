@@ -322,7 +322,14 @@ For any parent task being processed for the first time (no `[reflect]` subtask p
 If a parent task has no subtasks yet, dispatch a single worker with `TASK_TYPE: [decompose-or-execute]`. The worker must:
 - Analyze the parent's Context and scope
 - Either propose subtasks (edit `.orchestration/backlog.md` to add them under the parent) and report `STATUS: done` with a note that subtasks were added, OR
-- Execute the task directly if it's small (≤3 files) and report `STATUS: done` normally
+- Execute the task directly if it's small (≤3 files) using the same worktree/branch isolation as `[execute]` tasks:
+  1. Orchestrator creates a worktree: `git worktree add .worktrees/<feature-name> -b feature/<feature-name>`
+  2. Worker gets `WORKTREE_PATH` parameter and executes inside it (same as `[execute]` path)
+  3. Worker commits changes and runs `build`
+  4. Worker reports `STATUS: done` normally
+  5. Orchestrator proceeds with worktree PR creation (normal flow)
+
+This ensures Mode B (direct execution) receives identical isolation behavior to Mode A (subtask dispatch).
 
 If subtasks were added, the orchestrator picks them up in the next round (and auto-injects `[reflect]` via step 8.5).
 
