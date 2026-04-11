@@ -79,7 +79,7 @@ services:
       VITE_SERVER_BACKEND: backend
       HOST: http://frontend:3000
       PASSWORD: teambalance
-      CI: ${CI:-false}
+      CI: ${CI:-}
     volumes:
       - ./e2e:/usr/src/app
       - /usr/src/app/node_modules
