@@ -46,23 +46,27 @@ Never proceed with a broken build.
 
 **You MUST NEVER execute tasks directly.** "Tasks" means anything beyond:
 - Reading/writing `.orchestration/backlog.md`
+- Reading `.orchestration/research/*.md` and `.orchestration/plans/*.md` to surface user questions (step 11.5 only)
 - Managing the TaskList (create, update, delete)
 - Writing handover documents
 - Communicating blocks and questions to the user
+- Creating/removing worktrees (`git worktree add`, `git worktree remove`, `git worktree list`)
+- Creating PRs for completed worktrees (`gh pr create`)
+- Running `build` to verify a completed round (step 12 only)
 
 **ALL other work — including:**
 - Editing files (code, config, markdown, docs)
 - Applying plan changes to code
 - Fixing file paths or broken code
 - Reading skill files or source code
-- Running git commands beyond `git worktree list`
+- Running git commands beyond whitelisted operations above
 - Any code analysis or exploration
 
 **Must be dispatched to a worker subagent.** No exceptions, even for "trivial," "documentation-only," or "quick fix" work.
 
 **Why:** Direct execution by the orchestrator creates coupling, blocks parallel work, and violates the autonomous delegation principle. Workers exist precisely to handle this work.
 
-**How to apply:** Any time you find yourself about to use Edit, Write, Bash (beyond `git worktree list`), or Read on non-backlog files → stop immediately and dispatch a worker instead.
+**How to apply:** Any time you find yourself about to use Edit, Write, Bash (beyond whitelisted orchestrator operations listed above), or Read on non-backlog/non-orchestration-doc files → stop immediately and dispatch a worker instead.
 
 # Task Types
 
@@ -129,6 +133,10 @@ the orchestrator must escalate to the user rather than re-dispatching. Present:
 ## LOOP (Repeats Until No Eligible Tasks)
 
 ### 5. PARSE
+
+> **Self-check (run before every tool call this round):** Is the tool + target on the Task Delegation Rule whitelist?
+> Whitelist: backlog.md read/write, research/plan doc reads (step 11.5), `build` (step 12), `git worktree add/remove/list`, `gh pr create`, TaskList operations, handover writes, user comms.
+> If not on the whitelist → stop, dispatch a worker instead.
 
 - Extract tasks from **Active** section of `.orchestration/backlog.md`
 - Filter for eligible: not done, not parked, all dependencies in Done
@@ -359,6 +367,8 @@ The worker completed a [research|plan] task and needs your input on critical dec
 ### 12. VERIFY
 
 **Build Check:**
+
+> Orchestrator runs `build` directly — this is a whitelisted verification operation, not delegated to a worker.
 
 ```bash
 build
@@ -637,17 +647,17 @@ Active PRs:
 
 # Context-Mode Efficiency
 
-**You (orchestrator) should use context-mode tools for:**
+**Whitelisted direct orchestrator operations** (see Task Delegation Rule for full list):
+- Read `.orchestration/backlog.md` — single file, always direct
+- Read `.orchestration/research/*.md` and `.orchestration/plans/*.md` — for surfacing user questions (step 11.5)
+- Run `build` — verification only (step 12)
+- Run `git worktree list`, `git worktree add`, `git worktree remove` — worktree lifecycle (step 9.5)
+- Run `gh pr create` — PR creation per completed worktree (MR Creation section)
 
-- Reading backlog: use Read (it's a single file)
-- Running build: use execute with intent
-- Checking question file status: use batch_execute to check multiple files
-
-**Do NOT:**
-
-- Read code files yourself (workers do this)
-- Analyze test output yourself (workers report structured summaries)
-- Run detailed git commands (workers report commit SHAs)
+**Do NOT directly:**
+- Read code files (`.kt`, `.tsx`, `.ts`, `.sql`, etc.) — delegate to workers
+- Analyze test output — workers return structured summaries
+- Run detailed git commands (diff, log, status on feature branches) — workers report commit SHAs
 
 # Context Window Hygiene
 
@@ -697,6 +707,30 @@ As orchestration rounds accumulate, the orchestrator's context window grows. To 
 7. Update backlog → move both to Done
 8. Write handover for round 1
 9. Round 2: now attendance toggle is unblocked
+
+## Example: Meta-Task Dispatch (Editing orchestrate.md or .claude/ files)
+
+Even tasks that feel "internal" — like applying an improvement plan to `orchestrate.md` — must be dispatched to a worker.
+
+**Backlog state:**
+```markdown
+## Active
+
+- [ ] `[P1]` `[execute]` Implement orchestrate command improvements
+    - Depends: Plan orchestrate command improvements
+    - Context: Apply 6 changes from `.orchestration/plans/YYYY-MM-DD-orchestrate-improvements-plan.md` to `.claude/commands/orchestrate.md`.
+```
+
+**Round Actions:**
+
+1. Parse → 1 eligible task
+2. Create worktree: `git worktree add .worktrees/orchestrate-improvements -b feature/orchestrate-improvements`
+3. Dispatch:
+   - Worker 1: "Implement orchestrate command improvements", boundaries=`.claude/commands/orchestrate.md`, worktree=`.worktrees/orchestrate-improvements`
+4. Collect report → STATUS: done
+5. Verify build → skipped (markdown only, no compilation)
+6. Update backlog → move to Done
+7. Write handover
 
 # Start Orchestrating
 
