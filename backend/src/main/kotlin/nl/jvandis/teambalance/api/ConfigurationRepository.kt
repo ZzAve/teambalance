@@ -22,9 +22,8 @@ class ConfigurationRepository(
         value: String,
     ) {
         context
-            .insertInto(CONFIG)
-            .set(CONFIG.KEY, key)
-            .set(CONFIG.VALUE, value)
+            .insertInto(CONFIG, CONFIG.KEY, CONFIG.VALUE)
+            .values(key, value)
             .onConflict(CONFIG.KEY)
             .doUpdate()
             .set(CONFIG.VALUE, value)
