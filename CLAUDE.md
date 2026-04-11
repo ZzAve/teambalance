@@ -122,6 +122,8 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 5. Default credentials: username=`admin`, password=`admin` (set up via `make test`)
 6. Run `make format` before committing code
 
+When creating a worktree, be sure to run a `cd frontend && npm i` to bootsrap pre-commit hooks
+
 ## Troubleshooting
 
 - **Port already in use**: Kill Docker containers with `make clean` first
