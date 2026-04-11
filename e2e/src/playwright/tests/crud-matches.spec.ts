@@ -78,9 +78,15 @@ test.describe("Matches", () => {
       await verifyMatchAttendanceState(page, "absent", TEST_USER_NAME);
     } finally {
       // 7. Cleanup: always delete the match, even if assertions above failed.
-      await page.goto(HOST);
-      await page.getByRole("button", { name: "Admin dingen" }).click();
-      await deleteMatch(page, eventId);
+      // Wrap navigation in try/catch: Playwright may have already closed the
+      // browser context by the time finally runs, which would cause a 90s timeout.
+      try {
+        await page.goto(HOST);
+        await page.getByRole("button", { name: "Admin dingen" }).click();
+        await deleteMatch(page, eventId);
+      } catch {
+        // Best-effort cleanup — ignore navigation errors after context teardown.
+      }
     }
   });
 
