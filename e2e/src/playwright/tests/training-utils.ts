@@ -1,55 +1,5 @@
 import { expect, Page } from "@playwright/test";
-import { addDays, ensure, NOW } from "./utils";
-
-/**
- * Pick a date+time in the MUI MobileDateTimePicker dialog.
- *
- * Strategy: open dialog → switch to text-input view (pen icon) →
- *           type date + time into the text fields → confirm with OK.
- *
- * Previous approaches that used calendar month-navigation + gridcell clicking
- * broke because MUI renders duplicate day gridcells (overflow days from
- * adjacent months or transition animation artifacts). Using the text-input
- * view avoids all of that.
- */
-async function pickDateTime(page: Page, date: Date) {
-  // Open the MUI MobileDateTimePicker dialog by clicking the date input.
-  const dateInput = page.getByRole("textbox", { name: /Choose date/ });
-  await dateInput.waitFor({ state: "visible" });
-  await dateInput.click();
-
-  const dialog = page.getByRole("dialog");
-  await dialog.waitFor({ state: "visible" });
-
-  // Switch to text-input view immediately. The button label is
-  // "calendar view is open, go to text input view" (or similar).
-  const textInputToggle = dialog.getByRole("button", {
-    name: /text input/i,
-  });
-  await textInputToggle.click();
-
-  // In text-input mode, MUI v5 renders ONE combined date-time input field.
-  // Format for nl locale with 24h time: dd-mm-yyyy hh:mm
-  const pad2 = (n: number) => String(n).padStart(2, "0");
-
-  // MUI's masked input auto-inserts separators when you type digits only.
-  const digits = `${pad2(date.getDate())}${pad2(date.getMonth() + 1)}${date.getFullYear()}${pad2(date.getHours())}${pad2(date.getMinutes())}`;
-
-  // The single combined field — only one textbox exists in the dialog in keyboard mode.
-  const combinedInput = dialog.getByRole("textbox");
-  await combinedInput.waitFor({ state: "visible" });
-  await combinedInput.click();
-  // Move to start of the masked input before typing — Playwright's click()
-  // lands in the centre of the element, leaving the cursor mid-string.
-  await page.keyboard.press("Home");
-  await combinedInput.pressSequentially(digits);
-
-  // Confirm the selection
-  await dialog.getByRole("button", { name: "OK", exact: true }).click();
-
-  // Wait for the dialog to close
-  await dialog.waitFor({ state: "hidden" });
-}
+import { addDays, ensure, NOW, pickDateTime } from "./utils";
 
 export const createTrainingEvent = async (
   page: Page,
@@ -110,7 +60,8 @@ export async function deleteTraining(page: Page, eventId: string | void) {
 
   await page.getByRole("button", { name: "OK" }).click();
 
-  await expect(page.getByRole("alert")).toContainText(
-    `Event #${eventId} is verwijderd`,
-  );
+  // Use filter so multiple concurrent snackbars don't cause a strict-mode violation.
+  await expect(
+    page.getByRole("alert").filter({ hasText: `Event #${eventId} is verwijderd` })
+  ).toBeVisible();
 }

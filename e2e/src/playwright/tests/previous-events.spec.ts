@@ -5,6 +5,7 @@ import { v4 as uuid } from "uuid";
 
 test("Validate previous events can be shown", async ({ page }) => {
   await page.goto(HOST);
+  await page.getByText("Aanstaande trainingen").waitFor({ state: "visible" });
   await page.getByRole("button", { name: "Admin dingen" }).click();
 
   // Use a unique comment so we can find THIS specific past event later,

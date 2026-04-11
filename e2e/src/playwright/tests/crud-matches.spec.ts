@@ -10,6 +10,7 @@ import {
 test.describe("Matches", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(HOST);
+    await page.getByText("Aanstaande trainingen").waitFor({ state: "visible" });
   });
 
   test("CRUD normal match", async ({ page }) => {
