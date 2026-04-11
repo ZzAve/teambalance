@@ -167,9 +167,9 @@ Every parent task gets a persistent context file at `.orchestration/tasks/<slug>
 ```
 
 **Worker contract:**
-- Every subtask worker receives `PARENT_TASK_FILE: .orchestration/tasks/<slug>.md`
-- At start: read the file for context
-- At end: append a Decisions Log entry, overwrite Current State, mark its subtask line as `[x]`
+- Every worker (subtask or standalone) receives `TASK_FILE: .orchestration/tasks/<slug>.md`
+- At start: read the file for Intent, Decisions Log, and Current State
+- At end: append a Decisions Log entry, overwrite Current State, mark subtask line as `[x]` (subtasks only)
 
 # WIP Preference (Stop Starting, Start Finishing)
 
@@ -389,15 +389,18 @@ Active Worktrees:
 
 **Worker Invocation:**
 
-**Before dispatching a subtask of a parent task:**
+**Before dispatching any task (parent subtask OR standalone):**
 
-If the parent task has no task file yet at `.orchestration/tasks/<slug>.md`:
-1. Compute the slug from the parent task name (kebab-case)
-2. Create `.orchestration/tasks/<slug>.md` with the schema shown in the "Task Context Files" section — copy Intent from the parent Context field
-3. Add `- Task file: .orchestration/tasks/<slug>.md` as a metadata bullet under the parent in `backlog.md`
-4. Then dispatch workers with `PARENT_TASK_FILE` set to that path
+Ensure a task file exists at `.orchestration/tasks/<slug>.md`:
+1. Compute the slug from the task name (kebab-case, strip priority/type tags, max 60 chars)
+2. If file doesn't exist: create `.orchestration/tasks/<slug>.md` (copy Intent from inline `Context:` if present; otherwise write intent from task name)
+3. If backlog row has `Context:` but no `Task file:`: replace it with `- Task file: .orchestration/tasks/<slug>.md`
+4. Creating and updating task files is a **whitelisted orchestrator operation**
 
-Creating and updating task files is a whitelisted orchestrator operation.
+**Slug rules:**
+- Strip leading type/priority tags: `[P1] [execute] Fix foo → fix-foo`
+- Lowercase, kebab-case, ASCII only, max 60 chars
+- Suffix `-2`, `-3` on collision with existing files
 
 ```markdown
 Use Task tool with subagent_type="general-purpose", model="haiku"
@@ -408,14 +411,14 @@ Load the orchestrate-worker skill with these parameters:
 TASK_NAME: <task name>
 TASK_TYPE: <[research] | [plan] | [execute] | [test] | [ci] | [reflect] | [decompose-or-execute]>
 PRIORITY: <P1 | P2 | P3>
-DEPENDENCIES: <comma-separated list or "none">
-CONTEXT: <from backlog>
+TASK_FILE: <path to .orchestration/tasks/<slug>.md> (REQUIRED for all tasks)
 FILE_BOUNDARIES: <assigned file paths/patterns>
 WORKTREE_PATH: <path to worktree, e.g., .worktrees/events-page> (only for execute/test tasks)
-PARENT_TASK_FILE: <path to .orchestration/tasks/<slug>.md> (only for subtasks of a parent task, omit for standalone tasks)
 
 The worker will return a structured report.
 ```
+
+**Tolerance fallback:** If a row has no `Task file:` bullet and no `Context:` (unmigrated), materialize the task file lazily on first dispatch using the task name as intent — add the `Task file:` bullet to the backlog row in the same step.
 
 **File Boundary Assignment:**
 
@@ -529,7 +532,7 @@ Prompt template:
 Load the orchestrate-reviewer skill with these parameters:
 
 TASK_NAME: <task name>
-CONTEXT: <from backlog>
+TASK_FILE: <path to .orchestration/tasks/<slug>.md>
 FILES_CHANGED: <from worker report>
 COMMIT_SHA: <from worker report>
 

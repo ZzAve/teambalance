@@ -9,17 +9,12 @@ import org.springframework.web.servlet.HandlerExceptionResolver
 
 const val SECRET_HEADER = "X-Secret"
 
-/** API paths that are publicly accessible without a secret. */
-val PUBLIC_API_PATHS = listOf("/api/settings/season")
-
 @Configuration
 class SecretFilter(
     private val secretService: SecretService,
     private val handlerExceptionResolver: HandlerExceptionResolver,
 ) : OncePerRequestFilter() {
-    override fun shouldNotFilter(request: HttpServletRequest): Boolean =
-        !request.requestURI.startsWith("/api") ||
-            PUBLIC_API_PATHS.any { request.requestURI.startsWith(it) }
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean = !request.requestURI.startsWith("/api")
 
     override fun destroy() {}
 

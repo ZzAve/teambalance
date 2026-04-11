@@ -16,24 +16,7 @@ export const HOST: string = ensure(process.env.HOST, "host");
 export const PASSWORD = ensure(process.env.PASSWORD, "PASSWORD");
 
 export const NOW = new Date();
-
-/**
- * Fetch the current start-of-season date from the backend settings API.
- * The endpoint is public (no secret required).
- */
-export async function getStartOfSeason(
-  request: import("@playwright/test").APIRequestContext,
-): Promise<Date> {
-  const apiBase = HOST.replace(/\/+$/, "");
-  const response = await request.get(`${apiBase}/api/settings/season`);
-  if (!response.ok()) {
-    throw new Error(
-      `Failed to fetch start-of-season: ${response.status()} ${response.statusText()}`,
-    );
-  }
-  const body = (await response.json()) as { startOfSeason: string };
-  return new Date(body.startOfSeason);
-}
+export const START_OF_SEASON = new Date(2025, 8, 1, 2);
 
 export const addHours = (date: Date, hours: number): Date => {
   const result = new Date(date);
