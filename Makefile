@@ -1,5 +1,7 @@
 .PHONY: *
 
+E2E_BUILD_FLAG := $(if $(CI),,--build)
+
 # The first command will be invoked with `make` only and should be `build`
 build:
 	./mvnw install -Pformat
@@ -17,7 +19,7 @@ e2e:
 	(rm -rf ./e2e/playwright-report/index.html || true) && \
 		mkdir -p ./e2e/playwright-report && \
 		(echo "E2E tests are running ... " > ./e2e/playwright-report/index.html) && \
-		docker compose up --build --exit-code-from e2e --attach e2e
+		docker compose up $(E2E_BUILD_FLAG) --exit-code-from e2e --attach e2e
 
 e2e-report:
 	cd e2e && npm run report
