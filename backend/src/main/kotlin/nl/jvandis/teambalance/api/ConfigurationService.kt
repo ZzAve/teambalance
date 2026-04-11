@@ -9,6 +9,7 @@ import nl.jvandis.teambalance.log
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
+import java.time.format.DateTimeParseException
 import kotlin.reflect.KClass
 
 const val START_OF_SEASON_CONFIG_KEY = "startOfSeason"
@@ -47,7 +48,14 @@ class ConfigurationService(
 
     fun getStartOfSeason(): LocalDateTime {
         val raw = repository.getConfig(START_OF_SEASON_CONFIG_KEY) ?: DEFAULT_START_OF_SEASON_RAW
-        return LocalDateTime.parse(raw)
+        return try {
+            LocalDateTime.parse(raw)
+        } catch (e: DateTimeParseException) {
+            throw MalformedConfigFound(
+                "Config for '$START_OF_SEASON_CONFIG_KEY' seems to be malformed. Expected ISO local date time",
+                e,
+            )
+        }
     }
 
     fun getStartOfSeasonZoned(): ZonedDateTime = getStartOfSeason().toZonedDateTime()

@@ -1,9 +1,9 @@
 package nl.jvandis.teambalance.api.config
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.ConfigurationService
 import org.slf4j.LoggerFactory
-import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -26,6 +26,7 @@ class SeasonConfigController(
         return SeasonConfigResponse(startOfSeason = configurationService.getStartOfSeason())
     }
 
+    @Admin
     @PutMapping("/season")
     fun updateSeasonConfig(
         @RequestBody request: UpdateSeasonConfigRequest,
@@ -37,11 +38,9 @@ class SeasonConfigController(
 }
 
 data class SeasonConfigResponse(
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     val startOfSeason: LocalDateTime,
 )
 
 data class UpdateSeasonConfigRequest(
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     val startOfSeason: LocalDateTime,
 )
