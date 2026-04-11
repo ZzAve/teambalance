@@ -137,6 +137,24 @@ wo- **Working directory:**
   7. Run `build` to verify
 - **Report:** Coverage added, test results, build status, commit SHA, worktree path used
 
+## [ci]
+- **Goal:** Monitor PR CI status, validate review comments, rebase/merge when green
+- **No code changes** (unless a trivial rebase conflict must be resolved)
+- **Actions — follow in order:**
+  1. Run `gh pr checks <number>` to see current status
+  2. Run `gh pr view <number> --comments` to check for unresolved review comments
+  3. If **unresolved review comments exist**: report `STATUS: blocked`, list comments in NOTES
+  4. If **all checks pending**: wait 2 minutes, re-check (up to 3 retries; still pending → `STATUS: blocked`)
+  5. If **checks failed**: check if failure matches a known blocker in task Context
+     - If yes → `STATUS: blocked` with blocker name
+     - If no → investigate; dispatch mental fix plan; report `STATUS: blocked` with details for orchestrator
+  6. If **all checks pass and no unresolved comments**: merge PR
+     ```bash
+     gh pr merge <number> --squash --auto
+     ```
+  7. Report merge confirmation in NOTES
+- **Report:** PR number, check status, merge outcome or blocker reason
+
 # File Boundaries
 
 **YOU MUST ONLY MODIFY FILES WITHIN YOUR ASSIGNED BOUNDARIES.**

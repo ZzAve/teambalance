@@ -42,12 +42,83 @@ and reviewer subagents. You operate in rounds, maintaining minimal context by de
 
 Never proceed with a broken build.
 
+# Task Delegation Rule (CRITICAL)
+
+**You MUST NEVER execute tasks directly.** "Tasks" means anything beyond:
+- Reading/writing `.orchestration/backlog.md`
+- Managing the TaskList (create, update, delete)
+- Writing handover documents
+- Communicating blocks and questions to the user
+
+**ALL other work — including:**
+- Editing files (code, config, markdown, docs)
+- Applying plan changes to code
+- Fixing file paths or broken code
+- Reading skill files or source code
+- Running git commands beyond `git worktree list`
+- Any code analysis or exploration
+
+**Must be dispatched to a worker subagent.** No exceptions, even for "trivial," "documentation-only," or "quick fix" work.
+
+**Why:** Direct execution by the orchestrator creates coupling, blocks parallel work, and violates the autonomous delegation principle. Workers exist precisely to handle this work.
+
+**How to apply:** Any time you find yourself about to use Edit, Write, Bash (beyond `git worktree list`), or Read on non-backlog files → stop immediately and dispatch a worker instead.
+
+# Task Types
+
+| Type | Purpose | Worker Behavior |
+|------|---------|-----------------|
+| `[research]` | Explore codebase/docs, gather findings | Output to `.orchestration/research/`, include Questions section |
+| `[plan]` | Design implementation approach | Output to `.orchestration/plans/`, include Questions section |
+| `[execute]` | Implement feature or fix | Write code, tests, commit; requires worktree |
+| `[test]` | Add test coverage to existing code | Write tests, commit; requires worktree |
+| `[ci]` | Monitor PR CI status; validate PR comments; rebase/merge when green | No code changes; pure monitoring + merge |
+
+**`[ci]` Worker Decision Tree:**
+
+When dispatching a `[ci]` task, instruct the worker to follow these steps in order:
+
+1. Run `gh pr checks <number>` to see current status
+2. Run `gh pr view <number> --comments` to check for review comments that need addressing
+3. If **review comments exist and are unresolved**: report `STATUS: blocked`, list the comments in NOTES
+4. If **all checks pending**: wait 2 minutes, re-check (up to 3 retries; if still pending after 3 retries → `STATUS: blocked`)
+5. If **checks failed**: check if failure matches a *known blocker* listed in the task Context
+   - If yes → report `STATUS: blocked` immediately with the known blocker name
+   - If no → investigate the new failure; dispatch a fix worker; re-run CI validation after fix
+6. If **all checks pass and no unresolved comments**: merge PR
+   ```bash
+   gh pr merge <number> --squash --auto
+   ```
+7. Add a note to the handover: "PR #<number> merged — <branch>"
+
+**`[ci]` Escalation Rule (max retries):**
+
+If a `[ci]` task has returned `STATUS: blocked` 3 or more times across rounds (check handover history),
+the orchestrator must escalate to the user rather than re-dispatching. Present:
+- PR number and URL
+- All known blockers from previous rounds
+- Ask user what action to take (close PR, fix blocker, override)
+
 # Core Loop
 
 ## INIT (First Round Only)
 
 1. **Read** `.orchestration/backlog.md`
 2. **Check** `.orchestration/questions/README.md` for answered questions → update backlog (move from Parked to Active)
+
+2.5. **Pre-Flight Environment Check** — verify the environment before dispatching any workers:
+
+   ```bash
+   # Check worktree health
+   git worktree list
+   ```
+   - For each worktree listed: if its branch is merged or the worktree is in detached HEAD state, remove it automatically:
+     ```bash
+     git worktree remove .worktrees/<name> --force
+     ```
+   - Check Node.js availability: `node --version` — if not found, note that frontend tasks may fail and workers should use `nvm use` as first step.
+   - Note any degraded conditions in this round's handover under "Open Issues".
+
 3. **Sync TaskList** — call TaskList, then:
    - Delete stale tasks that no longer match the backlog (`status: deleted`)
    - Mark done tasks that match backlog Done section (`status: completed`)
@@ -61,6 +132,9 @@ Never proceed with a broken build.
 
 - Extract tasks from **Active** section of `.orchestration/backlog.md`
 - Filter for eligible: not done, not parked, all dependencies in Done
+- **Cascading park rule:** If a task's dependency is currently in the **Parked** section (not Done),
+  automatically move that task to Parked with note: `"Waiting for '<dependency>' to be unparked first"`
+  — do not dispatch it this round.
 
 ### 6. CHECK EXIT
 
@@ -114,6 +188,19 @@ Worktree 3 (feature/money-pool):
   - Bunq integration [execute]
 ```
 
+### 8.5. AUTO-TAG `[review]`
+
+Before dispatching, check if each `[execute]` or `[test]` task should have `[review]` added. Add it
+automatically if the task meets **any** of these criteria (even if backlog author did not include it):
+
+- Touches more than 3 files
+- Modifies backend API contracts (controllers, Wirespec `.ws` files, OpenAPI specs)
+- Touches security-sensitive code (authentication, authorization, role checks, secrets handling)
+- Modifies CI/CD configuration (`.github/workflows/`, `Makefile` build targets, Docker)
+- Changes database migrations or schema
+
+If a task already has `[review]`, keep it. Never remove `[review]` tags.
+
 ### 9. DECOMPOSE IF NEEDED
 
 - If task is too large (>3 files, unclear scope):
@@ -148,6 +235,8 @@ Active Worktrees:
 
 ### 10. DISPATCH WORKERS
 
+⚠️ **CRITICAL:** Refer to the Task Delegation Rule above. You are about to dispatch work — do not attempt to execute it yourself, even if it seems quick or trivial.
+
 **Before dispatching:** Call `TaskUpdate` to mark each task `in_progress` in the TaskList.
 
 **Parallel Dispatch Rules:**
@@ -156,6 +245,15 @@ Active Worktrees:
 - **1 worker** if tasks are dependent (sequential)
 - Each worker gets their own file boundaries
 - Each worker gets assigned worktree (for execute/test tasks)
+
+**Model Selection:**
+
+- Default: `model="haiku"` (faster, cheaper, sufficient for most tasks)
+- Use `model="sonnet"` when:
+  - Task requires context-mode MCP tools (`execute_file`, `fetch_and_index`, `index`, `search`)
+  - Task involves complex multi-file analysis or architectural decisions (e.g., `[research]`, `[plan]`)
+  - A previous Haiku worker returned `STATUS: failed` due to capability limits
+- Note in the worker's CONTEXT field if you're upgrading the model, so the handover reflects it.
 
 **Worker Invocation:**
 
@@ -166,7 +264,7 @@ Prompt template:
 Load the orchestrate-worker skill with these parameters:
 
 TASK_NAME: <task name>
-TASK_TYPE: <[research] | [plan] | [execute] | [test]>
+TASK_TYPE: <[research] | [plan] | [execute] | [test] | [ci]>
 PRIORITY: <P1 | P2 | P3>
 DEPENDENCIES: <comma-separated list or "none">
 CONTEXT: <from backlog>
@@ -196,6 +294,8 @@ FILES: <comma-separated list>
 TESTS: <pass>/<total> passing
 BUILD: pass | fail
 COMMIT: <sha>
+FOLLOW-UP: <comma-separated list of follow-up tasks, or "none">
+USER-QUESTIONS: <comma-separated list of questions, or "none">
 NOTES: <one line>
 ```
 
@@ -376,6 +476,13 @@ Create `.orchestration/handover/YYYY-MM-DD-HH-MM-round-N.md`:
 {{if any MRs were created this round:}}
 - #123: feat: money pool visualization (money-pool worktree) - https://github.com/.../pull/123
 
+## Stale Worktrees (Cleanup Candidates)
+
+{{list worktrees whose PR has been merged or closed, or that are in detached HEAD state}}
+{{if none: omit this section}}
+- `.worktrees/<name>` — PR #<N> merged on <date> → already removed automatically during INIT pre-flight
+- `.worktrees/<name>` — PR #<N> closed (abandoned) → removed automatically during INIT pre-flight
+
 ## Open Issues
 
 - {{if any tasks failed or were blocked}}
@@ -498,9 +605,9 @@ Example:
 6. **Add CI validation task to backlog:**
    After every PR creation, immediately add to the Active backlog:
    ```markdown
-   - [ ] `[P1]` `[test]` Validate CI for PR #<number> and decide next step
+   - [ ] `[P1]` `[ci]` Validate CI for PR #<number> and decide next step
        - Depends: none
-       - Context: PR #<number> (<branch>). Run `gh pr checks <number>`. If pass → merge or ask user. If fail → dispatch fix worker. If pending → wait and re-check.
+       - Context: PR #<number> (<branch>). Follow `[ci]` decision tree in Task Types section. Known blockers at time of creation: <list any known issues, or "none">.
    ```
    Also create the corresponding TaskList entry with `TaskCreate`.
 
@@ -541,6 +648,28 @@ Active PRs:
 - Read code files yourself (workers do this)
 - Analyze test output yourself (workers report structured summaries)
 - Run detailed git commands (workers report commit SHAs)
+
+# Context Window Hygiene
+
+As orchestration rounds accumulate, the orchestrator's context window grows. To keep it manageable:
+
+**Per round:**
+- Do NOT re-read the full backlog every step — read it once at PARSE (step 5), cache mentally
+- Do NOT read worker research/plan documents in full unless presenting questions to user; reference path only
+- Worker reports are ≤10 lines; do not expand them in your reasoning
+
+**Handover truncation:**
+- The Completed section in handovers should list task names + one-line notes only (no full worker output)
+- If a handover document exceeds 150 lines, summarize the Completed section into bullet points
+
+**Worker delegation:**
+- The orchestrator NEVER reads source code directly — all code analysis is delegated to workers
+- If you find yourself reading a `.kt`, `.tsx`, `.ts`, or `.sql` file, stop and delegate to a worker instead
+
+**Backlog hygiene:**
+- After each round, move all `[x]` completed items from Active to Done in `backlog.md`
+- The Active section must contain ONLY incomplete tasks (not done, not parked)
+- If the Done section exceeds 20 items, move oldest 10 to a `## Done (Archive)` subsection
 
 # Example Round
 
