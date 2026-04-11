@@ -9,6 +9,12 @@ import {
   verifyMatchAttendanceState,
 } from "./match-utils";
 
+/**
+ * Display name of the user authenticated in auth.setup.ts.
+ * Must match the name stored by the backend for the 'admin' account.
+ */
+const TEST_USER_NAME = "admin";
+
 test.describe("Matches", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(HOST);
@@ -30,33 +36,52 @@ test.describe("Matches", () => {
   });
 
   test("Set match attendance: attending → maybe → absent", async ({ page }) => {
-    // 1. Create match
+    // 1. Create match via admin UI.
     await page.getByRole("button", { name: "Admin dingen" }).click();
     const opponent = `Team ${uuid().slice(0, 8)}`;
     const eventId = await createMatchEvent(page, opponent);
 
-    // 2. Navigate to event details — click opponent text to open detail view
-    await page.getByText(opponent).first().click();
+    try {
+      // 2. Navigate to the events page (list view) where attendee buttons are
+      //    always visible inline — no expand toggle needed.
+      //    The home page shows "Aanstaande wedstrijden"; navigate there directly.
+      await page.goto(HOST);
+      await page.getByRole("link", { name: /wedstrijden/i }).first().click();
 
-    // 3. Set to Attending
-    await setMatchAttendance(page, "attending");
-    await verifyMatchAttendanceState(page, "attending");
+      // Ensure we are in list view — list view renders attendee buttons inline
+      // without requiring an expand click.
+      // The MUI Switch has name="listVsTable"; checked = list view.
+      const listSwitch = page.locator('input[name="listVsTable"]');
+      const isListView = await listSwitch.isChecked().catch(() => false);
+      if (!isListView) {
+        await listSwitch.click();
+      }
 
-    // 4. Transition to Maybe
-    await setMatchAttendance(page, "maybe");
-    await verifyMatchAttendanceState(page, "maybe");
+      // Wait for the newly created match to appear in the list.
+      await expect(page.getByText(opponent)).toBeVisible();
 
-    // 5. Transition to Absent
-    await setMatchAttendance(page, "absent");
-    await verifyMatchAttendanceState(page, "absent");
+      // 3. Set to Attending and verify.
+      await setMatchAttendance(page, "attending", TEST_USER_NAME);
+      await verifyMatchAttendanceState(page, "attending", TEST_USER_NAME);
 
-    // 6. Verify persistence: reload page
-    await page.reload();
-    await verifyMatchAttendanceState(page, "absent");
+      // 4. Transition to Maybe and verify.
+      await setMatchAttendance(page, "maybe", TEST_USER_NAME);
+      await verifyMatchAttendanceState(page, "maybe", TEST_USER_NAME);
 
-    // 7. Cleanup: navigate back to admin section and delete match
-    await page.getByRole("button", { name: "Admin dingen" }).click();
-    await deleteMatch(page, eventId);
+      // 5. Transition to Absent and verify.
+      await setMatchAttendance(page, "absent", TEST_USER_NAME);
+      await verifyMatchAttendanceState(page, "absent", TEST_USER_NAME);
+
+      // 6. Verify persistence: reload the page and check state is retained.
+      await page.reload();
+      await expect(page.getByText(opponent)).toBeVisible();
+      await verifyMatchAttendanceState(page, "absent", TEST_USER_NAME);
+    } finally {
+      // 7. Cleanup: always delete the match, even if assertions above failed.
+      await page.goto(HOST);
+      await page.getByRole("button", { name: "Admin dingen" }).click();
+      await deleteMatch(page, eventId);
+    }
   });
 
   test("Opponent field validation", async ({ page }) => {

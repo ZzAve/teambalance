@@ -136,39 +136,83 @@ export async function deleteMatch(page: Page, eventId: string): Promise<void> {
 }
 
 /**
- * Set user's attendance status for a match
+ * Map from logical attendance status to the MUI button color class suffix.
+ * AttendeeButton uses color="success" for PRESENT, "error" for ABSENT,
+ * "warning" for UNCERTAIN (maybe).
+ */
+const statusToMuiColorClass: Record<
+  "attending" | "maybe" | "absent",
+  string
+> = {
+  attending: "MuiButton-colorSuccess",
+  maybe: "MuiButton-colorWarning",
+  absent: "MuiButton-colorError",
+};
+
+/**
+ * Set attendance status for a specific attendee in the event attendee list.
+ *
+ * Flow (matches actual UI):
+ *  1. Click the attendee's name button to open the AttendeeRefinement view.
+ *  2. Click the appropriate icon button (CheckIcon=PRESENT, ClearIcon=ABSENT,
+ *     HelpIcon=UNCERTAIN).
+ *  3. Wait for the refinement view to close — i.e. the attendee name button
+ *     re-appears with the updated colour class.
+ *
+ * @param page        Playwright Page
+ * @param status      Target attendance status
+ * @param attendeeName Display name of the attendee whose status to change
  */
 export async function setMatchAttendance(
   page: Page,
   status: "attending" | "maybe" | "absent",
+  attendeeName: string
 ): Promise<void> {
-  const buttonMap = {
-    attending: /Aanwezig/i,
-    maybe: /Misschien/i,
-    absent: /Afwezig/i,
-  };
+  // Map status to the accessible name of the refinement icon button.
+  // MUI renders aria-label from the SVG title; Playwright finds these by
+  // role="button" with the SVG's accessible name.
+  const refinementButtonLabel: Record<"attending" | "maybe" | "absent", RegExp> =
+    {
+      attending: /check/i,
+      maybe: /help/i,
+      absent: /close/i,
+    };
 
-  const button = page.getByRole("button", { name: buttonMap[status] });
-  await button.waitFor({ state: "visible" });
-  await button.click();
+  // Step 1: click the attendee's name button to open AttendeeRefinement.
+  const attendeeBtn = page.getByRole("button", { name: attendeeName });
+  await attendeeBtn.waitFor({ state: "visible" });
+  await attendeeBtn.click();
 
-  // Wait for the button to reflect selected state (API response applied)
-  await expect(button).toHaveAttribute("data-selected", "true");
+  // Step 2: click the correct icon button in the refinement view.
+  const refinementBtn = page.getByRole("button", {
+    name: refinementButtonLabel[status],
+  });
+  await refinementBtn.waitFor({ state: "visible" });
+  await refinementBtn.click();
+
+  // Step 3: wait for the refinement view to close by waiting for the attendee
+  // button to reappear with the expected MUI colour class.
+  const expectedClass = statusToMuiColorClass[status];
+  await expect(
+    page.getByRole("button", { name: attendeeName })
+  ).toHaveClass(new RegExp(expectedClass));
 }
 
 /**
- * Verify match attendance button shows selected state
+ * Verify that the attendee's button shows the expected colour for the given
+ * attendance status.
+ *
+ * @param page        Playwright Page
+ * @param status      Expected attendance status
+ * @param attendeeName Display name of the attendee to check
  */
 export async function verifyMatchAttendanceState(
   page: Page,
-  status: "attending" | "maybe" | "absent"
+  status: "attending" | "maybe" | "absent",
+  attendeeName: string
 ): Promise<void> {
-  const buttonMap = {
-    attending: /Aanwezig/i,
-    maybe: /Misschien/i,
-    absent: /Afwezig/i,
-  };
-
-  const button = page.getByRole("button", { name: buttonMap[status] });
-  await expect(button).toHaveAttribute("data-selected", "true");
+  const expectedClass = statusToMuiColorClass[status];
+  await expect(
+    page.getByRole("button", { name: attendeeName })
+  ).toHaveClass(new RegExp(expectedClass));
 }
