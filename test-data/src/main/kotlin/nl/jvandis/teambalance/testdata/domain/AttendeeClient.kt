@@ -72,7 +72,7 @@ class AttendeeClient(
     }
 
     private fun createAttendee(attendee: CreateAttendee): Attendee {
-        val request = Request(POST, "$ATTENDEE_BASE_URL").body(jsonFormatter.encodeToString(attendee))
+        val request = Request(POST, ATTENDEE_BASE_URL).body(jsonFormatter.encodeToString(attendee))
         val response: Response = client(request)
 
         check(response.status.successful) {

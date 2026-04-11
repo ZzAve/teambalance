@@ -35,7 +35,7 @@ update:
 	./mvnw versions:update-parent versions:update-properties versions:use-latest-versions
 
 yolo:
-	./mvnw install -T0.5C -DskipTests -Dverification.skip -Dnpm.ci.skip -Dnpm.install.skip=false -Dnpm.lint.skip
+	./mvnw install -T0.5C -DskipTests -Pformat -Dnpm.ci.skip -Dnpm.install.skip=false -Dnpm.lint.skip
 
 db:
 	docker compose up --wait postgresql
@@ -44,7 +44,7 @@ run-local:
 	docker compose up --wait backend frontend
 
 run-local-backend:
-	docker compose up --wait backend
+	docker compose up --build --wait backend
 
 rerun-local-backend:
 	docker compose restart backend

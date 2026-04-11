@@ -183,4 +183,100 @@ class TrainingClient(
     fun updateAndValidateTraining(training: Training) {
         log.warn("NOT IMPLEMENTED: updateAndValidateTraining")
     }
+
+    fun createAndValidateRecurringTraining() {
+        log.info("Creating a recurring training (weekly, 3 occurrences)")
+
+        val startTime =
+            LocalDateTime
+                .now()
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0)
+                .plusDays(7)
+                .toKotlinLocalDateTime()
+
+        val recurringTraining =
+            CreateTraining(
+                startTime = startTime,
+                location = "Gym",
+                comment = "Recurring training",
+                recurringEventProperties =
+                    CreateRecurringEventProperties(
+                        intervalAmount = 1,
+                        intervalTimeUnit = "WEEK",
+                        amountLimit = 3,
+                        selectedDays = listOf(startTime.dayOfWeek.name),
+                    ),
+            )
+
+        val created = createTraining(recurringTraining).events
+        check(created.size == 3) {
+            "Expected 3 recurring training instances, got ${created.size}"
+        }
+        val recurringId =
+            checkNotNull(created.first().recurringEventProperties?.id) {
+                "Created recurring training has no recurringEventProperties"
+            }
+        log.info("Created ${created.size} recurring training instances with recurringId=$recurringId")
+
+        // Update all instances (ALL scope) — must echo back recurringEventProperties
+        val first = created.first()
+        val recurringProps = checkNotNull(first.recurringEventProperties)
+        updateTraining(
+            first.id,
+            UpdateTraining(
+                startTime = first.startTime,
+                comment = "Updated recurring training",
+                recurringEventProperties =
+                    UpdateRecurringEventProperties(
+                        id = recurringProps.id,
+                        intervalAmount = recurringProps.intervalAmount,
+                        intervalTimeUnit = recurringProps.intervalTimeUnit,
+                        amountLimit = recurringProps.amountLimit,
+                        dateLimit = recurringProps.dateLimit,
+                        selectedDays = recurringProps.selectedDays,
+                    ),
+            ),
+            affectedRecurringEvents = "ALL",
+        )
+        val updatedInstances = getAllTrainings().filter { it.recurringEventProperties?.id == recurringId }
+        check(updatedInstances.all { it.comment == "Updated recurring training" }) {
+            "Expected all recurring instances to have updated comment"
+        }
+        log.info("Updated all ${updatedInstances.size} recurring training instances")
+
+        // Delete all instances
+        val deleteRequest =
+            Request(Method.DELETE, "$TRAINING_BASE_URL/${first.id}")
+                .query("delete-attendees", "true")
+                .query("affected-recurring-events", "ALL")
+        val deleteResponse = client(deleteRequest)
+        check(deleteResponse.status.successful) {
+            "Failed to delete recurring training: [${deleteResponse.status}] ${deleteResponse.bodyString()}"
+        }
+        val remaining = getAllTrainings().filter { it.recurringEventProperties?.id == recurringId }
+        check(remaining.isEmpty()) {
+            "Expected 0 remaining instances after ALL delete, found ${remaining.size}"
+        }
+        log.info("Deleted all recurring training instances")
+    }
+
+    private fun updateTraining(
+        id: String,
+        update: UpdateTraining,
+        affectedRecurringEvents: String? = null,
+    ): List<Training> {
+        var request =
+            Request(Method.PUT, "$TRAINING_BASE_URL/$id")
+                .body(jsonFormatter.encodeToString(update))
+        if (affectedRecurringEvents != null) {
+            request = request.query("affected-recurring-events", affectedRecurringEvents)
+        }
+        val response = client(request)
+        check(response.status.successful) {
+            "Failed to update training $id: [${response.status}] ${response.bodyString()}"
+        }
+        return aTrainingsLens(response).events
+    }
 }

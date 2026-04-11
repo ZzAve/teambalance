@@ -3,6 +3,7 @@ package nl.jvandis.teambalance.api.bank
 import nl.jvandis.jooq.support.valuesFrom
 import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.data.MultiTenantDslContext
+import nl.jvandis.teambalance.data.jooq.schema.tables.records.TransactionExclusionRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.references.TRANSACTION_EXCLUSION
 import org.jooq.exception.DataAccessException
 import org.springframework.stereotype.Repository
@@ -16,7 +17,8 @@ class BankAccountTransactionExclusionRepository(
             .select()
             .from(TRANSACTION_EXCLUSION)
             .fetch()
-            .into(TransactionExclusion::class.java)
+            .into(TransactionExclusionRecord::class.java)
+            .map { it.toTransactionExclusion() }
 
     fun findByIdOrNull(transactionExclusionId: TeamBalanceId): TransactionExclusion? =
         context
@@ -24,7 +26,8 @@ class BankAccountTransactionExclusionRepository(
             .from(TRANSACTION_EXCLUSION)
             .where(TRANSACTION_EXCLUSION.TEAM_BALANCE_ID.eq(transactionExclusionId.value))
             .fetch()
-            .into(TransactionExclusion::class.java)
+            .into(TransactionExclusionRecord::class.java)
+            .map { it.toTransactionExclusion() }
             .also {
                 check(it.size < 2) { "Fetched more than 1 transactionExclusions with the same id. Should not be possible!" }
             }.firstOrNull()
@@ -51,7 +54,8 @@ class BankAccountTransactionExclusionRepository(
                     { it.description },
                 ).returningResult(TRANSACTION_EXCLUSION.fields().toList())
                 .fetch()
-                .into(TransactionExclusion::class.java)
+                .into(TransactionExclusionRecord::class.java)
+                .map { it.toTransactionExclusion() }
 
         return if (transactionExclusionsResult.size == transactionExclusions.size) {
             transactionExclusionsResult
@@ -73,3 +77,13 @@ class BankAccountTransactionExclusionRepository(
         }
     }
 }
+
+private fun TransactionExclusionRecord.toTransactionExclusion(): TransactionExclusion =
+    TransactionExclusion(
+        id = checkNotNull(id),
+        teamBalanceId = TeamBalanceId(checkNotNull(teamBalanceId)),
+        date = date,
+        transactionId = transactionId,
+        counterParty = counterParty,
+        description = description,
+    )

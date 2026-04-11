@@ -5,6 +5,7 @@ import nl.jvandis.teambalance.api.attendees.AttendeeWithUserRecordHandler
 import nl.jvandis.teambalance.api.event.Event
 import nl.jvandis.teambalance.api.event.RecurringEventProperties
 import nl.jvandis.teambalance.api.event.TeamBalanceRecordHandler
+import nl.jvandis.teambalance.api.event.toRecurringEventProperties
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.EventRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.MiscellaneousEventRecord
 import nl.jvandis.teambalance.data.jooq.schema.tables.records.RecurringEventPropertiesRecord
@@ -37,25 +38,38 @@ class MiscEventWithAttendeesRecordHandler : TeamBalanceRecordHandler<Miscellaneo
         val event =
             events.computeIfAbsent(eventId) {
                 // mapping via EventRecord works better with column name clashes (like `id`)
-                record
-                    .into(EventRecord::class.java)
-                    .into(Event.Builder::class.java)
+                record.into(EventRecord::class.java).let { er ->
+                    Event.Builder(
+                        id = checkNotNull(er.id),
+                        teamBalanceId = checkNotNull(er.teamBalanceId),
+                        startTime = checkNotNull(er.startTime),
+                        location = checkNotNull(er.location),
+                        comment = er.comment,
+                        recurringEventId = er.recurringEventId,
+                        recurringEventProperties = null,
+                    )
+                }
             }
         val recurringEventProperties =
             recurringEventId?.let {
                 recurringEventsPropertiesMap.computeIfAbsent(it) {
                     record
                         .into(RecurringEventPropertiesRecord::class.java)
-                        .into(RecurringEventProperties::class.java)
+                        .toRecurringEventProperties()
                 }
             }
 
         val miscEvent =
             miscEvent.computeIfAbsent(miscEventId) {
                 // mapping via MiscellaneousEventRecord works better with column name clashes (like `id`)
-                record
-                    .into(MiscellaneousEventRecord::class.java) //
-                    .into(MiscellaneousEvent.Builder::class.java)
+                record.into(MiscellaneousEventRecord::class.java).let { mr ->
+                    MiscellaneousEvent.Builder(
+                        id = checkNotNull(mr.id),
+                        title = mr.title,
+                        event = null,
+                        attendees = null,
+                    )
+                }
             }
 
         event.recurringEventProperties = recurringEventProperties
@@ -64,9 +78,9 @@ class MiscEventWithAttendeesRecordHandler : TeamBalanceRecordHandler<Miscellaneo
 
     fun stats(): String =
         """
-        Nr of records handled: $recordsHandled. 
-        Nr of events: ${events.size}. 
-        Nr of subEvents: ${miscEvent.size}. 
+        Nr of records handled: $recordsHandled.
+        Nr of events: ${events.size}.
+        Nr of subEvents: ${miscEvent.size}.
         -- Attendees:
         ${attendeeRecordHandler.stats()}
         """.trimIndent()

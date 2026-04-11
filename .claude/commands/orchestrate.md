@@ -48,7 +48,11 @@ Never proceed with a broken build.
 
 1. **Read** `.orchestration/backlog.md`
 2. **Check** `.orchestration/questions/README.md` for answered questions → update backlog (move from Parked to Active)
-3. **Sync** to TaskList using TaskCreate for visibility
+3. **Sync TaskList** — call TaskList, then:
+   - Delete stale tasks that no longer match the backlog (`status: deleted`)
+   - Mark done tasks that match backlog Done section (`status: completed`)
+   - Create tasks for all Active backlog items not yet in the list
+   - **Limit to 7 tasks**: 2 most-recent Done, all Active, 3 next-up from future/blocked
 4. **Set** round_number = 1
 
 ## LOOP (Repeats Until No Eligible Tasks)
@@ -143,6 +147,8 @@ Active Worktrees:
 ```
 
 ### 10. DISPATCH WORKERS
+
+**Before dispatching:** Call `TaskUpdate` to mark each task `in_progress` in the TaskList.
 
 **Parallel Dispatch Rules:**
 
@@ -316,7 +322,22 @@ Example:
 
 ### 14. UPDATE TASKLIST
 
-Use TaskUpdate to mark corresponding tasks as completed. Ad
+Keep the TaskList in sync with the backlog after every round. **Limit to 7 tasks.**
+
+**Rules:**
+- **Completed tasks** → `TaskUpdate(status: "completed")` for tasks just moved to Done
+- **New tasks added to backlog** → `TaskCreate` for tasks not yet in TaskList
+- **Removed/superseded tasks** → `TaskUpdate(status: "deleted")`
+- **7-task limit**: keep 2 most-recent Done, all currently Active, and up to 3 next-up blocked/future tasks
+- **Never let the list go stale** — a task in the list must always reflect its current backlog state
+
+**Per-task lifecycle in TaskList:**
+```
+Backlog: Active (dispatched)  → TaskUpdate: in_progress   (step 10)
+Backlog: Active (done)        → TaskUpdate: completed      (step 14)
+Backlog: removed/superseded   → TaskUpdate: deleted        (step 14)
+Backlog: new task added       → TaskCreate                 (step 14)
+```
 
 ### 15. WRITE HANDOVER
 
@@ -474,7 +495,16 @@ Example:
    - Note which tasks are included
    - Mark worktree as "PR created"
 
-6. **Optional cleanup (ask user first):**
+6. **Add CI validation task to backlog:**
+   After every PR creation, immediately add to the Active backlog:
+   ```markdown
+   - [ ] `[P1]` `[test]` Validate CI for PR #<number> and decide next step
+       - Depends: none
+       - Context: PR #<number> (<branch>). Run `gh pr checks <number>`. If pass → merge or ask user. If fail → dispatch fix worker. If pending → wait and re-check.
+   ```
+   Also create the corresponding TaskList entry with `TaskCreate`.
+
+7. **Optional cleanup (ask user first):**
    - After MR is merged, remove worktree: `git worktree remove .worktrees/<feature-name>`
    - Delete local branch if no longer needed
 
