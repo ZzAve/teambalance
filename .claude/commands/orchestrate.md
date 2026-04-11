@@ -53,6 +53,10 @@ Never proceed with a broken build.
 - Creating/removing worktrees (`git worktree add`, `git worktree remove`, `git worktree list`)
 - Creating PRs for completed worktrees (`gh pr create`)
 - Running `build` to verify a completed round (step 12 only)
+- Creating `.orchestration/tasks/<slug>.md` (new parent task context files)
+- Moving `.orchestration/tasks/<slug>.md` → `.orchestration/tasks/archive/<slug>.md` (archival on parent completion)
+- Adding `- Task file:` metadata bullets to parent tasks in `backlog.md`
+- Appending auto-injected `[reflect]` subtasks to parents in `backlog.md`
 
 **ALL other work — including:**
 - Editing files (code, config, markdown, docs)
@@ -77,6 +81,7 @@ Never proceed with a broken build.
 | `[execute]` | Implement feature or fix | Write code, tests, commit; requires worktree |
 | `[test]` | Add test coverage to existing code | Write tests, commit; requires worktree |
 | `[ci]` | Monitor PR CI status; validate PR comments; rebase/merge when green | No code changes; pure monitoring + merge |
+| `[reflect]` | Validate that a parent task's result matches its intent | Read parent task file, compare Intent vs Decisions Log + Current State, report gaps |
 
 **`[ci]` Worker Decision Tree:**
 
@@ -102,6 +107,95 @@ the orchestrator must escalate to the user rather than re-dispatching. Present:
 - PR number and URL
 - All known blockers from previous rounds
 - Ask user what action to take (close PR, fix blocker, override)
+
+# Hierarchical Tasks
+
+Parent tasks OWN subtasks nested in `.orchestration/backlog.md`:
+
+```markdown
+- [ ] `[P1]` Implement event list page
+    - Context: First page users see. FSD, MUI.
+    - Task file: .orchestration/tasks/implement-event-list-page.md
+    - [ ] `[P1]` `[execute]` Build event list component
+    - [ ] `[P2]` `[review]` Review event list
+    - [ ] `[P2]` `[ci]` Validate CI for PR
+    - [ ] `[P2]` `[reflect]` Verify result matches intent
+```
+
+**Rules:**
+- Parent tasks have priority only (no type tag)
+- Subtasks have priority + type tag, indented 4 spaces
+- A parent is Done only when ALL subtasks are Done
+- Standalone (non-nested) tasks still work as before
+
+# Task Context Files
+
+Every parent task gets a persistent context file at `.orchestration/tasks/<slug>.md`.
+
+**Lifecycle:**
+1. **Created by the orchestrator** when the parent is first dispatched (whitelisted direct operation)
+2. **Read and updated by each subtask worker** — they append to Decisions Log and overwrite Current State
+3. **Validated by the final `[reflect]` subtask** — worker reads Intent vs actual outcome
+4. **Archived** to `.orchestration/tasks/archive/<slug>.md` when the parent moves to Done
+
+**Schema (orchestrator writes this on creation):**
+
+```markdown
+# Task: <parent task name>
+
+**Status:** In Progress
+**Priority:** <P1/P2/P3>
+**Created:** YYYY-MM-DD
+**Parent backlog entry:** <task name>
+
+## Intent
+<parent Context field, verbatim>
+
+## Subtasks
+- [ ] <subtask 1 name>
+- [ ] <subtask 2 name>
+- [ ] <... including auto-injected [reflect] subtask>
+
+## Decisions Log
+(Appended by each worker)
+
+## Current State
+(Overwritten by each worker)
+
+## Reflection
+(Filled in by the [reflect] subtask)
+```
+
+**Worker contract:**
+- Every subtask worker receives `PARENT_TASK_FILE: .orchestration/tasks/<slug>.md`
+- At start: read the file for context
+- At end: append a Decisions Log entry, overwrite Current State, mark its subtask line as `[x]`
+
+# WIP Preference (Stop Starting, Start Finishing)
+
+Strong preference, not a hard limit:
+- ≤2 active parents at a time
+- ≤4 subtasks dispatched per round
+- **Always prefer** finishing an in-progress parent over starting a new one
+- If breaching the preference (e.g. only P1 work is in a third parent), allow it but note the breach in the handover
+
+# Auto-Injected `[reflect]` Subtask
+
+When the orchestrator first processes a parent task with existing subtasks, it auto-appends a final subtask:
+
+```markdown
+- [ ] `[P2]` `[reflect]` Verify result matches intent
+```
+
+The orchestrator never adds a `[reflect]` twice. If one already exists at the end of the subtask list, leave it alone.
+
+# Decomposition on Dispatch
+
+When the orchestrator encounters a parent task with NO subtasks, it dispatches a worker with a directive to either:
+- **Propose a decomposition** (worker writes subtasks into the backlog under the parent) OR
+- **Execute the task directly** if it's small enough
+
+The worker decides based on scope. If subtasks are proposed, the orchestrator picks them up in the next round and auto-injects `[reflect]` at that point.
 
 # Core Loop
 
@@ -139,6 +233,8 @@ the orchestrator must escalate to the user rather than re-dispatching. Present:
 > If not on the whitelist → stop, dispatch a worker instead.
 
 - Extract tasks from **Active** section of `.orchestration/backlog.md`
+- For parent tasks, extract the nested subtasks list; each subtask becomes an independently dispatchable unit
+- A parent is eligible only via its subtasks — never dispatch the parent itself
 - Filter for eligible: not done, not parked, all dependencies in Done
 - **Cascading park rule:** If a task's dependency is currently in the **Parked** section (not Done),
   automatically move that task to Parked with note: `"Waiting for '<dependency>' to be unparked first"`
@@ -150,6 +246,8 @@ the orchestrator must escalate to the user rather than re-dispatching. Present:
 
 ### 7. PRIORITIZE
 
+- **Finish-first bias (WIP preference):** if any parent has subtasks already marked `[x]`, strongly prefer its remaining subtasks over subtasks of a parent with zero progress
+- Prefer ≤2 active parents per round, ≤4 subtasks dispatched per round — soft limits, not hard blocks
 - Sort by: P-level first (P1 > P2 > P3), then file order
 - Select top tasks for this round
 
@@ -196,7 +294,7 @@ Worktree 3 (feature/money-pool):
   - Bunq integration [execute]
 ```
 
-### 8.5. AUTO-TAG `[review]`
+### 8.5. AUTO-TAG `[review]` AND AUTO-INJECT `[reflect]`
 
 Before dispatching, check if each `[execute]` or `[test]` task should have `[review]` added. Add it
 automatically if the task meets **any** of these criteria (even if backlog author did not include it):
@@ -209,7 +307,26 @@ automatically if the task meets **any** of these criteria (even if backlog autho
 
 If a task already has `[review]`, keep it. Never remove `[review]` tags.
 
+**Auto-inject `[reflect]` subtask:**
+
+For any parent task being processed for the first time (no `[reflect]` subtask present at the end of its subtask list):
+
+1. Append `- [ ] \`[P2]\` \`[reflect]\` Verify result matches intent` as the last subtask under the parent
+2. Update `.orchestration/backlog.md` directly (whitelisted backlog write)
+3. The new `[reflect]` subtask will be picked up in a later round after other subtasks complete
+
 ### 9. DECOMPOSE IF NEEDED
+
+**Parent tasks without subtasks:**
+
+If a parent task has no subtasks yet, dispatch a single worker with `TASK_TYPE: [decompose-or-execute]`. The worker must:
+- Analyze the parent's Context and scope
+- Either propose subtasks (edit `.orchestration/backlog.md` to add them under the parent) and report `STATUS: done` with a note that subtasks were added, OR
+- Execute the task directly if it's small (≤3 files) and report `STATUS: done` normally
+
+If subtasks were added, the orchestrator picks them up in the next round (and auto-injects `[reflect]` via step 8.5).
+
+**Legacy flat-task decomposition (still applies to standalone tasks):**
 
 - If task is too large (>3 files, unclear scope):
     - Break into subtasks: `[research]` → `[plan]` → `[execute]` → `[test]`
@@ -265,6 +382,16 @@ Active Worktrees:
 
 **Worker Invocation:**
 
+**Before dispatching a subtask of a parent task:**
+
+If the parent task has no task file yet at `.orchestration/tasks/<slug>.md`:
+1. Compute the slug from the parent task name (kebab-case)
+2. Create `.orchestration/tasks/<slug>.md` with the schema shown in the "Task Context Files" section — copy Intent from the parent Context field
+3. Add `- Task file: .orchestration/tasks/<slug>.md` as a metadata bullet under the parent in `backlog.md`
+4. Then dispatch workers with `PARENT_TASK_FILE` set to that path
+
+Creating and updating task files is a whitelisted orchestrator operation.
+
 ```markdown
 Use Task tool with subagent_type="general-purpose", model="haiku"
 
@@ -272,12 +399,13 @@ Prompt template:
 Load the orchestrate-worker skill with these parameters:
 
 TASK_NAME: <task name>
-TASK_TYPE: <[research] | [plan] | [execute] | [test] | [ci]>
+TASK_TYPE: <[research] | [plan] | [execute] | [test] | [ci] | [reflect] | [decompose-or-execute]>
 PRIORITY: <P1 | P2 | P3>
 DEPENDENCIES: <comma-separated list or "none">
 CONTEXT: <from backlog>
 FILE_BOUNDARIES: <assigned file paths/patterns>
 WORKTREE_PATH: <path to worktree, e.g., .worktrees/events-page> (only for execute/test tasks)
+PARENT_TASK_FILE: <path to .orchestration/tasks/<slug>.md> (only for subtasks of a parent task, omit for standalone tasks)
 
 The worker will return a structured report.
 ```
@@ -416,6 +544,13 @@ For each completed task:
 - Keep dependency info for reference
 - Derive follow-up tasks, and update tasks in backlog
 - Derive user questions (if any)
+
+**Parent task completion:**
+
+After a subtask is marked done, check if all subtasks of its parent are Done:
+- If yes: move the parent to the Done section (preserve nesting), mark the parent `[x]`, add completion date
+- Archive the task file: move `.orchestration/tasks/<slug>.md` to `.orchestration/tasks/archive/<slug>.md` (whitelisted file operation)
+- If no: leave the parent in Active, continue
 
 Example:
 
@@ -712,13 +847,15 @@ As orchestration rounds accumulate, the orchestrator's context window grows. To 
 
 Even tasks that feel "internal" — like applying an improvement plan to `orchestrate.md` — must be dispatched to a worker.
 
-**Backlog state:**
+**Backlog state (hierarchical format):**
 ```markdown
 ## Active
 
-- [ ] `[P1]` `[execute]` Implement orchestrate command improvements
-    - Depends: Plan orchestrate command improvements
-    - Context: Apply 6 changes from `.orchestration/plans/YYYY-MM-DD-orchestrate-improvements-plan.md` to `.claude/commands/orchestrate.md`.
+- [ ] `[P1]` Implement orchestrate command improvements
+    - Context: Apply changes from `.orchestration/plans/YYYY-MM-DD-orchestrate-improvements-plan.md` to `.claude/commands/orchestrate.md`.
+    - Task file: .orchestration/tasks/implement-orchestrate-improvements.md
+    - [ ] `[P1]` `[execute]` Apply plan to orchestrate.md
+    - [ ] `[P2]` `[reflect]` Verify result matches intent
 ```
 
 **Round Actions:**
