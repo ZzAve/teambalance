@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { HOST, getStartOfSeason } from "./utils";
+import { HOST, getStartOfSeason, addDays } from "./utils";
 import { createTrainingEvent } from "./training-utils";
 import { v4 as uuid } from "uuid";
 
@@ -13,7 +13,7 @@ test("Validate previous events can be shown", async ({ page, request }) => {
   // Use a unique comment so we can find THIS specific past event later,
   // even when other tests have created training events in the database.
   const comment = `past-${uuid().slice(0, 8)}`;
-  await createTrainingEvent(page, comment, startOfSeason);
+  await createTrainingEvent(page, comment, addDays(startOfSeason, -1));
   await page.getByRole("button", { name: "Terug naar de veiligheid" }).click();
 
   await page.getByTestId("training-events").waitFor({ state: "visible" });
