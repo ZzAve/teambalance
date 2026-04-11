@@ -46,7 +46,9 @@ export default defineConfig({
     }
   },
 
-  /* Configure projects for major browsers */
+  /* Configure projects for major browsers.
+   * On CI only chromium runs to keep the pipeline fast (2 vCPU runner, serial
+   * workers). Firefox and webkit are available for local cross-browser checks. */
   projects: [
     // Setup project
     { name: "setup", testMatch: /.*\.setup\.ts/ },
@@ -60,23 +62,25 @@ export default defineConfig({
       dependencies: ["setup"],
     },
 
-    {
-      name: "firefox",
-      use: {
-        ...devices["Desktop Firefox"],
-        storageState: ".auth/user.json",
+    ...(!process.env.CI ? [
+      {
+        name: "firefox",
+        use: {
+          ...devices["Desktop Firefox"],
+          storageState: ".auth/user.json",
+        },
+        dependencies: ["setup"],
       },
-      dependencies: ["setup"],
-    },
 
-    {
-      name: "webkit",
-      use: {
-        ...devices["Desktop Safari"],
-        storageState: ".auth/user.json",
+      {
+        name: "webkit",
+        use: {
+          ...devices["Desktop Safari"],
+          storageState: ".auth/user.json",
+        },
+        dependencies: ["setup"],
       },
-      dependencies: ["setup"],
-    },
+    ] : []),
 
     /* Test against mobile viewports. */
     // {

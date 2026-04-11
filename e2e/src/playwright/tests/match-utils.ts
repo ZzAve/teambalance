@@ -30,6 +30,9 @@ async function pickDateTime(page: Page, date: Date) {
   const combinedInput = dialog.getByRole("textbox");
   await combinedInput.waitFor({ state: "visible" });
   await combinedInput.click();
+  // Move to start of the masked input before typing — Playwright's click()
+  // lands in the centre of the element, leaving the cursor mid-string.
+  await page.keyboard.press("Home");
   await combinedInput.pressSequentially(digits);
 
   await dialog.getByRole("button", { name: "OK", exact: true }).click();
