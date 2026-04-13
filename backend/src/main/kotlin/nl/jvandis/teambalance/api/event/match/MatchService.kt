@@ -62,15 +62,16 @@ class MatchService(
 
         val updatedMatchs =
             when (affectedRecurringEvents) {
-                CURRENT ->
+                CURRENT -> {
                     matchRepository
                         .updateSingleEvent(
                             event = originalMatch.createUpdatedMatch(updateMatchRequest),
                             removeRecurringEvent = true,
                         ).also { log.info("Removed recurringEvent $teamBalanceId from Match with id $originalMatch.id") }
                         .let(::listOf)
+                }
 
-                CURRENT_AND_FUTURE ->
+                CURRENT_AND_FUTURE -> {
                     matchRepository
                         .partitionRecurringEvent(
                             currentRecurringEventId = teamBalanceId,
@@ -85,8 +86,11 @@ class MatchService(
                         }.run {
                             updateAllFromRecurringEvent(teamBalanceId, originalMatch, updateMatchRequest)
                         }
+                }
 
-                ALL -> updateAllFromRecurringEvent(teamBalanceId, originalMatch, updateMatchRequest)
+                ALL -> {
+                    updateAllFromRecurringEvent(teamBalanceId, originalMatch, updateMatchRequest)
+                }
             }
 
         log.info(

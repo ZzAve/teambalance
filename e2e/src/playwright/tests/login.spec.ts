@@ -9,7 +9,7 @@ test.describe("login/logout functionality", () => {
   });
 
   test("Login", async ({ page }) => {
-    await expect(page.locator("#root")).toContainText("Transacties");
+    await expect(page.locator("#root")).toContainText("Aanstaande trainingen");
   });
 
   test("Logout", async ({ page }) => {

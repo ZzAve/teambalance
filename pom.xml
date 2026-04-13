@@ -31,7 +31,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <jib-maven-plugin.version>3.5.1</jib-maven-plugin.version>
-        <spotless.version>2.46.1</spotless.version>
+        <spotless.version>3.4.0</spotless.version>
         <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
         <mockito-kotlin.version>4.1.0</mockito-kotlin.version>
         <testcontainers.version>2.0.4</testcontainers.version>
@@ -42,7 +42,7 @@
         <npm.version>10.9.2</npm.version>
 
         <!-- deps -->
-        <frontend-maven-plugin.version>1.15.4</frontend-maven-plugin.version>
+        <frontend-maven-plugin.version>2.0.0</frontend-maven-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- frontend defaults -->

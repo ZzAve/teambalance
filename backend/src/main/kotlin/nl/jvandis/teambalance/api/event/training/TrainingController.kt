@@ -246,11 +246,15 @@ class TrainingController(
     private fun getPotentialTrainer(updateTrainerRequest: UpdateTrainerRequest): User? {
         val userTeamBalanceId: TeamBalanceId? = updateTrainerRequest.userId?.let { TeamBalanceId(it) }
         return when (userTeamBalanceId) {
-            null -> null
-            else ->
+            null -> {
+                null
+            }
+
+            else -> {
                 userRepository
                     .findByIdOrNull(userTeamBalanceId)
                     ?: throw InvalidUserException(userTeamBalanceId)
+            }
         }
     }
 

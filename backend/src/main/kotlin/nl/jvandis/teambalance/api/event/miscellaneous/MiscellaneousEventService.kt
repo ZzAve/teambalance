@@ -71,7 +71,7 @@ class MiscellaneousEventService(
 
         val updatedMiscellaneousEvents =
             when (affectedRecurringEvents) {
-                CURRENT ->
+                CURRENT -> {
                     miscellaneousEventRepository
                         .updateSingleEvent(
                             event =
@@ -84,8 +84,9 @@ class MiscellaneousEventService(
                                 "Removed recurringEvent $teamBalanceId from MiscellaneousEvent with id $originalMiscellaneousEvent.id",
                             )
                         }.let(::listOf)
+                }
 
-                CURRENT_AND_FUTURE ->
+                CURRENT_AND_FUTURE -> {
                     miscellaneousEventRepository
                         .partitionRecurringEvent(
                             currentRecurringEventId = teamBalanceId,
@@ -104,13 +105,15 @@ class MiscellaneousEventService(
                                 updateMiscellaneousEventRequest,
                             )
                         }
+                }
 
-                ALL ->
+                ALL -> {
                     updateAllFromRecurringEvent(
                         teamBalanceId,
                         originalMiscellaneousEvent,
                         updateMiscellaneousEventRequest,
                     )
+                }
             }
 
         log.info(
