@@ -50,15 +50,24 @@ class AttendeeController(
 
         val attendees =
             when {
-                eventTeamBalanceIds.isEmpty() && userTeamBalanceIds.isEmpty() -> attendeeRepository.findAll()
-                eventTeamBalanceIds.isNotEmpty() && userTeamBalanceIds.isNotEmpty() ->
+                eventTeamBalanceIds.isEmpty() && userTeamBalanceIds.isEmpty() -> {
+                    attendeeRepository.findAll()
+                }
+
+                eventTeamBalanceIds.isNotEmpty() && userTeamBalanceIds.isNotEmpty() -> {
                     attendeeRepository.findALlByEventIdInAndUserIdIn(
                         eventTeamBalanceIds,
                         userTeamBalanceIds,
                     )
+                }
 
-                eventTeamBalanceIds.isNotEmpty() -> attendeeRepository.findAllByEventIdIn(eventTeamBalanceIds)
-                else -> attendeeRepository.findAllByUserIdIn(userTeamBalanceIds)
+                eventTeamBalanceIds.isNotEmpty() -> {
+                    attendeeRepository.findAllByEventIdIn(eventTeamBalanceIds)
+                }
+
+                else -> {
+                    attendeeRepository.findAllByUserIdIn(userTeamBalanceIds)
+                }
             }
 
         return attendees

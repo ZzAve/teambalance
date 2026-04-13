@@ -60,13 +60,10 @@ export async function updateTraining(page: Page, eventId: string) {
 export async function deleteTraining(page: Page, eventId: string | void) {
   // Navigate to the Trainingen section (admin page defaults to Trainingen)
   await page.getByRole("button", { name: /trainingen/i }).click();
-  let combobox = page
-    .getByRole('combobox', {name: 'Rows per page:'})
-  await combobox.isVisible()
-  await combobox.click()
-  await page
-    .getByRole('option', { name: '50' })
-    .click()
+  let combobox = page.getByRole("combobox", { name: "Rows per page:" });
+  await combobox.isVisible();
+  await combobox.click();
+  await page.getByRole("option", { name: "50" }).click();
 
   await page
     .getByRole("button", { name: `Verwijder event ${eventId}` })

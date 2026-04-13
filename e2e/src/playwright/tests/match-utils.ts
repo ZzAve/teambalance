@@ -1,4 +1,4 @@
-import {expect, APIRequestContext, Page, Locator} from "@playwright/test";
+import { expect, APIRequestContext, Page, Locator } from "@playwright/test";
 import { addDays, ensure, HOST, NOW, pickDateTime } from "./utils";
 
 /**
@@ -145,7 +145,9 @@ export async function updateMatch(
   newOpponent?: string,
   newLocation?: string,
 ): Promise<void> {
-  await page.getByRole("button", { name: `Update event ${eventId}` }).click({timeout:5000});
+  await page
+    .getByRole("button", { name: `Update event ${eventId}` })
+    .click({ timeout: 5000 });
 
   if (newOpponent) {
     await page.getByLabel("Tegenstander *").fill(newOpponent);
@@ -179,13 +181,10 @@ export async function deleteMatch(page: Page, eventId: string): Promise<void> {
   // Navigate to the Wedstrijden section (admin page defaults to Trainingen)
   await page.getByRole("button", { name: /wedstrijden/i }).click();
 
-  let combobox = page
-    .getByRole('combobox', {name: 'Rows per page:'})
-  await combobox.isVisible()
-  await combobox.click()
-  await page
-    .getByRole('option', { name: '50' })
-    .click()
+  let combobox = page.getByRole("combobox", { name: "Rows per page:" });
+  await combobox.isVisible();
+  await combobox.click();
+  await page.getByRole("option", { name: "50" }).click();
 
   await page
     .getByRole("button", { name: `Verwijder event ${eventId}` })
