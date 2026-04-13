@@ -17,6 +17,8 @@
   "automergeStrategy": "squash",
   "prConcurrentLimit": 2,
   "branchConcurrentLimit": 3,
+  "prCreation": "not-pending",
+  "minimumReleaseAge": "14 days",
   "packageRules": [
     {
       "matchDepTypes": [
