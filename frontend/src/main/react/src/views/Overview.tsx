@@ -5,7 +5,6 @@ import Potters from "../components/Potters";
 import PageItem from "../components/PageItem";
 import { Button } from "@mui/material";
 import Transactions from "../components/Transactions";
-import React from "react";
 import Events from "../components/events/Events";
 import { useNavigate } from "react-router-dom";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";

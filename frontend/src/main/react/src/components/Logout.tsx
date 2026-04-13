@@ -1,4 +1,3 @@
-import React from "react";
 import LockIcon from "@mui/icons-material/Lock";
 import { authenticationManager } from "../utils/AuthenticationManager";
 import Button from "@mui/material/Button";

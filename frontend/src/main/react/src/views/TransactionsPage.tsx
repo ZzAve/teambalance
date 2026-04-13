@@ -1,7 +1,6 @@
 import Grid from "@mui/material/Grid";
 import PageItem from "../components/PageItem";
 import { Button, Hidden } from "@mui/material";
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Transactions from "../components/Transactions";

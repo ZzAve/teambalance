@@ -1,5 +1,3 @@
-import React from "react";
-
 export const Conditional: (props: {
   condition: boolean;
   children: JSX.Element | Array<JSX.Element>;

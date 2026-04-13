@@ -1,6 +1,5 @@
 import Grid from "@mui/material/Grid";
 import { Button, Card } from "@mui/material";
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Typography from "@mui/material/Typography";

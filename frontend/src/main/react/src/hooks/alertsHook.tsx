@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SnackbarKey, useSnackbar } from "notistack";
+import { SnackbarKey, useSnackbar, closeSnackbar } from "notistack";
 import { Button } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -18,7 +18,7 @@ let setStates: React.Dispatch<React.SetStateAction<InternalAlert[]>>[] = [];
 
 export const useAlerts = () => {
   const [myAlerts, setMyAlerts] = useState<InternalAlert[]>(alerts);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     setStates.push(setMyAlerts);
