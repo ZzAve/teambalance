@@ -47,8 +47,13 @@ test.describe("Matches", () => {
       //    The home page shows "Aanstaande wedstrijden"; navigate there directly.
       await page.goto(HOST);
       await page.getByText("Aanstaande trainingen").waitFor({ state: "visible" });
-      // Home page uses MUI Tabs (role="tab") to switch between sections.
-      await page.getByRole("tab", { name: /wedstrijden/i }).first().click();
+      // Home page has a "Meer" button in the "Aanstaande wedstrijden" section
+      // that navigates to the full matches page (/matches).
+      await page
+        .getByTestId("match-events")
+        .getByTestId("more-button")
+        .click();
+      await page.waitForURL(/matches/);
 
       // Ensure we are in list view — list view renders attendee buttons inline
       // without requiring an expand click.
