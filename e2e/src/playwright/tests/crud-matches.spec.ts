@@ -43,7 +43,8 @@ test.describe("Matches", () => {
   }) => {
     // 0. Create a team member so the event has attendees to interact with.
     //    The e2e database starts empty; without a user, events have no attendees.
-    const userId = await createUserViaApi(request, TEST_USER_NAME);
+    let name = TEST_USER_NAME + "_" + Math.round(Math.random() * 10000);
+    const userId = await createUserViaApi(request, name);
 
     // 1. Create match via admin UI.
     await page.getByRole("button", { name: "Admin dingen" }).click();
@@ -83,21 +84,21 @@ test.describe("Matches", () => {
       ).toBeVisible();
 
       // 3. Set to Attending and verify.
-      await setMatchAttendance(page, "attending", TEST_USER_NAME);
-      await verifyMatchAttendanceState(page, "attending", TEST_USER_NAME);
+      await setMatchAttendance(page, "attending", name);
+      await verifyMatchAttendanceState(page, "attending", name);
 
       // 4. Transition to Maybe and verify.
-      await setMatchAttendance(page, "maybe", TEST_USER_NAME);
-      await verifyMatchAttendanceState(page, "maybe", TEST_USER_NAME);
+      await setMatchAttendance(page, "maybe", name);
+      await verifyMatchAttendanceState(page, "maybe", name);
 
       // 5. Transition to Absent and verify.
-      await setMatchAttendance(page, "absent", TEST_USER_NAME);
-      await verifyMatchAttendanceState(page, "absent", TEST_USER_NAME);
+      await setMatchAttendance(page, "absent", name);
+      await verifyMatchAttendanceState(page, "absent", name);
 
       // 6. Verify persistence: reload the page and check state is retained.
       await page.reload();
       await expect(page.getByText(opponent)).toBeVisible();
-      await verifyMatchAttendanceState(page, "absent", TEST_USER_NAME);
+      await verifyMatchAttendanceState(page, "absent", name);
     } finally {
       // 7. Cleanup: always delete the match and the test user, even if assertions failed.
       // Wrap navigation in try/catch: Playwright may have already closed the
@@ -105,6 +106,7 @@ test.describe("Matches", () => {
       try {
         await page.goto(HOST);
         await page.getByRole("button", { name: "Admin dingen" }).click();
+
         await deleteMatch(page, eventId);
       } catch {
         // Best-effort cleanup — ignore navigation errors after context teardown.

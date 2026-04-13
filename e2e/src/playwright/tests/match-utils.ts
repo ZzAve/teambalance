@@ -176,6 +176,9 @@ export async function updateMatch(
  * Delete match event with confirmation
  */
 export async function deleteMatch(page: Page, eventId: string): Promise<void> {
+  // Navigate to the Wedstrijden section (admin page defaults to Trainingen)
+  await page.getByRole("button", { name: /wedstrijden/i }).click();
+
   await page
     .getByRole("button", { name: `Verwijder event ${eventId}` })
     .click();
@@ -201,14 +204,12 @@ export async function deleteMatch(page: Page, eventId: string): Promise<void> {
  * AttendeeButton uses color="success" for PRESENT, "error" for ABSENT,
  * "warning" for UNCERTAIN (maybe).
  */
-const statusToMuiColorClass: Record<
-  "attending" | "maybe" | "absent",
-  string
-> = {
-  attending: "MuiButton-colorSuccess",
-  maybe: "MuiButton-colorWarning",
-  absent: "MuiButton-colorError",
-};
+const statusToMuiColorClass: Record<"attending" | "maybe" | "absent", string> =
+  {
+    attending: "MuiButton-colorSuccess",
+    maybe: "MuiButton-colorWarning",
+    absent: "MuiButton-colorError",
+  };
 
 /**
  * Set attendance status for a specific attendee in the event attendee list.
@@ -256,9 +257,9 @@ export async function setMatchAttendance(
   // Step 3: wait for the refinement view to close by waiting for the attendee
   // button to reappear with the expected MUI colour class.
   const expectedClass = statusToMuiColorClass[status];
-  await expect(
-    page.getByRole("button", { name: attendeeName }),
-  ).toHaveClass(new RegExp(expectedClass));
+  await expect(page.getByRole("button", { name: attendeeName })).toHaveClass(
+    new RegExp(expectedClass),
+  );
 }
 
 /**
@@ -275,7 +276,7 @@ export async function verifyMatchAttendanceState(
   attendeeName: string,
 ): Promise<void> {
   const expectedClass = statusToMuiColorClass[status];
-  await expect(
-    page.getByRole("button", { name: attendeeName }),
-  ).toHaveClass(new RegExp(expectedClass));
+  await expect(page.getByRole("button", { name: attendeeName })).toHaveClass(
+    new RegExp(expectedClass),
+  );
 }
