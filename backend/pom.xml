@@ -24,7 +24,7 @@
         <testcontainers.postgresql.version>16.5-alpine</testcontainers.postgresql.version>
         <kotlinx-coroutines.version>1.9.0</kotlinx-coroutines.version>
         <jooq-extensions.version>3.18.7</jooq-extensions.version>
-        <kminrandom.version>1.0.4</kminrandom.version>
+        <kminrandom.version>2.0.0</kminrandom.version>
         <caffeine-coroutines.version>2.0.3</caffeine-coroutines.version>
     </properties>
 
