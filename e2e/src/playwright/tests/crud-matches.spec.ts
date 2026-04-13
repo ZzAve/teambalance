@@ -46,7 +46,7 @@ test.describe("Matches", () => {
       //    always visible inline — no expand toggle needed.
       //    The home page shows "Aanstaande wedstrijden"; navigate there directly.
       await page.goto(HOST);
-      await page.getByRole("link", { name: /wedstrijden/i }).first().click();
+      await page.getByRole("button", { name: /wedstrijden/i }).first().click();
 
       // Ensure we are in list view — list view renders attendee buttons inline
       // without requiring an expand click.
