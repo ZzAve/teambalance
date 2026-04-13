@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import nl.jvandis.teambalance.api.ConfigurationService
 import nl.jvandis.teambalance.api.Error
+import nl.jvandis.teambalance.api.Public
 import nl.jvandis.teambalance.filters.toZonedDateTime
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
@@ -29,6 +30,7 @@ class PotterController(
     private val potterService: PotterService,
     private val configurationService: ConfigurationService,
 ) {
+    @Public
     @GetMapping("/potters")
     suspend fun getPotters(
         @RequestParam(defaultValue = "3")

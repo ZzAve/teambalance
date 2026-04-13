@@ -2,6 +2,7 @@ package nl.jvandis.teambalance.api.bank
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.TeamBalanceId
+import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidTransactionException
 import nl.jvandis.teambalance.filters.SecretService
@@ -29,6 +30,7 @@ class BankAccountTransactionExclusionController(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    @Admin
     @GetMapping
     fun getTransactionExclusions(): TransactionExclusionsResponse {
         log.debug("getTransactionExclusion")
@@ -36,6 +38,7 @@ class BankAccountTransactionExclusionController(
         return TransactionExclusions(transactionExclusionRepository.findAll()).toResponse()
     }
 
+    @Admin
     @GetMapping("/{id}")
     fun getTransactionExclusion(
         @PathVariable(value = "id") transactionExclusionId: String,
@@ -49,6 +52,7 @@ class BankAccountTransactionExclusionController(
             )
     }
 
+    @Admin
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun postTransactionExclusion(
@@ -67,6 +71,7 @@ class BankAccountTransactionExclusionController(
         return transactionExclusion.toResponse()
     }
 
+    @Admin
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun deleteTransactionExclusion(

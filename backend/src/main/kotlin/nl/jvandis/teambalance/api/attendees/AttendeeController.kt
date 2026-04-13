@@ -8,6 +8,7 @@ import nl.jvandis.teambalance.api.InvalidAttendeeException
 import nl.jvandis.teambalance.api.InvalidEventException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
+import nl.jvandis.teambalance.api.Public
 import nl.jvandis.teambalance.api.event.EventRepository
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.slf4j.LoggerFactory
@@ -39,6 +40,7 @@ class AttendeeController(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    @Public
     @GetMapping
     fun getAttendees(
         @RequestParam(value = "event-ids", defaultValue = "") eventIds: List<String>,
@@ -75,6 +77,7 @@ class AttendeeController(
             .let(::AttendeesResponse)
     }
 
+    @Public
     @GetMapping("/{id}")
     fun getAttendee(
         @PathVariable(value = "id") attendeeId: String,
@@ -90,6 +93,7 @@ class AttendeeController(
         return attendee.expose()
     }
 
+    @Public
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun addAttendee(
@@ -121,6 +125,7 @@ class AttendeeController(
         }
     }
 
+    @Public
     @Deprecated(
         "Superseded by PUT api/attendees/{id}/availability",
         replaceWith = ReplaceWith("updateAttendeeAvailability"),
@@ -131,6 +136,7 @@ class AttendeeController(
         @RequestBody attendeeStateUpdate: AttendeeStateUpdate,
     ): AttendeeResponse = updateAttendeeAvailability(attendeeId, attendeeStateUpdate)
 
+    @Public
     @PutMapping("{id}/availability")
     fun updateAttendeeAvailability(
         @PathVariable("id") attendeeId: String,
@@ -150,6 +156,7 @@ class AttendeeController(
             ?: throw AttendeeNotFoundException(attendeeTeamBalanceId, TeamBalanceId("unknown user"))
     }
 
+    @Public
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun deleteAttendee(
@@ -160,6 +167,7 @@ class AttendeeController(
         attendeeRepository.deleteById(id)
     }
 
+    @Public
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping
     fun deleteAttendeeByUserIdAndEventId(

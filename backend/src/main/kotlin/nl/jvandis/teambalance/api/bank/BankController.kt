@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import nl.jvandis.teambalance.MultiTenantContext
 import nl.jvandis.teambalance.api.Error
+import nl.jvandis.teambalance.api.Public
 import nl.jvandis.teambalance.filters.TenantsConfig
 import nl.jvandis.teambalance.log
 import org.springframework.http.HttpStatus
@@ -28,6 +29,7 @@ class BankController(
     private val bankService: BankService,
     private val tenantsConfig: TenantsConfig,
 ) {
+    @Public
     @PostMapping("/top-up")
     fun addMoneyToBankAccount(
         @RequestBody topUpRequestBody: TopUpRequestBody,
@@ -50,9 +52,11 @@ class BankController(
         return TopUpRedirectResponse(URI.create(url).toString())
     }
 
+    @Public
     @GetMapping("/balance")
     suspend fun getBalance(): BalanceResponse = bankService.getBalance().toResponse()
 
+    @Public
     @GetMapping("/transactions")
     suspend fun getTransactions(
         @RequestParam(defaultValue = "10")
