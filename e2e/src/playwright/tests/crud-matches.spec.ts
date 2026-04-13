@@ -46,7 +46,9 @@ test.describe("Matches", () => {
       //    always visible inline — no expand toggle needed.
       //    The home page shows "Aanstaande wedstrijden"; navigate there directly.
       await page.goto(HOST);
-      await page.getByRole("button", { name: /wedstrijden/i }).first().click();
+      await page.getByText("Aanstaande trainingen").waitFor({ state: "visible" });
+      // Home page uses MUI Tabs (role="tab") to switch between sections.
+      await page.getByRole("tab", { name: /wedstrijden/i }).first().click();
 
       // Ensure we are in list view — list view renders attendee buttons inline
       // without requiring an expand click.
