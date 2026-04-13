@@ -7,7 +7,7 @@ interface SeasonResponse {
 }
 
 const getSeasonStart: () => Promise<string> = async () => {
-  const data = await settingsClient.call("settings/season");
+  const data = await settingsClient.call("config/season");
   return (data as SeasonResponse).startOfSeason;
 };
 
@@ -15,7 +15,7 @@ const updateSeasonStart: (startOfSeason: string) => Promise<string> = async (
   startOfSeason: string
 ) => {
   const data = await settingsClient.callWithBody(
-    "settings/season",
+    "config/season",
     { startOfSeason },
     { method: "PUT" }
   );
