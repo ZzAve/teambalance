@@ -1,4 +1,4 @@
-import { expect, APIRequestContext, Page } from "@playwright/test";
+import {expect, APIRequestContext, Page, Locator} from "@playwright/test";
 import { addDays, ensure, HOST, NOW, pickDateTime } from "./utils";
 
 /**
@@ -145,7 +145,7 @@ export async function updateMatch(
   newOpponent?: string,
   newLocation?: string,
 ): Promise<void> {
-  await page.getByRole("button", { name: `Update event ${eventId}` }).click();
+  await page.getByRole("button", { name: `Update event ${eventId}` }).click({timeout:5000});
 
   if (newOpponent) {
     await page.getByLabel("Tegenstander *").fill(newOpponent);
@@ -178,6 +178,14 @@ export async function updateMatch(
 export async function deleteMatch(page: Page, eventId: string): Promise<void> {
   // Navigate to the Wedstrijden section (admin page defaults to Trainingen)
   await page.getByRole("button", { name: /wedstrijden/i }).click();
+
+  let combobox = page
+    .getByRole('combobox', {name: 'Rows per page:'})
+  await combobox.isVisible()
+  await combobox.click()
+  await page
+    .getByRole('option', { name: '50' })
+    .click()
 
   await page
     .getByRole("button", { name: `Verwijder event ${eventId}` })
@@ -221,12 +229,12 @@ const statusToMuiColorClass: Record<"attending" | "maybe" | "absent", string> =
  *  3. Wait for the refinement view to close — i.e. the attendee name button
  *     re-appears with the updated colour class.
  *
- * @param page        Playwright Page
+ * @param locator     Playwright locator
  * @param status      Target attendance status
  * @param attendeeName Display name of the attendee whose status to change
  */
 export async function setMatchAttendance(
-  page: Page,
+  locator: Locator,
   status: "attending" | "maybe" | "absent",
   attendeeName: string,
 ): Promise<void> {
@@ -243,12 +251,12 @@ export async function setMatchAttendance(
   };
 
   // Step 1: click the attendee's name button to open AttendeeRefinement.
-  const attendeeBtn = page.getByRole("button", { name: attendeeName });
+  const attendeeBtn = locator.getByRole("button", { name: attendeeName });
   await attendeeBtn.waitFor({ state: "visible" });
   await attendeeBtn.click();
 
   // Step 2: click the correct icon button in the refinement view.
-  const refinementBtn = page.getByRole("button", {
+  const refinementBtn = locator.getByRole("button", {
     name: refinementButtonLabel[status],
   });
   await refinementBtn.waitFor({ state: "visible" });
@@ -257,7 +265,7 @@ export async function setMatchAttendance(
   // Step 3: wait for the refinement view to close by waiting for the attendee
   // button to reappear with the expected MUI colour class.
   const expectedClass = statusToMuiColorClass[status];
-  await expect(page.getByRole("button", { name: attendeeName })).toHaveClass(
+  await expect(locator.getByRole("button", { name: attendeeName })).toHaveClass(
     new RegExp(expectedClass),
   );
 }
@@ -266,17 +274,17 @@ export async function setMatchAttendance(
  * Verify that the attendee's button shows the expected colour for the given
  * attendance status.
  *
- * @param page        Playwright Page
+ * @param locator     Playwright locator
  * @param status      Expected attendance status
  * @param attendeeName Display name of the attendee to check
  */
 export async function verifyMatchAttendanceState(
-  page: Page,
+  locator: Locator,
   status: "attending" | "maybe" | "absent",
   attendeeName: string,
 ): Promise<void> {
   const expectedClass = statusToMuiColorClass[status];
-  await expect(page.getByRole("button", { name: attendeeName })).toHaveClass(
+  await expect(locator.getByRole("button", { name: attendeeName })).toHaveClass(
     new RegExp(expectedClass),
   );
 }

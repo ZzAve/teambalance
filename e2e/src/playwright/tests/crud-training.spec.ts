@@ -26,6 +26,13 @@ test.describe("Training ", () => {
     await deleteTraining(page, eventId);
 
     // Ensure page does not contain event anymore (with the used comment)
+    let combobox = page
+      .getByRole('combobox', {name: 'Rows per page:'})
+    await combobox.isVisible()
+    await combobox.click()
+    await page
+      .getByRole('option', { name: '50' })
+      .click()
     await expect(page.locator("tbody")).not.toContainText(comment);
   });
 

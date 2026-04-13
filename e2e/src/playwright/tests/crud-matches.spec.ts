@@ -29,11 +29,25 @@ test.describe("Matches", () => {
     const opponent = `Team ${uuid().slice(0, 8)}`;
     const eventId = await createMatchEvent(page, opponent);
 
+    let combobox = page
+      .getByRole('combobox', {name: 'Rows per page:'})
+    await combobox.isVisible()
+    await combobox.click()
+    await page
+      .getByRole('option', { name: '50' })
+      .click()
     await expect(page.locator("tbody")).toContainText(opponent);
 
     await updateMatch(page, eventId, `${opponent} Updated`);
     await deleteMatch(page, eventId);
 
+    combobox = page
+      .getByRole('combobox', {name: 'Rows per page:'})
+    await combobox.isVisible()
+    await combobox.click()
+    await page
+      .getByRole('option', { name: '50' })
+      .click()
     await expect(page.locator("tbody")).not.toContainText(opponent);
   });
 
@@ -43,7 +57,7 @@ test.describe("Matches", () => {
   }) => {
     // 0. Create a team member so the event has attendees to interact with.
     //    The e2e database starts empty; without a user, events have no attendees.
-    let name = TEST_USER_NAME + "_" + Math.round(Math.random() * 10000);
+    let name = TEST_USER_NAME + "_" + Math.round(Math.random() * new Date().getTime());
     const userId = await createUserViaApi(request, name);
 
     // 1. Create match via admin UI.
@@ -79,26 +93,25 @@ test.describe("Matches", () => {
       await page.getByTestId("event-list").waitFor({ state: "visible" });
 
       // Wait for the newly created match to appear in the list.
-      await expect(
-        page.getByTestId("event-list-item").filter({ hasText: opponent }),
-      ).toBeVisible();
+      let matchEvent = page.getByTestId("event-list-item").filter({ hasText: opponent });
+      await expect(matchEvent).toBeVisible();
 
       // 3. Set to Attending and verify.
-      await setMatchAttendance(page, "attending", name);
-      await verifyMatchAttendanceState(page, "attending", name);
+      await setMatchAttendance(matchEvent, "attending", name);
+      await verifyMatchAttendanceState(matchEvent, "attending", name);
 
       // 4. Transition to Maybe and verify.
-      await setMatchAttendance(page, "maybe", name);
-      await verifyMatchAttendanceState(page, "maybe", name);
+      await setMatchAttendance(matchEvent, "maybe", name);
+      await verifyMatchAttendanceState(matchEvent, "maybe", name);
 
       // 5. Transition to Absent and verify.
-      await setMatchAttendance(page, "absent", name);
-      await verifyMatchAttendanceState(page, "absent", name);
+      await setMatchAttendance(matchEvent, "absent", name);
+      await verifyMatchAttendanceState(matchEvent, "absent", name);
 
       // 6. Verify persistence: reload the page and check state is retained.
       await page.reload();
       await expect(page.getByText(opponent)).toBeVisible();
-      await verifyMatchAttendanceState(page, "absent", name);
+      await verifyMatchAttendanceState(matchEvent, "absent", name);
     } finally {
       // 7. Cleanup: always delete the match and the test user, even if assertions failed.
       // Wrap navigation in try/catch: Playwright may have already closed the
@@ -138,7 +151,13 @@ test.describe("Matches", () => {
 
     const opponent = `Team ${uuid().slice(0, 8)}`;
     const eventId = await createMatchEvent(page, opponent);
-
+    let combobox = page
+      .getByRole('combobox', {name: 'Rows per page:'})
+    await combobox.isVisible()
+    await combobox.click()
+    await page
+      .getByRole('option', { name: '50' })
+      .click()
     // Attempt delete but cancel
     await page
       .getByRole("button", { name: `Verwijder event ${eventId}` })
@@ -149,10 +168,25 @@ test.describe("Matches", () => {
     await page.getByRole("button", { name: "Cancel" }).click();
 
     // Verify match still exists
+    combobox = page
+      .getByRole('combobox', {name: 'Rows per page:'})
+    await combobox.isVisible()
+    await combobox.click()
+    await page
+      .getByRole('option', { name: '50' })
+      .click()
+
     await expect(page.locator("tbody")).toContainText(opponent);
 
     // Cleanup
     await deleteMatch(page, eventId);
+    combobox = page
+      .getByRole('combobox', {name: 'Rows per page:'})
+    await combobox.isVisible()
+    await combobox.click()
+    await page
+      .getByRole('option', { name: '50' })
+      .click()
     await expect(page.locator("tbody")).not.toContainText(opponent);
   });
 

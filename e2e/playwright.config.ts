@@ -19,9 +19,9 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 1 : 0,
+  retries: process.env.CI ? 1 : 1,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : 1,
+  workers: process.env.CI ? 1 : undefined,
   /* Auth restoration via localStorage involves recursive API retries (up to
      10x, ~5 s each). On CI with a slow backend this can take 20-30 s before
      the app renders authenticated content. Both timeouts are raised so tests
