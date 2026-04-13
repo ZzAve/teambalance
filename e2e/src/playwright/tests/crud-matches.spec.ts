@@ -64,8 +64,15 @@ test.describe("Matches", () => {
         await listSwitch.click();
       }
 
+      // Wait for the event-list testid to confirm list view has rendered.
+      // The opponent text is visible in both table and list view, so we
+      // must confirm via testid that we are actually in the EventsList.
+      await page.getByTestId("event-list").waitFor({ state: "visible" });
+
       // Wait for the newly created match to appear in the list.
-      await expect(page.getByText(opponent)).toBeVisible();
+      await expect(
+        page.getByTestId("event-list-item").filter({ hasText: opponent }),
+      ).toBeVisible();
 
       // 3. Set to Attending and verify.
       await setMatchAttendance(page, "attending", TEST_USER_NAME);
