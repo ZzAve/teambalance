@@ -3,9 +3,16 @@ package nl.jvandis.teambalance.api
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
+import nl.jvandis.teambalance.filters.DEFAULT_START_OF_SEASON_RAW
+import nl.jvandis.teambalance.filters.toZonedDateTime
 import nl.jvandis.teambalance.log
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.time.format.DateTimeParseException
 import kotlin.reflect.KClass
+
+const val START_OF_SEASON_CONFIG_KEY = "startOfSeason"
 
 @Service
 class ConfigurationService(
@@ -38,6 +45,24 @@ class ConfigurationService(
             log.warn("Could not find any config for '$key'. Using fallback  $default")
             default
         }
+
+    fun getStartOfSeason(): LocalDateTime {
+        val raw = repository.getConfig(START_OF_SEASON_CONFIG_KEY) ?: DEFAULT_START_OF_SEASON_RAW
+        return try {
+            LocalDateTime.parse(raw)
+        } catch (e: DateTimeParseException) {
+            throw MalformedConfigFound(
+                "Config for '$START_OF_SEASON_CONFIG_KEY' seems to be malformed. Expected ISO local date time",
+                e,
+            )
+        }
+    }
+
+    fun getStartOfSeasonZoned(): ZonedDateTime = getStartOfSeason().toZonedDateTime()
+
+    fun setStartOfSeason(startOfSeason: LocalDateTime) {
+        repository.upsertConfig(START_OF_SEASON_CONFIG_KEY, startOfSeason.toString())
+    }
 }
 
 sealed class ConfigurationServiceException(

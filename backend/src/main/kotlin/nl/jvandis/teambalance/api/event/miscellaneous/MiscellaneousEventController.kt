@@ -2,6 +2,7 @@ package nl.jvandis.teambalance.api.event.miscellaneous
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.TeamBalanceId
+import nl.jvandis.teambalance.api.ConfigurationService
 import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMiscellaneousEventException
@@ -17,7 +18,6 @@ import nl.jvandis.teambalance.api.event.UserAddRequest
 import nl.jvandis.teambalance.api.event.getEventsAndAttendees
 import nl.jvandis.teambalance.api.users.UserRepository
 import nl.jvandis.teambalance.api.users.toBeInsertedAttendee
-import nl.jvandis.teambalance.filters.START_OF_SEASON_RAW
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
@@ -46,6 +46,7 @@ class MiscellaneousEventController(
     private val eventRepository: MiscellaneousEventRepository,
     private val userRepository: UserRepository,
     private val attendeeRepository: AttendeeRepository,
+    private val configurationService: ConfigurationService,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -53,13 +54,14 @@ class MiscellaneousEventController(
     fun getEvents(
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
-        @RequestParam(defaultValue = START_OF_SEASON_RAW)
+        @RequestParam(required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-        since: LocalDateTime,
+        since: LocalDateTime?,
         @RequestParam(defaultValue = "10") limit: Int,
         @RequestParam(defaultValue = "1") page: Int,
     ): EventsResponse<MiscellaneousEventResponse> {
         log.debug("GetAllMiscellaneousEvents")
+        val effectiveSince = since ?: configurationService.getStartOfSeason()
 
         // In case of testing performance again :)
         // measureTiming(50) {
@@ -77,7 +79,7 @@ class MiscellaneousEventController(
             eventsRepository = eventRepository,
             page = page,
             limit = limit,
-            since = since,
+            since = effectiveSince,
         ).expose(includeInactiveUsers)
     }
 

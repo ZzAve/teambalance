@@ -8,7 +8,6 @@ import nl.jvandis.teambalance.api.ConfigurationService
 import nl.jvandis.teambalance.api.bank.BankConfig.BunqEnvironment
 import nl.jvandis.teambalance.api.setupCache
 import nl.jvandis.teambalance.api.users.User
-import nl.jvandis.teambalance.filters.START_OF_SEASON_ZONED
 import org.springframework.stereotype.Service
 import kotlin.math.min
 
@@ -73,7 +72,7 @@ class BankService(
                 val exclusions = getAllTransactionExclusions()
                 val transactions =
                     transactions
-                        .filter { it.date > START_OF_SEASON_ZONED }
+                        .filter { it.date > configurationService.getStartOfSeasonZoned() }
                         .filter { !it.matchesExclusionCriteria(exclusions) }
                         .map { it.enrichWithAliasFrom(aliases) }
 
