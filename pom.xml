@@ -266,6 +266,11 @@
         </profile>
         <profile>
             <id>format</id>
+            <properties>
+                <npm.ci.skip>true</npm.ci.skip>
+                <npm.install.skip>false</npm.install.skip>
+                <npm.lint.fix.skip>false</npm.lint.fix.skip>
+            </properties>
             <build>
                 <plugins>
                     <plugin>

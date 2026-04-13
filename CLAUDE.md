@@ -79,15 +79,14 @@ Sports team management app for Tovo Utrecht volleyball club. Tracks event attend
 
 1. Clone the repo and `cd` to project root
 2. `make run-local` — starts PostgreSQL, backend (port 8080), and frontend (port 5173) via Docker
-3. Add to `/etc/hosts`: `127.0.0.1 4.teambalance.local app.teambalance.local api.teambalance.local`
-4. Open `http://4.teambalance.local:5173` in your browser
-5. Default credentials: username=`admin`, password=`admin` (set up via `make test`)
-6. Run `make format` before committing code
+3. Open `http://localhost:3000` in your browser
+4. Default credentials: frontend: `teambalance`, admin side: username=`admin`, password=`admin` (set up via `make test`)
 
 When creating a worktree, be sure to run a `cd frontend && npm i` to bootsrap pre-commit hooks
 
 ## Troubleshooting
 
+- **CI** CI pipelines on average take about 10 minutes to complete. Sleep in intervals of 293 seconds
 - **Port already in use**: Kill Docker containers with `make clean` first
 - **Frontend not hot-reloading**: Ensure `make run-local-frontend` is watching for changes
 - **Database migration failed**: Check Flyway SQL files in `backend/src/main/resources/db/migration/`

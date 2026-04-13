@@ -803,6 +803,7 @@ Active PRs:
 - Read code files (`.kt`, `.tsx`, `.ts`, `.sql`, etc.) — delegate to workers
 - Analyze test output — workers return structured summaries
 - Run detailed git commands (diff, log, status on feature branches) — workers report commit SHAs
+- Run `gh pr checks`, `gh run view`, `gh run list`, `gh pr view --comments` — CI monitoring belongs inside `[ci]` workers, never run by the orchestrator directly
 
 # Context Window Hygiene
 
