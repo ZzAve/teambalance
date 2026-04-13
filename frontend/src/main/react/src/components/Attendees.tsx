@@ -265,7 +265,8 @@ const AttendeeRefinement = (props: {
 
   const AttendeeButton = (
     state: Availability,
-    content: string | JSX.Element
+    content: string | JSX.Element,
+    ariaLabel?: string
   ) => {
     return (
       <Button
@@ -273,6 +274,7 @@ const AttendeeRefinement = (props: {
         variant="contained"
         color={buttonColor(state)}
         onClick={() => handleClick(state)}
+        aria-label={ariaLabel}
       >
         {content}
       </Button>
@@ -282,9 +284,9 @@ const AttendeeRefinement = (props: {
   const attendeeOptions = () => {
     return (
       <Grid item container spacing={1}>
-        <Grid item>{AttendeeButton("PRESENT", <CheckIcon />)}</Grid>
-        <Grid item>{AttendeeButton("ABSENT", <ClearIcon />)}</Grid>
-        <Grid item>{AttendeeButton("UNCERTAIN", <HelpIcon />)}</Grid>
+        <Grid item>{AttendeeButton("PRESENT", <CheckIcon />, "check")}</Grid>
+        <Grid item>{AttendeeButton("ABSENT", <ClearIcon />, "close")}</Grid>
+        <Grid item>{AttendeeButton("UNCERTAIN", <HelpIcon />, "help")}</Grid>
         <Grid item>
           <Button
             size={props.size}

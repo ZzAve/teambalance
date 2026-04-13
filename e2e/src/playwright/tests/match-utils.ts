@@ -1,5 +1,66 @@
-import { expect, Page } from "@playwright/test";
-import { addDays, ensure, NOW, pickDateTime } from "./utils";
+import {expect, APIRequestContext, Page, Locator} from "@playwright/test";
+import { addDays, ensure, HOST, NOW, pickDateTime } from "./utils";
+
+/**
+ * The X-Secret header value for the local/e2e tenant (base64 of "teambalance").
+ * Matches the secret configured in application-local.yml for domain frontend:3000.
+ */
+const API_SECRET = Buffer.from("teambalance").toString("base64");
+
+/**
+ * Headers required by the backend API: tenant resolution via Host + secret auth.
+ * The Vite dev server proxies /api/* to backend:8080 and forwards the Host header.
+ */
+const apiHeaders = {
+  Host: "frontend:3000",
+  "X-Secret": API_SECRET,
+  "Content-Type": "application/json",
+};
+
+/**
+ * Create a team member user via the backend API.
+ * Required so that newly created events have attendees to interact with.
+ *
+ * @returns the created user's id (for cleanup)
+ */
+export async function createUserViaApi(
+  request: APIRequestContext,
+  name: string,
+  role: string = "OTHER",
+): Promise<string> {
+  const response = await request.post(`${HOST}/api/users`, {
+    headers: apiHeaders,
+    data: { name, role },
+  });
+  if (!response.ok()) {
+    throw new Error(
+      `Failed to create user "${name}": ${response.status()} ${await response.text()}`,
+    );
+  }
+  const body = await response.json();
+  return ensure(body.id as string | undefined, `user id for "${name}"`);
+}
+
+/**
+ * Delete a team member user via the backend API (requires admin credentials).
+ */
+export async function deleteUserViaApi(
+  request: APIRequestContext,
+  userId: string,
+): Promise<void> {
+  const response = await request.delete(`${HOST}/api/users/${userId}`, {
+    headers: {
+      ...apiHeaders,
+      // DELETE /api/users/{id} is @Admin-protected; use HTTP Basic auth.
+      Authorization: `Basic ${Buffer.from("admin:admin").toString("base64")}`,
+    },
+  });
+  if (!response.ok() && response.status() !== 404) {
+    throw new Error(
+      `Failed to delete user "${userId}": ${response.status()} ${await response.text()}`,
+    );
+  }
+}
 
 /**
  * Generate realistic match date (next Saturday at 14:00)
@@ -84,7 +145,7 @@ export async function updateMatch(
   newOpponent?: string,
   newLocation?: string,
 ): Promise<void> {
-  await page.getByRole("button", { name: `Update event ${eventId}` }).click();
+  await page.getByRole("button", { name: `Update event ${eventId}` }).click({timeout:5000});
 
   if (newOpponent) {
     await page.getByLabel("Tegenstander *").fill(newOpponent);
@@ -115,6 +176,17 @@ export async function updateMatch(
  * Delete match event with confirmation
  */
 export async function deleteMatch(page: Page, eventId: string): Promise<void> {
+  // Navigate to the Wedstrijden section (admin page defaults to Trainingen)
+  await page.getByRole("button", { name: /wedstrijden/i }).click();
+
+  let combobox = page
+    .getByRole('combobox', {name: 'Rows per page:'})
+  await combobox.isVisible()
+  await combobox.click()
+  await page
+    .getByRole('option', { name: '50' })
+    .click()
+
   await page
     .getByRole("button", { name: `Verwijder event ${eventId}` })
     .click();
@@ -136,22 +208,83 @@ export async function deleteMatch(page: Page, eventId: string): Promise<void> {
 }
 
 /**
- * Set user's attendance status for a match
+ * Map from logical attendance status to the MUI button color class suffix.
+ * AttendeeButton uses color="success" for PRESENT, "error" for ABSENT,
+ * "warning" for UNCERTAIN (maybe).
  */
-export async function setMatchAttendance(
-  page: Page,
-  status: "attending" | "maybe" | "absent",
-): Promise<void> {
-  const buttonMap = {
-    attending: /Aanwezig/i,
-    maybe: /Misschien/i,
-    absent: /Afwezig/i,
+const statusToMuiColorClass: Record<"attending" | "maybe" | "absent", string> =
+  {
+    attending: "MuiButton-colorSuccess",
+    maybe: "MuiButton-colorWarning",
+    absent: "MuiButton-colorError",
   };
 
-  const button = page.getByRole("button", { name: buttonMap[status] });
-  await button.waitFor({ state: "visible" });
-  await button.click();
+/**
+ * Set attendance status for a specific attendee in the event attendee list.
+ *
+ * Flow (matches actual UI):
+ *  1. Click the attendee's name button to open the AttendeeRefinement view.
+ *  2. Click the appropriate icon button (CheckIcon=PRESENT, ClearIcon=ABSENT,
+ *     HelpIcon=UNCERTAIN).
+ *  3. Wait for the refinement view to close — i.e. the attendee name button
+ *     re-appears with the updated colour class.
+ *
+ * @param locator     Playwright locator
+ * @param status      Target attendance status
+ * @param attendeeName Display name of the attendee whose status to change
+ */
+export async function setMatchAttendance(
+  locator: Locator,
+  status: "attending" | "maybe" | "absent",
+  attendeeName: string,
+): Promise<void> {
+  // Map status to the accessible name of the refinement icon button.
+  // MUI renders aria-label from the SVG title; Playwright finds these by
+  // role="button" with the SVG's accessible name.
+  const refinementButtonLabel: Record<
+    "attending" | "maybe" | "absent",
+    RegExp
+  > = {
+    attending: /check/i,
+    maybe: /help/i,
+    absent: /close/i,
+  };
 
-  // Wait for state update (small delay for API call)
-  await page.waitForTimeout(300);
+  // Step 1: click the attendee's name button to open AttendeeRefinement.
+  const attendeeBtn = locator.getByRole("button", { name: attendeeName });
+  await attendeeBtn.waitFor({ state: "visible" });
+  await attendeeBtn.click();
+
+  // Step 2: click the correct icon button in the refinement view.
+  const refinementBtn = locator.getByRole("button", {
+    name: refinementButtonLabel[status],
+  });
+  await refinementBtn.waitFor({ state: "visible" });
+  await refinementBtn.click();
+
+  // Step 3: wait for the refinement view to close by waiting for the attendee
+  // button to reappear with the expected MUI colour class.
+  const expectedClass = statusToMuiColorClass[status];
+  await expect(locator.getByRole("button", { name: attendeeName })).toHaveClass(
+    new RegExp(expectedClass),
+  );
+}
+
+/**
+ * Verify that the attendee's button shows the expected colour for the given
+ * attendance status.
+ *
+ * @param locator     Playwright locator
+ * @param status      Expected attendance status
+ * @param attendeeName Display name of the attendee to check
+ */
+export async function verifyMatchAttendanceState(
+  locator: Locator,
+  status: "attending" | "maybe" | "absent",
+  attendeeName: string,
+): Promise<void> {
+  const expectedClass = statusToMuiColorClass[status];
+  await expect(locator.getByRole("button", { name: attendeeName })).toHaveClass(
+    new RegExp(expectedClass),
+  );
 }

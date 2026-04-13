@@ -7,7 +7,7 @@ import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
 
-dotenv.config({ path: path.resolve(__dirname, ".env") });
+dotenv.config({ quiet: true, path: path.resolve(__dirname, ".env") });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -19,15 +19,15 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 1 : 1,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Auth restoration via localStorage involves recursive API retries (up to
      10x, ~5 s each). On CI with a slow backend this can take 20-30 s before
      the app renders authenticated content. Both timeouts are raised so tests
      don't race against the startup auth flow. */
-  timeout: 90000,
-  expect: { timeout: 30000 },
+  timeout: 30000,
+  expect: { timeout: 10000 },
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ["html", { open: "never" }],

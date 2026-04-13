@@ -59,13 +59,10 @@ export async function pickDateTime(
   const pad2 = (n: number) => String(n).padStart(2, "0");
   const digits = `${pad2(date.getDate())}${pad2(date.getMonth() + 1)}${date.getFullYear()}${pad2(date.getHours())}${pad2(date.getMinutes())}`;
 
-  const combinedInput = dialog.getByRole("textbox");
+  const combinedInput = dialog.getByRole("textbox", { name: "Datum / tijd" });
   await combinedInput.waitFor({ state: "visible" });
   await combinedInput.click();
-  // Move to start of the masked input before typing — Playwright's click()
-  // lands in the centre of the element, leaving the cursor mid-string.
-  await page.keyboard.press("Home");
-  await combinedInput.pressSequentially(digits);
+  await combinedInput.fill(digits);
 
   await dialog.getByRole("button", { name: "OK", exact: true }).click();
   await dialog.waitFor({ state: "hidden" });
