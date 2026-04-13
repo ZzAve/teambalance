@@ -14,9 +14,6 @@
 
     <name>Team balance - jooq support</name>
 
-    <properties>
-        <jooq-extensions.version>3.21.1</jooq-extensions.version> <!-- to match jooq version from spring -->
-    </properties>
 
     <dependencies>
         <dependency>

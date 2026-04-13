@@ -37,6 +37,10 @@
         <testcontainers.version>2.0.4</testcontainers.version>
         <google-cloud-logging-logback.version>0.131.5-alpha</google-cloud-logging-logback.version>
 
+        <jooq-extensions.version>3.21.1</jooq-extensions.version> <!-- to match jooq version from spring -->
+        <jooq-postgres-extensions.version>3.21.1</jooq-postgres-extensions.version>
+        <jooq.version>3.21.1</jooq.version>
+
         <!-- installed node/npm version: lts/carbon -->
         <node.version>v22.13.0</node.version>
         <npm.version>10.9.2</npm.version>
@@ -183,7 +187,7 @@
                         <plugin>spring</plugin>
                         <plugin>all-open</plugin>
                     </compilerPlugins>
-                    <jvmTarget>17</jvmTarget>
+                    <jvmTarget>21</jvmTarget>
                 </configuration>
                 <dependencies>
                     <dependency>
