@@ -21,6 +21,7 @@ import List from "@mui/material/List";
 import AddIcon from "@mui/icons-material/Add";
 import { EventType } from "../components/events/utils";
 import CheckBox from "@mui/material/Checkbox";
+import AdminSettings from "./AdminSettings";
 
 const StyleMenuList = styled(List)((theme) => ({
   display: "flex",
@@ -117,6 +118,11 @@ const Admin = (props: { refresh: boolean }) => {
                 Overige events
               </Button>
             </Link>
+            <Link to="settings">
+              <Button variant="outlined" color="primary">
+                Instellingen
+              </Button>
+            </Link>
           </StyleMenuList>
         </Grid>
       </PageItem>
@@ -193,6 +199,15 @@ const Admin = (props: { refresh: boolean }) => {
           element={
             <RequireAuth>
               <ChangeEvent eventType="MISC" />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="settings"
+          element={
+            <RequireAuth>
+              <AdminSettings />
             </RequireAuth>
           }
         />
