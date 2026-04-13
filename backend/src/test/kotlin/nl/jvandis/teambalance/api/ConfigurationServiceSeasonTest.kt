@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import nl.jvandis.teambalance.filters.DEFAULT_START_OF_SEASON_RAW
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
@@ -49,5 +50,14 @@ class ConfigurationServiceSeasonTest {
         service.setStartOfSeason(newStart)
 
         verify(repository).upsertConfig(START_OF_SEASON_CONFIG_KEY, "2026-08-01T00:00")
+    }
+
+    @Test
+    fun `getStartOfSeason throws MalformedConfigFound when DB value is not a valid date`() {
+        `when`(repository.getConfig(START_OF_SEASON_CONFIG_KEY)).thenReturn("not-a-date")
+
+        assertThrows<MalformedConfigFound> {
+            service.getStartOfSeason()
+        }
     }
 }
