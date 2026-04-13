@@ -16,16 +16,14 @@
     <properties>
         <caffeine.version>v3.2.3</caffeine.version>
         <jakarta-servlet.version>5.0.0</jakarta-servlet.version>
-        <jetty.version>12.0.32</jetty.version>
-        <jooq-postgres-extensions.version>3.16.13</jooq-postgres-extensions.version>
-        <jooq.version>3.20.8</jooq.version> <!-- same as from spring-boot-starter-jooq -->
+        <jetty.version>12.1.8</jetty.version>
+
         <postgresql.version>42.7.10</postgresql.version>
-        <springdoc-openapi.version>2.0.2</springdoc-openapi.version>
+        <springdoc-openapi.version>2.8.17</springdoc-openapi.version>
         <testcontainers.postgresql.version>16.5-alpine</testcontainers.postgresql.version>
-        <kotlinx-coroutines.version>1.9.0</kotlinx-coroutines.version>
-        <jooq-extensions.version>3.18.7</jooq-extensions.version>
+        <kotlinx-coroutines.version>1.10.2</kotlinx-coroutines.version>
         <kminrandom.version>2.0.0</kminrandom.version>
-        <caffeine-coroutines.version>2.0.3</caffeine-coroutines.version>
+        <caffeine-coroutines.version>2.0.4</caffeine-coroutines.version>
     </properties>
 
     <dependencies>
@@ -120,10 +118,6 @@
         <dependency> <!-- used to deal with Pages and Sort and such. Not necessary?-->
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
