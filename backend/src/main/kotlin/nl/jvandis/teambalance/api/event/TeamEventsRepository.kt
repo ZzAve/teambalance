@@ -117,7 +117,7 @@ abstract class TeamEventsRepository<T : Event>(
 
         val allEventsToDeleteConditions: Condition =
             when (affectedRecurringEvents) {
-                AffectedRecurringEvents.ALL ->
+                AffectedRecurringEvents.ALL -> {
                     EVENT.ID.`in`(
                         DSL
                             .select(EVENT.ID)
@@ -126,8 +126,9 @@ abstract class TeamEventsRepository<T : Event>(
                             .on(recurringEventId.eq(EVENT.RECURRING_EVENT_ID))
                             .where(EVENT.RECURRING_EVENT_ID.eq(recurringEventId)),
                     )
+                }
 
-                AffectedRecurringEvents.CURRENT_AND_FUTURE ->
+                AffectedRecurringEvents.CURRENT_AND_FUTURE -> {
                     EVENT.ID.`in`(
                         DSL
                             .select(EVENT.ID)
@@ -137,8 +138,11 @@ abstract class TeamEventsRepository<T : Event>(
                             .where(EVENT.RECURRING_EVENT_ID.eq(recurringEventId))
                             .and(EVENT.START_TIME.greaterOrEqual(eventDetails.field(EVENT.START_TIME))),
                     )
+                }
 
-                AffectedRecurringEvents.CURRENT, null -> EVENT.TEAM_BALANCE_ID.eq(eventId.value)
+                AffectedRecurringEvents.CURRENT, null -> {
+                    EVENT.TEAM_BALANCE_ID.eq(eventId.value)
+                }
             }
         return allEventsToDeleteConditions
     }

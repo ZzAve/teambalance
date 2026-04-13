@@ -65,15 +65,16 @@ class TrainingService(
 
         val updatedTrainings =
             when (affectedRecurringEvents) {
-                CURRENT ->
+                CURRENT -> {
                     trainingRepository
                         .updateSingleEvent(
                             event = originalTraining.createUpdatedTraining(updateTrainingRequest),
                             removeRecurringEvent = true,
                         ).also { log.info("Removed recurringEvent $teamBalanceId from Training with id $originalTraining.id") }
                         .let(::listOf)
+                }
 
-                CURRENT_AND_FUTURE ->
+                CURRENT_AND_FUTURE -> {
                     trainingRepository
                         .partitionRecurringEvent(
                             currentRecurringEventId = teamBalanceId,
@@ -88,8 +89,11 @@ class TrainingService(
                         }.run {
                             updateAllFromRecurringEvent(teamBalanceId, originalTraining, updateTrainingRequest)
                         }
+                }
 
-                ALL -> updateAllFromRecurringEvent(teamBalanceId, originalTraining, updateTrainingRequest)
+                ALL -> {
+                    updateAllFromRecurringEvent(teamBalanceId, originalTraining, updateTrainingRequest)
+                }
             }
 
         log.info(

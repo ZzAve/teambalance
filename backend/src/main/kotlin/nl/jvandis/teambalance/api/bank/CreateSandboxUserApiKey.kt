@@ -50,7 +50,10 @@ suspend fun requireSpendingMoney(
         is CREATE_RequestInquiry_for_User_MonetaryAccount.Response200 -> {
             response.body
         }
-        is CREATE_RequestInquiry_for_User_MonetaryAccount.Response400 -> error("Failed to create request inquiry to sugar daddy")
+
+        is CREATE_RequestInquiry_for_User_MonetaryAccount.Response400 -> {
+            error("Failed to create request inquiry to sugar daddy")
+        }
     }
 } catch (e: Exception) {
     log.warn("Failed to create request inquiry to sugar daddy", e)
@@ -67,6 +70,7 @@ fun createSandboxUserApiKey(baseUrl: String): String {
             sandboxUserPersonResponse.body.ApiKey?.api_key
                 ?: throw IllegalStateException("No sandbox API key found in response")
         }
+
         is CREATE_SandboxUserPerson.Response400 -> {
             throw IllegalArgumentException("Failed to create sandbox user: Bad request")
         }

@@ -90,7 +90,9 @@ class BunqRepo(
                         ?: "Unknown"
                 }
 
-                is READ_MonetaryAccountBank_for_User.Response400 -> TODO()
+                is READ_MonetaryAccountBank_for_User.Response400 -> {
+                    TODO()
+                }
             }
         }
 
@@ -114,7 +116,9 @@ class BunqRepo(
                         .map(PaymentListing::toDomain)
                 }
 
-                is List_all_Payment_for_User_MonetaryAccount.Response400 -> TODO()
+                is List_all_Payment_for_User_MonetaryAccount.Response400 -> {
+                    TODO()
+                }
             }
         }
 
@@ -132,7 +136,9 @@ class BunqRepo(
                     bankAccountsResponse.body.map { it.toDomain() }
                 }
 
-                is List_all_MonetaryAccountBank_for_User.Response400 -> TODO()
+                is List_all_MonetaryAccountBank_for_User.Response400 -> {
+                    TODO()
+                }
             }
         }.also { bankAccounts ->
             bankAccounts.forEach {

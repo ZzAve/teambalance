@@ -29,25 +29,19 @@ test.describe("Matches", () => {
     const opponent = `Team ${uuid().slice(0, 8)}`;
     const eventId = await createMatchEvent(page, opponent);
 
-    let combobox = page
-      .getByRole('combobox', {name: 'Rows per page:'})
-    await combobox.isVisible()
-    await combobox.click()
-    await page
-      .getByRole('option', { name: '50' })
-      .click()
+    let combobox = page.getByRole("combobox", { name: "Rows per page:" });
+    await combobox.isVisible();
+    await combobox.click();
+    await page.getByRole("option", { name: "50" }).click();
     await expect(page.locator("tbody")).toContainText(opponent);
 
     await updateMatch(page, eventId, `${opponent} Updated`);
     await deleteMatch(page, eventId);
 
-    combobox = page
-      .getByRole('combobox', {name: 'Rows per page:'})
-    await combobox.isVisible()
-    await combobox.click()
-    await page
-      .getByRole('option', { name: '50' })
-      .click()
+    combobox = page.getByRole("combobox", { name: "Rows per page:" });
+    await combobox.isVisible();
+    await combobox.click();
+    await page.getByRole("option", { name: "50" }).click();
     await expect(page.locator("tbody")).not.toContainText(opponent);
   });
 
@@ -57,7 +51,8 @@ test.describe("Matches", () => {
   }) => {
     // 0. Create a team member so the event has attendees to interact with.
     //    The e2e database starts empty; without a user, events have no attendees.
-    let name = TEST_USER_NAME + "_" + Math.round(Math.random() * new Date().getTime());
+    let name =
+      TEST_USER_NAME + "_" + Math.round(Math.random() * new Date().getTime());
     const userId = await createUserViaApi(request, name);
 
     // 1. Create match via admin UI.
@@ -93,7 +88,9 @@ test.describe("Matches", () => {
       await page.getByTestId("event-list").waitFor({ state: "visible" });
 
       // Wait for the newly created match to appear in the list.
-      let matchEvent = page.getByTestId("event-list-item").filter({ hasText: opponent });
+      let matchEvent = page
+        .getByTestId("event-list-item")
+        .filter({ hasText: opponent });
       await expect(matchEvent).toBeVisible();
 
       // 3. Set to Attending and verify.
@@ -151,13 +148,10 @@ test.describe("Matches", () => {
 
     const opponent = `Team ${uuid().slice(0, 8)}`;
     const eventId = await createMatchEvent(page, opponent);
-    let combobox = page
-      .getByRole('combobox', {name: 'Rows per page:'})
-    await combobox.isVisible()
-    await combobox.click()
-    await page
-      .getByRole('option', { name: '50' })
-      .click()
+    let combobox = page.getByRole("combobox", { name: "Rows per page:" });
+    await combobox.isVisible();
+    await combobox.click();
+    await page.getByRole("option", { name: "50" }).click();
     // Attempt delete but cancel
     await page
       .getByRole("button", { name: `Verwijder event ${eventId}` })
@@ -168,25 +162,19 @@ test.describe("Matches", () => {
     await page.getByRole("button", { name: "Cancel" }).click();
 
     // Verify match still exists
-    combobox = page
-      .getByRole('combobox', {name: 'Rows per page:'})
-    await combobox.isVisible()
-    await combobox.click()
-    await page
-      .getByRole('option', { name: '50' })
-      .click()
+    combobox = page.getByRole("combobox", { name: "Rows per page:" });
+    await combobox.isVisible();
+    await combobox.click();
+    await page.getByRole("option", { name: "50" }).click();
 
     await expect(page.locator("tbody")).toContainText(opponent);
 
     // Cleanup
     await deleteMatch(page, eventId);
-    combobox = page
-      .getByRole('combobox', {name: 'Rows per page:'})
-    await combobox.isVisible()
-    await combobox.click()
-    await page
-      .getByRole('option', { name: '50' })
-      .click()
+    combobox = page.getByRole("combobox", { name: "Rows per page:" });
+    await combobox.isVisible();
+    await combobox.click();
+    await page.getByRole("option", { name: "50" }).click();
     await expect(page.locator("tbody")).not.toContainText(opponent);
   });
 
