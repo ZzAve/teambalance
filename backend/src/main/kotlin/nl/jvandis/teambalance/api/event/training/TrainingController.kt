@@ -2,11 +2,13 @@ package nl.jvandis.teambalance.api.event.training
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.TeamBalanceId
+import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.ConfigurationService
 import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidTrainingException
 import nl.jvandis.teambalance.api.InvalidUserException
+import nl.jvandis.teambalance.api.Public
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
@@ -51,6 +53,7 @@ class TrainingController(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    @Public
     @GetMapping
     fun getTrainings(
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
@@ -92,6 +95,7 @@ class TrainingController(
             events = content.map { it.expose(includeInactiveUsers) },
         )
 
+    @Public
     @GetMapping("/{training-id}")
     fun getTraining(
         @PathVariable("training-id") trainingId: String,
@@ -116,6 +120,7 @@ class TrainingController(
         return training.expose(attendees)
     }
 
+    @Admin
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun createTraining(
@@ -179,6 +184,7 @@ class TrainingController(
             }
     }
 
+    @Admin
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{training-id}/attendees")
     fun addAttendee(
@@ -208,6 +214,7 @@ class TrainingController(
         }
     }
 
+    @Admin
     @PutMapping("/{training-id}")
     fun updateTraining(
         @PathVariable(value = "training-id") trainingId: String,
@@ -223,6 +230,7 @@ class TrainingController(
             .also { log.info("Updated training $trainingTeamBalanceId") }
     }
 
+    @Admin
     @PutMapping("/{training-id}/trainer")
     fun updateTrainer(
         @PathVariable(value = "training-id") trainingId: String,
@@ -258,6 +266,7 @@ class TrainingController(
         }
     }
 
+    @Admin
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{training-id}")
     @Transactional

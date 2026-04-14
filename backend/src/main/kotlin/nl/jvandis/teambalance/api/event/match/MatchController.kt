@@ -3,11 +3,13 @@ package nl.jvandis.teambalance.api.event.match
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import nl.jvandis.teambalance.TeamBalanceId
+import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.ConfigurationService
 import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMatchException
 import nl.jvandis.teambalance.api.InvalidUserException
+import nl.jvandis.teambalance.api.Public
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
@@ -51,6 +53,7 @@ class MatchController(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    @Public
     @GetMapping
     fun getMatches(
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
@@ -84,6 +87,7 @@ class MatchController(
             events = content.map { it.expose(includeInactiveUsers) },
         )
 
+    @Public
     @GetMapping("/{match-id}")
     fun getMatch(
         @PathVariable("match-id") matchId: String,
@@ -105,6 +109,7 @@ class MatchController(
         return match.expose(attendees)
     }
 
+    @Admin
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun createMatch(
@@ -172,6 +177,7 @@ class MatchController(
             }
     }
 
+    @Admin
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{match-id}/attendees")
     fun addAttendee(
@@ -198,6 +204,7 @@ class MatchController(
         }
     }
 
+    @Admin
     @PutMapping("/{match-id}")
     fun updateMatch(
         @PathVariable(value = "match-id") matchId: String,
@@ -213,6 +220,7 @@ class MatchController(
             .also { log.info("Updated match $matchTeamBalanceId") }
     }
 
+    @Admin
     @PutMapping("/{match-id}/additional-info")
     fun updateAdditionalInfo(
         @PathVariable(value = "match-id") matchId: String,
@@ -232,6 +240,7 @@ class MatchController(
             ?: throw InvalidMatchException(teamBalanceId)
     }
 
+    @Admin
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{match-id}")
     fun deleteMatch(

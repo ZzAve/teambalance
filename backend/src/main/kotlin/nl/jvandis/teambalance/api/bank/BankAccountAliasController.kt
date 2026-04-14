@@ -2,9 +2,11 @@ package nl.jvandis.teambalance.api.bank
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.TeamBalanceId
+import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidAliasException
 import nl.jvandis.teambalance.api.InvalidUserException
+import nl.jvandis.teambalance.api.Public
 import nl.jvandis.teambalance.api.users.UserRepository
 import org.jooq.exception.DataAccessException
 import org.slf4j.LoggerFactory
@@ -30,6 +32,7 @@ class BankAccountAliasController(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    @Public
     @GetMapping
     fun getAliases(): BankAccountAliasesResponse {
         log.debug("getAliases")
@@ -40,7 +43,7 @@ class BankAccountAliasController(
         return BankAccountAliases(bankAccountAliases = bankAccountAliases).expose()
     }
 
-    //    @PreAuthorize("hasRole('admin')")
+    @Public
     @GetMapping("/{id}")
     fun getAlias(
         @PathVariable(value = "id") bankAccountAliasId: String,
@@ -54,7 +57,7 @@ class BankAccountAliasController(
             ?: throw InvalidAliasException(bankAccountAliasTeamBalanceId)
     }
 
-    //    @PreAuthorize("hasRole('admin')")
+    @Admin
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun postUser(
@@ -73,6 +76,7 @@ class BankAccountAliasController(
         }
     }
 
+    @Admin
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun updateAlias(
