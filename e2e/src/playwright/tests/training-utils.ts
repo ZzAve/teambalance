@@ -1,5 +1,74 @@
-import { expect, Page } from "@playwright/test";
-import { addDays, ensure, NOW, pickDateTime } from "./utils";
+import { expect, APIRequestContext, Page } from "@playwright/test";
+import { addDays, ensure, HOST, NOW, pickDateTime } from "./utils";
+
+/**
+ * The X-Secret header value for the local/e2e tenant.
+ * Reads from E2E_API_SECRET env var; falls back to base64 of "teambalance".
+ */
+const API_SECRET =
+  process.env.E2E_API_SECRET ?? Buffer.from("teambalance").toString("base64");
+
+const apiHeaders = {
+  Host: "frontend:3000",
+  "X-Secret": API_SECRET,
+  "Content-Type": "application/json",
+};
+
+const adminHeaders = {
+  ...apiHeaders,
+  Authorization: `Basic ${Buffer.from("admin:admin").toString("base64")}`,
+};
+
+/**
+ * Create a training event via the backend API (requires admin credentials).
+ * Returns the training ID (teamBalanceId) of the first created event.
+ */
+export async function createTrainingViaApi(
+  request: APIRequestContext,
+  date: Date,
+  location: string,
+  comment?: string,
+): Promise<string> {
+  // Backend expects ISO-8601 LocalDateTime without timezone, e.g. "2026-04-20T14:00:00"
+  const pad2 = (n: number) => String(n).padStart(2, "0");
+  const startTime = `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}T${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`;
+
+  const response = await request.post(`${HOST}/api/trainings`, {
+    headers: adminHeaders,
+    data: {
+      startTime,
+      location,
+      comment: comment ?? null,
+    },
+  });
+  if (!response.ok()) {
+    throw new Error(
+      `Failed to create training: ${response.status()} ${await response.text()}`,
+    );
+  }
+  const body = await response.json();
+  const firstEvent = body.events?.[0];
+  return ensure(firstEvent?.id as string | undefined, "training id");
+}
+
+/**
+ * Delete a training event via the backend API (requires admin credentials).
+ * Also deletes all attendees bound to the training.
+ */
+export async function deleteTrainingViaApi(
+  request: APIRequestContext,
+  trainingId: string,
+): Promise<void> {
+  const response = await request.delete(
+    `${HOST}/api/trainings/${trainingId}?delete-attendees=true`,
+    { headers: adminHeaders },
+  );
+  if (!response.ok() && response.status() !== 404) {
+    throw new Error(
+      `Failed to delete training "${trainingId}": ${response.status()} ${await response.text()}`,
+    );
+  }
+}
 
 export const createTrainingEvent = async (
   page: Page,
