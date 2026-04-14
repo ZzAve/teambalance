@@ -49,6 +49,10 @@ test.describe("Matches", () => {
     page,
     request,
   }) => {
+    // WebKit is significantly slower than Chromium/Firefox: date picker, 6
+    // attendance state transitions, API calls, and page reloads can exceed
+    // the global 60 s limit. 90 s is sufficient headroom.
+    test.setTimeout(90000);
     // 0. Create a team member so the event has attendees to interact with.
     //    The e2e database starts empty; without a user, events have no attendees.
     let name =
