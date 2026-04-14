@@ -1,10 +1,17 @@
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { createRequire } from "node:module";
 
 import { defineConfig, loadEnv } from "vite";
 import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineConfig(({ mode }) => {
+  const require = createRequire(import.meta.url);
+  const muiIconsEsm = path.join(
+    path.dirname(require.resolve("@mui/icons-material/package.json")),
+    "esm",
+  );
+
   const root = "src/main/react";
   console.log("Running in " + mode + " mode");
   const env = loadEnv(mode, process.cwd() + "/" + root, "VITE");
@@ -26,10 +33,7 @@ export default defineConfig(({ mode }) => {
         // esbuild does, so default imports from the CJS paths resolve to the
         // module namespace object instead of the component — crashing React.
         // Point the alias at the pre-built ESM subtree to avoid the issue.
-        "@mui/icons-material": path.join(
-          __dirname,
-          "node_modules/@mui/icons-material/esm",
-        ),
+        "@mui/icons-material": muiIconsEsm,
       },
     },
     plugins: [

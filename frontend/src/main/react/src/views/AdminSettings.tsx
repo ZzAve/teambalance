@@ -11,6 +11,7 @@ import Grid from "@mui/material/Grid";
 import { Alert } from "@mui/material";
 import PageItem from "../components/PageItem";
 import { settingsApiClient } from "../utils/SettingsApiClient";
+import { flushStartOfSeason } from "../components/events/Events";
 
 const AdminSettings = () => {
   const [seasonStart, setSeasonStart] = useState<Dayjs | null>(null);
@@ -43,6 +44,7 @@ const AdminSettings = () => {
       .updateSeasonStart(seasonStart.format("YYYY-MM-DDTHH:mm:ss"))
       .then(() => {
         setSuccessMessage("Seizoensbegin opgeslagen");
+        flushStartOfSeason();
       })
       .catch(() => {
         setError("Opslaan mislukt. Probeer het opnieuw.");

@@ -16,9 +16,9 @@ export const createTrainingEvent = async (
   await page.getByLabel("Iedereen").check();
   await page.getByRole("button", { name: "Opslaan" }).click();
 
-  await expect(
-    page.locator("span").filter({ hasText: "Trainingen" }),
-  ).toBeVisible();
+  // Wait for the success alert first — this is the authoritative confirmation
+  // that the save completed. The nav span check that was here before was
+  // redundant and raced against the form closing in Firefox.
   await expect(page.getByRole("alert")).toContainText("Training event");
   const snackbarText = await page.getByRole("alert").textContent();
   const matches = snackbarText?.match(/id ([a-f0-9-]+)/);
