@@ -15,6 +15,16 @@ import { TeamEvent } from "../../utils/domain";
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
 
+let startOfSeasonCache: Promise<Date> = settingsApiClient
+  .getSeasonStart()
+  .then((s) => new Date(s));
+
+export const flushStartOfSeason = () => {
+  startOfSeasonCache = settingsApiClient
+    .getSeasonStart()
+    .then((s) => new Date(s));
+};
+
 type EventsTexts = {
   fetch_events: Record<EventType, string>;
 };
@@ -56,7 +66,7 @@ const Events = (props: {
 
   const updateEvents = async () => {
     const startTime = includeHistory
-      ? new Date(await settingsApiClient.getSeasonStart())
+      ? await startOfSeasonCache
       : nowMinus6Hours;
     if (props.eventType === "TRAINING") {
       const data = await trainingsApiClient.getTrainings(
