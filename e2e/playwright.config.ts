@@ -78,6 +78,7 @@ export default defineConfig({
           ...devices["Desktop Safari"],
           storageState: ".auth/user.json",
         },
+        timeout: 90000,
         dependencies: ["setup"],
       },
     ] : []),

@@ -60,6 +60,7 @@ export const EventUsers = (props: {
     _: React.ChangeEvent<HTMLInputElement>,
     checked: boolean
   ) => {
+    setAllUsersCheckBox(checked);
     await setAllUsersCheckedStateTo(checked);
   };
 

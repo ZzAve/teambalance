@@ -1,5 +1,4 @@
 import { Navigate, useLocation } from "react-router-dom";
-import React from "react";
 import { authenticationManager } from "../utils/AuthenticationManager";
 
 const isAuthenticated = () => {

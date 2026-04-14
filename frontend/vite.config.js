@@ -43,6 +43,16 @@ export default defineConfig(({ mode }) => {
         include: "**/*.{jsx,tsx}",
       }),
     ],
+    resolve: {
+      alias: [
+        // Vite 8 no longer auto-interops CJS deep imports; redirect MUI icon
+        // deep imports to their ESM equivalents to avoid "got: object" errors.
+        {
+          find: /^@mui\/icons-material\/([^/]+)$/,
+          replacement: "@mui/icons-material/esm/$1",
+        },
+      ],
+    },
     server: {
       host: "0.0.0.0",
       port: 3000,
