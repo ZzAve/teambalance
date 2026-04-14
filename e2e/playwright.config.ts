@@ -26,7 +26,7 @@ export default defineConfig({
      10x, ~5 s each). On CI with a slow backend this can take 20-30 s before
      the app renders authenticated content. Both timeouts are raised so tests
      don't race against the startup auth flow. */
-  timeout: 30000,
+  timeout: 60000,
   expect: { timeout: 10000 },
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [

@@ -41,12 +41,15 @@ services:
       - ./frontend:/usr/src/app
       - /usr/src/app/node_modules
     healthcheck:
-      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000"]
+      # Use a real GET (not --spider/HEAD) so Vite actually compiles the JS entry
+      # point during the healthcheck. Without this, the first browser request from
+      # the e2e container triggers a cold Vite compilation that takes >60 s.
+      test: ["CMD", "sh", "-c", "wget -qO- http://127.0.0.1:3000/ > /dev/null && wget -qO- http://127.0.0.1:3000/index.tsx > /dev/null"]
       interval: 30s
-      timeout: 10s
-      start_period: 10s
-      start_interval: 1s
-      retries: 3
+      timeout: 90s
+      start_period: 30s
+      start_interval: 5s
+      retries: 5
 
   postgresql:
     image: postgres:16.13-alpine
