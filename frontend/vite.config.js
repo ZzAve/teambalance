@@ -1,4 +1,5 @@
 import react from "@vitejs/plugin-react";
+import path from "path";
 
 import { defineConfig, loadEnv } from "vite";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -17,6 +18,19 @@ export default defineConfig(({ mode }) => {
       manifest: true,
       sourcemap: "hidden",
       emptyOutDir: true,
+    },
+    resolve: {
+      alias: {
+        // @mui/icons-material ships both CJS (default) and ESM (esm/) builds.
+        // Vite 8 (Rolldown) does not apply __esModule interop the same way
+        // esbuild does, so default imports from the CJS paths resolve to the
+        // module namespace object instead of the component — crashing React.
+        // Point the alias at the pre-built ESM subtree to avoid the issue.
+        "@mui/icons-material": path.join(
+          __dirname,
+          "node_modules/@mui/icons-material/esm",
+        ),
+      },
     },
     plugins: [
       visualizer(),

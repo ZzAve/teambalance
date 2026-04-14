@@ -3,6 +3,10 @@ import path from "path";
 import { HOST, PASSWORD } from "./utils";
 
 const authFile = path.join(__dirname, "../../../.auth/user.json");
+// Give auth setup extra time: even after the healthcheck warms up the Vite entry
+// point, the browser still needs to fetch and compile the remaining module graph
+// on first load, which can take a while in Docker.
+setup.setTimeout(120000);
 setup("authenticate", async ({ page }) => {
   await page.goto(HOST);
   await page.getByPlaceholder("******").waitFor({ state: "visible" });
