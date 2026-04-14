@@ -117,10 +117,11 @@ export async function createMatchEvent(
 
   // Wait for success toast and extract event ID.
   // eventType() returns "Wedstrijd" for matches, so the message is "Wedstrijd event (id ...)".
+  // Use .filter() to avoid strict-mode violations when multiple alerts are visible simultaneously.
   const successAlert = page
     .getByRole("alert")
     .filter({ hasText: "Wedstrijd event" });
-  await expect(successAlert).toContainText("Wedstrijd event");
+  await expect(successAlert).toBeVisible();
   const snackbarText = await successAlert.textContent();
   const matches = snackbarText?.match(/id ([a-f0-9-]+)/);
   const eventId = matches && matches[1];
@@ -158,12 +159,11 @@ export async function updateMatch(
 
   await page.getByRole("button", { name: "Opslaan" }).click();
 
+  // Use .filter() to avoid strict-mode violations when multiple alerts are visible simultaneously.
   const updateAlert = page
     .getByRole("alert")
     .filter({ hasText: `Wedstrijd event (id ${eventId}) geüpdate` });
-  await expect(updateAlert).toContainText(
-    `Wedstrijd event (id ${eventId}) geüpdate`,
-  );
+  await expect(updateAlert).toBeVisible();
 
   await updateAlert
     .getByRole("button")
