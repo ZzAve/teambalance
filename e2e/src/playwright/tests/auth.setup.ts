@@ -5,6 +5,7 @@ import { HOST, PASSWORD } from "./utils";
 const authFile = path.join(__dirname, "../../../.auth/user.json");
 setup("authenticate", async ({ page }) => {
   await page.goto(HOST);
+  await page.getByPlaceholder("******").waitFor({ state: "visible" });
   await page.getByPlaceholder("******").click();
   await page.getByPlaceholder("******").fill(PASSWORD);
   await page.getByPlaceholder("******").press("Enter");
