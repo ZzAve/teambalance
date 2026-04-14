@@ -16,21 +16,22 @@ export const createTrainingEvent = async (
   await page.getByLabel("Iedereen").check();
   await page.getByRole("button", { name: "Opslaan" }).click();
 
-  // Wait for the success alert first — this is the authoritative confirmation
-  // that the save completed. The nav span check that was here before was
-  // redundant and raced against the form closing in Firefox.
-  await expect(page.getByRole("alert")).toContainText("Training event");
-  const snackbarText = await page.getByRole("alert").textContent();
+  const successAlert = page
+    .getByRole("alert")
+    .filter({ hasText: "Training event" });
+  await expect(successAlert).toContainText("Training event");
+  const snackbarText = await successAlert.textContent();
   const matches = snackbarText?.match(/id ([a-f0-9-]+)/);
   const eventId = matches && matches[1];
 
   // Dismiss the snackbar. The MUI Snackbar auto-hides and the button can
   // become detached mid-click. Try clicking, but if it fails just wait for
   // the snackbar to disappear on its own.
-  const alertDismiss = page.getByRole("alert").getByRole("button");
-  await alertDismiss.click({ timeout: 3000 }).catch(() => {});
-  await page
-    .getByRole("alert")
+  await successAlert
+    .getByRole("button")
+    .click({ timeout: 3000 })
+    .catch(() => {});
+  await successAlert
     .waitFor({ state: "hidden", timeout: 10000 })
     .catch(() => {});
   return ensure(eventId, "event training Id");
@@ -43,16 +44,17 @@ export async function updateTraining(page: Page, eventId: string) {
     .fill(`Updated location for event ${eventId}`);
 
   await page.getByRole("button", { name: "Opslaan" }).click();
-  await expect(page.getByRole("alert")).toContainText(
+  const updateAlert = page
+    .getByRole("alert")
+    .filter({ hasText: `Training event (id ${eventId}) geüpdate` });
+  await expect(updateAlert).toContainText(
     `Training event (id ${eventId}) geüpdate`,
   );
-  await page
-    .getByRole("alert")
+  await updateAlert
     .getByRole("button")
     .click({ timeout: 3000 })
     .catch(() => {});
-  await page
-    .getByRole("alert")
+  await updateAlert
     .waitFor({ state: "hidden", timeout: 10000 })
     .catch(() => {});
 }

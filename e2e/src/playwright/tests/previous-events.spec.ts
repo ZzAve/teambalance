@@ -17,22 +17,22 @@ test("Validate previous events can be shown", async ({ page, request }) => {
   await createTrainingEvent(page, comment, dayBeforeStartOfSeason);
   await page.getByRole("button", { name: "Terug naar de veiligheid" }).click();
 
-  await page.getByTestId("training-events").waitFor({ state: "visible" });
-  await page
-    .getByTestId("training-events")
-    .first()
-    .getByTestId("more-button")
-    .first()
-    .click();
+  const trainingEvents = page.getByTestId("training-events");
+  await trainingEvents.waitFor({ state: "visible" });
+  await trainingEvents.first().getByTestId("more-button").first().click();
 
-  await page.getByTestId("event-list").waitFor({ state: "visible" });
+  // more-button navigates to the /trainings route — wait for that before
+  // checking event-list (otherwise we'd still be on Overview with 3 lists).
+  await page.waitForURL("**/trainings");
+  const eventList = page.getByTestId("event-list");
+  await eventList.waitFor({ state: "visible" });
 
   const oudeEvents = page.getByLabel("Oude events");
 
   // Ensure the filter starts OFF — the checkbox may already be checked from
   // a previous run or because it is the default state in this view.
   await oudeEvents.uncheck();
-  await page.getByTestId("event-list").waitFor({ state: "visible" });
+  await eventList.waitFor({ state: "visible" });
 
   // The past event must NOT appear while old events are hidden.
   await expect(
@@ -41,7 +41,7 @@ test("Validate previous events can be shown", async ({ page, request }) => {
 
   // Toggle old events ON.
   await oudeEvents.check();
-  await page.getByTestId("event-list").waitFor({ state: "visible" });
+  await eventList.waitFor({ state: "visible" });
 
   // The past event must now be visible.
   await expect(

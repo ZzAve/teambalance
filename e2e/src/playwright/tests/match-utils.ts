@@ -117,19 +117,20 @@ export async function createMatchEvent(
 
   // Wait for success toast and extract event ID.
   // eventType() returns "Wedstrijd" for matches, so the message is "Wedstrijd event (id ...)".
-  await expect(page.getByRole("alert")).toContainText("Wedstrijd event");
-  const snackbarText = await page.getByRole("alert").textContent();
+  const successAlert = page
+    .getByRole("alert")
+    .filter({ hasText: "Wedstrijd event" });
+  await expect(successAlert).toContainText("Wedstrijd event");
+  const snackbarText = await successAlert.textContent();
   const matches = snackbarText?.match(/id ([a-f0-9-]+)/);
   const eventId = matches && matches[1];
 
   // Dismiss toast (may auto-hide; ignore errors)
-  await page
-    .getByRole("alert")
+  await successAlert
     .getByRole("button")
     .click({ timeout: 3000 })
     .catch(() => {});
-  await page
-    .getByRole("alert")
+  await successAlert
     .waitFor({ state: "hidden", timeout: 10000 })
     .catch(() => {});
 
@@ -145,9 +146,7 @@ export async function updateMatch(
   newOpponent?: string,
   newLocation?: string,
 ): Promise<void> {
-  await page
-    .getByRole("button", { name: `Update event ${eventId}` })
-    .click({ timeout: 5000 });
+  await page.getByRole("button", { name: `Update event ${eventId}` }).click();
 
   if (newOpponent) {
     await page.getByLabel("Tegenstander *").fill(newOpponent);
@@ -159,17 +158,18 @@ export async function updateMatch(
 
   await page.getByRole("button", { name: "Opslaan" }).click();
 
-  await expect(page.getByRole("alert")).toContainText(
+  const updateAlert = page
+    .getByRole("alert")
+    .filter({ hasText: `Wedstrijd event (id ${eventId}) geüpdate` });
+  await expect(updateAlert).toContainText(
     `Wedstrijd event (id ${eventId}) geüpdate`,
   );
 
-  await page
-    .getByRole("alert")
+  await updateAlert
     .getByRole("button")
     .click({ timeout: 3000 })
     .catch(() => {});
-  await page
-    .getByRole("alert")
+  await updateAlert
     .waitFor({ state: "hidden", timeout: 10000 })
     .catch(() => {});
 }

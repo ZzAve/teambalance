@@ -34,6 +34,7 @@ const Login = (opts: { handleRefresh: () => void }) => {
         })
         .catch(() => {
           setInput(authenticationManager.get() || "");
+          setIsLoading(false);
         });
     });
   }, []);
