@@ -114,20 +114,21 @@ export async function createMiscEvent(
   await page.getByRole("button", { name: "Opslaan" }).click();
 
   // Wait for success toast and extract event ID.
-  // eventType() returns "Misc" for misc events, so the message is "Misc event (id ...)".
-  await expect(page.getByRole("alert")).toContainText("Misc event");
-  const snackbarText = await page.getByRole("alert").textContent();
+  // Use .filter() to avoid strict-mode violations when multiple alerts are visible simultaneously.
+  const successAlert = page
+    .getByRole("alert")
+    .filter({ hasText: "Misc event" });
+  await expect(successAlert).toBeVisible();
+  const snackbarText = await successAlert.textContent();
   const matches = snackbarText?.match(/id ([a-f0-9-]+)/);
   const eventId = matches && matches[1];
 
   // Dismiss toast (may auto-hide; ignore errors)
-  await page
-    .getByRole("alert")
+  await successAlert
     .getByRole("button")
     .click({ timeout: 3000 })
     .catch(() => {});
-  await page
-    .getByRole("alert")
+  await successAlert
     .waitFor({ state: "hidden", timeout: 10000 })
     .catch(() => {});
 
@@ -150,17 +151,17 @@ export async function updateMiscEvent(
 
   await page.getByRole("button", { name: "Opslaan" }).click();
 
-  await expect(page.getByRole("alert")).toContainText(
-    `Misc event (id ${eventId}) geüpdate`,
-  );
-
-  await page
+  // Use .filter() to avoid strict-mode violations when multiple alerts are visible simultaneously.
+  const updateAlert = page
     .getByRole("alert")
+    .filter({ hasText: `Misc event (id ${eventId}) geüpdate` });
+  await expect(updateAlert).toBeVisible();
+
+  await updateAlert
     .getByRole("button")
     .click({ timeout: 3000 })
     .catch(() => {});
-  await page
-    .getByRole("alert")
+  await updateAlert
     .waitFor({ state: "hidden", timeout: 10000 })
     .catch(() => {});
 }
