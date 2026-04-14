@@ -3,7 +3,6 @@ package nl.jvandis.teambalance.api.authentication
 import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.InvalidSecretException
-import nl.jvandis.teambalance.api.Public
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "authentication")
 @RequestMapping(path = ["api/authentication"], produces = [MediaType.APPLICATION_JSON_VALUE])
 class AuthenticationController {
-    @Public
     @GetMapping
     fun authenticate(): Success = Success()
 
