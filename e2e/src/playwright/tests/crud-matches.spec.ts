@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { HOST } from "./utils";
 import { v4 as uuid } from "uuid";
 import {
+  apiHeaders,
   createMatchEvent,
   createUserViaApi,
   deleteMatch,
@@ -184,5 +185,23 @@ test.describe("Matches", () => {
 
   test.skip("CRUD recurring match", async ({ page }) => {
     // TODO: Implement once recurring match UI is finalized
+  });
+
+  test("attendee mutation endpoints require admin authorization", async ({
+    request,
+  }) => {
+    // Verify that POST /api/attendees without admin credentials returns 403.
+    // The addAttendee endpoint was changed from @Public to @Admin in PR #388,
+    // so any request without Authorization header should be forbidden.
+    const response = await request.post(`${HOST}/api/attendees`, {
+      headers: apiHeaders,
+      data: {
+        eventId: "dummy-event-id",
+        userId: "dummy-user-id",
+        state: "PRESENT",
+      },
+    });
+
+    expect(response.status()).toBe(403);
   });
 });

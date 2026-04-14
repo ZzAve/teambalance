@@ -11,7 +11,7 @@ const API_SECRET = Buffer.from("teambalance").toString("base64");
  * Headers required by the backend API: tenant resolution via Host + secret auth.
  * The Vite dev server proxies /api/* to backend:8080 and forwards the Host header.
  */
-const apiHeaders = {
+export const apiHeaders = {
   Host: "frontend:3000",
   "X-Secret": API_SECRET,
   "Content-Type": "application/json",
