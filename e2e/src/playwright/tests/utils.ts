@@ -1,3 +1,5 @@
+import { APIRequestContext } from "@playwright/test";
+
 export const ensure = <T>(
   value: T | undefined,
   name: string | undefined = "value",
@@ -15,8 +17,38 @@ export const ensure = <T>(
 export const HOST: string = ensure(process.env.HOST, "host");
 export const PASSWORD = ensure(process.env.PASSWORD, "PASSWORD");
 
+const API_SECRET = Buffer.from("teambalance").toString("base64");
+const apiHeaders = {
+  Host: "frontend:3000",
+  "X-Secret": API_SECRET,
+  "Content-Type": "application/json",
+};
+
 export const NOW = new Date();
-export const START_OF_SEASON = new Date(2025, 8, 1, 2);
+
+/**
+ * Fetch the current start-of-season date from the backend config API.
+ */
+export async function getStartOfSeason(
+  request: APIRequestContext,
+): Promise<Date> {
+  const response = await request.get(`${HOST}/api/config/season`, {
+    headers: apiHeaders,
+  });
+  if (!response.ok()) {
+    throw new Error(
+      `Failed to fetch start-of-season: ${response.status()} ${response.statusText()}`,
+    );
+  }
+  const body = (await response.json()) as { startOfSeason: string };
+  const result = new Date(body.startOfSeason);
+  if (isNaN(result.getTime())) {
+    throw new Error(
+      `getStartOfSeason: invalid date in response: ${body.startOfSeason}`,
+    );
+  }
+  return result;
+}
 
 export const addHours = (date: Date, hours: number): Date => {
   const result = new Date(date);
