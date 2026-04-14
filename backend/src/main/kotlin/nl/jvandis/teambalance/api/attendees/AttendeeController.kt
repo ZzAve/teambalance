@@ -2,6 +2,7 @@ package nl.jvandis.teambalance.api.attendees
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.TeamBalanceId
+import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.Error
 import nl.jvandis.teambalance.api.InvalidAttendeeException
@@ -93,7 +94,7 @@ class AttendeeController(
         return attendee.expose()
     }
 
-    @Public
+    @Admin
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun addAttendee(
@@ -156,7 +157,7 @@ class AttendeeController(
             ?: throw AttendeeNotFoundException(attendeeTeamBalanceId, TeamBalanceId("unknown user"))
     }
 
-    @Public
+    @Admin
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{id}")
     fun deleteAttendee(
@@ -167,7 +168,7 @@ class AttendeeController(
         attendeeRepository.deleteById(id)
     }
 
-    @Public
+    @Admin
     @ResponseStatus(NO_CONTENT)
     @DeleteMapping
     fun deleteAttendeeByUserIdAndEventId(

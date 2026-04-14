@@ -2,10 +2,12 @@ import { expect, APIRequestContext, Page, Locator } from "@playwright/test";
 import { addDays, ensure, HOST, NOW, pickDateTime } from "./utils";
 
 /**
- * The X-Secret header value for the local/e2e tenant (base64 of "teambalance").
- * Matches the secret configured in application-local.yml for domain frontend:3000.
+ * The X-Secret header value for the local/e2e tenant.
+ * Reads from E2E_API_SECRET env var; falls back to base64 of "teambalance"
+ * (the default secret in application-local.yml for domain frontend:3000).
  */
-const API_SECRET = Buffer.from("teambalance").toString("base64");
+const API_SECRET =
+  process.env.E2E_API_SECRET ?? Buffer.from("teambalance").toString("base64");
 
 /**
  * Headers required by the backend API: tenant resolution via Host + secret auth.
