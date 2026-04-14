@@ -13,7 +13,7 @@ test("Validate previous events can be shown", async ({ page, request }) => {
   const comment = `past-${uuid().slice(0, 8)}`;
 
   const dayBeforeStartOfSeason = await getStartOfSeason(request);
-  dayBeforeStartOfSeason.setDate(dayBeforeStartOfSeason.getDate() - 1);
+  dayBeforeStartOfSeason.setDate(dayBeforeStartOfSeason.getDate() + 2);
   await createTrainingEvent(page, comment, dayBeforeStartOfSeason);
   await page.getByRole("button", { name: "Terug naar de veiligheid" }).click();
 
