@@ -2,13 +2,11 @@ package nl.jvandis.teambalance.api.event.miscellaneous
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.TeamBalanceId
-import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.ConfigurationService
 import nl.jvandis.teambalance.api.CreateEventException
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidMiscellaneousEventException
 import nl.jvandis.teambalance.api.InvalidUserException
-import nl.jvandis.teambalance.api.Public
 import nl.jvandis.teambalance.api.attendees.Attendee
 import nl.jvandis.teambalance.api.attendees.AttendeeRepository
 import nl.jvandis.teambalance.api.attendees.AttendeeResponse
@@ -52,7 +50,6 @@ class MiscellaneousEventController(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @Public
     @GetMapping
     fun getEvents(
         @RequestParam(value = "include-attendees", defaultValue = "false") includeAttendees: Boolean,
@@ -95,7 +92,6 @@ class MiscellaneousEventController(
             events = content.map { it.expose(includeInactiveUsers) },
         )
 
-    @Public
     @GetMapping("/{event-id}")
     fun getEvent(
         @PathVariable("event-id") eventId: String,
@@ -120,7 +116,6 @@ class MiscellaneousEventController(
         return event.expose(attendees)
     }
 
-    @Admin
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun createMiscellaneousEvent(
@@ -180,7 +175,6 @@ class MiscellaneousEventController(
             }
     }
 
-    @Admin
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{event-id}/attendees")
     fun addAttendee(
@@ -210,7 +204,6 @@ class MiscellaneousEventController(
         }
     }
 
-    @Admin
     @PutMapping("/{event-id}")
     fun updateEvent(
         @PathVariable(value = "event-id") eventId: String,
@@ -227,7 +220,6 @@ class MiscellaneousEventController(
             .also { log.info("Updated miscellaneousEvent $miscellaneousTeamBalanceId") }
     }
 
-    @Admin
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{event-id}")
     @Transactional

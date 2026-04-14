@@ -5,7 +5,6 @@ import nl.jvandis.teambalance.TeamBalanceId
 import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.DataConstraintViolationException
 import nl.jvandis.teambalance.api.InvalidUserException
-import nl.jvandis.teambalance.api.Public
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Sort
@@ -31,7 +30,6 @@ class UserController(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @Public
     @GetMapping
     fun getUsers(
         @RequestParam(value = "include-inactive-users", defaultValue = "false") includeInactiveUsers: Boolean,
@@ -46,7 +44,6 @@ class UserController(
         ).expose()
     }
 
-    @Public
     @GetMapping("/{id}")
     fun getUser(
         @PathVariable(value = "id") userId: String,
@@ -59,7 +56,6 @@ class UserController(
         )
     }
 
-    @Admin
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun postUser(

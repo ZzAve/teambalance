@@ -1,7 +1,6 @@
 package nl.jvandis.teambalance.api.competion
 
 import io.swagger.v3.oas.annotations.tags.Tag
-import nl.jvandis.teambalance.api.Public
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController
 class CompetitionController(
     private val service: CompetitionService,
 ) {
-    @Public
     @GetMapping
     suspend fun getRanking(): CompetitionRankingDto = service.getRanking().expose()
 }

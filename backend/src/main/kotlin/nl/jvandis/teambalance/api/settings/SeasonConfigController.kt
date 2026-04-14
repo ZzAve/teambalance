@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.v3.oas.annotations.tags.Tag
 import nl.jvandis.teambalance.api.Admin
 import nl.jvandis.teambalance.api.ConfigurationService
-import nl.jvandis.teambalance.api.Public
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
@@ -22,7 +21,6 @@ class SeasonConfigController(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @Public
     @GetMapping("/season")
     fun getSeasonConfig(): SeasonConfigResponse {
         log.debug("getSeasonConfig")
