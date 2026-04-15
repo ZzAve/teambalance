@@ -48,7 +48,7 @@ class PotterService(
         .transactions
         .asSequence()
         .filter { it.transaction.date > since }
-        .filter { it.transaction.type == TransactionType.WITHDRAWAL && it.transaction.currency == "€" }
+        .filter { it.transaction.type == TransactionType.DEPOSIT && it.transaction.currency == "€" }
         .filter { it.alias != null }
         .filter { includeSupportRoles || !SUPPORT_TEAM_ROLES.contains(it.alias?.role) }
         .toList()
