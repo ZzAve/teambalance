@@ -1,6 +1,6 @@
 import React, { FormEvent, useEffect, useState } from "react";
 import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import PageItem from "../components/PageItem";
 import TextField from "@mui/material/TextField";
@@ -81,11 +81,11 @@ const Login = (opts: { handleRefresh: () => void }) => {
   return (
     <PageItem xs={12} title="Login" pageTitle="Login" dataTestId="login">
       <form onSubmit={handleLogin}>
-        <Grid item container spacing={2}>
-          <Grid item xs={12}>
+        <Grid container spacing={2}>
+          <Grid size={12}>
             <Typography>omdat we niet graag onze namen delen</Typography>
           </Grid>
-          <Grid item>
+          <Grid>
             <TextField
               variant="standard"
               sx={{ display: "none" }}
@@ -104,7 +104,7 @@ const Login = (opts: { handleRefresh: () => void }) => {
               autoFocus
             />
           </Grid>
-          <Grid item>
+          <Grid>
             <Button variant="contained" color="primary" type="submit">
               <LockOpenIcon /> Login
             </Button>

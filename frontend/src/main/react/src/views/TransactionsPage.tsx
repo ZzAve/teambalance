@@ -1,6 +1,7 @@
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import PageItem from "../components/PageItem";
-import { Button, Hidden } from "@mui/material";
+import { Button } from "@mui/material";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Transactions from "../components/Transactions";
@@ -18,24 +19,27 @@ const TransactionsPage = (props: { refresh: boolean }) => {
   return (
     <>
       <PageTitle title="Transacties" />
-      <Grid item container spacing={2}>
-        <Grid container item xs={12}>
+      <Grid container spacing={2}>
+        <Grid size={12}>
           <Button variant="contained" color="primary" onClick={navigateBack}>
             <ArrowBackIcon />
-            <Hidden smDown>
-              <Typography variant={"button"}>Terug</Typography>
-            </Hidden>
+            <Typography
+              variant={"button"}
+              sx={{ display: { xs: "none", sm: "block" } }}
+            >
+              Terug
+            </Typography>
           </Button>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <PageItem title="Transacties" dataTestId="transactions">
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Transactions refresh={props.refresh} withPagination={true} />
             </Grid>
           </PageItem>
         </Grid>
-        <Grid container item xs={12}>
+        <Grid size={12}>
           <PageItem title="Potters" dataTestId="potters">
             <Potters
               refresh={props.refresh}

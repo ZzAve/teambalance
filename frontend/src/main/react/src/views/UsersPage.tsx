@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import { Button, Card } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -16,8 +16,8 @@ const UsersPage = (props: { refresh: boolean }) => {
   return (
     <>
       <PageTitle title="Teamleden" />
-      <Grid item container spacing={2}>
-        <Grid container item xs={12}>
+      <Grid container spacing={2}>
+        <Grid container size={12}>
           <Button variant="contained" color="primary" onClick={navigateBack}>
             <ArrowBackIcon />
             <Typography
@@ -29,13 +29,13 @@ const UsersPage = (props: { refresh: boolean }) => {
           </Button>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Card>
-            <Grid container item xs={12}>
-              <Grid item xs={12} sx={{ padding: "16px" }}>
+            <Grid container size={12}>
+              <Grid size={12} sx={{ padding: "16px" }}>
                 <Typography variant="h5">Teamleden</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Users refresh={props.refresh} />
               </Grid>
             </Grid>

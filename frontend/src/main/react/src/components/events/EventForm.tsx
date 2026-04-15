@@ -7,7 +7,7 @@ import {
 import { Navigate, useLocation } from "react-router-dom";
 import { SpinnerWithText } from "../SpinnerWithText";
 import { nl } from "date-fns/locale";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import CheckBox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
@@ -323,7 +323,7 @@ export const EventForm = (props: {
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"nl"}>
       <Grid container spacing={3}>
         <Conditional condition={isCreateEvent}>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Alert severity="info">
               <AlertTitle>Nieuwe functionaliteit</AlertTitle>
               <Typography>
@@ -343,12 +343,12 @@ export const EventForm = (props: {
             readOnly={!isCreateEvent}
             isCreateEvent={isCreateEvent}
           ></RecurringEvent>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Divider variant="fullWidth"></Divider>
           </Grid>
         </Conditional>
         <Conditional condition={!isCreateEvent}>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <TextField
               variant="standard"
               id="trainingId"
@@ -359,13 +359,10 @@ export const EventForm = (props: {
             />
           </Grid>
         </Conditional>
-        <Grid item container spacing={2}>
-          <Grid container item spacing={1} marginY="10px" alignItems="end">
-            <Grid item>
+        <Grid container spacing={2}>
+          <Grid container spacing={1} marginY="10px" alignItems="end">
+            <Grid>
               <MobileDateTimePicker
-                renderInput={(props) => (
-                  <TextField variant="standard" {...props}></TextField>
-                )}
                 label="Datum / tijd"
                 value={selectedDateTime}
                 onChange={(x) => {
@@ -378,7 +375,7 @@ export const EventForm = (props: {
               />
             </Grid>
             <Conditional condition={isCreateEvent}>
-              <Grid item>
+              <Grid>
                 <FormControl>
                   <FormControlLabel
                     label={"herhalend event?"}
@@ -393,7 +390,7 @@ export const EventForm = (props: {
           </Grid>
         </Grid>
         <Conditional condition={props.eventType === "MISC"}>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <FormControl fullWidth>
               <TextField
                 variant="standard"
@@ -407,7 +404,7 @@ export const EventForm = (props: {
           </Grid>
         </Conditional>
         <Conditional condition={props.eventType === "MATCH"}>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <FormControl fullWidth>
               <TextField
                 variant="standard"
@@ -420,7 +417,7 @@ export const EventForm = (props: {
               />
             </FormControl>
           </Grid>
-          <Grid item xs={6}>
+          <Grid size={6}>
             <FormControl>
               <RadioGroup
                 aria-label="thuis-of-uit"
@@ -444,7 +441,7 @@ export const EventForm = (props: {
             </FormControl>
           </Grid>
         </Conditional>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <FormControl fullWidth required>
             <TextField
               variant="standard"
@@ -460,7 +457,7 @@ export const EventForm = (props: {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <FormControl fullWidth>
             <TextField
               variant="standard"
@@ -473,7 +470,7 @@ export const EventForm = (props: {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Typography variant="h6">Teamgenoten</Typography>
           <EventUsers
             users={props.users}
@@ -486,13 +483,12 @@ export const EventForm = (props: {
           />
         </Grid>
         <Grid
-          item
           container
           spacing={5}
           alignItems="flex-end"
           justifyContent="flex-end"
         >
-          <Grid item>
+          <Grid>
             <FormControlLabel
               control={
                 <CheckBox
@@ -507,7 +503,7 @@ export const EventForm = (props: {
               label="Nog eentje toevoegen"
             />
           </Grid>
-          <Grid item>
+          <Grid>
             <Button
               variant="contained"
               color="primary"
@@ -516,7 +512,7 @@ export const EventForm = (props: {
               Opslaan
             </Button>
           </Grid>
-          <Grid item>
+          <Grid>
             <Button
               variant="contained"
               color="secondary"

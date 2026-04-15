@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import { SpinnerWithText } from "./SpinnerWithText";
 import { bankApiClient } from "../utils/BankApiClient";
 import { withLoading } from "../utils/util";
@@ -27,13 +27,13 @@ const Balance = (props: { refresh: boolean }) => {
 
   return (
     <Grid container spacing={1}>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Typography>Wat kunnen we nog drinken?</Typography>
       </Grid>
-      <Grid item xs>
+      <Grid size="grow">
         <Typography variant="h6">{balance} </Typography>
       </Grid>
-      <Grid item>
+      <Grid>
         <Typography variant="h6">( ~ {calculateBeers(balance)}🍺)</Typography>
       </Grid>
     </Grid>

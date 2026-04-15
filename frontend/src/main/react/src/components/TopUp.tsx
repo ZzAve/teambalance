@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import { bankApiClient } from "../utils/BankApiClient";
 
@@ -22,14 +22,14 @@ const getTopUpButton = (content: string, amountInCents?: number) => (
 const TopUp = () => {
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Typography>Spek jij de teamkas vandaag?</Typography>
       </Grid>
-      <Grid item container spacing={1}>
-        <Grid item>{getTopUpButton("€ 10,-", 1000)}</Grid>
-        <Grid item>{getTopUpButton("€ 20,-", 2000)}</Grid>
-        <Grid item>{getTopUpButton("€ 50,-", 5000)}</Grid>
-        <Grid item>{getTopUpButton("Anders ...")}</Grid>
+      <Grid container spacing={1}>
+        <Grid>{getTopUpButton("€ 10,-", 1000)}</Grid>
+        <Grid>{getTopUpButton("€ 20,-", 2000)}</Grid>
+        <Grid>{getTopUpButton("€ 50,-", 5000)}</Grid>
+        <Grid>{getTopUpButton("Anders ...")}</Grid>
       </Grid>
     </Grid>
   );

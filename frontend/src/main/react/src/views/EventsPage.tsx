@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import PageItem from "../components/PageItem";
 import { Button } from "@mui/material";
 import React, { useState } from "react";
@@ -46,8 +46,8 @@ const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
     setViewType(newViewType);
   };
   return (
-    <Grid item container spacing={2}>
-      <Grid container item>
+    <Grid container spacing={2}>
+      <Grid container>
         <Button
           variant="contained"
           color="primary"
@@ -62,43 +62,41 @@ const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
           </Typography>
         </Button>
       </Grid>
-      <Grid container item xs={12}>
+      <Grid container size={12}>
         <PageItem pageTitle={title} title={title} dataTestId="events">
           <Grid container spacing={1}>
             <Grid
               component="label"
-              item
               container
               alignItems="center"
               spacing={0}
               justifyContent="flex-end"
-              xs={12}
+              size={12}
             >
-              <Grid item>
+              <Grid>
                 <Typography variant="body1"> Table </Typography>
               </Grid>
-              <Grid item>
+              <Grid>
                 <Switch
                   checked={viewType === "list"}
                   onChange={toggleViewType}
                   name="listVsTable"
                 />
               </Grid>
-              <Grid item>
+              <Grid>
                 <Typography variant="body1"> List </Typography>
               </Grid>
             </Grid>
 
             <Grid
               component="label"
-              item
               container
               alignItems="center"
               spacing={0}
               justifyContent="flex-end"
-              xs={12}
+              size={12}
             >
-              <Grid item>
+              <Grid>
                 <CheckBox
                   checked={includeHistory}
                   onChange={(x) => setIncludeHistory(x.target.checked)}
@@ -106,11 +104,11 @@ const EventsPage = (props: { eventType: EventType; refresh: boolean }) => {
                   size="small"
                 ></CheckBox>
               </Grid>
-              <Grid item>
+              <Grid>
                 <Typography variant="body1">Oude events</Typography>
               </Grid>
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Events
                 eventType={props.eventType}
                 refresh={props.refresh}

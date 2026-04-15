@@ -1,6 +1,6 @@
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -175,7 +175,7 @@ const EventsTable = (props: {
 
   const getUpdateIcons = (props: { id: TeamBalanceId }) => (
     <Grid container spacing={1}>
-      <Grid item xs>
+      <Grid size="grow">
         <Button
           title={`Update event ${props.id}`}
           variant="contained"
@@ -185,7 +185,7 @@ const EventsTable = (props: {
           <EditIcon />
         </Button>
       </Grid>
-      <Grid item xs>
+      <Grid size="grow">
         <Button
           title={`Verwijder event ${props.id}`}
           variant="contained"
@@ -377,7 +377,7 @@ const EventsTable = (props: {
   }
 
   return (
-    <Grid container item xs={12}>
+    <Grid container size={12}>
       {getAlertDialog()}
       <TableContainer component={Paper}>
         <Table aria-label="simple table" size="small" sx={{ minSize: "480px" }}>

@@ -21,7 +21,7 @@ import { BankAccountAliases } from "./BankAccountAliases";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import { useAlerts } from "../hooks/alertsHook";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -92,15 +92,15 @@ export const Users = (props: { refresh: boolean }) => {
   const UserList = () => (
     <Grid container spacing={2}>
       {users.map((user) => (
-        <Grid xs={12} item key={user.id} spacing={2} margin={2}>
+        <Grid size={12} key={user.id} margin={2}>
           <Card variant="outlined">
             <CardHeader
               title={
                 <Grid container alignItems="center" spacing={1}>
-                  <Grid item>
+                  <Grid>
                     <Typography variant="h6">{user.name}</Typography>
                   </Grid>
-                  <Grid item>
+                  <Grid>
                     <Chip size="small" label={roleMapper[user.role]} />
                   </Grid>
                 </Grid>

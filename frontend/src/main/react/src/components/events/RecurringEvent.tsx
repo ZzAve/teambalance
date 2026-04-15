@@ -8,7 +8,7 @@ import {
 } from "../../utils/domain";
 import React, { useEffect, useReducer, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import {
   FormControl,
   FormLabel,
@@ -117,7 +117,7 @@ export const AffectedRecurringEvent = (props: {
   }, [affectedRecurringEvents, props.onChange]);
 
   return (
-    <Grid container item>
+    <Grid container>
       <FormControl>
         <FormLabel id="affected-recurring-events-label">
           Welke events wil je aanpassen?
@@ -202,10 +202,10 @@ export const CreateRecurringEvent = (props: {
   }, [recProps, recurringLimitType, props.onChange]);
 
   return (
-    <Grid container item spacing={2} alignItems="center" marginY="10px">
-      <Grid item container xs={12}>
-        <Grid container item spacing={2}>
-          <Grid item>
+    <Grid container spacing={2} alignItems="center" marginY="10px">
+      <Grid container size={12}>
+        <Grid container spacing={2}>
+          <Grid>
             <Typography
               sx={{
                 display: "inline-block",
@@ -216,7 +216,7 @@ export const CreateRecurringEvent = (props: {
               Elke
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid>
             <FormControl variant="standard">
               <TextField
                 InputLabelProps={{ shrink: true }}
@@ -242,7 +242,7 @@ export const CreateRecurringEvent = (props: {
               />
             </FormControl>
           </Grid>
-          <Grid item>
+          <Grid>
             <FormControl variant="standard">
               <Select
                 variant="standard"
@@ -266,11 +266,11 @@ export const CreateRecurringEvent = (props: {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item container xs={12} spacing={1}>
-        <Grid item xs={12}>
+      <Grid container size={12} spacing={1}>
+        <Grid size={12}>
           <Typography variant="body1">Herhaal op:</Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           {Object.entries(Day).map(([key, value]) => {
             const dayType = key as keyof typeof Day;
             return (
@@ -295,12 +295,12 @@ export const CreateRecurringEvent = (props: {
           })}
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid>
         <Typography variant="body1">Eindigt</Typography>
       </Grid>
-      <Grid container item>
-        <Grid container item columnSpacing={3}>
-          <Grid item>
+      <Grid container>
+        <Grid container columnSpacing={3}>
+          <Grid>
             <FormControl>
               <FormControlLabel
                 value="EndDate"
@@ -312,11 +312,8 @@ export const CreateRecurringEvent = (props: {
               />
             </FormControl>
           </Grid>
-          <Grid item>
+          <Grid>
             <MobileDatePicker
-              renderInput={(props) => (
-                <TextField variant="standard" {...props}></TextField>
-              )}
               minDate={dayjs("2020-01-01")}
               maxDate={dayjs("2030-01-01")}
               value={recProps.dateLimit}
@@ -327,8 +324,8 @@ export const CreateRecurringEvent = (props: {
             />
           </Grid>
         </Grid>
-        <Grid container item columnSpacing={3}>
-          <Grid item>
+        <Grid container columnSpacing={3}>
+          <Grid>
             <FormControl>
               <FormControlLabel
                 value="AmountOfEvents"
@@ -342,13 +339,12 @@ export const CreateRecurringEvent = (props: {
             </FormControl>
           </Grid>
           <Grid
-            item
             container
-            xs
+            size="grow"
             direction="column"
             justifyContent="space-evenly"
           >
-            <Grid item>
+            <Grid>
               <TextField
                 variant="standard"
                 id="interval-limit"

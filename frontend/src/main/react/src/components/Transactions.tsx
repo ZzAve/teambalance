@@ -17,7 +17,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { Transaction } from "../utils/domain";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 
 const PREFIX = "Transactions";
 
@@ -26,7 +26,7 @@ const transactionClasses = {
   DEPOSIT: `${PREFIX}-DEPOSIT`,
 };
 
-const TransactionTableCell = styled(TableCell)((theme) => ({
+const TransactionTableCell = styled(TableCell)(() => ({
   [`&.${transactionClasses.WITHDRAWAL}`]: {
     color: "red",
   },
