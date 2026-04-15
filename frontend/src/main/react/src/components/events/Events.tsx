@@ -15,14 +15,10 @@ import { TeamEvent } from "../../utils/domain";
 let nowMinus6Hours = new Date();
 nowMinus6Hours.setHours(nowMinus6Hours.getHours() - 6);
 
-let startOfSeasonCache: Promise<Date> = settingsApiClient
-  .getSeasonStart()
-  .then((s) => new Date(s));
+let startOfSeasonCache: Promise<string> = settingsApiClient.getSeasonStart();
 
 export const flushStartOfSeason = () => {
-  startOfSeasonCache = settingsApiClient
-    .getSeasonStart()
-    .then((s) => new Date(s));
+  startOfSeasonCache = settingsApiClient.getSeasonStart();
 };
 
 type EventsTexts = {
@@ -67,18 +63,15 @@ const Events = (props: {
   const updateEvents = async () => {
     const startTime = includeHistory
       ? await startOfSeasonCache
-      : nowMinus6Hours;
+      : nowMinus6Hours.toJSON();
     if (props.eventType === "TRAINING") {
-      const data = await trainingsApiClient.getTrainings(
-        startTime.toJSON(),
-        limit
-      );
+      const data = await trainingsApiClient.getTrainings(startTime, limit);
       setEvents(data || []);
     } else if (props.eventType === "MATCH") {
-      const data = await matchesApiClient.getMatches(startTime.toJSON(), limit);
+      const data = await matchesApiClient.getMatches(startTime, limit);
       setEvents(data || []);
     } else if (props.eventType === "MISC") {
-      const data = await eventsApiClient.getEvents(startTime.toJSON(), limit);
+      const data = await eventsApiClient.getEvents(startTime, limit);
       setEvents(data || []);
     } else {
       console.warn("NO SUPPORT FOR OTHER EVENTS yet(?)");
