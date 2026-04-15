@@ -28,11 +28,11 @@ const transactionClasses = {
 
 const TransactionTableCell = styled(TableCell)((theme) => ({
   [`&.${transactionClasses.WITHDRAWAL}`]: {
-    color: "green",
+    color: "red",
   },
 
   [`&.${transactionClasses.DEPOSIT}`]: {
-    color: "red",
+    color: "green",
   },
 }));
 
