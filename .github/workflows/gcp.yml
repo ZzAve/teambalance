@@ -32,7 +32,7 @@ jobs:
           service_account: ${{ secrets.GCP_SA_EMAIL }}
 
       - name: Setup gcloud environment
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@v3
 
       - name: Google cloud info
         run: gcloud info
@@ -41,10 +41,10 @@ jobs:
         run: gcloud auth configure-docker
 
       - name: Set up Docker CLI
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -61,7 +61,7 @@ jobs:
           node-version: "22"
 
       - name: Set up Docker CLI
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Apply maven-cache
         uses: actions/cache@v5
@@ -102,7 +102,7 @@ jobs:
         run: make test
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
