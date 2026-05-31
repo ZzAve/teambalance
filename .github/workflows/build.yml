@@ -36,7 +36,7 @@ jobs:
           node-version: "22"
 
       - name: Set up Docker CLI
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Apply maven-cache
         uses: actions/cache@v5
@@ -78,7 +78,7 @@ jobs:
 
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -97,7 +97,7 @@ jobs:
           retention-days: 30
 
       - name: Add Playwright Github comment
-        uses: daun/playwright-report-summary@v3
+        uses: daun/playwright-report-summary@v4
         if: ${{ !cancelled() }}
         with:
           report-file: e2e/results.json
