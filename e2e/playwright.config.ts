@@ -13,6 +13,7 @@ dotenv.config({ quiet: true, path: path.resolve(__dirname, ".env") });
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  globalSetup: "./src/playwright/global-setup",
   testDir: "./src/playwright/tests",
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -38,8 +39,8 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "retain-on-failure",
     screenshot: {
-      mode: "only-on-failure"
-    }
+      mode: "only-on-failure",
+    },
   },
 
   /* Configure projects for major browsers.
@@ -58,25 +59,27 @@ export default defineConfig({
       dependencies: ["setup"],
     },
 
-    ...(!process.env.CI ? [
-      {
-        name: "firefox",
-        use: {
-          ...devices["Desktop Firefox"],
-          storageState: ".auth/user.json",
-        },
-        dependencies: ["setup"],
-      },
+    ...(!process.env.CI
+      ? [
+          {
+            name: "firefox",
+            use: {
+              ...devices["Desktop Firefox"],
+              storageState: ".auth/user.json",
+            },
+            dependencies: ["setup"],
+          },
 
-      {
-        name: "webkit",
-        use: {
-          ...devices["Desktop Safari"],
-          storageState: ".auth/user.json",
-        },
-        dependencies: ["setup"],
-      },
-    ] : []),
+          {
+            name: "webkit",
+            use: {
+              ...devices["Desktop Safari"],
+              storageState: ".auth/user.json",
+            },
+            dependencies: ["setup"],
+          },
+        ]
+      : []),
 
     /* Test against mobile viewports. */
     // {
