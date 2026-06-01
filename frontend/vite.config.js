@@ -60,9 +60,19 @@ export default defineConfig(({ mode }) => {
       proxy: {
         "/api": `http://${env.VITE_SERVER_BACKEND || "localhost"}:8080`,
       },
+      warmup: {
+        clientFiles: [
+          `./${root}/index.tsx`,
+          `./${root}/src/App.tsx`,
+        ],
+      },
     },
     preview: {
-      port: 3001,
+      host: "0.0.0.0",
+      port: 3000,
+      proxy: {
+        "/api": `http://${env.VITE_SERVER_BACKEND || "localhost"}:8080`,
+      },
     },
   };
 });

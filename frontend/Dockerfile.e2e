@@ -1,0 +1,35 @@
+# E2E Dockerfile: builds the frontend bundle and serves it with vite preview.
+# This eliminates Vite v8/Rolldown cold dep-bundling on first request,
+# which caused startup race conditions in CI e2e runs.
+
+FROM node:22-alpine AS build
+
+WORKDIR /usr/src/app
+
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm \
+  npm set cache /root/.npm && \
+  npm ci
+
+# Copy source and build for the e2e team (tovoheren4).
+# The vite root is src/main/react; --outDir dist puts output at src/main/react/dist.
+COPY . .
+RUN npx vite build --mode tovoheren4 --outDir dist --emptyOutDir
+
+# ---
+
+FROM node:22-alpine AS preview
+
+WORKDIR /usr/src/app
+
+# Copy node_modules (for the vite binary), config, and built assets.
+# The built assets land in src/main/react/dist (relative to vite root).
+COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/package.json ./package.json
+COPY --from=build /usr/src/app/vite.config.js ./vite.config.js
+COPY --from=build /usr/src/app/src/main/react ./src/main/react
+
+# Serve with vite preview. --outDir matches the build step above.
+# --host exposes the server on all interfaces so Docker port mapping works.
+CMD ["node_modules/.bin/vite", "preview", "--outDir", "dist", "--host", "0.0.0.0"]
