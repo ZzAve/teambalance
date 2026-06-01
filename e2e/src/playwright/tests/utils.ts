@@ -71,6 +71,12 @@ export const addDays = (date: Date, days: number): Date => {
  *   the picker auto-advances to the clock view → select the hour → select
  *   the minute → confirm with OK.
  *
+ * DOM evidence (trace from run 26754228619):
+ *   MUI X v7 MobileDateTimePicker renders a MuiTextField with a <LABEL for=":rXX:">
+ *   "Datum / tijd" and a readonly <INPUT aria-label="Choose date, selected date is …">.
+ *   There is NO role="group". page.getByLabel("Datum / tijd") resolves to the input
+ *   via the label's `for` attribute; clicking it opens the picker dialog.
+ *
  * The calendar renders day cells as buttons with aria-label "DD MMMM YYYY"
  * (nl locale via dayjs). The clock renders hour/minute cells similarly.
  * minutesStep={15} means only 0, 15, 30, 45 are shown.
@@ -79,10 +85,11 @@ export async function pickDateTime(
   page: import("@playwright/test").Page,
   date: Date,
 ): Promise<void> {
-  // Open the picker – the field group is labelled "Datum / tijd".
-  const fieldGroup = page.getByRole("group", { name: "Datum / tijd" });
-  await fieldGroup.waitFor({ state: "visible" });
-  await fieldGroup.click();
+  // Open the picker – MUI X v7 renders a labelled text field (no role="group").
+  // getByLabel resolves via <label for="…"> to the readonly input, clicking opens the dialog.
+  const field = page.getByLabel("Datum / tijd");
+  await field.waitFor({ state: "visible" });
+  await field.click();
 
   const dialog = page.getByRole("dialog");
   await dialog.waitFor({ state: "visible" });
