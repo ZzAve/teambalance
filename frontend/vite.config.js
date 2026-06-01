@@ -62,8 +62,8 @@ export default defineConfig(({ mode }) => {
       },
       warmup: {
         clientFiles: [
-          `./${root}/index.tsx`,
-          `./${root}/src/App.tsx`,
+          `./index.tsx`,
+          `./src/App.tsx`,
         ],
       },
     },
