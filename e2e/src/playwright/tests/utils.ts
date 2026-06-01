@@ -65,37 +65,112 @@ export const addDays = (date: Date, days: number): Date => {
 /**
  * Pick a date+time in the MUI MobileDateTimePicker dialog.
  *
- * Strategy: open dialog → switch to text-input view (pen icon) →
- *           type digits into the single combined field → confirm with OK.
+ * Strategy (MUI X v7 / @mui/x-date-pickers v7):
+ *   The v5 "switch to text input" toggle (pencil icon) was removed in v7.
+ *   Instead we open the dialog → select the day on the calendar →
+ *   the picker auto-advances to the clock view → select the hour → select
+ *   the minute → confirm with OK.
  *
- * MUI v5 keyboard mode renders ONE combined input (nl locale: dd-mm-yyyy hh:mm).
- * The masked input auto-inserts separators when given digit-only input.
+ * The calendar renders day cells as buttons with aria-label "DD MMMM YYYY"
+ * (nl locale via dayjs). The clock renders hour/minute cells similarly.
+ * minutesStep={15} means only 0, 15, 30, 45 are shown.
  */
 export async function pickDateTime(
   page: import("@playwright/test").Page,
   date: Date,
 ): Promise<void> {
-  const dateInput = page.getByRole("textbox", { name: /Choose date/ });
-  await dateInput.waitFor({ state: "visible" });
-  await dateInput.click();
+  // Open the picker – the field group is labelled "Datum / tijd".
+  const fieldGroup = page.getByRole("group", { name: "Datum / tijd" });
+  await fieldGroup.waitFor({ state: "visible" });
+  await fieldGroup.click();
 
   const dialog = page.getByRole("dialog");
   await dialog.waitFor({ state: "visible" });
 
-  // Switch to text-input view
-  const textInputToggle = dialog.getByRole("button", { name: /text input/i });
-  await textInputToggle.click();
+  // --- Calendar view: navigate to the correct month if needed, then click day ---
+  // The "previous month" / "next month" buttons let us navigate.
+  // MUI renders the calendar title as a button like "juni 2025".
+  const targetYear = date.getFullYear();
+  const targetMonth = date.getMonth(); // 0-based
 
-  // MUI v5 keyboard mode: ONE combined date-time input (nl locale, 24h).
-  // Type digits only — the mask auto-inserts separators.
-  const pad2 = (n: number) => String(n).padStart(2, "0");
-  const digits = `${pad2(date.getDate())}${pad2(date.getMonth() + 1)}${date.getFullYear()}${pad2(date.getHours())}${pad2(date.getMinutes())}`;
+  for (let attempts = 0; attempts < 24; attempts++) {
+    // Read the current month/year label (e.g. "juni 2025")
+    const titleButton = dialog.locator(
+      '[class*="calendarHeader"] button, [class*="CalendarHeader"] button',
+    );
+    const titleText = await titleButton.first().textContent();
+    if (!titleText) break;
 
-  const combinedInput = dialog.getByRole("textbox", { name: "Datum / tijd" });
-  await combinedInput.waitFor({ state: "visible" });
-  await combinedInput.click();
-  await combinedInput.fill(digits);
+    // Parse month index from Dutch month name
+    const nlMonths = [
+      "januari",
+      "februari",
+      "maart",
+      "april",
+      "mei",
+      "juni",
+      "juli",
+      "augustus",
+      "september",
+      "oktober",
+      "november",
+      "december",
+    ];
+    const lowerTitle = titleText.toLowerCase();
+    const displayedMonthIndex = nlMonths.findIndex((m) =>
+      lowerTitle.includes(m),
+    );
+    const displayedYearMatch = titleText.match(/\d{4}/);
+    const displayedYear = displayedYearMatch
+      ? parseInt(displayedYearMatch[0], 10)
+      : targetYear;
 
+    const monthDiff =
+      (targetYear - displayedYear) * 12 + (targetMonth - displayedMonthIndex);
+
+    if (monthDiff === 0) break;
+
+    // Click previous or next month arrow
+    if (monthDiff > 0) {
+      await dialog
+        .getByRole("button", { name: /next month|volgende maand/i })
+        .click();
+    } else {
+      await dialog
+        .getByRole("button", { name: /previous month|vorige maand/i })
+        .click();
+    }
+  }
+
+  // Click the target day cell — aria-label is locale-formatted, e.g. "15 juni 2025"
+  const nlMonthNames = [
+    "januari",
+    "februari",
+    "maart",
+    "april",
+    "mei",
+    "juni",
+    "juli",
+    "augustus",
+    "september",
+    "oktober",
+    "november",
+    "december",
+  ];
+  const dayLabel = `${date.getDate()} ${nlMonthNames[targetMonth]} ${targetYear}`;
+  await dialog.getByRole("gridcell", { name: dayLabel, exact: true }).click();
+
+  // --- Clock view: select hour ---
+  await dialog
+    .getByRole("option", { name: `${date.getHours()} hours` })
+    .click();
+
+  // --- Clock view: select minute ---
+  await dialog
+    .getByRole("option", { name: `${date.getMinutes()} minutes` })
+    .click();
+
+  // --- Confirm ---
   await dialog.getByRole("button", { name: "OK", exact: true }).click();
   await dialog.waitFor({ state: "hidden" });
 }
