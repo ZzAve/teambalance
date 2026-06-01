@@ -25,11 +25,10 @@ services:
 
 
   frontend:
-    image: teambalance/frontend
+    image: teambalance/frontend-e2e
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-    command: npm start
+      dockerfile: Dockerfile.e2e
     depends_on:
       backend:
         condition: service_healthy
@@ -37,19 +36,15 @@ services:
       - "3000:3000"
     environment:
       VITE_SERVER_BACKEND: backend
-    volumes:
-      - ./frontend:/usr/src/app
-      - /usr/src/app/node_modules
     healthcheck:
-      # Use a real GET (not --spider/HEAD) so Vite actually compiles the JS entry
-      # point during the healthcheck. Without this, the first browser request from
-      # the e2e container triggers a cold Vite compilation that takes >60 s.
-      test: ["CMD", "sh", "-c", "wget -qO- http://127.0.0.1:3000/ > /dev/null && wget -qO- http://127.0.0.1:3000/index.tsx > /dev/null"]
-      interval: 30s
-      timeout: 90s
-      start_period: 30s
-      start_interval: 5s
-      retries: 5
+      # vite preview serves pre-built static assets — no compilation on first request,
+      # so a fast HEAD check is sufficient.
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/"]
+      interval: 5s
+      timeout: 5s
+      start_period: 10s
+      start_interval: 2s
+      retries: 10
 
   postgresql:
     image: postgres:16.13-alpine
