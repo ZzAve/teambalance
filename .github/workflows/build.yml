@@ -84,7 +84,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: E2E tests
-        run: make e2e  || (docker compose logs frontend && exit 1)
+        run: make e2e  || (docker compose logs frontend; docker compose logs backend; exit 1)
         env:
           CI: true
 
