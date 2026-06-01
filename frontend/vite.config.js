@@ -30,24 +30,13 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
     },
     resolve: {
-      alias: {
+      alias: [
         // @mui/icons-material ships both CJS (default) and ESM (esm/) builds.
         // Vite 8 (Rolldown) does not apply __esModule interop the same way
         // esbuild does, so default imports from the CJS paths resolve to the
         // module namespace object instead of the component — crashing React.
         // Point the alias at the pre-built ESM subtree to avoid the issue.
-        "@mui/icons-material": muiIconsEsm,
-      },
-    },
-    plugins: [
-      visualizer(),
-      react({
-        // Use React plugin in all *.jsx and *.tsx files
-        include: "**/*.{jsx,tsx}",
-      }),
-    ],
-    resolve: {
-      alias: [
+        { find: "@mui/icons-material", replacement: muiIconsEsm },
         // Vite 8 no longer auto-interops CJS deep imports; redirect MUI icon
         // deep imports to their ESM equivalents to avoid "got: object" errors.
         {
@@ -56,6 +45,13 @@ export default defineConfig(({ mode }) => {
         },
       ],
     },
+    plugins: [
+      visualizer(),
+      react({
+        // Use React plugin in all *.jsx and *.tsx files
+        include: "**/*.{jsx,tsx}",
+      }),
+    ],
     server: {
       host: "0.0.0.0",
       port: 3000,
