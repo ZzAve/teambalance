@@ -1,4 +1,4 @@
-import { APIRequestContext } from "@playwright/test";
+import { APIRequestContext, expect } from "@playwright/test";
 
 export const ensure = <T>(
   value: T | undefined,
@@ -63,94 +63,38 @@ export const addDays = (date: Date, days: number): Date => {
 };
 
 /**
- * Pick a date+time in the MUI MobileDateTimePicker dialog.
+ * Pick a date+time in the MUI X v7 MobileDateTimePicker dialog.
  *
- * Strategy (MUI X v7 / @mui/x-date-pickers v7):
- *   The v5 "switch to text input" toggle (pencil icon) was removed in v7.
- *   Instead we open the dialog → select the day on the calendar →
- *   the picker auto-advances to the clock view → select the hour → select
- *   the minute → confirm with OK.
+ * The readonly input's accessible name is an auto-generated aria-label
+ * ("Choose date, selected date is …") which overrides the visible <label>,
+ * so getByLabel("Datum / tijd") matches nothing. Target the stable placeholder.
  *
- * DOM evidence (trace from run 26754228619):
- *   MUI X v7 MobileDateTimePicker renders a MuiTextField with a <LABEL for=":rXX:">
- *   "Datum / tijd" and a readonly <INPUT aria-label="Choose date, selected date is …">.
- *   There is NO role="group". page.getByLabel("Datum / tijd") resolves to the input
- *   via the label's `for` attribute; clicking it opens the picker dialog.
+ * Flow: click field → dialog opens on the "pick date" tab → navigate month →
+ * click the day (auto-advances to the "pick time" tab, hours view) → pick hour
+ * (auto-advances to minutes) → pick minute → OK.
  *
- * The calendar renders day cells as buttons with aria-label "DD MMMM YYYY"
- * (nl locale via dayjs). The clock renders hour/minute cells similarly.
- * minutesStep={15} means only 0, 15, 30, 45 are shown.
+ * The time view is an analog clock: a transparent MuiClock-squareMask overlay
+ * intercepts pointer events, so clock numbers must be clicked with { force: true }.
+ * Clock numbers expose role="option" with aria-labels: hours "0" → "00 hours",
+ * otherwise "<h> hours"; minutes are zero-padded, e.g. "00 minutes", "30 minutes".
+ * The field uses minutesStep={15}, so the target minute is rounded to the nearest
+ * 15-min step (no test asserts the exact time — only the unique comment/title).
  */
 export async function pickDateTime(
   page: import("@playwright/test").Page,
   date: Date,
 ): Promise<void> {
-  // Open the picker – MUI X v7 renders a labelled text field (no role="group").
-  // getByLabel resolves via <label for="…"> to the readonly input, clicking opens the dialog.
-  const field = page.getByLabel("Datum / tijd");
+  const field = page.getByPlaceholder("DD-MM-YYYY hh:mm");
   await field.waitFor({ state: "visible" });
   await field.click();
 
   const dialog = page.getByRole("dialog");
   await dialog.waitFor({ state: "visible" });
 
-  // --- Calendar view: navigate to the correct month if needed, then click day ---
-  // The "previous month" / "next month" buttons let us navigate.
-  // MUI renders the calendar title as a button like "juni 2025".
+  // --- Pick date tab: navigate to the correct month, then click the day ---
   const targetYear = date.getFullYear();
   const targetMonth = date.getMonth(); // 0-based
-
-  for (let attempts = 0; attempts < 24; attempts++) {
-    // Read the current month/year label (e.g. "juni 2025")
-    const titleButton = dialog.locator(
-      '[class*="calendarHeader"] button, [class*="CalendarHeader"] button',
-    );
-    const titleText = await titleButton.first().textContent();
-    if (!titleText) break;
-
-    // Parse month index from Dutch month name
-    const nlMonths = [
-      "januari",
-      "februari",
-      "maart",
-      "april",
-      "mei",
-      "juni",
-      "juli",
-      "augustus",
-      "september",
-      "oktober",
-      "november",
-      "december",
-    ];
-    const lowerTitle = titleText.toLowerCase();
-    const displayedMonthIndex = nlMonths.findIndex((m) =>
-      lowerTitle.includes(m),
-    );
-    const displayedYearMatch = titleText.match(/\d{4}/);
-    const displayedYear = displayedYearMatch
-      ? parseInt(displayedYearMatch[0], 10)
-      : targetYear;
-
-    const monthDiff =
-      (targetYear - displayedYear) * 12 + (targetMonth - displayedMonthIndex);
-
-    if (monthDiff === 0) break;
-
-    // Click previous or next month arrow
-    if (monthDiff > 0) {
-      await dialog
-        .getByRole("button", { name: /next month|volgende maand/i })
-        .click();
-    } else {
-      await dialog
-        .getByRole("button", { name: /previous month|vorige maand/i })
-        .click();
-    }
-  }
-
-  // Click the target day cell — aria-label is locale-formatted, e.g. "15 juni 2025"
-  const nlMonthNames = [
+  const nlMonths = [
     "januari",
     "februari",
     "maart",
@@ -164,18 +108,58 @@ export async function pickDateTime(
     "november",
     "december",
   ];
-  const dayLabel = `${date.getDate()} ${nlMonthNames[targetMonth]} ${targetYear}`;
-  await dialog.getByRole("gridcell", { name: dayLabel, exact: true }).click();
 
-  // --- Clock view: select hour ---
-  await dialog
-    .getByRole("option", { name: `${date.getHours()} hours` })
-    .click();
+  for (let attempts = 0; attempts < 24; attempts++) {
+    // The month/year label (e.g. "juni 2026") lives in its own element; the only
+    // button in the header is the year-view toggle, so read the label text.
+    const label = dialog
+      .locator('[class*="PickersCalendarHeader-label"]')
+      .first();
+    const titleText = (await label.textContent())?.toLowerCase() ?? "";
+    const displayedMonthIndex = nlMonths.findIndex((m) =>
+      titleText.includes(m),
+    );
+    const displayedYearMatch = titleText.match(/\d{4}/);
+    const displayedYear = displayedYearMatch
+      ? parseInt(displayedYearMatch[0], 10)
+      : targetYear;
 
-  // --- Clock view: select minute ---
-  await dialog
-    .getByRole("option", { name: `${date.getMinutes()} minutes` })
-    .click();
+    const monthDiff =
+      (targetYear - displayedYear) * 12 + (targetMonth - displayedMonthIndex);
+    if (monthDiff === 0) break;
+
+    await dialog
+      .getByRole("button", {
+        name:
+          monthDiff > 0
+            ? /next month|volgende maand/i
+            : /previous month|vorige maand/i,
+      })
+      .click();
+  }
+
+  // Day cells are named by day number only (e.g. "15"). Rapidly clicking the
+  // month-nav arrow stacks several month slides in the DOM (MUI's slide
+  // transition mounts entering + exiting months), so the same day-number can
+  // briefly resolve to multiple cells. Wait for the transitions to settle to a
+  // single match before clicking. Selecting a day auto-advances to the time tab.
+  const dayCell = dialog.getByRole("gridcell", {
+    name: String(date.getDate()),
+    exact: true,
+  });
+  await expect(dayCell).toHaveCount(1);
+  await dayCell.click();
+
+  // --- Pick time tab (analog clock) ---
+  await dialog.getByRole("tab", { name: "pick time" }).click();
+
+  const hourLabel =
+    date.getHours() === 0 ? "00 hours" : `${date.getHours()} hours`;
+  await dialog.locator(`[aria-label="${hourLabel}"]`).click({ force: true });
+
+  const steppedMinute = Math.min(45, Math.round(date.getMinutes() / 15) * 15);
+  const minuteLabel = `${String(steppedMinute).padStart(2, "0")} minutes`;
+  await dialog.locator(`[aria-label="${minuteLabel}"]`).click({ force: true });
 
   // --- Confirm ---
   await dialog.getByRole("button", { name: "OK", exact: true }).click();
