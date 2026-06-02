@@ -85,20 +85,24 @@ Never proceed with a broken build.
 
 **`[ci]` Worker Decision Tree:**
 
-When dispatching a `[ci]` task, instruct the worker to follow these steps in order:
+**Bounded-check rule (CRITICAL — avoids killed background workers):** A `[ci]` worker must take ONE short action and return (target < 2 min). It must NEVER sit and watch CI (`gh ... --watch`, or "wait N minutes × M retries"). Long watches get killed by socket timeout (~45 min) and burn the worker for nothing. **Waiting between checks is the ORCHESTRATOR's job, not the worker's:** when CI is still pending, the worker returns `STATUS: blocked (still pending)`, and the orchestrator schedules a re-check next round via `ScheduleWakeup` (~300–600s). Only dispatch a `[ci]` worker once there is something actionable to do.
 
-1. Run `gh pr checks <number>` to see current status
+When dispatching a `[ci]` task, instruct the worker to follow these steps in order, then return immediately:
+
+1. Run `gh pr checks <number>` ONCE to see current status
 2. Run `gh pr view <number> --comments` to check for review comments that need addressing
 3. If **review comments exist and are unresolved**: report `STATUS: blocked`, list the comments in NOTES
-4. If **all checks pending**: wait 2 minutes, re-check (up to 3 retries; if still pending after 3 retries → `STATUS: blocked`)
+4. If **checks still pending/in-progress**: at most ONE short bounded wait (≤90s) and re-read once; if still not terminal → report `STATUS: blocked` with `NOTES: "CI still pending on run <id>"`. Do NOT keep looping — the orchestrator re-checks next round.
 5. If **checks failed**: check if failure matches a *known blocker* listed in the task Context
    - If yes → report `STATUS: blocked` immediately with the known blocker name
-   - If no → investigate the new failure; dispatch a fix worker; re-run CI validation after fix
+   - If no → pull the failing log once (`gh run view <id> --log-failed`), summarize the real cause, report `STATUS: blocked` with specifics; the orchestrator dispatches a fix worker (the worker does not fix it itself)
 6. If **all checks pass and no unresolved comments**: merge PR
    ```bash
-   gh pr merge <number> --squash --auto
+   gh pr merge <number> --squash
    ```
 7. Add a note to the handover: "PR #<number> merged — <branch>"
+
+**Orchestrator polling pattern (replaces worker long-watches):** At the top of each round the orchestrator may directly run `gh pr checks <number>` (a single read) to see if an in-flight PR has reached a terminal state. If still pending → do other eligible work, then `ScheduleWakeup` (~300–600s) and re-check next round. If terminal (pass/fail) → dispatch a single bounded `[ci]` worker to merge or to diagnose+report. This keeps all waiting at the round boundary, where it is cheap and cannot kill a worker.
 
 **`[ci]` Escalation Rule (max retries):**
 
@@ -799,11 +803,14 @@ Active PRs:
 - Run `git worktree list`, `git worktree add`, `git worktree remove` — worktree lifecycle (step 9.5)
 - Run `gh pr create` — PR creation per completed worktree (MR Creation section)
 
+**Allowed at a round boundary (single read, not monitoring):**
+- Run `gh pr checks <number>` ONCE to decide whether to dispatch a `[ci]` worker (merge/diagnose) or `ScheduleWakeup` and re-check next round.
+
 **Do NOT directly:**
 - Read code files (`.kt`, `.tsx`, `.ts`, `.sql`, etc.) — delegate to workers
 - Analyze test output — workers return structured summaries
 - Run detailed git commands (diff, log, status on feature branches) — workers report commit SHAs
-- Run `gh pr checks`, `gh run view`, `gh run list`, `gh pr view --comments` — CI monitoring belongs inside `[ci]` workers, never run by the orchestrator directly
+- Run `gh run view --log`, `gh pr view --comments`, or any iterative CI watch/poll loop — deep log analysis and merging belong inside a bounded `[ci]` worker. Never sit in a watch loop (it gets killed by socket timeout). The single `gh pr checks` read above is the only direct CI touch allowed.
 
 # Context Window Hygiene
 

@@ -185,22 +185,23 @@ You are a focused worker agent in the TeamBalance orchestrate system. Your job i
   2. Report as usual with commit SHA, tests, build status
 
 ## [ci]
-- **Goal:** Monitor PR CI status, validate review comments, rebase/merge when green
+- **Goal:** Take ONE bounded action on a PR's CI, then return. **Never sit and watch.**
 - **No code changes** (unless a trivial rebase conflict must be resolved)
-- **Actions — follow in order:**
-  1. Run `gh pr checks <number>` to see current status
-  2. Run `gh pr view <number> --comments` to check for unresolved review comments
-  3. If **unresolved review comments exist**: report `STATUS: blocked`, list comments in NOTES
-  4. If **all checks pending**: wait 2 minutes, re-check (up to 3 retries; still pending → `STATUS: blocked`)
-  5. If **checks failed**: check if failure matches a known blocker in task Context
-     - If yes → `STATUS: blocked` with blocker name
-     - If no → investigate; dispatch mental fix plan; report `STATUS: blocked` with details for orchestrator
-  6. If **all checks pass and no unresolved comments**: merge PR
+- **CRITICAL — do NOT long-poll.** A `[ci]` worker must finish in a single short check (target < 2 min, hard cap ~5 min). Do NOT use `gh ... --watch`, do NOT loop "wait N minutes and re-check". Long watches get killed by socket timeout and waste the worker. The **orchestrator** is responsible for waiting between rounds (via ScheduleWakeup) and only dispatches you once there is something to act on.
+- **Actions — follow in order, then return immediately:**
+  1. Run `gh pr checks <number>` ONCE to read current status.
+  2. Run `gh pr view <number> --comments` to check for unresolved review comments.
+  3. If **unresolved review comments exist**: report `STATUS: blocked`, list comments in NOTES.
+  4. If **checks still PENDING/QUEUED/IN_PROGRESS**: do a single short bounded wait at most (≤90s) and re-read ONCE. If still not terminal → report `STATUS: blocked` with `NOTES: "CI still pending on run <id>; orchestrator should re-check next round"`. Do NOT keep looping.
+  5. If **checks FAILED**: check if it matches a known blocker in task Context.
+     - If yes → `STATUS: blocked` with the blocker name.
+     - If no → pull the failing log ONCE (`gh run view <id> --log-failed`), summarize the real cause, and report `STATUS: blocked` with specifics for the orchestrator to dispatch a fix. Do NOT attempt the fix yourself.
+  6. If **all checks PASS and no unresolved comments**: merge PR
      ```bash
-     gh pr merge <number> --squash --auto
+     gh pr merge <number> --squash
      ```
-  7. Report merge confirmation in NOTES
-- **Report:** PR number, check status, merge outcome or blocker reason
+  7. Report merge confirmation (and merge SHA) in NOTES.
+- **Report:** PR number, terminal check status (or "still pending"), merge outcome or precise blocker reason.
 
 # File Boundaries
 
