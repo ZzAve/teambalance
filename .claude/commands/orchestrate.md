@@ -102,15 +102,21 @@ When dispatching a `[ci]` task, instruct the worker to follow these steps in ord
    ```
 7. Add a note to the handover: "PR #<number> merged — <branch>"
 
+**Diagnose-before-retry (CRITICAL — no blind re-runs):** NEVER re-trigger / re-run CI on a "probably flaky" hunch. A "flaky" classification is only valid with **evidence**: the SAME failure signature observed on `master` (or another known-good ref) AND a prior passing run of the same suite — cite both. Absent that evidence, you MUST `gh run view <id> --log-failed` and classify the real cause before any re-run. A re-run without a cited flaky-justification is a process violation. Record the failure signature in the task file's Failure Ledger (see Task Context Files) so the next round does not re-diagnose from scratch.
+
 **Orchestrator polling pattern (replaces worker long-watches):** At the top of each round the orchestrator may directly run `gh pr checks <number>` (a single read) to see if an in-flight PR has reached a terminal state. If still pending → do other eligible work, then `ScheduleWakeup` (~300–600s) and re-check next round. If terminal (pass/fail) → dispatch a single bounded `[ci]` worker to merge or to diagnose+report. This keeps all waiting at the round boundary, where it is cheap and cannot kill a worker.
 
-**`[ci]` Escalation Rule (max retries):**
+**`[ci]` Escalation Rule (HARD STOP — max retries):**
 
-If a `[ci]` task has returned `STATUS: blocked` 3 or more times across rounds (check handover history),
-the orchestrator must escalate to the user rather than re-dispatching. Present:
+If the **same PR** has reached `STATUS: blocked` on CI **3 times across rounds** (count from the task file's Failure Ledger / handover history), the orchestrator MUST stop and escalate to the user — it may NOT dispatch a 4th fix/retry attempt on that PR. This is a hard stop, not a preference. After 2 blocks on one PR, treat the 3rd as the final attempt and prepare to escalate.
+
+Escalate by presenting:
 - PR number and URL
-- All known blockers from previous rounds
-- Ask user what action to take (close PR, fix blocker, override)
+- The **Failure Ledger**: each distinct failure signature seen, the cause ruled in/out, and what was tried
+- A recommendation (fix-the-cause / admin-merge / pause / close) with tradeoffs
+- Ask the user what action to take
+
+Rationale: blind repetition past 3 attempts is how a single PR consumed many rounds of CI time. The ledger makes the escalation concrete instead of "it keeps failing."
 
 # Hierarchical Tasks
 
@@ -155,6 +161,9 @@ Every parent task gets a persistent context file at `.orchestration/tasks/<slug>
 ## Intent
 <parent Context field, verbatim>
 
+## Definition of Done
+<concrete, verifiable success criteria + the EXACT command(s) that prove it, e.g. "PR #NNN merged to master" / "`make build` green" / "e2e suite passes in CI run". Avoid vague "make it work".>
+
 ## Subtasks
 - [ ] <subtask 1 name>
 - [ ] <subtask 2 name>
@@ -162,6 +171,9 @@ Every parent task gets a persistent context file at `.orchestration/tasks/<slug>
 
 ## Decisions Log
 (Appended by each worker)
+
+## Failure Ledger
+(Append-only. Each distinct failure signature seen, its diagnosed/ruled-out cause, and what was tried. Prevents re-diagnosing the same failure from scratch each round. Format: `- <date>: <signature> → <cause / ruled-out> → <action taken>`)
 
 ## Current State
 (Overwritten by each worker)
@@ -656,6 +668,22 @@ Create `.orchestration/handover/YYYY-MM-DD-HH-MM-round-N.md`:
 - {{if plan was approved: Ready to execute [taskname]}}
 - {{if worktree ready: Create MR for [worktree-name]}}
 ```
+
+### 15.5. SELF-REFLECTION (MANDATORY after any handover request)
+
+**Trigger:** Whenever the user requests a handover (e.g. "prepare for handover"), or a final/end-of-session handover is written, the orchestrator MUST immediately follow the handover with a self-reflection. This is not optional and is not skippable — writing the handover is no longer the last step; the reflection is.
+
+Produce, in the response (not a file unless asked):
+
+1. **3 things that worked well** this session — concrete, with the specific evidence/example.
+2. **3 things that did NOT work well** — concrete, naming the actual failure (wasted rounds, misdiagnosis, blind retries, killed workers, etc.). Be candid, not performative.
+3. **Improvement suggestions**, each explicitly scoped to WHERE the change lands:
+   - the **orchestrate workflow** (`.claude/commands/orchestrate*.md`),
+   - the way **task/spec files** are created, or
+   - **CLAUDE.md / standing instructions** at your disposal.
+4. End by asking the user which suggestions to action (do not self-apply config/instruction changes without consent).
+
+Keep it tight and honest — the goal is cumulative process improvement, not a status recap (the handover already covered status).
 
 ### 16. INCREMENT ROUND
 
