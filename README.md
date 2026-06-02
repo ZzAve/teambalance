@@ -1,254 +1,132 @@
 <div align="center">
     <h1>teambalance</h1>
     <img src="./frontend/src/main/react/images/logo512.png" width="200px" alt="Boy throwing a volleyball"/>
-    <p>A pet project to monitor event attendance ✅, and team expenses 💸 on beer 🍻 and borrels 🍸🍟</p>
+    <p>Sports team management: event attendance and a shared money pool (Bunq integration)</p>
 </div>
 
 ## What it does
 
-Teambalance allows groups of people that meet regularly (such as sports team) to plan their events' attendance, and have
-a shared wallet, or 'pot' in Dutch to pay for expenses around those events. go out together often to have a kind of
-shared wallet or 'pot' in Dutch. With everybody being able to chip in and see what transactions went out, it allows the
-bills to be paid from a single bank account.
-
-As it is becoming more uncommon to use cash, and bars and clubs allow card payments more often, the need for a digital
-money pool is becoming more and more apparent.
-
-Team balance started off a hobby project and technology explorer (see setup).
-
-### Use case
-
-[Tovo](https://tovo.nl/) is a Utrecht based Volleybal club, consisting of many. The teams have a training on a weekly
-basis, and play a competion is a poule of 11, meaning they'll play 20 matches per year. What's more, there are some
-other (obligatory) events for the team to meet. During events (most notably the matches), members meet in the canteen of
-the sports hall before and after the match for some drinks.
-
-As everybody in the team has a role, e.g. outside hitter, libero and setter. For each event, each position should be
-filled, and keeping track of attendance beforehand makes it easy to spot when substitutes from other teams are needed.
-
-<!-- attendence overview -->
-
-Oftentimes, canteen allow teams to have a tab, which they can pay at once afterwards. To not have one member having to
-pay the whole bill it would be nice to have a money pool everyone can contribute towards. As a cashless option is
-preferred, and payments are often done with a debit card (in the Netherlands), a dedicated bank account for the team
-would be a good way to solve it, if and only if all members would be able to send money at any point in time to the
-account, and, of course, there is a basis of trust towards the owner of said account.
-
-## Comparable solutions:
-
-(this list is probably never complete)
-
-As far as I am aware, there are currently (2022) no solutions that offer both event planning / attendance tracking as
-well as money pool solutions.
-
-The event and attendance planning aspect:
-
-1. [Datumprikker](https://datumprikker.nl/)
-   1. Allows you to, in great detail plan (recursive) events and keep track of attendance.
-   2. It does not seem to have grouping functionality (grouping members to a 'hitters' or 'keepers' pool or something)
-   3. It does not seem to offer an API to allow it to be integrated into other solutions
-2. [voetbal.nl](https://www.voetbal.nl/aanwezigheid)
-   1. Limited to, well, football
-3. more...
-
-The money pool aspect:
-
-1. [Paypal's money pools](https://www.paypal.com/uk/webapps/mpp/money-pools):
-   1. More targeted towards reaching a certain goals (in terms of $), to be able to buy something.
-2. [Tikkie](https://www.tikkie.me/)
-   1. Tikkie allows you to pay people upon request. Unfortunately there's no way of creating a money pool up front that
-      allows to centralize spending. Decentralised spending is a nice, but different approach, teambalance doesn't aim
-      for.
-   2. Tikkie's concept of payment requests is used by teambalance. [bunq.me](https://bunq.me) is a similar concept
-      where one can own a page a allow people to pay whatever they want, and include a message.
-3. more...
-
-## Components
-
-Team balance has 2 main functional parts:
-
-- A money pool
-- (calendar)Event creation and moderation
-
-### 🔌 Money pool through Bunq 🌈 API integration
-
-There is an integration available with Bunq, through their [`sdk_java`](https://github.com/bunq/sdk_java).
-
-This shows everything you'd expect from a money pool:
-
-- Current balance
-- Transaction history
-- most / least contributors to the money pool
-
-<div align="center">
-<img alt="Bunq balance" src="./bunq-balance-integration.jpg" />
-</div>
-
-They money pool is build an a basis of mutual trust, where there is a single bank account connected to the money pool,
-owned by one of the team members. All team member are expected to contribute fairly. There is no concept of keeping
-track of individual consumption
-
-### 📆 Events creation / moderation
-
-The Events api allows team members to register availability for upcoming events in three categories:
-
-- trainings
-- matches, and
-- other, miscellaneous events
-
-Through admin screen, events can be created, modified, deleted at any point in time.
+Teambalance helps sports teams plan event attendance and manage a shared money pool. Built for
+[Tovo Utrecht](https://tovo.nl/) volleyball club, it supports multiple teams via multitenancy
+(one team per subdomain). Members track attendance for trainings, matches, and other events, and
+chip in to a shared Bunq bank account that covers team expenses.
 
 <div align="center">
 <img alt="Events overview" width="45%" src="./teambalance-events-overview.jpg" />
 <img alt="Admin screens for events" width="45%" src="./teambalance-events-admin.jpg" />
 </div>
 
-## 🛠 Technology
+### Money pool (Bunq)
 
-Teambalance is composed of a Kotlin JVM backend, and a React frontend. Through REST APIs they are connected.
-The frontend includes an authentication flow as well to prevent nosy neighbours from peeking.
+<div align="center">
+<img alt="Bunq balance" src="./bunq-balance-integration.jpg" />
+</div>
 
-Backend app
+The money pool integrates with [bunq](https://www.bunq.com/) and shows:
 
-- Spring boot
-- Spring data (with JOOQ)
-- Spring security
-- Kotlin
+- Current balance and transaction history
+- Top contributors (Hall of Fame) and bottom contributors (Hall of Shame)
+- Top-up via bunq.me link (mobile-first)
 
-Frontend application
+## Tech stack
 
-- React
-- Typescript
-- Mui
+| Layer | Technologies |
+|-------|-------------|
+| **Backend** | Kotlin 2.x, Spring Boot 3.x, Spring Data JPA + JOOQ, Flyway, PostgreSQL, Java 21 |
+| **Frontend** | React 18, TypeScript, Vite, MUI v5, React Router v6 |
+| **API contracts** | [Wirespec](https://wirespec.dev/) — generates Kotlin + TypeScript types |
+| **Build** | Maven (`./mvnw`), multi-module |
+| **Infra (prod)** | Google Cloud Run, GCP Container Registry |
+| **Infra (local)** | Docker Compose |
+| **E2E tests** | Playwright (via Docker Compose) |
 
-Persistence
+## Prerequisites
 
-- PostgreSQL
+- Java 21+
+- Docker & Docker Compose
+- Maven (or use the `./mvnw` wrapper)
+- Add to `/etc/hosts`:
+  ```
+  127.0.0.1  4.teambalance.local
+  127.0.0.1  5.teambalance.local
+  ```
+  (Required — teambalance resolves the tenant from the subdomain)
 
-Infra
+## Quick start (local)
 
-- Jib, GCP container registry
-- Google cloud run
-
-This project makes use of `code-review-graph`. Install it using `pipx install code-review-graph`
-
-## Setup
-
-### Getting started
-
-Build everything
 ```bash
-./mvnw clean install
+# Start backend + frontend + PostgreSQL
+make run-local
+
+# Open the app
+open http://4.teambalance.local:5173
 ```
 
-To be able to run this locally there are two options:
+Seed sample data (events, users, transactions) after the backend is up:
 
-1. by using the 'dev' application profile, teambalance tries to fetch the properties from GCP, which are stored in GCP
-   secret manager. One should make sure to be connected to gcloud, and having [credentials for a service account
-   for a service account](https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login)
-2. by using the 'local' application profile, teambalances assumes one has a local postgres instance running, exposed on
-   port `54321` (note the trailing `1`), with a database named `teambalance`
-   - Hint: `docker compose up -d`
-
-> ⚠️ Attention
-> Because of the multitenant setup of teambalance, it is necessary to access teambalance through a recognised domain.
-> The ones that are set up are:
->
-> - 4.teambalance.local
-> - 5.teambalance.local
->
-> Make sure configure your local `/etc/hosts` file to map these domains to `127.0.0.1` in order to work with teambalance locally.
-> ([Both port 3000 and 8080 work for the local setup](app/src/main/resources/application-local.yml))
-
-
-### 🚀 Deploying to production:
-
-Any commit to master, use the [gcp](.github/workflows/gcp.yml) workflow to build and push a docker image to GCR.
-
-Through [google cloud console](https://console.cloud.google.com/run/0), deployments can be managed
-
-### 💾 PostgreSQL database
-
-Teambalance makes use of a PostgreSQL database that sits in the cloud
-
-Using [JOOQ](https://www.jooq.org/)
-(used to be [Spring data jpa](https://spring.io/projects/spring-data) )and [Postgres](https://www.postgresql.org/) dependency:
-
-```xml
-<dependencies>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-jooq</artifactId>
-    </dependency>
-
-    <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-    </dependency>
-</dependencies>
+```bash
+make test
+# admin UI: username=admin password=admin
+# frontend: password=teambalance
 ```
 
-Which is configured through the `spring.datasource` config properties
+## Key commands
 
-```yaml
-spring:
-  datasource:
-    username: <username>
-    password: <password>
-    url: <jdbc-url>>
+| Command | What it does |
+|---------|-------------|
+| `make build` | Full build with formatting (`./mvnw install -Pformat`) |
+| `make yolo` | Fast compile — skips tests and lint |
+| `make format` | Format code (`./mvnw process-sources -Pformat`) |
+| `make test` | Seed test data against a running local backend |
+| `make e2e` | Run Playwright e2e tests via Docker Compose |
+| `make ci` | Full CI build including SonarCloud analysis |
+| `make db` | Start PostgreSQL only |
+| `make run-local` | Start backend + frontend via Docker Compose |
+| `make run-local-backend` | Start backend only |
+| `make run-local-frontend` | Start frontend only |
+| `make clean` | Clean build artifacts and stop Docker containers |
+
+## Project layout
+
+```
+teambalance/
+├── backend/                  # Kotlin / Spring Boot service
+│   └── src/main/kotlin/nl/jvandis/teambalance/
+│       └── api/              # REST controllers, services, repos (per domain)
+├── frontend/                 # React SPA
+│   └── src/main/react/src/   # TypeScript source
+├── e2e/                      # Playwright end-to-end tests
+│   └── src/playwright/
+├── test-data/                # Spring Boot CLI — seeds sample data
+├── jooq-support/             # JOOQ code generation module
+└── compose.yml               # Docker Compose (local dev + e2e)
 ```
 
+## Domain routing
 
-## 📈 Next steps:
+| URL | Target |
+|-----|--------|
+| `teambalance.app` | Landing page |
+| `app.teambalance.app` | React SPA |
+| `api.teambalance.app` | REST API |
+| `4.teambalance.local` / `5.teambalance.local` | Local dev (two teams) |
 
-As with most projects, it's hardly ever considered finished.
+## Testing
 
-### Must have:
+- **Backend**: JUnit 5 + MockK (unit and integration tests in `backend/src/test/kotlin/`)
+- **Frontend**: No unit tests currently
+- **E2E**: Playwright — run with `make e2e`
+- **Test data**: `make test` seeds a running local backend with sample data
 
-- ~~Dec 2019 Ability to contribute to team balance~~
-- ~~Dec 2019 View latest contribution to team balance~~
-- ~~June 2020 Training overview including player availability~~
-- ~~Aug 2020 Match overview including player availability~~
-- ~~Aug 2020 Training admin screen (add/change/remove trainings)~~
-  - Allow to remove trainings
-- ~~Aug 2020 Match admin screen (add/change/remove matches)~~
-  - Allow to remove trainings
-- ~~Use polling mechanism when back-end is still down.~~
-  - Handle back-end being down better in the front-end (500's should result in a 'whoops' screen?)
-- ~~Aug 2020 Ensure training endpoint are also protected~~
-- Use 'proper' authentication mechanism.
-- Decouple front-end and back-end to seperate deployables
-- ~~Try google run~~
+## Deployment
 
-### Should have:
+Pushing to `master` triggers the [GCP workflow](.github/workflows/gcp.yml), which builds a Docker
+image with [Jib](https://github.com/GoogleContainerTools/jib) and pushes it to GCP Container
+Registry. Deployments are managed via [Google Cloud Run](https://console.cloud.google.com/run).
 
-- ~~Jan 2020 Debounce was introduced to ensure every API call takes at least 500 ms (for UX purposes). This only works
-  if a call is successful. Should also work for unsuccessful ones.~~
-- ~~October 2020 Github actions, used to deploy to Google cloud on every merge to master~~
-- ~~April 2020Stg env for testing purposes (use a different application version, but don't take all traffic ?)~~
+## Troubleshooting
 
-### Could have
-
-- ~~Oct 2020 Availabilities and agenda for non training/match events (like team uitje)~~
-- Upload receipts and tie them to payments
-- Stats on team balanc contributors
-- Link to Nevobo site with competition
-- Integration with Nevobo: Link to Nevobo team 'API': https://api.nevobo.nl/export/team/CKL7W0D/heren/1/programma.rss
-- A setup that makes it reusable for different teams as well.
-
-### Won't have:
-
-- Integration with CMS systems for customisation purposes
-
-
-## ❤️‍🩹 Troubleshooting
-### Let Intellij understand the shaded artifact from [shaded-bunq-sdk](shaded-bunq-sdk/pom.xml).
-
-Unfortunately, Intellij doesn't understand shaded artifacts ([read up on it here](https://youtrack.jetbrains.com/issue/IDEA-126596))
-
-> A better workaround seems to be:
->
-> - Right-click on shade-bug-repackaged -> pom.xml in the project view in IntelliJ,
-> - choose "Maven" -> "Ignore Projects".
-> - Then do a "Maven" -> "Reload" on the top-level pom.xml.
-> .
+- **Port already in use** — run `make clean` to stop all containers
+- **Tenant not recognised** — confirm `/etc/hosts` maps `4.teambalance.local` to `127.0.0.1`
+- **Database migration failed** — check Flyway SQL in `backend/src/main/resources/db/migration/`
+- **Build hangs on JOOQ generation** — normal; can take 1–2 minutes for large schemas
