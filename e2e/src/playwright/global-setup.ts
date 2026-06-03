@@ -13,6 +13,8 @@
  *      and schema initialization are still completing.
  *
  * In the Docker Compose network the backend is reachable as http://backend:8080.
+ * The /api/* routes require the X-Secret header (SecretFilter); "backend:8080"
+ * is a recognised tenant domain so no explicit Host override is needed.
  */
 
 const BACKEND_HOST = `http://${process.env.VITE_SERVER_BACKEND ?? "backend"}:8080`;
@@ -20,6 +22,10 @@ const BACKEND_HEALTH_URL = `${BACKEND_HOST}/internal/actuator/health`;
 const BACKEND_API_URL = `${BACKEND_HOST}/api/users`;
 const TIMEOUT_MS = 120_000;
 const POLL_INTERVAL_MS = 2_000;
+
+// The SecretFilter requires X-Secret on all /api/* routes.
+// The secret value is the base64-encoded shared secret (same as in utils.ts).
+const API_SECRET = Buffer.from("teambalance").toString("base64");
 
 async function pollUntilOk(
   url: string,
@@ -32,7 +38,10 @@ async function pollUntilOk(
   while (Date.now() < deadline) {
     try {
       const res = await fetch(url, {
-        headers: { Authorization: `Basic ${credentials}` },
+        headers: {
+          Authorization: `Basic ${credentials}`,
+          "X-Secret": API_SECRET,
+        },
         signal: AbortSignal.timeout(3_000),
       });
       if (res.ok) {
