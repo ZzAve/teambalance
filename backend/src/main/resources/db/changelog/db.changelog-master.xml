@@ -16,4 +16,5 @@
     <include file="db.changelog.2024-12-01-fix-bunq-account-configuration.xml" relativeToChangelogFile="true"/>
     <include file="db.changelog.2025-07-18-change-transaction-id-to-string.xml" relativeToChangelogFile="true"/>
     <include file="db.changelog.2026-04-11-add-start-of-season-config.xml" relativeToChangelogFile="true"/>
+    <include file="db.changelog.2026-06-03-add-event-guest-table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
