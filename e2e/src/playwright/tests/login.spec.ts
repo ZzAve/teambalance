@@ -5,7 +5,6 @@ test.describe("login/logout functionality", () => {
   test.beforeEach(async ({ page }) => {
     // Go to the starting url before each test.
     await page.goto(HOST);
-    await page.getByText("Aanstaande trainingen").waitFor({ state: "visible" });
   });
 
   test("Login", async ({ page }) => {

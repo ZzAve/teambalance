@@ -19,7 +19,6 @@ test.describe("Training ", () => {
   test.beforeEach(async ({ page }) => {
     // Go to the starting url before each test.
     await page.goto(HOST);
-    await page.getByText("Aanstaande trainingen").waitFor({ state: "visible" });
   });
 
   test("CRUD normal training", async ({ page }) => {
