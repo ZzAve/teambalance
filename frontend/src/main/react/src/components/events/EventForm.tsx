@@ -21,6 +21,7 @@ import {
 } from "../../utils/MiscEventsApiClient";
 import Typography from "@mui/material/Typography";
 import { EventUsers } from "./EventUsers";
+import { EventGuests } from "./EventGuests";
 import { useAlerts } from "../../hooks/alertsHook";
 import { LocationState } from "../utils";
 import {
@@ -485,6 +486,11 @@ export const EventForm = (props: {
             }}
           />
         </Grid>
+        <Conditional condition={!isCreateEvent}>
+          <Grid item xs={12}>
+            <EventGuests eventId={id!} />
+          </Grid>
+        </Conditional>
         <Grid
           item
           container
