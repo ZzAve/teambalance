@@ -136,7 +136,7 @@ const Overview = (props: { refresh: boolean }) => {
               <Grid size={12}>
                 <Transactions refresh={props.refresh} />
               </Grid>
-              <Grid container justifyContent="flex-end">
+              <Grid container size={12} justifyContent="flex-end">
                 <Button
                   data-testid="more-button"
                   variant="contained"
