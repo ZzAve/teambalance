@@ -20,7 +20,7 @@ export const SpinnerWithText = (props: {
   };
   return (
     <>
-      <Grid container>
+      <Grid container size={12}>
         <Grid size={12} sx={styles}>
           <CircularProgress />
         </Grid>

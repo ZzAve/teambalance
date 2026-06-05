@@ -175,7 +175,7 @@ const EventsTable = (props: {
 
   const getUpdateIcons = (props: { id: TeamBalanceId }) => (
     <Grid container spacing={1}>
-      <Grid size="grow">
+      <Grid size={12}>
         <Button
           title={`Update event ${props.id}`}
           variant="contained"
@@ -185,7 +185,7 @@ const EventsTable = (props: {
           <EditIcon />
         </Button>
       </Grid>
-      <Grid size="grow">
+      <Grid size={12}>
         <Button
           title={`Verwijder event ${props.id}`}
           variant="contained"

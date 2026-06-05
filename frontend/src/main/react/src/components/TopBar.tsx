@@ -28,7 +28,7 @@ const TopBar = (props: {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} alignItems="center" sx={{ width: "100%" }}>
           <Grid size="grow">
             <Typography variant="h6">{TENANT.title} Team balance</Typography>
           </Grid>

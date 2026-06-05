@@ -87,6 +87,7 @@ export const Potters = (props: {
       <Grid
         component="label"
         container
+        size={12}
         alignItems="center"
         spacing={1}
         justifyContent="flex-end"

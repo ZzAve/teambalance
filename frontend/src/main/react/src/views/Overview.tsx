@@ -37,7 +37,7 @@ const Overview = (props: { refresh: boolean }) => {
                   withPagination={false}
                 />
               </Grid>
-              <Grid container justifyContent="flex-end">
+              <Grid container size={12} mt={2} justifyContent="flex-end">
                 <Button
                   data-testid="more-button"
                   variant="contained"
@@ -65,7 +65,7 @@ const Overview = (props: { refresh: boolean }) => {
                   withPagination={false}
                 />
               </Grid>
-              <Grid container justifyContent="flex-end">
+              <Grid container size={12} justifyContent="flex-end">
                 <Button
                   data-testid="more-button"
                   variant="contained"
@@ -94,7 +94,7 @@ const Overview = (props: { refresh: boolean }) => {
                   withPagination={false}
                 />
               </Grid>
-              <Grid container justifyContent="flex-end">
+              <Grid container size={12} justifyContent="flex-end">
                 <Button
                   data-testid="more-button"
                   variant="contained"

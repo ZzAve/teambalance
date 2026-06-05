@@ -15,7 +15,7 @@ const PageItem = (props: {
     <>
       {!!pageTitle && <PageTitle title={pageTitle} />}
       <Grid size={{ xs, md }} data-testid={props.dataTestId}>
-        <Card>
+        <Card sx={{ px: 1 }}>
           <CardHeader title={title} />
           <CardContent sx={{ width: "100%" }}>{children}</CardContent>
         </Card>

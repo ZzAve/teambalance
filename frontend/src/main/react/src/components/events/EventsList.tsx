@@ -34,7 +34,7 @@ export const EventsList = (props: {
     setPage(page);
   };
   return (
-    <Grid container spacing={5} data-testid="event-list">
+    <Grid container spacing={4} data-testid="event-list">
       {props.events
         .slice((page - 1) * rowsPerPage, page * rowsPerPage)
         .map((it) => (
@@ -170,7 +170,7 @@ export const EventListItem = (props: {
   };
 
   return (
-    <Grid container spacing={1} data-testid="event-list-item">
+    <Grid container size={12} spacing={1} data-testid="event-list-item">
       <Conditional condition={isMiscEvent(teamEvent)}>
         <Grid size={12}>
           <Typography variant={"h6"}>
