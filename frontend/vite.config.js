@@ -1,15 +1,18 @@
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 
 import { defineConfig, loadEnv } from "vite";
 import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineConfig(({ mode }) => {
-  const require = createRequire(import.meta.url);
-  const muiIconsEsm = path.join(
-    path.dirname(require.resolve("@mui/icons-material/package.json")),
-    "esm",
+  // Resolve the ESM subtree of @mui/icons-material.
+  // We can't use require.resolve("@mui/icons-material/package.json") because
+  // the package's exports map does not include the "package.json" subpath.
+  // import.meta.resolve resolves to the ESM entry (esm/index.js), so dirname
+  // gives us the esm/ directory directly — use that as the alias target.
+  const muiIconsEsm = path.dirname(
+    fileURLToPath(import.meta.resolve("@mui/icons-material")),
   );
 
   const root = "src/main/react";
@@ -27,24 +30,13 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
     },
     resolve: {
-      alias: {
+      alias: [
         // @mui/icons-material ships both CJS (default) and ESM (esm/) builds.
         // Vite 8 (Rolldown) does not apply __esModule interop the same way
         // esbuild does, so default imports from the CJS paths resolve to the
         // module namespace object instead of the component — crashing React.
         // Point the alias at the pre-built ESM subtree to avoid the issue.
-        "@mui/icons-material": muiIconsEsm,
-      },
-    },
-    plugins: [
-      visualizer(),
-      react({
-        // Use React plugin in all *.jsx and *.tsx files
-        include: "**/*.{jsx,tsx}",
-      }),
-    ],
-    resolve: {
-      alias: [
+        { find: "@mui/icons-material", replacement: muiIconsEsm },
         // Vite 8 no longer auto-interops CJS deep imports; redirect MUI icon
         // deep imports to their ESM equivalents to avoid "got: object" errors.
         {
@@ -53,6 +45,13 @@ export default defineConfig(({ mode }) => {
         },
       ],
     },
+    plugins: [
+      visualizer(),
+      react({
+        // Use React plugin in all *.jsx and *.tsx files
+        include: "**/*.{jsx,tsx}",
+      }),
+    ],
     server: {
       host: "0.0.0.0",
       port: 3000,

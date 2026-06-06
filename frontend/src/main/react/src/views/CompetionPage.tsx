@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import {
   Button,
   Card,
@@ -30,8 +30,8 @@ const CompetitionPage = (props: { refresh: boolean }) => {
   return (
     <>
       <PageTitle title="Teamleden" />
-      <Grid item container spacing={2}>
-        <Grid container item xs={12}>
+      <Grid container spacing={2}>
+        <Grid container size={12}>
           <Button variant="contained" color="primary" onClick={navigateBack}>
             <ArrowBackIcon />
             <Typography
@@ -43,13 +43,13 @@ const CompetitionPage = (props: { refresh: boolean }) => {
           </Button>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Card>
-            <Grid container item xs={12}>
-              <Grid item xs={12} sx={{ padding: "16px" }}>
+            <Grid container size={12}>
+              <Grid size={12} sx={{ padding: "16px" }}>
                 <Typography variant="h5">Stand van de competitie</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <LoaderBoard refresh={props.refresh} />
               </Grid>
             </Grid>

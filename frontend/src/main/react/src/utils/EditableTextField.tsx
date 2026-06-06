@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import CheckIcon from "@mui/icons-material/Check";
@@ -27,8 +27,8 @@ export const EditableTextField = (props: {
     setValue(event.target.value);
   };
   return (
-    <Grid item container alignItems="center" spacing={1}>
-      <Grid item>
+    <Grid container alignItems="center" spacing={1}>
+      <Grid>
         <TextField
           value={value}
           placeholder={props.placeholder}
@@ -44,7 +44,7 @@ export const EditableTextField = (props: {
           size="small"
         />
       </Grid>
-      <Grid item>
+      <Grid>
         <IconButton onClick={submit} size="small" aria-label="Bevestig">
           <CheckIcon />
         </IconButton>

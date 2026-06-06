@@ -7,7 +7,7 @@ import { MobileDateTimePicker } from "@mui/x-date-pickers";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import { Alert } from "@mui/material";
 import PageItem from "../components/PageItem";
 import { settingsApiClient } from "../utils/SettingsApiClient";
@@ -62,11 +62,8 @@ const AdminSettings = () => {
         {successMessage && <Alert severity="success">{successMessage}</Alert>}
         {!loading && (
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="nl">
-            <Grid item>
+            <Grid>
               <MobileDateTimePicker
-                renderInput={(props) => (
-                  <TextField variant="standard" {...props} />
-                )}
                 label="Begin van het seizoen"
                 value={seasonStart}
                 onChange={(x) => {
@@ -76,7 +73,7 @@ const AdminSettings = () => {
                 minutesStep={15}
               />
             </Grid>
-            <Grid item>
+            <Grid>
               <Button
                 variant="contained"
                 color="primary"

@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import React, { useEffect, useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
@@ -117,9 +117,9 @@ export const EventUsers = (props: {
 
   return (
     <Grid container>
-      <Grid item xs={12}>
-        <Grid item container spacing={2}>
-          <Grid item xs={12}>
+      <Grid size={12}>
+        <Grid container spacing={2}>
+          <Grid size={12}>
             <FormControlLabel
               control={
                 props.controlType === "CHECKBOX" ? (
@@ -144,7 +144,7 @@ export const EventUsers = (props: {
             />
           </Grid>
           {props.users.map((it) => (
-            <Grid item key={it.id}>
+            <Grid key={it.id}>
               <FormControlLabel
                 key={it.id}
                 control={

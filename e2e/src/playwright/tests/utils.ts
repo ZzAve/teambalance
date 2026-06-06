@@ -1,4 +1,4 @@
-import { APIRequestContext } from "@playwright/test";
+import { APIRequestContext, expect } from "@playwright/test";
 
 export const ensure = <T>(
   value: T | undefined,
@@ -63,39 +63,105 @@ export const addDays = (date: Date, days: number): Date => {
 };
 
 /**
- * Pick a date+time in the MUI MobileDateTimePicker dialog.
+ * Pick a date+time in the MUI X v7 MobileDateTimePicker dialog.
  *
- * Strategy: open dialog → switch to text-input view (pen icon) →
- *           type digits into the single combined field → confirm with OK.
+ * The readonly input's accessible name is an auto-generated aria-label
+ * ("Choose date, selected date is …") which overrides the visible <label>,
+ * so getByLabel("Datum / tijd") matches nothing. Target the stable placeholder.
  *
- * MUI v5 keyboard mode renders ONE combined input (nl locale: dd-mm-yyyy hh:mm).
- * The masked input auto-inserts separators when given digit-only input.
+ * Flow: click field → dialog opens on the "pick date" tab → navigate month →
+ * click the day (auto-advances to the "pick time" tab, hours view) → pick hour
+ * (auto-advances to minutes) → pick minute → OK.
+ *
+ * The time view is an analog clock: a transparent MuiClock-squareMask overlay
+ * intercepts pointer events, so clock numbers must be clicked with { force: true }.
+ * Clock numbers expose role="option" with aria-labels: hours "0" → "00 hours",
+ * otherwise "<h> hours"; minutes are zero-padded, e.g. "00 minutes", "30 minutes".
+ * The field uses minutesStep={15}, so the target minute is rounded to the nearest
+ * 15-min step (no test asserts the exact time — only the unique comment/title).
  */
 export async function pickDateTime(
   page: import("@playwright/test").Page,
   date: Date,
 ): Promise<void> {
-  const dateInput = page.getByRole("textbox", { name: /Choose date/ });
-  await dateInput.waitFor({ state: "visible" });
-  await dateInput.click();
+  const field = page.getByPlaceholder("DD-MM-YYYY hh:mm");
+  await field.waitFor({ state: "visible" });
+  await field.click();
 
   const dialog = page.getByRole("dialog");
   await dialog.waitFor({ state: "visible" });
 
-  // Switch to text-input view
-  const textInputToggle = dialog.getByRole("button", { name: /text input/i });
-  await textInputToggle.click();
+  // --- Pick date tab: navigate to the correct month, then click the day ---
+  const targetYear = date.getFullYear();
+  const targetMonth = date.getMonth(); // 0-based
+  const nlMonths = [
+    "januari",
+    "februari",
+    "maart",
+    "april",
+    "mei",
+    "juni",
+    "juli",
+    "augustus",
+    "september",
+    "oktober",
+    "november",
+    "december",
+  ];
 
-  // MUI v5 keyboard mode: ONE combined date-time input (nl locale, 24h).
-  // Type digits only — the mask auto-inserts separators.
-  const pad2 = (n: number) => String(n).padStart(2, "0");
-  const digits = `${pad2(date.getDate())}${pad2(date.getMonth() + 1)}${date.getFullYear()}${pad2(date.getHours())}${pad2(date.getMinutes())}`;
+  for (let attempts = 0; attempts < 24; attempts++) {
+    // The month/year label (e.g. "juni 2026") lives in its own element; the only
+    // button in the header is the year-view toggle, so read the label text.
+    const label = dialog
+      .locator('[class*="PickersCalendarHeader-label"]')
+      .first();
+    const titleText = (await label.textContent())?.toLowerCase() ?? "";
+    const displayedMonthIndex = nlMonths.findIndex((m) =>
+      titleText.includes(m),
+    );
+    const displayedYearMatch = titleText.match(/\d{4}/);
+    const displayedYear = displayedYearMatch
+      ? parseInt(displayedYearMatch[0], 10)
+      : targetYear;
 
-  const combinedInput = dialog.getByRole("textbox", { name: "Datum / tijd" });
-  await combinedInput.waitFor({ state: "visible" });
-  await combinedInput.click();
-  await combinedInput.fill(digits);
+    const monthDiff =
+      (targetYear - displayedYear) * 12 + (targetMonth - displayedMonthIndex);
+    if (monthDiff === 0) break;
 
+    await dialog
+      .getByRole("button", {
+        name:
+          monthDiff > 0
+            ? /next month|volgende maand/i
+            : /previous month|vorige maand/i,
+      })
+      .click();
+  }
+
+  // Day cells are named by day number only (e.g. "15"). Rapidly clicking the
+  // month-nav arrow stacks several month slides in the DOM (MUI's slide
+  // transition mounts entering + exiting months), so the same day-number can
+  // briefly resolve to multiple cells. Wait for the transitions to settle to a
+  // single match before clicking. Selecting a day auto-advances to the time tab.
+  const dayCell = dialog.getByRole("gridcell", {
+    name: String(date.getDate()),
+    exact: true,
+  });
+  await expect(dayCell).toHaveCount(1);
+  await dayCell.click();
+
+  // --- Pick time tab (analog clock) ---
+  await dialog.getByRole("tab", { name: "pick time" }).click();
+
+  const hourLabel =
+    date.getHours() === 0 ? "00 hours" : `${date.getHours()} hours`;
+  await dialog.locator(`[aria-label="${hourLabel}"]`).click({ force: true });
+
+  const steppedMinute = Math.min(45, Math.round(date.getMinutes() / 15) * 15);
+  const minuteLabel = `${String(steppedMinute).padStart(2, "0")} minutes`;
+  await dialog.locator(`[aria-label="${minuteLabel}"]`).click({ force: true });
+
+  // --- Confirm ---
   await dialog.getByRole("button", { name: "OK", exact: true }).click();
   await dialog.waitFor({ state: "hidden" });
 }

@@ -1,5 +1,5 @@
 import { SpinnerWithText } from "./SpinnerWithText";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import React, { Dispatch, useEffect, useState } from "react";
 import Button from "@mui/material/Button";
@@ -157,7 +157,7 @@ const Attendees = (props: {
         attendees.forEach((it) => {
           const key = it.id;
           elements.push(
-            <Grid key={key} item>
+            <Grid key={key}>
               <AttendeeButton
                 size={size}
                 attendee={it}
@@ -169,13 +169,13 @@ const Attendees = (props: {
         });
 
         if (attendees.length > 0)
-          elements.push(<Grid key={type} item xs={0}></Grid>);
+          elements.push(<Grid key={type} size={0}></Grid>);
       }
     );
     return (
       <>
         <Conditional condition={showSummary}>
-          <Grid key={"total"} item xs={12}>
+          <Grid key={"total"} size={12}>
             <Button
               size={size}
               variant="outlined"
@@ -207,12 +207,12 @@ const Attendees = (props: {
   return (
     <Grid container spacing={1}>
       <Conditional condition={showExpand}>
-        <Grid key={"expand"} item>
+        <Grid key={"expand"}>
           <IconButton onClick={() => setExpanded((x) => !x)}>
             {isExpanded ? <VisibilityOffIcon /> : <VisibilityIcon />}
           </IconButton>
         </Grid>
-        <Grid item></Grid>
+        <Grid></Grid>
       </Conditional>
       <Conditional condition={isExpanded}>{showAttendee()}</Conditional>
     </Grid>
@@ -283,11 +283,11 @@ const AttendeeRefinement = (props: {
 
   const attendeeOptions = () => {
     return (
-      <Grid item container spacing={1}>
-        <Grid item>{AttendeeButton("PRESENT", <CheckIcon />, "check")}</Grid>
-        <Grid item>{AttendeeButton("ABSENT", <ClearIcon />, "close")}</Grid>
-        <Grid item>{AttendeeButton("UNCERTAIN", <HelpIcon />, "help")}</Grid>
-        <Grid item>
+      <Grid container spacing={1}>
+        <Grid>{AttendeeButton("PRESENT", <CheckIcon />, "check")}</Grid>
+        <Grid>{AttendeeButton("ABSENT", <ClearIcon />, "close")}</Grid>
+        <Grid>{AttendeeButton("UNCERTAIN", <HelpIcon />, "help")}</Grid>
+        <Grid>
           <Button
             size={props.size}
             variant="contained"
@@ -303,8 +303,8 @@ const AttendeeRefinement = (props: {
   };
 
   return (
-    <Grid container item spacing={2}>
-      <Grid item xs={12}>
+    <Grid container spacing={2}>
+      <Grid size={12}>
         <Typography>
           {getSimpleText("is_present_on_event", {
             name: props.attendee.user.name,
@@ -313,7 +313,7 @@ const AttendeeRefinement = (props: {
       </Grid>
 
       {isLoading ? (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <SpinnerWithText
             text={`updating ${props.attendee.user.name}`}
             size={"sm"}

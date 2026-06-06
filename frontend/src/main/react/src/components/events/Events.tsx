@@ -1,5 +1,5 @@
 import { SpinnerWithText } from "../SpinnerWithText";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
@@ -84,8 +84,8 @@ const Events = (props: {
 
   if (props.view === "list") {
     return (
-      <Grid item container xs={12} spacing={1}>
-        <Grid item xs={12}>
+      <Grid container size={12} spacing={1}>
+        <Grid size={12}>
           <EventsList
             eventType={props.eventType}
             events={events}
@@ -97,7 +97,7 @@ const Events = (props: {
     );
   } else if (props.view === "table") {
     return (
-      <Grid item container xs={12} spacing={1}>
+      <Grid container size={12} spacing={1}>
         <EventsTable
           eventType={props.eventType}
           events={events}
@@ -109,8 +109,8 @@ const Events = (props: {
     );
   } else {
     return (
-      <Grid item container xs={12} spacing={1}>
-        <Grid item xs={12}>
+      <Grid container size={12} spacing={1}>
+        <Grid size={12}>
           <Typography variant="h6">
             Could not view "{props.eventType}" in view '{props.view}'
           </Typography>

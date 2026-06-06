@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Balance from "../components/Balance";
 import TopUp from "../components/TopUp";
 import Potters from "../components/Potters";
@@ -19,16 +19,16 @@ const Overview = (props: { refresh: boolean }) => {
   return (
     <>
       <PageTitle title="Team Balance" withSuffix={false} />
-      <Grid container item xs={12} spacing={1} justifyContent="space-between">
-        <Grid container item xs={12} md={6} rowSpacing={2}>
+      <Grid container size={12} spacing={1} justifyContent="space-between">
+        <Grid container size={{ xs: 12, md: 6 }} rowSpacing={2}>
           <PageItem title="Aanstaande trainingen" dataTestId="training-events">
-            <Grid item container spacing={2}>
-              <Grid item xs={12}>
+            <Grid container spacing={2}>
+              <Grid size={12}>
                 <Typography>
                   Wanneer mogen we onszelf weer een beetje beter maken?
                 </Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Events
                   eventType="TRAINING"
                   refresh={props.refresh}
@@ -37,7 +37,7 @@ const Overview = (props: { refresh: boolean }) => {
                   withPagination={false}
                 />
               </Grid>
-              <Grid container item justifyContent="flex-end">
+              <Grid container size={12} mt={2} justifyContent="flex-end">
                 <Button
                   data-testid="more-button"
                   variant="contained"
@@ -50,13 +50,13 @@ const Overview = (props: { refresh: boolean }) => {
             </Grid>
           </PageItem>
           <PageItem title="Aanstaande wedstrijden" dataTestId="match-events">
-            <Grid item container spacing={2}>
-              <Grid item xs={12}>
+            <Grid container spacing={2}>
+              <Grid size={12}>
                 <Typography>
                   Wanneer huffen we onszelf weer dicatoriaal naar de top?
                 </Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Events
                   eventType="MATCH"
                   refresh={props.refresh}
@@ -65,7 +65,7 @@ const Overview = (props: { refresh: boolean }) => {
                   withPagination={false}
                 />
               </Grid>
-              <Grid container item justifyContent="flex-end">
+              <Grid container size={12} justifyContent="flex-end">
                 <Button
                   data-testid="more-button"
                   variant="contained"
@@ -81,11 +81,11 @@ const Overview = (props: { refresh: boolean }) => {
             title="Aanstaande andere evenementen en uitjes"
             dataTestId="misc-events"
           >
-            <Grid item container spacing={2}>
-              <Grid item xs={12}>
+            <Grid container spacing={2}>
+              <Grid size={12}>
                 <Typography>Wanneer moeten we iets anders doen?</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Events
                   eventType="MISC"
                   refresh={props.refresh}
@@ -94,7 +94,7 @@ const Overview = (props: { refresh: boolean }) => {
                   withPagination={false}
                 />
               </Grid>
-              <Grid container item justifyContent="flex-end">
+              <Grid container size={12} justifyContent="flex-end">
                 <Button
                   data-testid="more-button"
                   variant="contained"
@@ -109,36 +109,34 @@ const Overview = (props: { refresh: boolean }) => {
         </Grid>
         <Grid
           container
-          item
-          xs={12}
-          md={6}
+          size={{ xs: 12, md: 6 }}
           rowSpacing={2}
           alignContent="flex-start"
         >
           <PageItem title="De bierstand" dataTestId="balance">
-            <Grid item container spacing={3} xs={12}>
-              <Grid item xs={12}>
+            <Grid container spacing={3} size={12}>
+              <Grid size={12}>
                 <Balance refresh={props.refresh} />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <TopUp />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Typography>
                   Wie spekt de pot het meeste en verdient een pluim?
                 </Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Potters refresh={props.refresh} />
               </Grid>
             </Grid>
           </PageItem>
           <PageItem title="Transacties" dataTestId="transactions">
-            <Grid item container spacing={2}>
-              <Grid item xs={12}>
+            <Grid container spacing={2}>
+              <Grid size={12}>
                 <Transactions refresh={props.refresh} />
               </Grid>
-              <Grid container item justifyContent="flex-end">
+              <Grid container size={12} justifyContent="flex-end">
                 <Button
                   data-testid="more-button"
                   variant="contained"
@@ -152,7 +150,7 @@ const Overview = (props: { refresh: boolean }) => {
           </PageItem>
           <PageItem title="Snelkoppelingen" dataTestId="quick-links">
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <Button
                   fullWidth
                   variant="outlined"
@@ -164,7 +162,7 @@ const Overview = (props: { refresh: boolean }) => {
                   Admin dingen
                 </Button>
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <Button
                   fullWidth
                   variant="outlined"
@@ -176,7 +174,7 @@ const Overview = (props: { refresh: boolean }) => {
                   Teamleden
                 </Button>
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <Button
                   fullWidth
                   variant="outlined"

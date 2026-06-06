@@ -5,7 +5,7 @@ import {
   User,
 } from "../utils/domain";
 import React, { useEffect, useState } from "react";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import Conditional from "./Conditional";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -46,17 +46,16 @@ export const BankAccountAliases = (props: {
           ?.map((it: BankAccountAlias, index) => (
             <Grid
               key={index}
-              xs={12}
+              size={12}
               container
-              item
               alignItems="center"
               justifyContent="space-between"
               spacing={1}
             >
-              <Grid item xs={8} sm={9} md={9} lg={10}>
+              <Grid size={{ xs: 8, sm: 9, md: 9, lg: 10 }}>
                 <Typography>{it.alias}</Typography>
               </Grid>
-              <Grid item>
+              <Grid>
                 <IconButton
                   onClick={() => setConfirmDeleteAlias(it.id)}
                   aria-label="Verwijder alias"
@@ -84,7 +83,7 @@ export const BankAccountAliases = (props: {
   };
 
   const renderAddAliasButton = () => (
-    <Grid item xs={12}>
+    <Grid size={12}>
       <IconButton
         key={"add"}
         onClick={() =>
@@ -100,7 +99,7 @@ export const BankAccountAliases = (props: {
   );
 
   const renderAddAliasTextField = () => (
-    <Grid item xs={12}>
+    <Grid size={12}>
       <EditableTextField onSubmit={onSubmit} />
     </Grid>
   );
@@ -136,12 +135,12 @@ export const BankAccountAliases = (props: {
   return (
     <Grid container spacing={1} alignItems="center">
       {getAlertDialog()}
-      <Grid xs={2} key={"expand"} item>
+      <Grid size={2} key={"expand"}>
         <IconButton onClick={() => setExpanded((x) => !x)}>
           {isExpanded ? <VisibilityOffIcon /> : <VisibilityIcon />}
         </IconButton>
       </Grid>
-      <Grid xs={10} container item>
+      <Grid size={10} container>
         <Conditional condition={isExpanded}>
           {renderAliases()}
           <Conditional condition={!newAlias}>

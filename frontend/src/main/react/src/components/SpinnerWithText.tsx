@@ -1,5 +1,5 @@
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import CircularProgress from "@mui/material/CircularProgress";
 
 const minHeight = {
@@ -20,11 +20,11 @@ export const SpinnerWithText = (props: {
   };
   return (
     <>
-      <Grid container>
-        <Grid item xs={12} sx={styles}>
+      <Grid container size={12}>
+        <Grid size={12} sx={styles}>
           <CircularProgress />
         </Grid>
-        <Grid item xs={12} sx={styles}>
+        <Grid size={12} sx={styles}>
           <Typography variant="h6">{props.text}</Typography>
         </Grid>
       </Grid>

@@ -5,7 +5,7 @@ import { RequireAuth } from "./components/RequireAuth";
 import TopBar from "./components/TopBar";
 import CssBaseline from "@mui/material/CssBaseline";
 import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import {
   BrowserRouter as Router,
   Navigate,
@@ -75,7 +75,7 @@ const App = () => {
 
   const getHappyState = () => (
     <Grid container spacing={2} alignItems="flex-start">
-      <Grid item xs={12} />
+      <Grid size={12} />
       <Router>
         <Suspense fallback={<Loading />}>
           <Routes>

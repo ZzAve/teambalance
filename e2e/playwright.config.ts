@@ -21,8 +21,11 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 1 : 1,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Opt out of parallel tests on CI. Locally cap workers to 2: the full local
+   * run exercises all 3 browser engines (chromium/firefox/webkit), and webkit
+   * in particular is slow (~50s/test), so unbounded workers overwhelm the
+   * single backend and cause navigation/save timeouts. */
+  workers: process.env.CI ? 1 : 2,
   /* Auth restoration via localStorage involves recursive API retries (up to
    * 10×, ~5 s each). On CI with a slow backend + Vite startup this can
    * take 30–60 s before the app renders authenticated content. */

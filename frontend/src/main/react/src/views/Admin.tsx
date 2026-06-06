@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/material/styles";
 import PageItem from "../components/PageItem";
 import React, { useState } from "react";
@@ -23,7 +23,7 @@ import { EventType } from "../components/events/utils";
 import CheckBox from "@mui/material/Checkbox";
 import AdminSettings from "./AdminSettings";
 
-const StyleMenuList = styled(List)((theme) => ({
+const StyleMenuList = styled(List)(() => ({
   display: "flex",
   flexDirection: "column",
   width: "100%",
@@ -85,7 +85,7 @@ const Admin = (props: { refresh: boolean }) => {
         <Typography variant="h6">
           Je begeeft je nu op de 'admin' pagina's. Pas op voor de lactacyd
         </Typography>
-        <Grid item container sm={12} md={3}>
+        <Grid size={{ sm: 12, md: 3 }}>
           <StyleMenuList as="nav" aria-label="Admin menu">
             <Link to="../">
               <Button
@@ -238,8 +238,8 @@ const EventsOverview = (props: { eventType: EventType; refresh: boolean }) => {
   const title = getText(props.eventType, "event_type_name");
   return (
     <PageItem title={title} pageTitle={title} dataTestId="events-overview">
-      <Grid item container spacing={5}>
-        <Grid item xs={6}>
+      <Grid container spacing={5}>
+        <Grid size={6}>
           <Button
             variant="contained"
             color="primary"
@@ -258,14 +258,13 @@ const EventsOverview = (props: { eventType: EventType; refresh: boolean }) => {
         </Grid>
         <Grid
           component="label"
-          item
           container
           alignItems="center"
           spacing={0}
           justifyContent="flex-end"
-          xs={6}
+          size={6}
         >
-          <Grid item>
+          <Grid>
             <CheckBox
               checked={includeHistory}
               onChange={(x) => setIncludeHistory(x.target.checked)}
@@ -273,12 +272,12 @@ const EventsOverview = (props: { eventType: EventType; refresh: boolean }) => {
               size="small"
             ></CheckBox>
           </Grid>
-          <Grid item>
+          <Grid>
             <Typography variant="body1">Oude events</Typography>
           </Grid>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Events
             eventType={props.eventType}
             refresh={props.refresh}
@@ -330,7 +329,7 @@ const NewEvent = (props: { eventType: EventType; location?: object }) => {
 const HiAdmin = ({}) => {
   return (
     <PageItem pageTitle="Admin" title="Admin" dataTestId="admin">
-      <Grid container spacing={2} justifyContent="center">
+      <Grid container spacing={2} justifyContent="center" size={12}>
         <img
           alt="Walt from Breaking Bad telling you who's admin"
           src="https://media.giphy.com/media/Ufc2geerZac4U/giphy.gif"

@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import React, { useState } from "react";
 import Typography from "@mui/material/Typography";
 import Attendees from "../Attendees";
@@ -34,7 +34,7 @@ export const EventsList = (props: {
     setPage(page);
   };
   return (
-    <Grid container spacing={5} data-testid="event-list">
+    <Grid container spacing={4} data-testid="event-list">
       {props.events
         .slice((page - 1) * rowsPerPage, page * rowsPerPage)
         .map((it) => (
@@ -46,7 +46,7 @@ export const EventsList = (props: {
           />
         ))}
       {props.withPagination && (
-        <Grid item xs={12} data-testid="event-list-pagination-container">
+        <Grid size={12} data-testid="event-list-pagination-container">
           <Pagination
             count={Math.ceil(props.events.length / rowsPerPage)}
             page={page}
@@ -170,15 +170,15 @@ export const EventListItem = (props: {
   };
 
   return (
-    <Grid container item spacing={1} data-testid="event-list-item">
+    <Grid container size={12} spacing={1} data-testid="event-list-item">
       <Conditional condition={isMiscEvent(teamEvent)}>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Typography variant={"h6"}>
             {(teamEvent as MiscEvent).title}
           </Typography>
         </Grid>
       </Conditional>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <Typography variant={dateTimeVariant}>
           📅 {formattedDate(startDateTime)}
         </Typography>
@@ -202,8 +202,7 @@ export const EventListItem = (props: {
         </Conditional>
       </Grid>
       <Grid
-        item
-        xs={12}
+        size={12}
         order={useMediaQuery(useTheme().breakpoints.up("sm")) ? 5 : 2}
       >
         <Conditional condition={isMatch(teamEvent)}>
@@ -215,7 +214,7 @@ export const EventListItem = (props: {
           ></EditableTextArea>
         </Conditional>
       </Grid>
-      <Grid item xs={12} sm={6} md={8} order={3}>
+      <Grid size={{ xs: 12, sm: 6, md: 8 }} order={3}>
         <Attendees
           size="small"
           attendees={teamEvent.attendees}

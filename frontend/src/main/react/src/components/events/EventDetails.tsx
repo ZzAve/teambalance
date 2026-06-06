@@ -1,5 +1,5 @@
 import { SpinnerWithText } from "../SpinnerWithText";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import React, { useEffect, useState } from "react";
 import { trainingsApiClient } from "../../utils/TrainingsApiClient";
 import { withLoading } from "../../utils/util";
@@ -120,7 +120,7 @@ const EventDetails = (props: { eventType: EventType; id?: TeamBalanceId }) => {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <EventForm eventType={props.eventType} event={event} users={users} />
       </Grid>
     </Grid>

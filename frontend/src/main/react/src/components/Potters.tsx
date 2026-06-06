@@ -3,7 +3,7 @@ import { SpinnerWithText } from "./SpinnerWithText";
 import { bankApiClient } from "../utils/BankApiClient";
 import { withLoading } from "../utils/util";
 import Typography from "@mui/material/Typography";
-import { Grid } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import Switch from "@mui/material/Switch";
 import { Potter, roleMapper, SUPPORT_ROLES } from "../utils/domain";
 
@@ -35,18 +35,18 @@ export const Potters = (props: {
 
   const renderItem = (item: Potter, prefix: string | number, index: number) =>
     item && (
-      <Grid item xs={12} container alignItems={"center"} key={index}>
-        <Grid item xs={2}>
+      <Grid size={12} container alignItems={"center"} key={index}>
+        <Grid size={2}>
           <Typography align={"center"} variant={"h4"}>
             {prefix}
           </Typography>
         </Grid>
-        <Grid item xs={4}>
+        <Grid size={4}>
           <Typography>
             {item.currency} {Number(item.amount).toFixed(2)}
           </Typography>
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <Typography>
             {item.name}{" "}
             {SUPPORT_ROLES.includes(item.role) ? (
@@ -61,8 +61,8 @@ export const Potters = (props: {
 
   const renderItems = (items: Potter[], title: string, prefixes: string[]) =>
     items.length > 0 && (
-      <Grid container item xs={12} sm={6}>
-        <Grid item>
+      <Grid container size={{ xs: 12, sm: 6 }}>
+        <Grid>
           <Typography variant={"h6"}>{title}</Typography>
         </Grid>
         {items.map((item, i) =>
@@ -83,26 +83,26 @@ export const Potters = (props: {
     setShowSeason(checked);
 
   return (
-    <Grid item container spacing={2}>
+    <Grid container spacing={2}>
       <Grid
         component="label"
-        item
         container
+        size={12}
         alignItems="center"
         spacing={1}
         justifyContent="flex-end"
       >
-        <Grid item>
+        <Grid>
           <Typography variant="body1"> Maand (laatste 30 dagen) </Typography>
         </Grid>
-        <Grid item>
+        <Grid>
           <Switch
             checked={showSeason}
             onChange={(x) => setShowSeasonToggle(x.target.checked)}
             name="monthVsSeason"
           />
         </Grid>
-        <Grid item>
+        <Grid>
           <Typography variant="body1"> Seizoen </Typography>
         </Grid>
       </Grid>
