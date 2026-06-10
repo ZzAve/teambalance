@@ -4,7 +4,7 @@ Sports team management app for Tovo Utrecht volleyball club. Tracks event attend
 
 ## Tech Stack
 
-- **Backend**: Kotlin 2.x, Spring Boot 3.3.x, Spring Data JPA + JOOQ, Flyway, PostgreSQL, Java 21
+- **Backend**: Kotlin 2.x, Spring Boot 3.3.x, Spring Data JPA + JOOQ, Liquibase, PostgreSQL, Java 21
 - **Frontend**: React + TypeScript, Vite, MUI v5 (Material UI), React Router
 - **API contracts**: Wirespec (generates Kotlin + TypeScript types)
 - **Build**: Maven (`./mvnw`), multi-module project
@@ -72,7 +72,7 @@ Sports team management app for Tovo Utrecht volleyball club. Tracks event attend
 - Do not commit directly to `master`; use PRs
 - Do not skip tests in CI builds
 - Do not hardcode tenant/team IDs; always resolve from request context (subdomain/header)
-- Do not modify SQL schemas directly; use Flyway migrations
+- Do not modify SQL schemas directly; use Liquibase migrations (XML changelogs in `backend/src/main/resources/db/changelog/`)
 - Do not share sensitive config (API keys, Bunq tokens) in code; use environment variables
 
 ## Quick Start (Local Development)
@@ -89,7 +89,7 @@ When creating a worktree, be sure to run a `cd frontend && npm i` to bootsrap pr
 - **CI** CI pipelines on average take about 10 minutes to complete. Sleep in intervals of 293 seconds
 - **Port already in use**: Kill Docker containers with `make clean` first
 - **Frontend not hot-reloading**: Ensure `make run-local-frontend` is watching for changes
-- **Database migration failed**: Check Flyway SQL files in `backend/src/main/resources/db/migration/`
+- **Database migration failed**: Check Liquibase XML changelogs in `backend/src/main/resources/db/changelog/`
 - **Build hangs on JOOQ generation**: This is normal; it can take 1–2 minutes for large schemas
 
 <!-- code-review-graph MCP tools -->
