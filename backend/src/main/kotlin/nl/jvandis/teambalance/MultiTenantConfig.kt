@@ -5,9 +5,9 @@ import com.zaxxer.hikari.HikariDataSource
 import liquibase.integration.spring.MultiTenantSpringLiquibase
 import liquibase.integration.spring.SpringLiquibase
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties
+import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties
 import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

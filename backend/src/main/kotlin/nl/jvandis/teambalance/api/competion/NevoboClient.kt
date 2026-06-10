@@ -1,12 +1,11 @@
 package nl.jvandis.teambalance.api.competion
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import nl.jvandis.teambalance.api.CacheConfig
 import nl.jvandis.teambalance.api.setupCache
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import tools.jackson.dataformat.xml.XmlMapper
 
 data class RssFeed(
     val channel: Channel,
@@ -61,8 +60,7 @@ data class CompetitionProperties(
 @Component
 class NevoboClient(
     private val restTemplate: RestTemplate,
-    @Qualifier("xmlMapper")
-    private val xmlMapper: ObjectMapper,
+    private val xmlMapper: XmlMapper,
     competitionProperties: CompetitionProperties,
 ) {
     private val rankingCache =
