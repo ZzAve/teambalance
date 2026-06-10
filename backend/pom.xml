@@ -18,7 +18,7 @@
         <jakarta-servlet.version>5.0.0</jakarta-servlet.version>
         <jetty.version>12.1.8</jetty.version>
 
-        <postgresql.version>42.7.10</postgresql.version>
+        <postgresql.version>42.7.11</postgresql.version>
         <springdoc-openapi.version>2.8.17</springdoc-openapi.version>
         <testcontainers.postgresql.version>16.5-alpine</testcontainers.postgresql.version>
         <kotlinx-coroutines.version>1.10.2</kotlinx-coroutines.version>
