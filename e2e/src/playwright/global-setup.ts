@@ -1,48 +1,88 @@
 /**
- * Global setup: wait for the backend health endpoint before any tests run.
+ * Global setup: wait for the backend to be fully ready before any tests run.
  *
  * Defense-in-depth on top of the Docker healthcheck — ensures the backend
- * is actually serving before Playwright dispatches the first test, even if
- * the container scheduler starts the e2e container slightly early.
+ * is actually serving authenticated API routes before Playwright dispatches
+ * the first test, even if the container scheduler starts the e2e container
+ * slightly early.
  *
- * The backend actuator path is /internal/actuator/health (auth required).
+ * Two-stage readiness check:
+ *   1. Actuator health: /internal/actuator/health (Spring Boot readiness)
+ *   2. API probe: /api/users (authenticated application route) — closes the
+ *      gap where actuator reports healthy but the Spring Security filter chain
+ *      and schema initialization are still completing.
+ *
  * In the Docker Compose network the backend is reachable as http://backend:8080.
+ * The /api/* routes require the X-Secret header (SecretFilter); "backend:8080"
+ * is a recognised tenant domain so no explicit Host override is needed.
  */
 
-const BACKEND_HEALTH_URL = `http://${process.env.VITE_SERVER_BACKEND ?? "backend"}:8080/internal/actuator/health`;
+const BACKEND_HOST = `http://${process.env.VITE_SERVER_BACKEND ?? "backend"}:8080`;
+const BACKEND_HEALTH_URL = `${BACKEND_HOST}/internal/actuator/health`;
+const BACKEND_API_URL = `${BACKEND_HOST}/api/users`;
 const TIMEOUT_MS = 120_000;
 const POLL_INTERVAL_MS = 2_000;
 
-async function waitForBackend(): Promise<void> {
-  const deadline = Date.now() + TIMEOUT_MS;
-  const credentials = Buffer.from("admin:admin").toString("base64");
+// The SecretFilter requires X-Secret on all /api/* routes.
+// The secret value is the base64-encoded shared secret (same as in utils.ts).
+const API_SECRET = Buffer.from("teambalance").toString("base64");
 
-  console.log(`[global-setup] Waiting for backend at ${BACKEND_HEALTH_URL} …`);
+async function pollUntilOk(
+  url: string,
+  credentials: string,
+  deadline: number,
+  label: string,
+): Promise<void> {
+  console.log(`[global-setup] Waiting for ${label} at ${url} …`);
 
   while (Date.now() < deadline) {
     try {
-      const res = await fetch(BACKEND_HEALTH_URL, {
-        headers: { Authorization: `Basic ${credentials}` },
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Basic ${credentials}`,
+          "X-Secret": API_SECRET,
+        },
         signal: AbortSignal.timeout(3_000),
       });
       if (res.ok) {
-        console.log(`[global-setup] Backend is healthy (HTTP ${res.status})`);
+        console.log(`[global-setup] ${label} ready (HTTP ${res.status})`);
         return;
       }
       console.log(
-        `[global-setup] Backend returned HTTP ${res.status}, retrying…`,
+        `[global-setup] ${label} returned HTTP ${res.status}, retrying…`,
       );
     } catch (err) {
-      // connection refused / timeout — backend not up yet
       console.log(
-        `[global-setup] Backend not reachable yet (${(err as Error).message}), retrying…`,
+        `[global-setup] ${label} not reachable yet (${(err as Error).message}), retrying…`,
       );
     }
     await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
   }
 
   throw new Error(
-    `[global-setup] Backend did not become healthy within ${TIMEOUT_MS / 1000}s`,
+    `[global-setup] ${label} did not become ready within ${TIMEOUT_MS / 1000}s`,
+  );
+}
+
+async function waitForBackend(): Promise<void> {
+  const deadline = Date.now() + TIMEOUT_MS;
+  const credentials = Buffer.from("admin:admin").toString("base64");
+
+  // Stage 1: actuator health (fast Spring Boot readiness indicator)
+  await pollUntilOk(
+    BACKEND_HEALTH_URL,
+    credentials,
+    deadline,
+    "backend actuator",
+  );
+
+  // Stage 2: authenticated API route — confirms the Spring Security filter
+  // chain and tenant schema are fully initialised and serving API responses.
+  await pollUntilOk(
+    BACKEND_API_URL,
+    credentials,
+    deadline,
+    "backend API (/api/users)",
   );
 }
 

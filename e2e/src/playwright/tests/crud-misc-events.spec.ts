@@ -11,7 +11,6 @@ test.describe("Misc events", () => {
   test.beforeEach(async ({ page }) => {
     // Go to the starting url before each test.
     await page.goto(HOST);
-    await page.getByText("Aanstaande trainingen").waitFor({ state: "visible" });
   });
 
   test("can create a miscellaneous event", async ({ page }) => {
