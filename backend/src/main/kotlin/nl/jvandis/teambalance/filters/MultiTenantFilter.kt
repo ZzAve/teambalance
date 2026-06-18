@@ -7,7 +7,6 @@ import nl.jvandis.teambalance.MultiTenantContext
 import nl.jvandis.teambalance.Tenant
 import nl.jvandis.teambalance.log
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.bind.ConstructorBinding
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
@@ -35,7 +34,6 @@ data class TenantsConfig(
          * Specific constructor for configuration binding by spring. Highly unideal,
          * and deliberately had to put 'tenant' on top, to avoid JVM signature clashes between the constructors
          */
-        @ConstructorBinding
         constructor(
             tenant: Tenant,
             domain: String,
@@ -74,11 +72,11 @@ class MultiTenantFilter(
         if (tenant == null) {
             log.warn("Received a request from an unknown host $host")
             response.sendError(401, "Unknown domain. $host doesn't have anything to do with teambalance it seems")
-        } else {
-            MultiTenantContext.setCurrentTenant(tenant.tenant)
-            response.addHeader("X-Tenant", MultiTenantContext.getCurrentTenant().name.lowercase())
+            return
         }
 
+        MultiTenantContext.setCurrentTenant(tenant.tenant)
+        response.addHeader("X-Tenant", MultiTenantContext.getCurrentTenant().name.lowercase())
         filterChain.doFilter(request, response)
         MultiTenantContext.clear()
     }

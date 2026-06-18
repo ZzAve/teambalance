@@ -39,10 +39,6 @@ spring:
     hikari:
       maximum-pool-size: 1
     driver-class-name: org.postgresql.Driver
-  jackson:
-    serialization:
-      write_dates_as_timestamps: false
-      WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS: false
   liquibase:
     change-log: "classpath:db/changelog/db.changelog-master.xml"
     enabled: true

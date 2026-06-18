@@ -1,6 +1,5 @@
 package nl.jvandis.teambalance.api
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import nl.jvandis.teambalance.filters.DEFAULT_START_OF_SEASON_RAW
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -8,6 +7,7 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import tools.jackson.databind.ObjectMapper
 import java.time.LocalDateTime
 import java.time.ZoneId
 
