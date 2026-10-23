@@ -1,12 +1,11 @@
 package nl.jvandis.teambalance.api
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.JsonMappingException
-import com.fasterxml.jackson.databind.ObjectMapper
 import nl.jvandis.teambalance.filters.DEFAULT_START_OF_SEASON_RAW
 import nl.jvandis.teambalance.filters.toZonedDateTime
 import nl.jvandis.teambalance.log
 import org.springframework.stereotype.Service
+import tools.jackson.core.JacksonException
+import tools.jackson.databind.ObjectMapper
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeParseException
@@ -28,9 +27,7 @@ class ConfigurationService(
                 .getConfig(key)
                 ?.let { objectMapper.readValue(it, clazz.java) }
                 ?: throw NoConfigFound("There was no configuration found for config with key '$key'")
-        } catch (e: JsonProcessingException) {
-            throw MalformedConfigFound("Config for '$key' seems to be malformed. Expected type $clazz", e)
-        } catch (e: JsonMappingException) {
+        } catch (e: JacksonException) {
             throw MalformedConfigFound("Config for '$key' seems to be malformed. Expected type $clazz", e)
         }
 
